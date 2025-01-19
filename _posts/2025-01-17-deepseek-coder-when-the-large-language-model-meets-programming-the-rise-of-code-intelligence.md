@@ -2,10 +2,11 @@
 layout: post
 title: "DeepSeek-Coder: When the Large Language Model Meets Programming - The Rise of Code Intelligence"
 date: 2024-01-25 14:17:53
-author: "DeepSeek-AI"
+author: "DeepSeek AI"
 categories: "Language-Models"
 tags: ["Open-Foundation-Language-Models", "Open-Source-Foundation-Language-Models", "Efficient-Transformer-Architecture", "Grouped-Query-Attention", "Rotary-Positional-Embeddings", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Scaling-Laws-for-Large-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation"]
 use_math: true
+cover: "/assets/images/language-models.webp"
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

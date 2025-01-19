@@ -6,6 +6,7 @@ author: "Microsoft Research"
 categories: "Language-Models"
 tags: ["Graph-RAG", "Hierarchical-Summarization", "Query-Focused-Summarization", "Retrieval-Augmented-Generation"]
 use_math: true
+cover: "/assets/images/language-models.webp"
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

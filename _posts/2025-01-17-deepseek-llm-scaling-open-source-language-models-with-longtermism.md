@@ -2,10 +2,11 @@
 layout: post
 title: "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"
 date: 2024-01-05 18:59:13
-author: "DeepSeek-AI"
+author: "DeepSeek AI"
 categories: "Language-Models"
 tags: ["Scaling-Laws-for-Large-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Multi-Step-Learning-Rate-Scheduler", "Grouped-Query-Attention", "SwiGLU-Activation-Function", "Rotary-Positional-Embeddings", "Supervised-Fine-Tuning", "Direct-Preference-Optimization", "Open-Foundation-and-Fine-Tuned-Chat-Models"]
 use_math: true
+cover: "/assets/images/language-models.webp"
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

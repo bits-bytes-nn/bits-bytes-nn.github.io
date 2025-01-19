@@ -6,6 +6,7 @@ author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
 use_math: true
+cover: "/assets/images/language-models.webp"
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

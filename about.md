@@ -9,7 +9,7 @@ main_nav: true
 
 # Hello!
 
-I'm **Young-min (Jonas) Kim**, currently working as a *Senior Data Scientist* at [AWS Korea](https://aws.amazon.com/ko/careers/professionalservices/).
+I'm **Young min (Jonas) Kim**, currently working as a *Senior Data Scientist* at [Amazon Web Services Korea](https://aws.amazon.com/ko/careers/professionalservices/).
 
 ## Professional Background
 

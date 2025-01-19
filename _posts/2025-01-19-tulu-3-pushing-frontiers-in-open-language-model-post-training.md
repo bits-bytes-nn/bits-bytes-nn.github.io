@@ -6,6 +6,7 @@ author: "Allen Institute for AI"
 categories: "Language-Models"
 tags: ["Direct-Preference-Optimization", "Reinforcement-Learning-with-Verifiable-Rewards", "Prompt-Decontamination", "Supervised-Finetuning", "Evaluation-Framework"]
 use_math: true
+cover: "/assets/images/language-models.webp"
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

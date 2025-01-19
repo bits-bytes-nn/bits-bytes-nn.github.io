@@ -45,6 +45,8 @@ descriptions:
 
 disqus_shortname: bits-bytes-nn
 
+ga_tracking_id: G-MRH9Z5ETSQ
+
 social:
   - name: Facebook
     icon: facebook
@@ -55,8 +57,8 @@ social:
 
   - name: GitHub
     icon: github
-    username: aldente0630
-    url: https://github.com/aldente0630
+    username: bits-bytes-nn
+    url: https://github.com/bits-bytes-nn
     desc: Fork me on GitHub
     share: true
 
