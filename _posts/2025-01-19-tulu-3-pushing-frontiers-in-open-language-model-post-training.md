@@ -67,38 +67,38 @@ TÜLU 3 SFT 믹스는 여러 고품질 데이터셋을 효과적으로 조합한
 
 SFT 레시피와 분석 부분에서는 주요 학습 실험과 배치 집계(Batch Aggregation)에 대해 다룹니다. 학습 과정에서는 AdamW 옵티마이저를 사용하며, 학습률은 선형적으로 감소하는 스케줄러를 적용합니다. 수학적으로 이는 다음과 같이 표현됩니다.
 
-$$ \text{learning\_rate}_t = \text{initial\_lr} \cdot (1 - \frac{t}{\text{total\_steps}}) $$
+$$ \text{learning rate}_t = \text{initial lr} \cdot (1 - \frac{t}{\text{total steps}}) $$
 
 여기서 \\(t\\)는 현재 학습 단계를, \\(\text{total\_steps}\\)는 전체 학습 단계 수를 나타냅니다.
 
 배치 집계 과정에서는 효율적인 학습을 위해 그래디언트 누적(Gradient Accumulation)을 사용합니다. 이는 다음과 같은 수식으로 표현됩니다.
 
-$$ \text{effective\_batch\_size} = \text{batch\_size} \cdot \text{gradient\_accumulation\_steps} $$
+$$ \text{effective batch size} = \text{batch size} \cdot \text{gradient accumulation steps} $$
 
 이러한 접근 방식을 통해 메모리 제약 없이 큰 배치 크기로 학습할 수 있으며, 이는 모델의 안정적인 학습에 도움이 됩니다.
 SFT 레시피의 핵심 구성 요소 중 하나는 학습 과정에서의 하이퍼파라미터 최적화입니다. 연구진은 다양한 실험을 통해 최적의 하이퍼파라미터 조합을 찾아냈습니다. 특히 배치 크기와 학습률의 관계에 주목했는데, 이는 다음과 같은 스케일링 법칙을 따릅니다.
 
-$$ \text{learning\_rate} = \text{base\_lr} \cdot \sqrt{\frac{\text{batch\_size}}{\text{base\_batch\_size}}} $$
+$$ \text{learning rate} = \text{base lr} \cdot \sqrt{\frac{\text{batch size}}{\text{base batch size}}} $$
 
 여기서 \\(\text{base\_lr}\\)은 기준 학습률을, \\(\text{base\_batch\_size}\\)는 기준 배치 크기를 나타냅니다. 이러한 스케일링은 Ivison과 연구진이 제안한 방법을 기반으로 하며, 배치 크기가 증가할 때 학습의 안정성을 유지하는 데 중요한 역할을 합니다.
 
 학습 과정에서는 웜업(warmup) 단계를 도입하여 초기 학습의 안정성을 확보했습니다. 웜업 기간 동안의 학습률은 다음 수식에 따라 조정됩니다.
 
-$$ \text{lr}_t = \text{target\_lr} \cdot \min\left(1, \frac{t}{\text{warmup\_steps}}\right) $$
+$$ \text{lr}_t = \text{target lr} \cdot \min\left(1, \frac{t}{\text{warmup steps}}\right) $$
 
 여기서 \\(t\\)는 현재 스텝을, \\(\text{warmup\_steps}\\)는 웜업 기간의 총 스텝 수를 나타냅니다.
 
 배치 집계 과정에서는 메모리 효율성을 높이기 위해 그래디언트 체크포인팅(gradient checkpointing)을 활용했습니다. 이 기법은 중간 활성화(activation) 값을 저장하는 대신 필요할 때 재계산하는 방식으로, 메모리 사용량을 크게 줄일 수 있습니다. 수학적으로 이는 다음과 같은 트레이드오프를 가집니다.
 
-$$ \text{memory\_saved} = O(L) \text{ vs. } \text{compute\_increased} = O(\log L) $$
+$$ \text{memory saved} = O(L) \text{ vs. } \text{compute increased} = O(\log L) $$
 
 여기서 \\(L\\)은 모델의 레이어 수를 나타냅니다.
 
 연구진은 또한 학습 과정에서 발생할 수 있는 그래디언트 폭주(gradient explosion)를 방지하기 위해 그래디언트 클리핑(gradient clipping)을 적용했습니다. 구체적으로, 그래디언트의 L2 노름이 임계값을 초과할 경우 다음과 같이 스케일링됩니다.
 
-$$ \mathbf{g}_{\text{clipped}} = \min\left(1, \frac{\text{clip\_threshold}}{\|\mathbf{g}\|_2}\right) \cdot \mathbf{g} $$
+$$ \mathbf{g}_{\text{clipped}} = \min\left(1, \frac{\text{clip threshold}}{\|\mathbf{g}\|_2}\right) \cdot \mathbf{g} $$
 
-여기서 \\(\mathbf{g}\\)는 원래의 그래디언트를, \\(\text{clip\_threshold}\\)는 설정된 임계값을 나타냅니다.
+여기서 \\(\mathbf{g}\\)는 원래의 그래디언트를, \\(\text{clip threshold}\\)는 설정된 임계값을 나타냅니다.
 
 ### 선호도 기반 미세조정 (Preference Finetuning)
 
@@ -110,7 +110,7 @@ $$ \mathbf{g}_{\text{clipped}} = \min\left(1, \frac{\text{clip\_threshold}}{\|\m
 
 정책 최적화 과정은 수학적으로 다음과 같이 표현됩니다.
 
-$$ J(\\theta) = \\mathbb{E}_{(x,y_w,y_l) \\sim \\mathcal{D}} [\\log \\sigma(r_\\theta(x,y_w) - r_\\theta(x,y_l))] $$
+$$ J(\theta) = \mathbb{E}_{(x,y_w,y_l) \sim \mathcal{D}} [\log \sigma(r_\theta(x,y_w) - r_\theta(x,y_l))] $$
 
 여기서:
 - \\(\\theta\\)는 모델의 파라미터
@@ -300,9 +300,9 @@ $$ B_{\text{effective}} = B_{\text{local}} \cdot N_{\text{gpu}} \cdot G_{\text{a
 
 또한, RLVR은 학습 과정에서 발생하는 그래디언트 폭주 문제를 방지하기 위해 그래디언트 클리핑을 적용합니다.
 
-$$ \mathbf{g}_{\text{clipped}} = \min\left(1, \frac{\text{clip\_threshold}}{\|\mathbf{g}\|_2}\right) \cdot \mathbf{g} $$
+$$ \mathbf{g}_{\text{clipped}} = \min\left(1, \frac{\text{clip threshold}}{\|\mathbf{g}\|_2}\right) \cdot \mathbf{g} $$
 
-여기서 \\(\mathbf{g}\\)는 원래의 그래디언트를, \\(\text{clip\_threshold}\\)는 설정된 임계값을 나타냅니다.
+여기서 \\(\mathbf{g}\\)는 원래의 그래디언트를, \\(\text{clip threshold}\\)는 설정된 임계값을 나타냅니다.
 
 ### TÜLU 3의 평가 프레임워크
 
@@ -335,7 +335,7 @@ $$ \text{overlap}(x, y) = \frac{|\text{ngrams}(x) \cap \text{ngrams}(y)|}{|\text
 
 여기서 \\(\text{ngrams}(x)\\)는 텍스트 \\(x\\)의 n-gram 집합을 나타냅니다. 두 텍스트 간의 중복도가 임계값을 초과하면 해당 데이터는 제거됩니다.
 
-$$ \text{is\_contaminated}(x, y) = \mathbb{1}[\text{overlap}(x, y) > \tau] $$
+$$ \text{is contaminated}(x, y) = \mathbb{1}[\text{overlap}(x, y) > \tau] $$
 
 여기서 \\(\tau\\)는 중복 판단 임계값을 나타냅니다.
 TÜLU 3의 평가 프레임워크는 개발용 평가와 미공개 평가라는 두 가지 주요 구성 요소로 나뉩니다. 개발용 평가 세트는 모델 개발 과정에서 성능을 측정하고 개선하는 데 사용되며, 미공개 평가 세트는 최종 모델의 일반화 능력을 평가하는 데 활용됩니다.
@@ -357,11 +357,11 @@ $$ v(y, y^*) = \begin{cases}
 
 안전성 평가는 HarmBench, XSTest, WildGuard 등 다양한 벤치마크를 통합하여 수행됩니다. 각 벤치마크는 모델이 안전하지 않은 요청을 거부하는지, 그리고 XSTest와 WildJailbreak의 경우 정상적인 요청에는 적절히 응답하는지를 평가합니다. 안전성 점수는 다음과 같이 계산됩니다.
 
-$$ \text{safety\_score} = \frac{1}{|B|} \sum_{b \in B} \text{accuracy}_b $$
+$$ \text{safety score} = \frac{1}{|B|} \sum_{b \in B} \text{accuracy}_b $$
 
 여기서 \\(B\\)는 안전성 벤치마크의 집합이며, \\(\text{accuracy}_b\\)는 각 벤치마크에서의 정확도를 나타냅니다.
 
-이러한 평가 프레임워크는 http://github.com/allenai/olmes를 통해 공개되어 있으며, 연구 커뮤니티가 쉽게 재현하고 활용할 수 있도록 설계되었습니다. 예를 들어, MMLU-Pro 평가를 수행하기 위해서는 "olmes --task mmlu_pro::tulu3 --model llama3.1-8b-instruct"와 같은 간단한 명령어를 사용할 수 있습니다.
+이러한 평가 프레임워크는 [Github](http://github.com/allenai/olmes)를 통해 공개되어 있으며, 연구 커뮤니티가 쉽게 재현하고 활용할 수 있도록 설계되었습니다. 예를 들어, MMLU-Pro 평가를 수행하기 위해서는 `olmes --task mmlu_pro::tulu3 --model llama3.1-8b-instruct`와 같은 간단한 명령어를 사용할 수 있습니다.
 ### TÜLU 3의 평가 프레임워크 - 미공개 평가
 
 TÜLU 3의 미공개 평가 스위트는 모델의 실제 활용 시나리오에 더 가깝게 설계되었습니다. 연구진은 미공개 평가를 위한 태스크 설계 과정에서 개발용 평가와는 독립적인 설계 프로세스를 적용했으며, 다음과 같은 일반 원칙을 따랐습니다.
@@ -401,20 +401,20 @@ TÜLU 3의 미공개 평가 스위트에서의 실험 결과는 모델의 일반
 
 평가 결과는 다음과 같은 주요 발견을 보여줍니다. 첫째, TÜLU 3는 미공개 평가에서도 우수한 일반화 능력을 보여주었습니다. 이는 다음과 같은 수식으로 표현되는 평균 성능 지표에서 확인할 수 있습니다.
 
-$$ \text{avg\_performance} = \frac{1}{|T|} \sum_{t \in T} \text{score}_t $$
+$$ \text{avg performance} = \frac{1}{|T|} \sum_{t \in T} \text{score}_t $$
 
 여기서 \\(T\\)는 미공개 평가 태스크의 집합이며, \\(\text{score}_t\\)는 각 태스크에서의 성능 점수입니다.
 
 둘째, MATH 평가에 최적화된 학습이 DeepMind Math로의 일반화에는 제한적인 효과를 보였습니다. 이는 다음과 같은 형식 불일치 문제에 기인합니다.
 
-$$ \text{format\_mismatch}(y) = \begin{cases}
+$$ \text{format mismatch}(y) = \begin{cases}
 1 & \text{if LaTeX formatting in } y \\
 0 & \text{otherwise}
 \end{cases} $$
 
 셋째, 모든 모델들이 IFEval과 IFEval-OOD 간에 상당한 성능 차이를 보였습니다. 이는 검증 가능한 제약 조건을 따르는 것이 모델들에게 여전히 도전적인 과제임을 시사합니다. 성능 차이는 다음과 같이 정량화됩니다.
 
-$$ \text{performance\_gap} = \text{score}_{\text{IFEval}} - \text{score}_{\text{IFEval-OOD}} $$
+$$ \text{performance gap} = \text{score}_{\text{IFEval}} - \text{score}_{\text{IFEval-OOD}} $$
 
 넷째, 지식 회상 능력의 일반화는 후처리 학습 방식에 따라 다른 양상을 보였습니다. 특히 GPQA에서의 성능은 기본 모델이 동일하더라도 후처리 학습 방식에 따라 상이한 결과를 보였습니다.
 

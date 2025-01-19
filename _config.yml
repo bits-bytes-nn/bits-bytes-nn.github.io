@@ -43,6 +43,8 @@ descriptions:
   - cat: language-models
     desc: "Posts about Language Models research papers and techniques"
 
+disqus_shortname: bits-bytes-nn
+
 social:
   - name: Facebook
     icon: facebook
