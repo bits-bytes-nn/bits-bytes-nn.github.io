@@ -3,7 +3,7 @@ layout: post
 title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
 date: 2025-01-22 15:19:35
 author: "DeepSeek AI"
-categories: "Reinforcement-Learning"
+categories: "Language-Models"
 tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Reasoning-Oriented-Reinforcement-Learning", "Distillation-of-Reasoning-Capability", "Reinforcement-Learning-with-Cold-Start", "Rejection-Sampling-and-Supervised-Fine-Tuning"]
 use_math: true
 cover: "/assets/images/language-models.webp"
