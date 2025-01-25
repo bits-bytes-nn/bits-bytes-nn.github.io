@@ -3,11 +3,10 @@
 ---
 @charset "utf-8";
 
-// Import partials from `sass_dir` (defaults to `_sass`)
-// Includes Bourbon, Neat, and Bitters (thanks, thoughtbot!)
+// Import Sass partials
 @import
-  "bourbon/bourbon",
-  "base/base",
-  "neat/neat",
-  "layout"
+  "bourbon/bourbon", // Bourbon mixins
+  "base/base",      // Base styles and variables  
+  "neat/neat",      // Neat grid system
+  "layout"          // Layout styles
 ;
