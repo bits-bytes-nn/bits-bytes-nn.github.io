@@ -5,27 +5,34 @@ button {
   background-color: $action-color;
   border-radius: $base-border-radius;
   border: none;
-  color: #fff;
+  color: $white;
   cursor: pointer;
   display: inline-block;
   font-family: $base-font-family;
   font-size: $base-font-size;
   font-weight: 600;
   line-height: 1;
-  padding: 0.75em 1em;
+  padding: $small-spacing $base-spacing;
   text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
   user-select: none;
   vertical-align: middle;
   white-space: nowrap;
 
   &:hover,
   &:focus {
-    background-color: darken($action-color, 15%);
-    color: #fff;
+    background-color: $deep-blue;
+    color: $white;
+  }
+
+  &:focus {
+    outline: 2px solid rgba($action-color, 0.4);
+    outline-offset: 2px;
   }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+    pointer-events: none;
   }
 }
