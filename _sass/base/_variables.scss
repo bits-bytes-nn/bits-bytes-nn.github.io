@@ -1,47 +1,46 @@
 // Google Fonts
-@import url(//fonts.googleapis.com/css?family=Roboto+Slab:400,700,300|Roboto:400,700,300|Open+Sans:300italic,400italic,600italic,700italic,800italic,400,800,700,600,300);
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&family=Source+Sans+Pro:wght@300;400;600;700&family=Source+Serif+Pro:wght@400;700&display=swap');
 
 // Typography
-$base-font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif; // $helvetica;
-$heading-font-family: "Roboto Slab", "Helvetica Neue", "Helvetica", "Arial", sans-serif; // $base-font-family;
+$base-font-family: "Source Sans Pro", "Noto Sans KR", "Helvetica Neue", sans-serif;
+$heading-font-family: "Source Serif Pro", "Noto Serif KR", serif;
 
 // Font Sizes
-$base-font-size: $em-base; // 16px
+$base-font-size: $em-base;
 
-// Adjust modular scale ratio
+// Scale
 $modular-scale-ratio: $minor-third;
 
 // Line height
-$base-line-height: 1.8;
-$heading-line-height: 1.8;
+$base-line-height: 1.85;
+$heading-line-height: 1.6;
 
-// Other Sizes
-$base-border-radius: 3px;
+// Spacing
+$base-border-radius: 4px;
 $base-spacing: $base-line-height * $em-base;
 $small-spacing: $base-spacing / 2;
 $base-z-index: 0;
 
 // Colors
-$dark-gray: #333;
-$medium-gray: #999;
-$light-gray: #ddd;
-$white: #fff;
-// Flat UI Colors. For more, see http://flatuicolors.com/
-$turquoise: #1abc9c;	// Turqoise
-$green: #27ae60;	  	// Nephritis
-$blue: #2980b9;				// Belize Hole
-$purple: #8e44ad;			// Wisteria
-$orange: #d35400;			// Pumpkin
-$red:	#c0392b;				// Pomegranate
-$gray: #7f8c8d;				// Asbestos
-// Even more colors
-$bc-red: #bc0000;
+$white: #ffffff;
+$light-gray: #ecf0f1;     // Clouds
+$medium-gray: #7f8c8d;    // Asbestos
+$dark-gray: #2c3e50;      // Midnight Blue
 
-// Font Colors
-$base-background-color: #fff;
+// Brand Colors
+$blue: #2980b9;           // Primary
+$deep-blue: #1a5581;      // Dark variant
+$soft-blue: #3498db;      // Light variant
+$accent-purple: #6c5ce7;  // Accent
+$accent-teal: #00b894;    // Success
+$warning-orange: #e17055; // Warning
+$error-red: #d63031;      // Error
+
+// Theme Colors
+$base-background-color: $white;
 $base-font-color: $dark-gray;
 $action-color: $blue;
-$highlight-color: tint($action-color, 33%);
+$highlight-color: mix($action-color, $white, 85%);
 
 // Border
 $base-border-color: $light-gray;
