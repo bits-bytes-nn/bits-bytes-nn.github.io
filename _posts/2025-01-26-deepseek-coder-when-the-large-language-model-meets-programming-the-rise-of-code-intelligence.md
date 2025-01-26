@@ -123,7 +123,7 @@ DeepSeek-Coder-Base 1.3B 모델을 사용하여 FIM 기법의 효과성을 평�
 
 이러한 실험 결과를 바탕으로 DeepSeek-Coder는 FIM과 코드 완성 능력 사이의 균형을 위해 50% PSM 비율을 최종 학습 정책으로 채택했습니다. 구현 과정에서는 세 개의 특수 토큰을 도입했으며, 각 코드 파일의 내용을 $$ f_{pre} $$, $$ f_{middle} $$, $$ f_{suf} $$ 세 부분으로 나눕니다. PSM 모드를 사용하여 다음과 같은 형식으로 학습 예제를 구성합니다.
 
-$$ \texttt{<｜fim\_start｜>}f_{pre}\texttt{<｜fim\_hole｜>}f_{suf}\texttt{<｜fim\_end｜>}f_{middle}\texttt{<|eos\_token|>} $$
+$$ \texttt{<｜fim_start｜>}f_{pre}\texttt{<｜fim_hole｜>}f_{suf}\texttt{<｜fim_end｜>}f_{middle}\texttt{<|eos_token|>} $$
 
 Bavarian과 연구진이 제안한 원래 작업에 따라, FIM 방식은 패킹 프로세스 이전에 문서 수준에서 구현되며, 0.5의 FIM 비율로 PSM 모드를 따릅니다.
 

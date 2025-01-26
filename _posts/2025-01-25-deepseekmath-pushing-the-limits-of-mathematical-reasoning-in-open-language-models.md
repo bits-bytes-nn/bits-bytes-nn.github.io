@@ -51,7 +51,7 @@ DeepSeekMath 프로젝트는 DeepSeek-AI를 중심으로 칭화대학교와 북�
 
 ### 오픈소스 접근 방식
 
-DeepSeekMath는 GitHub를 통해 모델과 관련 코드를 공개함으로써, 연구 커뮤니티의 접근성과 투명성을 높이고자 했습니다. 이는 Llama 2의 오픈소스 철학을 계승하면서도, 수학적 추론이라는 특수한 영역에서 더 나은 성과를 이끌어내고자 하는 시도입니다. 연구팀은 [https://github.com/deepseek-ai/DeepSeek-Math](https://github.com/deepseek-ai/DeepSeek-Math)를 통해 연구 결과를 공유하고 있으며, 이는 수학적 추론 분야의 발전을 가속화하는데 기여할 것으로 기대됩니다.
+DeepSeekMath는 GitHub를 통해 모델과 관련 코드를 공개함으로써, 연구 커뮤니티의 접근성과 투명성을 높이고자 했습니다. 이는 Llama 2의 오픈소스 철학을 계승하면서도, 수학적 추론이라는 특수한 영역에서 더 나은 성과를 이끌어내고자 하는 시도입니다. 연구팀은 [GitHub](https://github.com/deepseek-ai/DeepSeek-Math)를 통해 연구 결과를 공유하고 있으며, 이는 수학적 추론 분야의 발전을 가속화하는데 기여할 것으로 기대됩니다.
 
 ### 연구의 혁신성
 
@@ -131,9 +131,7 @@ DeepSeekMath-Base 7B 모델은 DeepSeek-Coder-Base-v1.5 7B를 초기 모델로 �
 
 사전학습 이후에는 체인오브소트, 프로그램오브소트, 도구 통합 추론 데이터를 활용한 수학적 명령어 튜닝을 적용했습니다. 이를 통해 DeepSeekMath-Instruct 7B는 동일한 규모의 모든 경쟁 모델들을 능가하고, 700억 개의 파라미터를 가진 오픈소스 명령어 튜닝 모델들과 비슷한 성능을 달성했습니다.
 
-![MATH 벤치마크 성능 비교](https://ar5iv.org//html/2402.03300/assets/figures/Math.png)
-
-위 그래프는 다양한 모델들의 MATH 벤치마크 성능을 보여줍니다. DeepSeekMath-7B가 보여주는 우수한 성능은 효과적인 사전학습과 명령어 튜닝의 결과를 명확하게 보여줍니다. 특히 외부 도구나 복잡한 투표 기법 없이도 이러한 성과를 달성했다는 점이 주목할 만합니다.
+DeepSeekMath-7B가 보여주는 우수한 성능은 효과적인 사전학습과 명령어 튜닝의 결과를 명확하게 보여줍니다. 특히 외부 도구나 복잡한 투표 기법 없이도 이러한 성과를 달성했다는 점이 주목할 만합니다.
 ### 수학 사전학습의 기술적 혁신
 
 #### Group Relative Policy Optimization
@@ -145,27 +143,27 @@ DeepSeekMath는 Group Relative Policy Optimization(GRPO)이라는 새로운 강�
 연구팀은 RFT, DPO, PPO, GRPO와 같은 다양한 방법들을 이해하기 위한 통합된 패러다임을 제시했습니다. 이들은 모든 방법이 직접적이거나 단순화된 강화학습 기법으로 개념화될 수 있음을 발견했습니다. 이 통합 패러다임은 다음과 같은 수학적 표현으로 정리됩니다.
 
 $$
-\mathcal{L}(\theta) = \mathbb{E}_{(x,y)\sim \mathcal{D}} \left[ \log p_\theta(y|x) \cdot r(x,y) \right]
+\mathcal{L}(\theta) = \mathbb{E}_{(x,y)\sim \mathcal{D}} \left[ \log p_\theta(y \vert x) \cdot r(x,y) \right]
 $$
 
-여기서 $p_\theta(y|x)$는 모델의 조건부 확률 분포를, $r(x,y)$는 보상 함수를 나타냅니다. 이 통합된 목적 함수는 다양한 학습 방법들의 본질적인 공통점을 포착합니다.
+여기서 $p_\theta(y \vert x)$는 모델의 조건부 확률 분포를, $r(x,y)$는 보상 함수를 나타냅니다. 이 통합된 목적 함수는 다양한 학습 방법들의 본질적인 공통점을 포착합니다.
 
 #### 수학적 추론 능력 향상 메커니즘
 
 DeepSeekMath의 수학적 추론 능력 향상은 세 가지 핵심 메커니즘에 기반합니다.
 
-1. 고품질 데이터 선별: fastText 분류기를 통해 수학적 콘텐츠를 효과적으로 식별하고 필터링하는 과정은 다음과 같은 손실 함수를 최소화합니다.
+1\. 고품질 데이터 선별: fastText 분류기를 통해 수학적 콘텐츠를 효과적으로 식별하고 필터링하는 과정은 다음과 같은 손실 함수를 최소화합니다.
 
 $$
 \mathcal{L}_{\text{classifier}} = -\sum_{i=1}^N [y_i \log(\hat{y}_i) + (1-y_i)\log(1-\hat{y}_i)]
 $$
 
-2. 계층적 학습 구조: 코드 학습에서 시작하여 수학적 추론으로 발전하는 계층적 학습 구조를 통해 모델의 일반화 능력을 향상시켰습니다.
+2\. 계층적 학습 구조: 코드 학습에서 시작하여 수학적 추론으로 발전하는 계층적 학습 구조를 통해 모델의 일반화 능력을 향상시켰습니다.
 
-3. 효율적인 강화학습: GRPO를 통한 효율적인 정책 최적화는 다음과 같은 목적 함수를 사용합니다.
+3\. 효율적인 강화학습: GRPO를 통한 효율적인 정책 최적화는 다음과 같은 목적 함수를 사용합니다.
 
 $$
-\mathcal{L}_{\text{GRPO}}(\theta) = \mathbb{E}_{(x,y)\sim \mathcal{D}} \left[ \min\left(\frac{p_\theta(y|x)}{p_{\theta_{\text{old}}}(y|x)}A(x,y), \text{clip}(\epsilon)A(x,y)\right) \right]
+\mathcal{L}_{\text{GRPO}}(\theta) = \mathbb{E}_{(x,y)\sim \mathcal{D}} \left[ \min\left(\frac{p_\theta(y \vert x)}{p_{\theta_{\text{old}}}(y \vert x)}A(x,y), \text{clip}(\epsilon)A(x,y)\right) \right]
 $$
 
 여기서 $A(x,y)$는 그룹 기반 이점 추정치를 나타냅니다.
@@ -246,11 +244,6 @@ DeepSeekMath-Base의 수학적 능력은 영어와 중국어로 된 8개의 벤�
 
 GSM8K와 MATH 데이터셋에서 프로그램오브소트 프롬프팅을 사용하여 프로그램 기반 수학적 추론 능력을 평가했습니다. 모델은 각 문제를 math와 sympy 같은 라이브러리를 활용할 수 있는 Python 프로그램을 작성하여 해결하도록 프롬프팅되었으며, 프로그램의 실행 결과가 답안으로 평가되었습니다. 이 평가에서도 DeepSeekMath-Base 7B는 이전 최고 성능을 보였던 Llemma 34B를 능가했습니다.
 
-![성능 비교 결과](https://ar5iv.org//html/2402.03300/assets/figures/corpus_comparisons.png)
-
-위 그래프는 다양한 수학 관련 벤치마크에서 각 모델들의 성능을 보여줍니다. DeepSeekMath-Base 7B가 GSM8K, MATH, CMATH, BBH 등 모든 벤치마크에서 가장 우수한 성능을 달성했음을 확인할 수 있습니다.
-### DeepSeekMath-Base 7B의 학습과 평가
-
 #### 형식 수학 분야에서의 성능
 
 형식 증명 자동화는 수학적 증명의 정확성과 신뢰성을 보장하고 효율성을 높이는 데 중요한 역할을 합니다. DeepSeekMath-Base 7B는 Jiang과 연구진이 제안한 비형식-형식 증명 과제에서 평가되었습니다. 이는 비형식적 진술문, 그에 대응하는 형식적 진술문, 그리고 비형식적 증명을 바탕으로 형식적 증명을 생성하는 과제입니다.
@@ -278,7 +271,7 @@ DeepSeekMath의 지도 학습 기반 미세조정 과정은 수학적 추론 능
 DeepSeekMath-Instruct 7B는 DeepSeekMath-Base를 기반으로 수학적 명령어 튜닝을 수행했습니다. 학습 과정에서는 최대 4,000 토큰의 컨텍스트 길이를 활용하여 학습 예제들을 무작위로 연결했으며, 256의 배치 크기와 5e-5의 고정 학습률을 적용하여 500 스텝 동안 학습을 진행했습니다. 이러한 학습 설정은 다음과 같은 손실 함수를 최소화하는 방향으로 설계되었습니다.
 
 $$
-\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^T \log p_\theta(y_t^i|x^i, y_{<t}^i)
+\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^T \log p_\theta(y_t^i \vert x^i, y_{<t}^i)
 $$
 
 여기서 $N$은 배치 크기, $T$는 시퀀스 길이, $p_\theta$는 모델의 조건부 확률 분포를 나타냅니다.
@@ -334,7 +327,7 @@ $$
 도구 통합 추론 시스템의 구현은 세 가지 핵심 컴포넌트로 구성됩니다. 첫째, 문제 분석기는 입력된 수학 문제를 파싱하여 필요한 도구와 접근 방식을 결정합니다. 둘째, 도구 선택기는 다음과 같은 확률 모델을 통해 최적의 도구를 선택합니다.
 
 $$
-P(t|x) = \frac{\exp(f_\theta(x, t))}{\sum_{t' \in \mathcal{T}} \exp(f_\theta(x, t'))}
+P(t \vert x) = \frac{\exp(f_\theta(x, t))}{\sum_{t' \in \mathcal{T}} \exp(f_\theta(x, t'))}
 $$
 
 여기서 $\mathcal{T}$는 사용 가능한 도구들의 집합, $f_\theta$는 도구 적합성 점수 함수입니다.
@@ -357,13 +350,13 @@ DeepSeekMath 연구진은 지도학습 미세조정(SFT) 단계 이후 수학적
 
 GRPO는 Proximal Policy Optimization(PPO)의 한계를 극복하기 위해 개발되었습니다. PPO는 다음과 같은 목적 함수를 최대화하는 방식으로 동작합니다.
 
-$$ \mathcal{J}_{PPO}(\theta)=\mathbb{E}_{[q\sim P(Q),o\sim\pi_{\theta_{old}}(O|q)]}\frac{1}{|o|}\sum_{t=1}^{|o|}\min\left[\frac{\pi_{\theta}(o_{t}|q,o_{<t})}{\pi_{\theta_{old}}(o_{t}|q,o_{<t})}A_{t},\text{clip}\left(\frac{\pi_{\theta}(o_{t}|q,o_{<t})}{\pi_{\theta_{old}}(o_{t}|q,o_{<t})},1-\varepsilon,1+\varepsilon\right)A_{t}\right] $$
+$$ \mathcal{J}_{PPO}(\theta)=\mathbb{E}_{[q\sim P(Q),o\sim\pi_{\theta_{old}}(O \vert q)]}\frac{1}{ \left\vert o \right\vert }\sum_{t=1}^{ \left\vert o \right\vert }\min\left[\frac{\pi_{\theta}(o_{t} \vert q,o_{<t})}{\pi_{\theta_{old}}(o_{t} \vert q,o_{<t})}A_{t},\text{clip}\left(\frac{\pi_{\theta}(o_{t} \vert q,o_{<t})}{\pi_{\theta_{old}}(o_{t} \vert q,o_{<t})},1-\varepsilon,1+\varepsilon\right)A_{t}\right] $$
 
 여기서 $\pi_{\theta}$와 $\pi_{\theta_{old}}$는 각각 현재와 이전 정책 모델을 나타내며, $q$와 $o$는 질문 데이터셋과 이전 정책에서 샘플링된 출력입니다. $\varepsilon$은 PPO에서 학습 안정성을 위해 도입된 클리핑 관련 하이퍼파라미터입니다. $A_t$는 Generalized Advantage Estimation(GAE)을 통해 계산되는 이점값으로, 보상 $\{r_{\geq t}\}$와 학습된 가치 함수 $V_{\psi}$를 기반으로 합니다.
 
 PPO에서는 정책 모델과 함께 가치 함수를 학습해야 하며, 보상 모델의 과도한 최적화를 방지하기 위해 각 토큰에서 참조 모델로부터의 KL 페널티를 보상에 추가합니다.
 
-$$ r_{t}=r_{\varphi}(q,o_{\leq t})-\beta\log\frac{\pi_{\theta}(o_{t}|q,o_{<t})}{\pi_{ref}(o_{t}|q,o_{<t})} $$
+$$ r_{t}=r_{\varphi}(q,o_{\leq t})-\beta\log\frac{\pi_{\theta}(o_{t} \vert q,o_{<t})}{\pi_{ref}(o_{t} \vert q,o_{<t})} $$
 
 여기서 $r_{\varphi}$는 보상 모델, $\pi_{ref}$는 일반적으로 초기 SFT 모델인 참조 모델, $\beta$는 KL 페널티의 계수입니다.
 
@@ -374,13 +367,13 @@ $$ r_{t}=r_{\varphi}(q,o_{\leq t})-\beta\log\frac{\pi_{\theta}(o_{t}|q,o_{<t})}{
 
 GRPO는 이러한 PPO의 한계를 극복하기 위해 각 질문 $q$에 대해 이전 정책 $\pi_{\theta_{old}}$로부터 그룹 출력 $\{o_1,o_2,\cdots,o_G\}$을 샘플링하고, 다음과 같은 목적 함수를 최대화하는 방식으로 정책 모델을 최적화합니다.
 
-$$ \mathcal{J}_{GRPO}(\theta)=\mathbb{E}_{[q\sim P(Q),\{o_i\}_{i=1}^G\sim\pi_{\theta_{old}}(O|q)]}\frac{1}{G}\sum_{i=1}^G\frac{1}{|o_i|}\sum_{t=1}^{|o_i|}\left\{\min\left[\frac{\pi_{\theta}(o_{i,t}|q,o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t}|q,o_{i,<t})}\hat{A}_{i,t},\text{clip}\left(\frac{\pi_{\theta}(o_{i,t}|q,o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t}|q,o_{i,<t})},1-\varepsilon,1+\varepsilon\right)\hat{A}_{i,t}\right]-\beta\mathbb{D}_{KL}\left[\pi_{\theta}||\pi_{ref}\right]\right\} $$
+$$ \mathcal{J}_{GRPO}(\theta)=\mathbb{E}_{[q\sim P(Q),\{o_i\}_{i=1}^G\sim\pi_{\theta_{old}}(O \vert q)]}\frac{1}{G}\sum_{i=1}^G\frac{1}{ \left\vert o_i \right\vert }\sum_{t=1}^{ \left\vert o_i \right\vert }\left\{\min\left[\frac{\pi_{\theta}(o_{i,t} \vert q,o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t} \vert q,o_{i,<t})}\hat{A}_{i,t},\text{clip}\left(\frac{\pi_{\theta}(o_{i,t} \vert q,o_{i,<t})}{\pi_{\theta_{old}}(o_{i,t} \vert q,o_{i,<t})},1-\varepsilon,1+\varepsilon\right)\hat{A}_{i,t}\right]-\beta\mathbb{D}_{KL}\left[\pi_{\theta} \parallel \pi_{ref}\right]\right\} $$
 
-여기서 $\hat{A}_{i,t}$는 각 그룹 내 출력들의 상대적 보상을 기반으로 계산된 이점값입니다. GRPO는 보상 모델이 일반적으로 동일한 질문에 대한 출력들 간의 비교를 통해 학습된다는 점을 고려하여, 그룹 상대적 방식으로 이점값을 계산합니다. 또한 보상에 KL 페널티를 추가하는 대신, 학습된 정책과 참조 정책 간의 KL 발산을 직접 손실에 추가함으로써 $\hat{A}_{i,t}$ 계산을 단순화했습니다.
+여기서 $\hat{A}\_{i,t}$는 각 그룹 내 출력들의 상대적 보상을 기반으로 계산된 이점값입니다. GRPO는 보상 모델이 일반적으로 동일한 질문에 대한 출력들 간의 비교를 통해 학습된다는 점을 고려하여, 그룹 상대적 방식으로 이점값을 계산합니다. 또한 보상에 KL 페널티를 추가하는 대신, 학습된 정책과 참조 정책 간의 KL 발산을 직접 손실에 추가함으로써 $\hat{A}\_{i,t}$ 계산을 단순화했습니다.
 
 KL 발산은 다음과 같은 편향되지 않은 추정기를 통해 계산됩니다.
 
-$$ \mathbb{D}_{KL}\left[\pi_{\theta}||\pi_{ref}\right]=\frac{\pi_{ref}(o_{i,t}|q,o_{i,<t})}{\pi_{\theta}(o_{i,t}|q,o_{i,<t})}-\log\frac{\pi_{ref}(o_{i,t}|q,o_{i,<t})}{\pi_{\theta}(o_{i,t}|q,o_{i,<t})}-1 $$
+$$ \mathbb{D}_{KL}\left[\pi_{\theta} \parallel \pi_{ref}\right]=\frac{\pi_{ref}(o_{i,t} \vert q,o_{i,<t})}{\pi_{\theta}(o_{i,t} \vert q,o_{i,<t})}-\log\frac{\pi_{ref}(o_{i,t} \vert q,o_{i,<t})}{\pi_{\theta}(o_{i,t} \vert q,o_{i,<t})}-1 $$
 
 이 추정기는 항상 양수임이 보장됩니다.
 
@@ -388,7 +381,7 @@ $$ \mathbb{D}_{KL}\left[\pi_{\theta}||\pi_{ref}\right]=\frac{\pi_{ref}(o_{i,t}|q
 
 GRPO를 활용한 결과 기반 강화학습에서는 각 질문 $q$에 대해 이전 정책 모델 $\pi_{\theta_{old}}$로부터 $G$개의 출력 $\{o_1,o_2,\cdots,o_G\}$을 샘플링합니다. 보상 모델은 이 출력들을 평가하여 $G$개의 보상 $\mathbf{r}=\{r_1,r_2,\cdots,r_G\}$을 생성합니다. 이후 이 보상들은 그룹 평균을 빼고 그룹 표준편차로 나누어 정규화됩니다. 결과 감독은 각 출력 $o_i$의 끝에서 정규화된 보상을 제공하고, 출력의 모든 토큰의 이점값 $\hat{A}_{i,t}$를 정규화된 보상과 동일하게 설정합니다.
 
-$$ \hat{A}_{i,t}=\widetilde{r}_{i}=\frac{r_{i}-{\rm mean}(\mathbf{r})}{{\rm std}(\mathbf{r})} $$
+$$ \hat{A}_{i,t}=\widetilde{r}_{i}=\frac{r_{i}-\text{mean}(\mathbf{r})}{\text{std}(\mathbf{r})} $$
 
 그리고 식 (3)에 정의된 목적 함수를 최대화하여 정책을 최적화합니다.
 ### 과정 기반 강화학습
@@ -399,7 +392,7 @@ $$ \mathbf{R}=\{\{r_{1}^{index(1)},\cdots,r_{1}^{index(K_{1})}\},\cdots,\{r_{G}^
 
 여기서 $index(j)$는 $j$번째 단계의 마지막 토큰 인덱스를, $K_i$는 $i$번째 출력의 총 단계 수를 나타냅니다. 이러한 보상들도 그룹 평균과 표준편차를 사용하여 정규화됩니다.
 
-$$ \widetilde{r}_{i}^{index(j)}=\frac{r_{i}^{index(j)}-{\rm mean(\mathbf{R})}}{{\rm std(\mathbf{R})}} $$
+$$ \widetilde{r}_{i}^{index(j)}=\frac{r_{i}^{index(j)}-\text{mean}(\mathbf{R})}{\text{std}(\mathbf{R})} $$
 
 과정 감독은 각 토큰의 이점값을 해당 토큰 이후의 모든 단계에서 받은 정규화된 보상의 합으로 계산합니다.
 
@@ -411,11 +404,11 @@ $$ \hat{A}_{i,t}=\sum_{index(j)\geq t}\widetilde{r}_{i}^{index(j)} $$
 
 이러한 반복적 GRPO의 학습 과정은 다음과 같은 특징을 가집니다.
 
-1. 보상 모델의 지속적 개선: 정책 모델의 발전에 맞춰 보상 모델도 함께 발전하여 더 정교한 피드백을 제공할 수 있습니다.
+1\. 보상 모델의 지속적 개선: 정책 모델의 발전에 맞춰 보상 모델도 함께 발전하여 더 정교한 피드백을 제공할 수 있습니다.
 
-2. 안정적인 학습: 이전 데이터의 일부를 재사용함으로써 급격한 정책 변화를 방지하고 학습의 안정성을 확보합니다.
+2\. 안정적인 학습: 이전 데이터의 일부를 재사용함으로써 급격한 정책 변화를 방지하고 학습의 안정성을 확보합니다.
 
-3. 효율적인 메모리 사용: 가치 함수 없이도 효과적인 학습이 가능하며, 그룹 단위의 상대적 평가를 통해 계산 효율성을 높입니다.
+3\. 효율적인 메모리 사용: 가치 함수 없이도 효과적인 학습이 가능하며, 그룹 단위의 상대적 평가를 통해 계산 효율성을 높입니다.
 ### GRPO의 이론적 분석과 구현 최적화
 
 GRPO의 핵심적인 혁신은 가치 함수 없이도 효과적인 분산 감소를 달성하는 데 있습니다. 이는 그룹 샘플링을 통한 상대적 이점 추정이라는 독특한 접근 방식을 통해 구현됩니다. 그룹 크기 G는 분산 감소와 계산 효율성 사이의 균형을 결정하는 중요한 하이퍼파라미터입니다. 실험적 분석 결과, G=64일 때 최적의 성능과 효율성 균형을 달성할 수 있었습니다.
@@ -495,7 +488,7 @@ DeepSeekMath-RL 7B는 DeepSeekMath-Instruct 7B와 동일한 벤치마크에서 �
 
 DeepSeekMath 연구진은 SFT, RFT, DPO, PPO, GRPO 등 다양한 학습 방법을 분석하기 위한 통합 패러다임을 제시했습니다. 이 패러다임에서 파라미터 $\theta$에 대한 학습 방법의 그래디언트는 다음과 같이 표현됩니다.
 
-$$ \nabla_{\theta}\mathcal{J}_{\mathcal{A}}(\theta)=\mathbb{E}_{[(q,o)\sim\mathcal{D}]}\left(\frac{1}{|o|}\sum_{t=1}^{|o|}GC_{\mathcal{A}}(q,o,t,\pi_{rf})\nabla_{\theta}\log\pi_{\theta}(o_{t}|q,o_{<t})\right) $$
+$$ \nabla_{\theta}\mathcal{J}_{\mathcal{A}}(\theta)=\mathbb{E}_{[(q,o)\sim\mathcal{D}]}\left(\frac{1}{ \left\vert o \right\vert }\sum_{t=1}^{ \left\vert o \right\vert }GC_{\mathcal{A}}(q,o,t,\pi_{rf})\nabla_{\theta}\log\pi_{\theta}(o_{t} \vert q,o_{<t})\right) $$
 
 여기서 세 가지 핵심 요소를 확인할 수 있습니다.
 1. 데이터 소스 $\mathcal{D}$: 학습 데이터를 결정합니다.
