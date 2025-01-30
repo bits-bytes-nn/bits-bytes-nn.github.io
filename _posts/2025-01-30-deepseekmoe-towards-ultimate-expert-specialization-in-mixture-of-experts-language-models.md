@@ -161,11 +161,11 @@ P_{i} = \frac{1}{T}\sum_{t=1}^{T}{s_{i,t}}
 여기서 \\(f_i^{\prime}\\)와 \\(P_i^{\prime}\\)는 각각 다음과 같이 정의됩니다.
 
 \\[
-f_{i}^{\prime} = \frac{1}{|\mathcal{E}_i|}\sum_{j\in\mathcal{E}_i}{f_{j}}
+f_{i}^{\prime} = \frac{1}{|\mathcal{E}\_i|}\sum_{j\in\mathcal{E}\_i}{f_{j}}
 \\]
 
 \\[
-P_{i}^{\prime} = \sum_{j\in\mathcal{E}_i}{P_{j}}
+P_{i}^{\prime} = \sum_{j\in\mathcal{E}\_i}{P_{j}}
 \\]
 
 \\(\alpha_2\\)는 디바이스 수준 균형 인자라고 하는 하이퍼파라미터입니다. 실제 구현에서는 라우팅 붕괴의 위험을 완화하기 위해 작은 전문가 수준 균형 인자를 설정하고, 동시에 디바이스 간의 균형 잡힌 계산을 촉진하기 위해 더 큰 디바이스 수준 균형 인자를 설정합니다.
