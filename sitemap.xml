@@ -1,17 +1,47 @@
 ---
 layout: null
+sitemap:
+  exclude: true
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                           http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  {% for post in site.posts %}
+{% for post in site.posts %}{% unless post.sitemap.exclude %}
   <url>
-    <loc>{{ site.url }}{{ post.url }}</loc>
-    <lastmod>{{ post.lastmod | default: post.date | date_to_xmlschema }}</lastmod>
+    <loc>{% if site.url %}{{ site.url }}{% else %}{{ site.github.url }}{% endif %}{{ post.url | remove: 'index.html' }}</loc>
+    {% if post.lastmod %}
+    <lastmod>{{ post.lastmod | date_to_xmlschema }}</lastmod>
+    {% elsif post.date %}
+    <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
+    {% else %}
+    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    {% endif %}
     <changefreq>{{ post.sitemap.changefreq | default: 'weekly' }}</changefreq>
     <priority>{{ post.sitemap.priority | default: 0.5 }}</priority>
   </url>
-  {% endfor %}
+{% endunless %}{% endfor %}
+{% for page in site.pages %}{% unless page.sitemap.exclude %}
+  <url>
+    <loc>{% if site.url %}{{ site.url }}{% else %}{{ site.github.url }}{% endif %}{{ page.url | remove: 'index.html' }}</loc>
+    {% if page.lastmod %}
+    <lastmod>{{ page.lastmod | date_to_xmlschema }}</lastmod>
+    {% elsif page.date %}
+    <lastmod>{{ page.date | date_to_xmlschema }}</lastmod>
+    {% else %}
+    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    {% endif %}
+    {% if page.sitemap.changefreq %}
+    <changefreq>{{ page.sitemap.changefreq }}</changefreq>
+    {% else %}
+    <changefreq>monthly</changefreq>
+    {% endif %}
+    {% if page.sitemap.priority %}
+    <priority>{{ page.sitemap.priority }}</priority>
+    {% else %}
+    <priority>0.3</priority>
+    {% endif %}
+  </url>
+{% endunless %}{% endfor %}
 </urlset>
