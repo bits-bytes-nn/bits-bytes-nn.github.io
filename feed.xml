@@ -11,7 +11,7 @@ layout: null
     <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     <generator>Jekyll v{{ jekyll.version }}</generator>
-    <language>{{ site.language | default: 'en' }}</language>
+    <language>{{ site.language | default: 'ko' }}</language>
     {% if site.author %}
     <managingEditor>{{ site.author.email }} ({{ site.author.name }})</managingEditor>
     <webMaster>{{ site.author.email }} ({{ site.author.name }})</webMaster>
