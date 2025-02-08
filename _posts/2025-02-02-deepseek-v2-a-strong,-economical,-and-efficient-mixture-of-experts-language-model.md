@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Economical-Training", "Efficient-Inference", "Long-Context-Adaptation"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

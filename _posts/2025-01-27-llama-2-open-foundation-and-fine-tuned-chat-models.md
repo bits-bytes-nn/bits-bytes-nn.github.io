@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Grouped-Query-Attention", "Reinforcement-Learning-with-Human-Feedback", "System-Message-for-Multi-Turn-Consistency", "Temporal-Organization-of-Knowledge", "Tool-Use-Emergence"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
@@ -333,9 +336,9 @@ BOLD 프롬프트를 사용한 평가에서는 많은 집단에 대해 전반적
 
 연구진은 LLM의 알려진 한계를 바탕으로 위험 카테고리와 공격 벡터라는 두 가지 차원에서 주석 팀을 위한 지침을 설계했습니다. 위험 카테고리는 다음과 같이 세 가지로 구분됩니다.
 
-- 불법 및 범죄 활동: 테러리즘, 절도, 인신매매 등  
-- 혐오 및 유해 활동: 명예훼손, 자해, 섭식장애, 차별 등  
-- 비전문가 조언: 의료, 재무, 법률 조언 등  
+- 불법 및 범죄 활동: 테러리즘, 절도, 인신매매 등
+- 혐오 및 유해 활동: 명예훼손, 자해, 섭식장애, 차별 등
+- 비전문가 조언: 의료, 재무, 법률 조언 등
 
 공격 벡터는 심리적 조작(권위 조작), 논리적 조작(거짓 전제), 구문적 조작(오타), 의미적 조작(은유), 관점 조작(역할극), 비영어 언어 등으로 구성됩니다.
 
@@ -444,14 +447,14 @@ OpenAI의 플러그인 출시는 학계에서 "모델에게 도구 사용을 어
 
 도구 사용에 대한 명시적인 주석 없이도, 위 그림에서 볼 수 있듯이 모델은 제로샷 상황에서 일련의 도구들을 활용하는 능력을 보여주었습니다. 또한 연구진은 계산기 접근 권한이 있는 Llama 2-Chat을 평가했으며, 그 결과는 아래 표에서 확인할 수 있습니다.
 
-| 모델 | ASD | ivSVAMP | MAWP |
-|------|-----|---------|------|
-| OPT-66B | 6.0 | 4.9 | 7.9 |
-| GPT-J | 7.5 | 5.2 | 9.9 |
-| GPT-J + CC | 9.6 | 5.0 | 9.3 |
-| GPT-3 | 14.0 | 10.0 | 19.8 |
-| Toolformer | 40.4 | 29.4 | 44.0 |
-| Llama 2-Chat | 67.1 | 69.2 | 82.4 |
+| 모델         | ASD  | ivSVAMP | MAWP |
+| ------------ | ---- | ------- | ---- |
+| OPT-66B      | 6.0  | 4.9     | 7.9  |
+| GPT-J        | 7.5  | 5.2     | 9.9  |
+| GPT-J + CC   | 9.6  | 5.0     | 9.3  |
+| GPT-3        | 14.0 | 10.0    | 19.8 |
+| Toolformer   | 40.4 | 29.4    | 44.0 |
+| Llama 2-Chat | 67.1 | 69.2    | 82.4 |
 
 LLM의 도구 사용은 흥미로운 가능성을 제시하지만 동시에 안전성 우려도 야기합니다. 연구진은 이 분야에 대한 커뮤니티의 추가 연구와 레드팀 테스팅을 권장합니다.
 ### Llama 2-Chat의 한계점과 윤리적 고려사항

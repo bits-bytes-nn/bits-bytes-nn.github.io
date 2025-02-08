@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["Efficient-Transformer-Architecture", "Grouped-Query-Attention", "Optimal-Model/Data-Scaling-Up-Allocation", "Scaling-Laws-for-Large-Language-Models", "Supervised-Finetuning", "Direct-Preference-Optimization", "Retrieval-Augmented-Generation", "Prompt-Decontamination", "Safety-Alignment", "Open-Foundation-Language-Models"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
@@ -432,7 +435,7 @@ Llama 3의 안전성 평가는 매우 포괄적이고 체계적으로 이루어�
 위반율의 대응 지표로서 연구진은 경계선상의 프롬프트로 구성된 거짓 거부(false refusal) 벤치마크도 구축했습니다. 거짓 거부는 안전한 응답이 가능한 상황에서도 모델이 도움이 되는 방식으로 응답하기를 거부하는 경우를 의미합니다. 경계선상의 프롬프트는 잘 조정된 모델이 처리할 수 있어야 하는 결정 경계 근처의 프롬프트입니다.
 
 전체 벤치마크는 각 기능이나 언어당 4,000개 이상의 프롬프트를 포함하며, 단일 턴과 멀티턴 프롬프트가 혼합되어 있습니다. 이러한 포괄적인 벤치마크 구성을 통해 Llama 3의 안전성을 다각도로 평가하고 개선할 수 있었습니다.
-안전성 사전 학습 과정에서 Llama 3는 발견 가능한 메모리제이션(discoverable memorization)에 특별한 주의를 기울였습니다. Carlini와 연구진의 방법론을 따라, 연구진은 학습 데이터에서 다양한 빈도로 발생하는 프롬프트와 정답을 샘플링했습니다. 이를 위해 코퍼스의 모든 n-gram에 대한 효율적인 롤링 해시 인덱스를 사용했습니다. 
+안전성 사전 학습 과정에서 Llama 3는 발견 가능한 메모리제이션(discoverable memorization)에 특별한 주의를 기울였습니다. Carlini와 연구진의 방법론을 따라, 연구진은 학습 데이터에서 다양한 빈도로 발생하는 프롬프트와 정답을 샘플링했습니다. 이를 위해 코퍼스의 모든 n-gram에 대한 효율적인 롤링 해시 인덱스를 사용했습니다.
 
 테스트 시나리오는 프롬프트와 정답의 길이, 대상 데이터의 감지된 언어, 도메인을 변경하면서 구성되었습니다. 그런 다음 모델이 정답 시퀀스를 그대로 생성하는 빈도를 측정하고, 지정된 시나리오에서의 상대적 메모리제이션 비율을 분석했습니다. 연구진은 정확한 일치를 포함하는 모델 생성의 비율로 정의되는 '포함율'을 사용했으며, 주어진 특성의 데이터 분포를 고려한 가중 평균을 보고했습니다.
 

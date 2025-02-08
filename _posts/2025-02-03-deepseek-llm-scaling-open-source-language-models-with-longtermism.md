@@ -7,6 +7,7 @@ categories: "Language-Models"
 tags: ["Scaling-Laws", "Optimal-Model/Data-Scaling-Up-Allocation", "Multi-Step-Learning-Rate-Scheduler", "Grouped-Query-Attention", "DeepSeekMath-Corpus", "Reinforcement-Learning-with-Human-Feedback", "Direct-Preference-Optimization", "Safety-Alignment"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Instruction-Tuning", "Grouped-Query-Attention", "Rotary-Positional-Embeddings"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
@@ -256,7 +259,7 @@ DeepSeek-Coder의 실제 활용 능력을 검증하기 위해 두 가지 대표�
 
 ![LeetCode 문제 해결 예시](https://ar5iv.org//html/2401.14196/assets/x5.png)
 
-두 번째 사례는 토너먼트에서 우승 팀을 찾는 LeetCode 문제 해결 과정을 보여줍니다. 이 문제는 2023년 11월에 공개된 것으로, 모델의 학습 데이터에 포함되지 않은 새로운 문제입니다. 해결 방법은 토너먼트를 방향 그래프로 표현하고, 진입 차수와 진출 차수를 기반으로 우승 팀을 결정하는 위상 정렬 알고리즘을 활용합니다. 
+두 번째 사례는 토너먼트에서 우승 팀을 찾는 LeetCode 문제 해결 과정을 보여줍니다. 이 문제는 2023년 11월에 공개된 것으로, 모델의 학습 데이터에 포함되지 않은 새로운 문제입니다. 해결 방법은 토너먼트를 방향 그래프로 표현하고, 진입 차수와 진출 차수를 기반으로 우승 팀을 결정하는 위상 정렬 알고리즘을 활용합니다.
 
 특히 주목할 만한 점은 DeepSeek-Coder가 학습 데이터 분포를 벗어난 문제도 효과적으로 해결할 수 있다는 것입니다. 모델은 문제를 정확히 이해하고, 버그 없는 완성도 높은 코드를 생성했으며, 각 단계에 대한 상세한 설명도 함께 제공했습니다. 이는 모델이 단순히 학습 데이터를 기억하는 것을 넘어서, 실제 프로그래밍 문제 해결에 필요한 추론 능력을 갖추고 있음을 보여줍니다.
 
@@ -266,7 +269,7 @@ DeepSeek-Coder-Base 모델의 학습 과정에서 성능 변화를 면밀히 추
 
 ![학습 과정 벤치마크](https://ar5iv.org//html/2401.14196/assets/x6.png)
 
-위 그래프는 DeepSeek-Coder-Base 모델의 학습 과정에서 다양한 평가 지표의 변화를 보여줍니다. 주요 평가 지표에는 HumanEval-Pass@1, HumanEval-cpp-Pass@1, HumanEval-java-Pass@1, MBPP-Pass@1, HumanEvalFIM-EM, MeanHumanEval, Validation-Completion-EM, Validation-Completion-FIM-EM이 포함됩니다. 
+위 그래프는 DeepSeek-Coder-Base 모델의 학습 과정에서 다양한 평가 지표의 변화를 보여줍니다. 주요 평가 지표에는 HumanEval-Pass@1, HumanEval-cpp-Pass@1, HumanEval-java-Pass@1, MBPP-Pass@1, HumanEvalFIM-EM, MeanHumanEval, Validation-Completion-EM, Validation-Completion-FIM-EM이 포함됩니다.
 
 각 평가 지표는 모델의 서로 다른 능력을 측정합니다. HumanEval 관련 지표들은 Python, C++, Java 등 다양한 프로그래밍 언어에서의 코드 생성 능력을 평가하며, FIM(Fill-in-the-Middle) 관련 지표들은 주어진 코드의 중간 부분을 채우는 능력을 측정합니다. 특히 Validation-Completion 지표들은 실제 개발 환경에서 자주 발생하는 코드 완성 태스크에서의 성능을 평가합니다.
 

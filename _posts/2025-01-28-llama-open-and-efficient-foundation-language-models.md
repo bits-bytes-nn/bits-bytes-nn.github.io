@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
@@ -161,7 +164,7 @@ MMLU(Massive Multitask Language Understanding) 벤치마크에서 모델의 성�
 
 #### RealToxicityPrompts 평가
 
-언어 모델이 생성할 수 있는 유해 콘텐츠의 범위는 매우 광범위하며, 이는 포괄적인 평가를 어렵게 만듭니다. RealToxicityPrompts 벤치마크는 약 100k개의 프롬프트로 구성되어 있으며, 모델이 이에 대한 응답을 생성하면 PerspectiveAPI를 통해 유해성 점수가 자동으로 평가됩니다. 
+언어 모델이 생성할 수 있는 유해 콘텐츠의 범위는 매우 광범위하며, 이는 포괄적인 평가를 어렵게 만듭니다. RealToxicityPrompts 벤치마크는 약 100k개의 프롬프트로 구성되어 있으며, 모델이 이에 대한 응답을 생성하면 PerspectiveAPI를 통해 유해성 점수가 자동으로 평가됩니다.
 
 연구진은 각 프롬프트에 대해 그리디 디코딩을 사용하여 응답을 생성했으며, 유해성 점수는 0(무해)에서 1(유해) 사이의 값으로 측정되었습니다. 실험 결과, 모델의 크기가 증가할수록 유해성도 증가하는 경향을 보였으며, 특히 "respectful" 프롬프트에서 이러한 현상이 두드러졌습니다. 이는 이전 연구에서도 관찰된 현상이지만, Hoffmann과 연구진의 연구에서는 Chinchilla와 Gopher 사이에서 이러한 차이가 발견되지 않았습니다. 이는 모델 크기와 유해성의 관계가 동일한 모델 계열 내에서만 적용될 수 있음을 시사합니다.
 

@@ -7,6 +7,9 @@ categories: "Language-Models"
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Large-Scale-Reinforcement-Learning-on-Base-Model", "Reasoning-Oriented-Reinforcement-Learning"]
 use_math: true
 cover: /assets/images/language-models.webp
+sitemap:
+    changefreq: "weekly"
+    priority: 1.0
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
@@ -137,7 +140,7 @@ DeepSeekMath-Base 7B는 강력한 수학적 추론 능력을 갖춘 기반 모�
 
 ### 수학적 문제 해결 능력 평가
 
-DeepSeekMath-Base 7B의 수학적 능력은 세 가지 주요 측면에서 평가되었습니다. 첫째, 외부 도구 없이 단계별 수학적 추론을 통한 문제 해결 능력, 둘째, 도구를 활용한 수학 문제 해결 능력, 셋째, 형식적 정리 증명 능력입니다. 
+DeepSeekMath-Base 7B의 수학적 능력은 세 가지 주요 측면에서 평가되었습니다. 첫째, 외부 도구 없이 단계별 수학적 추론을 통한 문제 해결 능력, 둘째, 도구를 활용한 수학 문제 해결 능력, 셋째, 형식적 정리 증명 능력입니다.
 
 ![수학 벤치마크 성능 비교](/assets/2025-01-30-deepseekmath-pushing-the-limits-of-mathematical-reasoning-in-open-language-models/2.png)
 
@@ -188,7 +191,7 @@ DeepSeekMath-Base를 기반으로 수학적 지시어 튜닝을 진행했습니�
 
 ### 강화학습을 통한 수학적 추론 능력 향상
 
-DeepSeekMath는 Proximal Policy Optimization(PPO)의 변형인 Group Relative Policy Optimization(GRPO)를 도입하여 강화학습을 통해 수학적 추론 능력을 향상시켰습니다. GRPO는 기존 PPO의 크리틱 모델을 제거하고 대신 그룹 점수에서 기준선을 추정함으로써 학습 리소스를 크게 절감했습니다. 
+DeepSeekMath는 Proximal Policy Optimization(PPO)의 변형인 Group Relative Policy Optimization(GRPO)를 도입하여 강화학습을 통해 수학적 추론 능력을 향상시켰습니다. GRPO는 기존 PPO의 크리틱 모델을 제거하고 대신 그룹 점수에서 기준선을 추정함으로써 학습 리소스를 크게 절감했습니다.
 
 PPO는 안정적인 정책 최적화를 위해 다음과 같은 목적 함수를 사용합니다.
 
@@ -200,7 +203,7 @@ GRPO는 이러한 PPO의 기본 구조를 유지하면서도, 크리틱 모델�
 
 ### 통합 패러다임을 통한 강화학습 기법의 이해
 
-연구진은 Rejection Sampling Fine-Tuning(RFT), Direct Preference Optimization(DPO), PPO, GRPO와 같은 다양한 방법들을 이해하기 위한 통합 패러다임을 제시했습니다. 이러한 방법들은 모두 직접적이거나 단순화된 강화학습 기법으로 개념화될 수 있습니다. 
+연구진은 Rejection Sampling Fine-Tuning(RFT), Direct Preference Optimization(DPO), PPO, GRPO와 같은 다양한 방법들을 이해하기 위한 통합 패러다임을 제시했습니다. 이러한 방법들은 모두 직접적이거나 단순화된 강화학습 기법으로 개념화될 수 있습니다.
 
 특히 GRPO는 PPO의 복잡성을 줄이면서도 효과적인 학습을 가능하게 합니다. 크리틱 모델을 제거하고 그룹 점수를 활용함으로써, 계산 비용을 크게 절감하면서도 모델의 수학적 추론 능력을 효과적으로 향상시킬 수 있었습니다. 이는 강화학습이 수학적 추론 과제에서 모델의 성능을 개선하는 데 매우 효과적인 도구가 될 수 있음을 보여줍니다.
 ### 강화학습 기법의 수학적 기초와 구현
@@ -355,7 +358,7 @@ arXiv 논문은 일반적으로 수학 사전 학습 데이터의 중요한 구�
 
 #### 데이터 소스의 중요성
 
-데이터 소스는 모든 학습 방법의 기초가 되는 원자재입니다. 강화학습의 맥락에서 데이터 소스는 정책 모델에서 샘플링한 출력이 있는 레이블이 없는 질문들을 의미합니다. 본 연구에서는 지시어 튜닝 단계의 질문들과 단순한 핵심 샘플링만을 사용했는데, 이것이 우리의 강화학습 파이프라인이 Maj@K 성능만 향상시킨 잠재적 원인일 수 있습니다. 
+데이터 소스는 모든 학습 방법의 기초가 되는 원자재입니다. 강화학습의 맥락에서 데이터 소스는 정책 모델에서 샘플링한 출력이 있는 레이블이 없는 질문들을 의미합니다. 본 연구에서는 지시어 튜닝 단계의 질문들과 단순한 핵심 샘플링만을 사용했는데, 이것이 우리의 강화학습 파이프라인이 Maj@K 성능만 향상시킨 잠재적 원인일 수 있습니다.
 
 향후에는 분포 외 질문 프롬프트에 대한 강화학습 파이프라인을 탐구하고, Yao와 연구진이 제안한 트리 검색 방법을 기반으로 한 고급 샘플링 전략을 적용할 계획입니다. 또한 Kwon과 연구진, Leviathan과 연구진, Xia와 연구진이 연구한 효율적인 추론 기술도 정책 모델의 탐색 효율성을 결정하는 매우 중요한 역할을 합니다.
 
