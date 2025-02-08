@@ -30,7 +30,7 @@ DeepSeek-R1은 대규모 언어 모델의 추론 능력을 향상시키기 위�
 
 이러한 문제를 해결하고 추론 성능을 더욱 향상시키기 위해, 연구진은 DeepSeek-R1을 개발했습니다. 이 모델은 강화학습 이전에 콜드 스타트(cold start) 데이터를 활용한 다단계 학습 방식을 도입했습니다. 실험 결과에 따르면, DeepSeek-R1은 OpenAI-o1-1217와 비견될 만한 성능을 달성했으며, 특히 AIME 2024, GPQA Diamond, MATH-500과 같은 특정 추론 과제에서는 더 우수한 성능을 보여주었습니다.
 
-![성능 비교 결과](/assets/2025-01-24-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/0.png)
+![성능 비교 결과](/assets/2025-01-26-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/0.png)
 
 위 그래프는 DeepSeek-R1과 다른 주요 모델들의 성능을 비교한 결과를 보여줍니다. DeepSeek-R1은 AIME 2024에서 97.3%, GPQA Diamond에서 96.4%, MATH-500에서 90.2%의 높은 정확도를 달성했습니다. 특히 주목할 만한 점은 DeepSeek-R1-32B 모델이 더 큰 규모의 모델들과 비교해도 경쟁력 있는 성능을 보여준다는 것입니다.
 
@@ -136,7 +136,7 @@ DeepSeek-R1-Zero의 훈련에서는 규칙 기반 보상 시스템을 채택했�
 
 연구진은 신경망 보상 모델을 사용하지 않았는데, 이는 대규모 강화학습 과정에서 보상 해킹(reward hacking)이 발생할 수 있고, 보상 모델의 재훈련이 추가적인 훈련 리소스를 필요로 하며 전체 훈련 파이프라인을 복잡하게 만들 수 있기 때문입니다.
 
-![AIME accuracy during training](/assets/2025-01-24-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/1.png)
+![AIME accuracy during training](/assets/2025-01-26-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/1.png)
 
 위 그래프는 DeepSeek-R1-Zero의 AIME 2024 벤치마크에서의 성능 향상을 보여줍니다. 강화학습이 진행됨에 따라 모델의 성능이 꾸준히 향상되어, pass@1 점수가 초기 15.6%에서 71.0%로 크게 증가했으며, 이는 OpenAI-o1-0912와 비견될 만한 수준입니다.
 #### 훈련 템플릿과 자기 진화 과정
@@ -145,7 +145,7 @@ DeepSeek-R1-Zero의 훈련을 위해 연구진은 기본 모델이 지정된 지
 
 DeepSeek-R1-Zero의 자기 진화 과정은 강화학습이 어떻게 모델의 추론 능력을 자율적으로 향상시킬 수 있는지를 보여주는 흥미로운 사례입니다. 기본 모델에서 직접 강화학습을 시작함으로써, 지도 학습 단계의 영향 없이 모델의 발전 과정을 면밀히 관찰할 수 있었습니다.
 
-![Average response length during training](/assets/2025-01-24-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/2.png)
+![Average response length during training](/assets/2025-01-26-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning/2.png)
 
 위 그래프에서 볼 수 있듯이, DeepSeek-R1-Zero의 사고 시간은 훈련 과정 전반에 걸쳐 지속적으로 향상되었습니다. 이는 외부의 조정 없이 모델 내부에서 자연스럽게 발생한 발전입니다. 모델은 수백에서 수천 개의 추론 토큰을 생성하며 더 깊이 있는 사고 과정을 탐색하고 정제하는 능력을 자연스럽게 획득했습니다.
 
