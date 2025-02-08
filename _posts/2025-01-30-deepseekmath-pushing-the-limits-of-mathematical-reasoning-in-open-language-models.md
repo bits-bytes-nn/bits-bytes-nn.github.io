@@ -5,11 +5,11 @@ date: 2024-02-05 18:55:32
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Large-Scale-Reinforcement-Learning-on-Base-Model", "Reasoning-Oriented-Reinforcement-Learning"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
     changefreq: "weekly"
-    priority: 1.0
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

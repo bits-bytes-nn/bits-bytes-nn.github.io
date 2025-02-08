@@ -5,11 +5,11 @@ date: 2024-01-11 17:31:42
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Ultimate-Expert-Specialization", "Mixture-of-Experts-Architecture", "Parameter-Efficient-Language-Model-Scaling", "Efficient-Transformer-Architecture", "Economical-Training", "Efficient-Inference"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
     changefreq: "weekly"
-    priority: 1.0
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

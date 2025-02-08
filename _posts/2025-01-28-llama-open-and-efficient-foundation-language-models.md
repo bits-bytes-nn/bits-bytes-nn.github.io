@@ -5,11 +5,11 @@ date: 2023-02-27 17:11:15
 author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
     changefreq: "weekly"
-    priority: 1.0
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

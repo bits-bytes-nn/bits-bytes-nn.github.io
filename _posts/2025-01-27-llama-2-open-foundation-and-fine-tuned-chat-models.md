@@ -5,11 +5,11 @@ date: 2023-07-18 14:31:57
 author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Grouped-Query-Attention", "Reinforcement-Learning-with-Human-Feedback", "System-Message-for-Multi-Turn-Consistency", "Temporal-Organization-of-Knowledge", "Tool-Use-Emergence"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
     changefreq: "weekly"
-    priority: 1.0
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

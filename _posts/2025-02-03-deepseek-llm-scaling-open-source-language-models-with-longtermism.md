@@ -5,9 +5,11 @@ date: 2024-01-05 18:59:13
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Scaling-Laws", "Optimal-Model/Data-Scaling-Up-Allocation", "Multi-Step-Learning-Rate-Scheduler", "Grouped-Query-Attention", "DeepSeekMath-Corpus", "Reinforcement-Learning-with-Human-Feedback", "Direct-Preference-Optimization", "Safety-Alignment"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
+    changefreq: "weekly"
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?

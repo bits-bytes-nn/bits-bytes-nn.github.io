@@ -5,11 +5,11 @@ date: 2024-11-22 18:44:04
 author: "Allen Institute for AI"
 categories: "Language-Models"
 tags: ["Direct-Preference-Optimization", "Reinforcement-Learning-with-Verifiable-Rewards", "Prompt-Decontamination", "Supervised-Finetuning", "Evaluation-Framework"]
-use_math: true
 cover: /assets/images/language-models.webp
 sitemap:
     changefreq: "weekly"
-    priority: 1.0
+    priority: 0.5
+use_math: true
 ---
 ### TL;DR
 #### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
