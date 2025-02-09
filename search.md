@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getSnippet(text, searchTerm, snippetLength) {
-        snippetLength = snippetLength || 100;
+        snippetLength = snippetLength || 200;
         const lowerText = text.toLowerCase();
         const lowerSearchTerm = searchTerm.toLowerCase();
         const index = lowerText.indexOf(lowerSearchTerm);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const snippetElement = result.querySelector('.search-snippet');
                         if (snippetElement) {
                             const fullText = snippetElement.getAttribute('data-fullcontent') || snippetElement.textContent;
-                            let snippet = getSnippet(fullText, searchTerm, 100);
+                            let snippet = getSnippet(fullText, searchTerm, 200);
                             snippetElement.innerHTML = snippet;
                             highlightText(snippetElement, searchTerm);
                         }
