@@ -5,6 +5,7 @@ permalink: /posts/
 main_nav: true
 ---
 
+<div style="min-height: 60vh">
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}
   <h2 id="{{cat}}">{{ cat | capitalize }}</h2>
@@ -25,4 +26,5 @@ main_nav: true
   </ul>
   {% if forloop.last == false %}<hr>{% endif %}
 {% endfor %}
+</div>
 <br>

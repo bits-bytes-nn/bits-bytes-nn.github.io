@@ -5,43 +5,43 @@ plugins:
   - jekyll-sitemap
 
 exclude:
-  - "/vendor/"
+  - /vendor/
 
-title: "Bits, Bytes & Neural Networks"
-subtitle: "A Data Scientist's Digital Playground"
+title: Bits, Bytes & Neural Networks
+subtitle: A Data Scientist's Digital Playground
 email: aldente0630@gmail.com
 name: Jonas Kim
-description: >
+description: |
   A tech blog focusing on AI/ML paper reviews and latest research trends
-baseurl: ""
-url: "https://bits-bytes-nn.github.io"
-cover: "/assets/my_header_image.jpg"
-logo: "/assets/my_logo.png"
+baseurl: ''
+url: https://bits-bytes-nn.github.io
+cover: /assets/my_header_image.jpg
+logo: /assets/my_logo.png
 
 markdown: kramdown
 kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
 inter_post_navigation: false
-highlightjs_theme: "monokai-sublime"
+highlightjs_theme: monokai-sublime
 
 paginate: 5
-paginate_path: "/page/:num/"
+paginate_path: /page/:num/
 
 jekyll-archives:
   enabled:
     - categories
     - tags
-  layout: 'archive'
+  layout: archive
   permalinks:
-    category: '/category/:name/'
-    tag: '/tag/:name/'
+    category: /category/:name/
+    tag: /tag/:name/
 
 descriptions:
   - cat: computer-vision
-    desc: "Posts about Computer Vision research papers and techniques"
+    desc: Posts about Computer Vision research papers and techniques
   - cat: language-models
-    desc: "Posts about Language Models research papers and techniques"
+    desc: Posts about Language Models research papers and techniques
 
 disqus_shortname: bits-bytes-nn
 
@@ -51,7 +51,7 @@ social:
   - name: Facebook
     icon: facebook
     username: aldente0630
-    url: "https://www.facebook.com/aldente0630"
+    url: https://www.facebook.com/aldente0630
     desc: Friend me on Facebook
     share: true
 
@@ -70,18 +70,18 @@ social:
     share: true
 
 protocols:
-  fb_image: "/assets/my_logo.png"
+  fb_image: /assets/my_logo.png
   fb_image_width: 612
   fb_image_height: 605
-  fb_image_type: "image/png"
+  fb_image_type: image/png
 
-  twitter_image: "/assets/my_logo.png"
+  twitter_image: /assets/my_logo.png
 
-  os_repo: "https://github.com/bits-bytes-nn/bits-bytes-nn.github.io"
-  os_rcs_type: "git"
-  os_src: "git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git"
-
-algolia:
-  application_id: 'YOUR_APP_ID'
-  index_name: 'YOUR_INDEX_NAME'
-  search_only_api_key: 'YOUR_SEARCH_ONLY_API_KEY'
+  os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
+  os_rcs_type: git
+  os_src: git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git
+simple_jekyll_search:
+  exclude:
+    - about.md
+    - search.md
+    - index.html
