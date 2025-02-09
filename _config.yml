@@ -1,5 +1,4 @@
 plugins:
-  - jekyll-archives
   - jekyll-feed
   - jekyll-paginate
   - jekyll-sitemap
@@ -28,20 +27,11 @@ highlightjs_theme: monokai-sublime
 paginate: 5
 paginate_path: /page/:num/
 
-jekyll-archives:
-  enabled:
-    - categories
-    - tags
-  layout: archive
-  permalinks:
-    category: /category/:name/
-    tag: /tag/:name/
-
-descriptions:
-  - cat: computer-vision
-    desc: Posts about Computer Vision research papers and techniques
-  - cat: language-models
-    desc: Posts about Language Models research papers and techniques
+simple_jekyll_search:
+  exclude:
+    - about.md
+    - search.md
+    - index.html
 
 disqus_shortname: bits-bytes-nn
 
@@ -80,8 +70,3 @@ protocols:
   os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
   os_rcs_type: git
   os_src: git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git
-simple_jekyll_search:
-  exclude:
-    - about.md
-    - search.md
-    - index.html
