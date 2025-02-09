@@ -8,7 +8,7 @@ main_nav: true
 {% assign sorted_cats = site.categories | sort %}
 {% for category in sorted_cats %}
 {% capture cat %}{{ category | first }}{% endcapture %}
-<div class="category-section" style="min-height: 62.5vh">
+<div class="category-section" style="min-height: 65vh">
   <h2 id="{{cat}}" class="category-title">{{ cat | replace: '-', ' ' }}</h2>
 
   {% for desc in site.descriptions %}

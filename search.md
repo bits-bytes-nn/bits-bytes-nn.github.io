@@ -6,7 +6,7 @@ main_nav: true
 ---
 
 <div class="search-page">
-    <div class="search-container" style="min-height: 62.5vh">
+    <div class="search-container" style="min-height: 65vh">
         <div class="search-box">
             <input type="text" id="search-input" placeholder="Enter search term..." aria-label="Search blog posts">
         </div>
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatDate(dateString) {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'long',
+        return new Date(dateString).toLocaleDateString('en-GB', {
             day: 'numeric',
+            month: 'long',
             year: 'numeric'
         });
     }
