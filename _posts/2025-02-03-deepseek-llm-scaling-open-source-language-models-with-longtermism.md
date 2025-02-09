@@ -6,9 +6,6 @@ author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Scaling-Laws", "Optimal-Model/Data-Scaling-Up-Allocation", "Multi-Step-Learning-Rate-Scheduler", "Grouped-Query-Attention", "DeepSeekMath-Corpus", "Reinforcement-Learning-with-Human-Feedback", "Direct-Preference-Optimization", "Safety-Alignment"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

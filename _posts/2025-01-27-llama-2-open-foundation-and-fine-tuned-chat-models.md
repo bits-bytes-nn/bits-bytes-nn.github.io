@@ -6,9 +6,6 @@ author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Grouped-Query-Attention", "Reinforcement-Learning-with-Human-Feedback", "System-Message-for-Multi-Turn-Consistency", "Temporal-Organization-of-Knowledge", "Tool-Use-Emergence"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

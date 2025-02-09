@@ -6,9 +6,6 @@ author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

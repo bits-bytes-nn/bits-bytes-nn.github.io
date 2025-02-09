@@ -6,9 +6,6 @@ author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Ultimate-Expert-Specialization", "Mixture-of-Experts-Architecture", "Parameter-Efficient-Language-Model-Scaling", "Efficient-Transformer-Architecture", "Economical-Training", "Efficient-Inference"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

@@ -80,3 +80,8 @@ protocols:
   os_repo: "https://github.com/bits-bytes-nn/bits-bytes-nn.github.io"
   os_rcs_type: "git"
   os_src: "git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git"
+
+algolia:
+  application_id: 'YOUR_APP_ID'
+  index_name: 'YOUR_INDEX_NAME'
+  search_only_api_key: 'YOUR_SEARCH_ONLY_API_KEY'

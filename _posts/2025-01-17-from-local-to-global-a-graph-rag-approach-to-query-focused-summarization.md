@@ -6,9 +6,6 @@ author: "Microsoft Research"
 categories: "Language-Models"
 tags: ["Graph-RAG", "Hierarchical-Summarization", "Query-Focused-Summarization", "Retrieval-Augmented-Generation"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

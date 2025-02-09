@@ -6,9 +6,6 @@ author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Economical-Training", "Efficient-Inference", "Long-Context-Adaptation"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

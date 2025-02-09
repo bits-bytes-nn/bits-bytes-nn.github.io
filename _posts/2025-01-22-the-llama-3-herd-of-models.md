@@ -6,9 +6,6 @@ author: "Meta AI"
 categories: "Language-Models"
 tags: ["Efficient-Transformer-Architecture", "Grouped-Query-Attention", "Optimal-Model/Data-Scaling-Up-Allocation", "Scaling-Laws-for-Large-Language-Models", "Supervised-Finetuning", "Direct-Preference-Optimization", "Retrieval-Augmented-Generation", "Prompt-Decontamination", "Safety-Alignment", "Open-Foundation-Language-Models"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

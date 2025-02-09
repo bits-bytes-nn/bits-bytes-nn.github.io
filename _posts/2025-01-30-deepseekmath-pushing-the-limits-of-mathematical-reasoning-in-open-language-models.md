@@ -6,9 +6,6 @@ author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Large-Scale-Reinforcement-Learning-on-Base-Model", "Reasoning-Oriented-Reinforcement-Learning"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

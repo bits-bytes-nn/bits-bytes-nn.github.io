@@ -6,9 +6,6 @@ author: "Allen Institute for AI"
 categories: "Language-Models"
 tags: ["Direct-Preference-Optimization", "Reinforcement-Learning-with-Verifiable-Rewards", "Prompt-Decontamination", "Supervised-Finetuning", "Evaluation-Framework"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR

@@ -6,9 +6,6 @@ author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Instruction-Tuning", "Grouped-Query-Attention", "Rotary-Positional-Embeddings"]
 cover: /assets/images/language-models.webp
-sitemap:
-    changefreq: "weekly"
-    priority: 0.5
 use_math: true
 ---
 ### TL;DR
