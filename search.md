@@ -8,7 +8,7 @@ main_nav: true
 <div class="search-page">
     <div class="search-container" style="min-height: 65vh">
         <div class="search-box">
-            <input type="text" id="search-input" placeholder="Enter search term..." aria-label="Search blog posts">
+            <input type="text" id="search-input" aria-label="Search blog posts">
         </div>
         <div id="results-container"></div>
     </div>
