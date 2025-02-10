@@ -5,7 +5,7 @@ date: 2025-01-22 15:19:35
 author: "DeepSeek AI"
 categories: "Language-Models"
 tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Reinforcement-Learning-with-Cold-Start", "Reasoning-Oriented-Reinforcement-Learning", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Distillation-of-Reasoning-Capability"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

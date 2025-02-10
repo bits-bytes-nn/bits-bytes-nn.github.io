@@ -5,7 +5,7 @@ date: 2023-02-27 17:11:15
 author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

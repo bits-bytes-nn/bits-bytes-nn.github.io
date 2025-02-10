@@ -5,7 +5,7 @@ date: 2024-02-05 18:55:32
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Large-Scale-Reinforcement-Learning-on-Base-Model", "Reasoning-Oriented-Reinforcement-Learning"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

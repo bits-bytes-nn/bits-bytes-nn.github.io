@@ -5,7 +5,7 @@ date: 2023-07-18 14:31:57
 author: "Meta AI"
 categories: "Language-Models"
 tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Grouped-Query-Attention", "Reinforcement-Learning-with-Human-Feedback", "System-Message-for-Multi-Turn-Consistency", "Temporal-Organization-of-Knowledge", "Tool-Use-Emergence"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

@@ -5,7 +5,7 @@ date: 2024-01-25 14:17:53
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Instruction-Tuning", "Grouped-Query-Attention", "Rotary-Positional-Embeddings"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

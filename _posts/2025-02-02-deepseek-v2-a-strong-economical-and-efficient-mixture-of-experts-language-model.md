@@ -5,7 +5,7 @@ date: 2024-05-07 15:56:43
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Economical-Training", "Efficient-Inference", "Long-Context-Adaptation"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

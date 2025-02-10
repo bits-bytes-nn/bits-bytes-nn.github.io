@@ -3,9 +3,9 @@ layout: post
 title: "From Local to Global: A Graph RAG Approach to Query-Focused Summarization"
 date: 2024-04-24 18:38:11
 author: "Microsoft Research"
-categories: "Language-Models"
+categories: "Retrieval-Augmented-Generation"
 tags: ["Graph-RAG", "Hierarchical-Summarization", "Query-Focused-Summarization", "Retrieval-Augmented-Generation"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/retrieval-augmented-generation.jpg
 use_math: true
 ---
 ### TL;DR

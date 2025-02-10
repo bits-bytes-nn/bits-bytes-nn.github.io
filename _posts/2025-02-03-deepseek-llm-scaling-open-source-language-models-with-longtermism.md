@@ -5,7 +5,7 @@ date: 2024-01-05 18:59:13
 author: "DeepSeek-AI"
 categories: "Language-Models"
 tags: ["Scaling-Laws", "Optimal-Model/Data-Scaling-Up-Allocation", "Multi-Step-Learning-Rate-Scheduler", "Grouped-Query-Attention", "DeepSeekMath-Corpus", "Reinforcement-Learning-with-Human-Feedback", "Direct-Preference-Optimization", "Safety-Alignment"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR

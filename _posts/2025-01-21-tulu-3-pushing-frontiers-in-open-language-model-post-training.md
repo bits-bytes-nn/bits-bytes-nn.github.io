@@ -5,7 +5,7 @@ date: 2024-11-22 18:44:04
 author: "Allen Institute for AI"
 categories: "Language-Models"
 tags: ["Direct-Preference-Optimization", "Reinforcement-Learning-with-Verifiable-Rewards", "Prompt-Decontamination", "Supervised-Finetuning", "Evaluation-Framework"]
-cover: /assets/images/language-models.webp
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR
