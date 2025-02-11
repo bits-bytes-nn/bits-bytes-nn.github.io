@@ -209,7 +209,7 @@ DeepSeekMoE의 학습 데이터는 DeepSeek-AI가 구축한 대규모 다국어 
 
 DeepSeekMoE의 성능 평가는 다양한 유형의 작업을 포괄하는 광범위한 벤치마크에서 수행되었습니다. 언어 모델링 평가를 위해 Pile 테스트 세트를 사용했으며, 평가 지표로는 교차 엔트로피 손실을 사용했습니다. 언어 이해와 추론 능력 평가를 위해서는 HellaSwag, PIQA, ARC-challenge, ARC-easy를 고려했으며, 평가 지표는 정확도를 사용했습니다.
 
-독해 능력 평가를 위해 RACE-high와 RACE-middle을 사용했으며, 코드 생성 능력 평가를 위해서는 HumanEval과 MBPP를 사용했습니다. 코드 생성의 평가 지표로는 단일 생성 시도에서의 통과율을 나타내는 Pass@1을 사용했습니다. 닫힌 책 질의응답 평가를 위해서는 TriviaQA와 NaturalQuestions를 고려했으며, 평가 지표로는 정확 일치(Exactly Matching) 비율을 사용했습니다.
+독해 능력 평가를 위해 RACE-high와 RACE-middle을 사용했으며, 코드 생성 능력 평가를 위해서는 HumanEval과 MBPP를 사용했습니다. 코드 생성의 평가 지표로는 단일 생성 시도에서의 통과율을 나타내는 Pass@1을 사용했습니다. 클로즈 북 질의응답 평가를 위해서는 TriviaQA와 NaturalQuestions를 고려했으며, 평가 지표로는 정확 일치(Exactly Matching) 비율을 사용했습니다.
 
 #### 실험 결과 분석
 

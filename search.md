@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+    }-
 
     function highlightText(element, searchTerm) {
         if (!element || !searchTerm) return;

@@ -4,7 +4,17 @@ title: "LLaMA: Open and Efficient Foundation Language Models"
 date: 2023-02-27 17:11:15
 author: "Meta AI"
 categories: "Language-Models"
-tags: ["Open-and-Efficient-Foundation-Language-Models", "Optimal-Model/Data-Scaling-Up-Allocation", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Responsible-AI-Evaluation"]
+tags: [
+    "Chinchilla-Scaling-Laws",
+    "CommonCrawl-Quality-Filtering",
+    "Compute-Efficient-Training",
+    "Memory-Efficient-Attention",
+    "Open-Source-LLM",
+    "Public-Dataset-Only",
+    "RMSNorm-Pre-Normalization",
+    "Rotary-Position-Embeddings",
+    "SwiGLU-Activation"
+]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

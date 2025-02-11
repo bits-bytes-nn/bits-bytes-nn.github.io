@@ -4,7 +4,16 @@ title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
 date: 2023-07-18 14:31:57
 author: "Meta AI"
 categories: "Language-Models"
-tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Grouped-Query-Attention", "Reinforcement-Learning-with-Human-Feedback", "System-Message-for-Multi-Turn-Consistency", "Temporal-Organization-of-Knowledge", "Tool-Use-Emergence"]
+tags: [
+    "AI-Safety-Enhancement",
+    "Ghost-Attention",
+    "Grouped-Query-Attention",
+    "Human-Feedback-Reinforcement-Learning",
+    "Proximal-Policy-Optimization",
+    "Red-Team-Safety-Testing",
+    "Rejection-Sampling",
+    "Reward-Modeling"
+]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
