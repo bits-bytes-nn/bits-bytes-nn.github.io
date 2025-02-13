@@ -8,7 +8,13 @@ main_nav: true
 <div class="search-page">
     <div class="search-container" style="min-height: 65vh">
         <div class="search-box">
-            <input type="text" id="search-input" aria-label="Search blog posts">
+            <div class="search-input-wrapper" style="position: relative; width: 100%;">
+                <input type="text" id="search-input" aria-label="Search blog posts" style="width: 100%; padding: 10px 40px 10px 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #666;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
         </div>
         <div id="results-container"></div>
     </div>
