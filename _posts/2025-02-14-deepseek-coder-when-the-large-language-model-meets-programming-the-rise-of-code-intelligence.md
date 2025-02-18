@@ -39,7 +39,7 @@ DeepSeek-AI와 북경대학교 연구진이 공동으로 개발한 DeepSeek-Code
 
 DeepSeek-Coder는 1.3B부터 33B 파라미터에 이르는 다양한 규모의 오픈소스 코드 모델을 제공합니다. 이 모델들은 2조 개의 토큰으로 구성된 방대한 데이터셋에서 처음부터 학습되었으며, 프로젝트 수준의 고품질 코드 코퍼스를 기반으로 합니다. 특히 16K 윈도우 크기를 활용한 fill-in-the-blank 태스크를 통해 코드 생성과 채우기 능력을 향상시켰습니다.
 
-![DeepSeek-Coder의 성능](https://ar5iv.org//html/2401.14196/assets/figures/PLT.png)
+![DeepSeek-Coder의 성능](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/figures/PLT.png)
 
 위 그래프는 LeetCode 주간 코딩 대회에서 DeepSeek-Coder를 포함한 다양한 AI/ML 모델들의 성능을 보여줍니다. Python, Java, JavaScript, C# 등 여러 프로그래밍 언어에서의 성능을 비교한 결과, DeepSeek-Coder가 GPT-4-Turbo와 GPT-3.5-Turbo를 포함한 다른 모델들을 능가하는 우수한 성능을 보여주었습니다.
 
@@ -75,7 +75,7 @@ DeepSeek-Coder의 성능 평가는 다양한 공개 코드 관련 벤치마크�
 
 DeepSeek-Coder의 학습 데이터셋은 소스 코드 87%, 영어 코드 관련 자연어 코퍼스 10%, 중국어 자연어 코퍼스 3%로 구성되어 있습니다. 영어 코퍼스는 GitHub의 마크다운 문서와 StackExchange에서 수집된 자료로, 모델이 코드 관련 개념을 이해하고 라이브러리 사용법이나 버그 수정과 같은 작업을 수행하는 능력을 향상시키는 데 활용됩니다. 중국어 코퍼스는 고품질 기술 문서들로 구성되어 중국어 이해 능력을 향상시키는 데 사용됩니다.
 
-![데이터셋 생성 절차](https://ar5iv.org//html/2401.14196/assets/x1.png)
+![데이터셋 생성 절차](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/x1.png)
 
 데이터셋 구축 과정은 위 그림과 같이 데이터 크롤링, 규칙 기반 필터링, 의존성 분석, 저장소 수준의 중복 제거, 품질 검사 단계로 이루어집니다. 이러한 체계적인 접근을 통해 고품질의 학습 데이터를 확보할 수 있습니다.
 
@@ -127,7 +127,7 @@ DeepSeek-Coder의 학습은 두 가지 핵심적인 목표를 중심으로 이�
 
 두 번째는 중간 채우기(Fill-in-the-Middle, FIM) 방식입니다. 코드 사전 학습 과정에서는 주어진 컨텍스트와 이후 텍스트를 기반으로 중간에 들어갈 내용을 생성해야 하는 경우가 많습니다. [Bavarian과 연구진](https://arxiv.org/abs/2207.14255)이 제안한 FIM 방식은 텍스트를 세 부분으로 무작위로 나누고, 이 부분들의 순서를 섞은 후 특수 문자로 연결하는 방식을 사용합니다.
 
-![FIM 목표의 효과성](https://ar5iv.org//html/2401.14196/assets/x2.png)
+![FIM 목표의 효과성](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/x2.png)
 
 FIM 방식에는 PSM(Prefix-Suffix-Middle)과 SPM(Suffix-Prefix-Middle)이라는 두 가지 모드가 있습니다. PSM 모드에서는 텍스트가 $$ \text{Prefix}, \text{Suffix}, \text{Middle} $$ 순서로 구성되며, SPM 모드에서는 $$ \text{Suffix}, \text{Prefix}, \text{Middle} $$ 순서로 구성됩니다.
 
@@ -231,7 +231,7 @@ DeepSeek-Coder-Instruct 모델의 실제 활용 사례를 통해 모델의 실�
 
 #### 데이터베이스 구축 및 분석 사례
 
-![데이터베이스 구축 및 분석 예시](https://ar5iv.org//html/2401.14196/assets/x4.png)
+![데이터베이스 구축 및 분석 예시](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/x4.png)
 
 첫 번째 사례는 Python을 사용한 학생 데이터베이스 구축과 데이터 분석 과정을 보여줍니다. 이 사례에서는 SQLite 데이터베이스를 생성하고 학생 정보를 관리하는 전체 과정이 구현되었습니다. 특히 주목할 만한 점은 모델이 데이터베이스 생성, 데이터 삽입, 그리고 데이터 분석까지 이어지는 복잡한 작업을 버그 없이 수행했다는 것입니다.
 
@@ -239,7 +239,7 @@ DeepSeek-Coder-Instruct 모델의 실제 활용 사례를 통해 모델의 실�
 
 #### 알고리즘 문제 해결 사례
 
-![LeetCode 문제 해결 예시](https://ar5iv.org//html/2401.14196/assets/x5.png)
+![LeetCode 문제 해결 예시](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/x5.png)
 
 두 번째 사례는 모델의 알고리즘 문제 해결 능력을 보여줍니다. 특히 2023년 11월에 출제된 LeetCode 대회 문제를 활용했는데, 이는 모델의 학습 데이터에 포함되지 않은 시점의 문제입니다. 이를 통해 모델이 학습 데이터의 분포를 넘어서는 문제도 효과적으로 해결할 수 있음을 입증했습니다.
 
@@ -251,7 +251,7 @@ DeepSeek-Coder-Instruct 모델의 실제 활용 사례를 통해 모델의 실�
 
 DeepSeek-Coder-Base 모델의 학습 과정에서 성능 변화를 추적하기 위해 연구진은 체계적인 검증 프레임워크를 구축했습니다. 이 프레임워크는 학습 코퍼스에서 신중하게 선별된 8,000개의 코드 파일로 구성된 검증 데이터셋을 활용합니다. 이 데이터셋은 모델의 성능을 정확하게 평가하기 위해 다양한 프로그래밍 언어와 코딩 패턴을 포함하도록 설계되었습니다.
 
-![DeepSeek-Coder-Base 학습 과정 벤치마크](https://ar5iv.org//html/2401.14196/assets/x6.png)
+![DeepSeek-Coder-Base 학습 과정 벤치마크](https://ar5iv.labs.arxiv.org//html/2401.14196/assets/x6.png)
 
 위 그래프는 DeepSeek-Coder-Base 모델의 학습 과정에서 다양한 평가 지표의 변화를 보여줍니다. 주요 평가 지표들은 다음과 같습니다.
 

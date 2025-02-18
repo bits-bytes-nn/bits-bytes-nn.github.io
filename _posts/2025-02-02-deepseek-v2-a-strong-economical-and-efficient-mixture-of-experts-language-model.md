@@ -31,11 +31,11 @@ DeepSeek-V2는 혼합 전문가(Mixture-of-Experts, MoE) 아키텍처를 기반�
 
 ## DeepSeek-V2: 혁신적인 아키텍처를 통한 효율적인 대규모 언어 모델
 
-![DeepSeek-V2 성능 비교](https://ar5iv.org//html/2405.04434/assets/x1.png)
+![DeepSeek-V2 성능 비교](https://ar5iv.labs.arxiv.org//html/2405.04434/assets/x1.png)
 
 DeepSeek-V2는 혼합 전문가(Mixture-of-Experts, MoE) 아키텍처를 기반으로 한 대규모 언어 모델로, 총 236B 개의 파라미터를 보유하고 있으며 각 토큰 처리 시 21B 개의 파라미터가 활성화됩니다. 이 모델은 128K 토큰의 컨텍스트 길이를 지원하며, 다중 헤드 잠재 어텐션(Multi-head Latent Attention, MLA)과 DeepSeekMoE라는 두 가지 혁신적인 아키텍처를 도입했습니다.
 
-![DeepSeek-V2 아키텍처](https://ar5iv.org//html/2405.04434/assets/x3.png)
+![DeepSeek-V2 아키텍처](https://ar5iv.labs.arxiv.org//html/2405.04434/assets/x3.png)
 
 MLA는 키-밸류(Key-Value, KV) 캐시를 잠재 벡터로 크게 압축함으로써 효율적인 추론을 가능하게 합니다. 기존의 다중 헤드 어텐션(MHA)이 가진 KV 캐시 문제를 해결하기 위해 그룹 쿼리 어텐션(GQA)이나 다중 쿼리 어텐션(MQA) 등 다양한 접근 방식이 시도되었으나, 이러한 방법들은 성능을 희생하면서 KV 캐시를 줄이는 한계가 있었습니다. MLA는 저차원 키-밸류 결합 압축을 통해 이러한 한계를 극복하고, 우수한 성능을 유지하면서도 KV 캐시를 대폭 감소시켰습니다.
 
@@ -168,7 +168,7 @@ DeepSeek-V2는 MLA와 DeepSeekMoE의 통합을 통해 다음과 같은 계층적
 
 DeepSeek-V2는 기본적으로 트랜스포머 아키텍처를 기반으로 하지만, 어텐션 모듈과 피드포워드 네트워크(FFN)에서 혁신적인 구조적 변화를 도입했습니다. 이 모델의 핵심 구성 요소는 다중 헤드 잠재 어텐션(Multi-head Latent Attention, MLA)과 DeepSeekMoE입니다.
 
-![DeepSeek-V2 아키텍처](https://ar5iv.org//html/2405.04434/assets/x2.png)
+![DeepSeek-V2 아키텍처](https://ar5iv.labs.arxiv.org//html/2405.04434/assets/x2.png)
 
 MLA는 저차원 키-밸류 결합 압축 기술을 활용하여 추론 시 발생하는 키-밸류 캐시의 병목 현상을 해결합니다. 이는 기존 트랜스포머 모델의 주요 한계점이었던 메모리 효율성 문제를 획기적으로 개선한 것입니다. MLA의 수학적 기반은 다음과 같이 표현됩니다.
 
@@ -214,7 +214,7 @@ DeepSeek-V2는 이러한 한계를 극복하기 위해 다중 헤드 잠재 어�
 
 ### 표준 다중 헤드 어텐션의 기본 원리
 
-![어텐션 메커니즘 비교](https://ar5iv.org//html/2405.04434/assets/x4.png)
+![어텐션 메커니즘 비교](https://ar5iv.labs.arxiv.org//html/2405.04434/assets/x4.png)
 
 표준 MHA의 작동 원리를 이해하기 위해, 먼저 핵심 구성 요소들을 살펴보겠습니다. 임베딩 차원을 $d$, 어텐션 헤드의 수를 $n_h$, 헤드당 차원을 $d_h$라고 하고, $t$번째 토큰의 어텐션 입력을 $\mathbf{h}_t \in \mathbb{R}^d$라고 합니다.
 
