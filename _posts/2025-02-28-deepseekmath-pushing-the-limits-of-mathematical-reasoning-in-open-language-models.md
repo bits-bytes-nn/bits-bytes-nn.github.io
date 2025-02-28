@@ -367,15 +367,15 @@ $$ \mathbb{D}_{KL}\left[\pi_{\theta}||\pi_{ref}\right]=\frac{\pi_{ref}(o_{i,t}|q
 6: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;이전 정책 모델 업데이트 $\pi_{\theta_{old}} \leftarrow \pi_{\theta}$  
 7: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;각 질문 $q \in \mathcal{D}\_b$에 대해 $G$ 개의 출력 $\{o_i\}\_{i=1}^{G} \sim \pi_{\theta_{old}}(\cdot \mid q)$ 샘플링  
 8: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$r_{\varphi}$를 실행하여 각 샘플링된 출력 $o_i$에 대한 보상 $\{r_i\}\_{i=1}^{G}$ 계산  
-9: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;그룹 상대 이점 추정을 통해 $o_i$의 $t$번째 토큰에 대한 $\hat{A}\_{i,t}$ 계산  
+9: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;그룹 상대 어드밴티지 추정을 통해 $o_i$의 $t$번째 토큰에 대한 $\hat{A}\_{i,t}$ 계산  
 10: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for GRPO iteration = 1, …, $\mu$ do  
 11: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GRPO 목적 함수를 최대화하여 정책 모델 $\pi_{\theta}$ 업데이트  
 12: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;재생 메커니즘을 사용한 연속 훈련을 통해 $r_{\varphi}$ 업데이트  
-출력: $\pi_{\theta}$
+출력: $\pi_{\theta}$  
 
 #### 결과 감독 RL과 GRPO
 
-형식적으로, 각 질문 $q$에 대해, 이전 정책 모델 $\pi_{\theta_{old}}$에서 출력 그룹 $\{o_1, o_2, \cdots, o_G\}$이 샘플링됩니다. 그런 다음 보상 모델을 사용하여 출력에 점수를 매기고, 이에 따라 $G$개의 보상 $\mathbf{r}=\{r_1, r_2, \cdots, r_G\}$를 얻습니다. 이후 이러한 보상은 그룹 평균을 빼고 그룹 표준 편차로 나누어 정규화됩니다. 결과 감독은 각 출력 $o_i$의 끝에 정규화된 보상을 제공하고, 출력의 모든 토큰의 어드밴티지 $\hat{A}\_{i,t}$를 정규화된 보상으로 설정합니다. 즉, $\hat{A}\_{i,t}=\widetilde{r}_{i}=\frac{r_{i}-\text{mean}(\mathbf{r})}{\text{std}(\mathbf{r})}$로 설정하고, 식 (3)에 정의된 목적 함수를 최대화하여 정책을 최적화합니다.
+형식적으로, 각 질문 $q$에 대해, 이전 정책 모델 $\pi_{\theta_{old}}$에서 출력 그룹 $\{o_1, o_2, \cdots, o_G\}$이 샘플링됩니다. 그런 다음 보상 모델을 사용하여 출력에 점수를 매기고, 이에 따라 $G$개의 보상 $\mathbf{r}=\{r_1, r_2, \cdots, r_G\}$를 얻습니다. 이후 이러한 보상은 그룹 평균을 빼고 그룹 표준 편차로 나누어 정규화됩니다. 결과 감독은 각 출력 $o_i$의 끝에 정규화된 보상을 제공하고, 출력의 모든 토큰의 어드밴티지 $\hat{A}\_{i,t}$를 정규화된 보상으로 설정합니다. 즉, $\hat{A}\_{i,t}=\widetilde{r}\_{i}=\frac{r_{i}-\text{mean}(\mathbf{r})}{\text{std}(\mathbf{r})}$로 설정하고, 식 (3)에 정의된 목적 함수를 최대화하여 정책을 최적화합니다.
 
 #### 과정 감독 RL과 GRPO
 
@@ -438,7 +438,7 @@ DeepSeek-LLM 1.3B와 DeepSeek-Coder-Base-v1.5 7B(Guo 등, 2024)를 포함한 다
 
 실험에서는 DeepSeek-LLM 1.3B를 150B 토큰, DeepSeek-Coder-Base-v1.5 7B를 40B 토큰으로 각 arXiv 코퍼스에 대해 별도로 학습시켰습니다.
 
-arXiv 논문은 수학적 추론 향상에 효과적이지 않은 것으로 보입니다. arXiv 전용 코퍼스로 학습했을 때, 두 모델 모두 이 연구에서 사용된 다양한 수학적 벤치마크에서 주목할 만한 개선을 보이지 않거나 오히려 성능이 저하되었습니다. 이러한 벤치마크에는 GSM8K와 MATH와 같은 정량적 추론 데이터셋(표 8), MMLU-STEM과 같은 객관식 문제(표 8), miniF2F와 같은 형식적 수학(표 9)이 포함됩니다.
+arXiv 논문은 수학적 추론 향상에 효과적이지 않은 것으로 보입니다. arXiv 전용 코퍼스로 학습했을 때, 두 모델 모두 이 연구에서 사용된 다양한 수학적 벤치마크에서 주목할 만한 개선을 보이지 않거나 오히려 성능이 저하되었습니다. 이러한 벤치마크에는 GSM8K와 MATH와 같은 정량적 추론 데이터셋, MMLU-STEM과 같은 객관식 문제, miniF2F와 같은 형식적 수학이 포함됩니다.
 
 그러나 이 결론에는 한계가 있으며 주의해서 받아들여야 합니다. 아직 연구하지 않은 부분은 다음과 같습니다.
 * 이 연구에 포함되지 않은 정리의 비형식화와 같은 특정 수학 관련 작업에 대한 arXiv 토큰의 영향
