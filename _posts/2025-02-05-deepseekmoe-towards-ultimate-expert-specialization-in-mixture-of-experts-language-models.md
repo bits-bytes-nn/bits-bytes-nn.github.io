@@ -4,7 +4,7 @@ title: "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Expert
 date: 2024-01-11 17:31:42
 author: "DeepSeek-AI"
 categories: "Language-Models"
-tags: ["Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Ultimate-Expert-Specialization", "Mixture-of-Experts-Architecture", "Parameter-Efficient-Language-Model-Scaling", "Efficient-Transformer-Architecture", "Economical-Training", "Efficient-Inference"]
+tags: ["Ultimate-Expert-Specialization", "Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Mixture-of-Experts-Architecture", "Parameter-Efficient-Language-Model-Scaling", "Sparse-Mixture-of-Experts", "Efficient-Transformer-Architecture", "Economical-Training", "Multi-Level-Load-Balancing", "Efficient-Inference"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

@@ -11,6 +11,9 @@ th {
   font-weight: 600;
   padding: $small-spacing 0;
   text-align: left;
+  padding-right: 15px;
+  word-break: break-word;
+  white-space: normal;
 }
 
 td {
@@ -22,4 +25,9 @@ tr,
 td,
 th {
   vertical-align: middle;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: $base-spacing;
 }

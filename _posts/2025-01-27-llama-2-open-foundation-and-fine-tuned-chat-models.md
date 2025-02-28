@@ -5,14 +5,7 @@ date: 2023-07-18 14:31:57
 author: "Meta AI"
 categories: "Language-Models"
 tags: [
-    "AI-Safety-Enhancement",
-    "Ghost-Attention",
-    "Grouped-Query-Attention",
-    "Human-Feedback-Reinforcement-Learning",
-    "Proximal-Policy-Optimization",
-    "Red-Team-Safety-Testing",
-    "Rejection-Sampling",
-    "Reward-Modeling"
+    "Open-Foundation-and-Fine-Tuned-Chat-Models", "Reinforcement-Learning-with-Human-Feedback", "Ghost-Attention", "Rejection-Sampling-Fine-Tuning", "Grouped-Query-Attention", "Proximal-Policy-Optimization", "Red-Team-Safety-Testing", "Safety-Alignment", "System-Message-for-Multi-Turn-Consistency", "Safety-Context-Distillation"
 ]
 cover: /assets/images/language-models.jpg
 use_math: true
