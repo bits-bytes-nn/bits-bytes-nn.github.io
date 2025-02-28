@@ -150,12 +150,12 @@ $$B_{\mathrm{opt}} = 0.2920 \cdot C^{0.3271}$$
 
 그러나 $$6N_1$$과 $$6N_2$$ 모두 어텐션 연산의 계산 오버헤드를 고려하지 않으며, $$6N_2$$는 모델의 용량에 덜 기여하는 어휘 계산까지 포함하기 때문에 특정 설정에서 상당한 근사 오차를 보입니다. 이러한 오차를 줄이기 위해 새로운 모델 규모 표현인 비임베딩 FLOPs/토큰 $$M$$을 도입했습니다. $$M$$은 어텐션 연산의 계산 오버헤드는 포함하지만 어휘 계산은 고려하지 않습니다. $$M$$으로 모델 규모를 표현할 때, 컴퓨트 예산 $$C$$는 간단히 $$C=MD$$로 표현될 수 있습니다.
 
-$$6N_1$$, $$6N_2$$, $$M$$ 사이의 구체적인 차이는 다음 공식들로 나타낼 수 있습니다.
-
-$$6N_1 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2$$
-$$6N_2 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+6\,n_{\mathrm{vocab}}\,d_{\mathrm{model}}$$
-$$M = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+12\,n_{\mathrm{layer}}\,d_{\mathrm{model}}\,l_{\mathrm{seq}}$$
-
+$$6N_1$$, $$6N_2$$, $$M$$ 사이의 구체적인 차이는 다음 공식들로 나타낼 수 있습니다.  
+  
+$$6N_1 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2$$  
+$$6N_2 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+6\,n_{\mathrm{vocab}}\,d_{\mathrm{model}}$$  
+$$M = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+12\,n_{\mathrm{layer}}\,d_{\mathrm{model}}\,l_{\mathrm{seq}}$$  
+  
 여기서 $$n_{\mathrm{layer}}$$는 레이어 수, $$d_{\mathrm{model}}$$은 모델 너비, $$n_{\mathrm{vocab}}$$은 어휘 크기, $$l_{\mathrm{seq}}$$는 시퀀스 길이를 나타냅니다.
 ### 모델 규모 표현 방식의 비교 분석
 

@@ -4,7 +4,7 @@ title: "From Local to Global: A Graph RAG Approach to Query-Focused Summarizatio
 date: 2024-04-24 18:38:11
 author: "Microsoft Research"
 categories: "Retrieval-Augmented-Generation"
-tags: ["Graph-RAG", "Hierarchical-Summarization", "Query-Focused-Summarization", "Retrieval-Augmented-Generation"]
+tags: ["Graph-RAG", "Query-Focused-Summarization", "Community-Based-Summarization", "Entity-Knowledge-Graph-Extraction", "Map-Reduce-Summarization", "Modularity-Based-Retrieval", "Community-Detection-For-RAG", "Leiden-Algorithm-For-Text", "Multi-Level-Community-Indexing", "Global-Context-Understanding"]
 cover: /assets/images/retrieval-augmented-generation.jpg
 use_math: true
 ---

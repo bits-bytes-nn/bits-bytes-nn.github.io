@@ -4,7 +4,7 @@ title: "DeepSeek-Coder: When the Large Language Model Meets Programming - The Ri
 date: 2024-01-25 14:17:53
 author: "DeepSeek-AI"
 categories: "Language-Models"
-tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Instruction-Tuning"]
+tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Repository-Level-Deduplication", "Dependency-Aware-Training", "Project-Level-Code-Understanding", "Cross-File-Dependency-Analysis", "Topological-Sorting-For-Code-Learning", "LeetCode-Competition-Benchmark"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
