@@ -2,7 +2,7 @@
 layout: post
 title: "Apple Intelligence Foundation Language Models"
 date: 2024-07-29 18:38:49
-author: "Apple Inc."
+author: "Apple"
 categories: "Language-Models"
 tags: ["Iterative-Teaching-Committee", "Mirror-Descent-with-Leave-One-Out-Estimation", "Runtime-Swappable-Model-Adapters", "Accuracy-Recovery-Adapters", "Soft-Label-Reward-Modeling", "Responsible-AI-Principles", "Synthetic-Data-Generation-for-Mathematics", "Grouped-Query-Attention", "Mixed-Precision-Quantization", "Responsible-AI-Evaluation"]
 cover: /assets/images/language-models.jpg
