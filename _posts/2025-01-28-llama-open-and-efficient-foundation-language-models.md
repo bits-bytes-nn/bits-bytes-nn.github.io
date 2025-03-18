@@ -70,20 +70,20 @@ Stack Exchange 데이터는 2%를 차지하며, 컴퓨터 과학부터 화학까
 LLaMA는 Vaswani와 연구진이 제안한 트랜스포머 아키텍처를 기반으로 하며, PaLM과 같은 최신 언어 모델들에서 사용된 다양한 개선사항들을 통합했습니다. 기존 트랜스포머 아키텍처에서 주요하게 변경된 사항들을 살펴보면 다음과 같습니다.
 
 먼저, GPT-3에서 영감을 받은 사전 정규화(Pre-normalization) 방식을 도입했습니다. 이는 학습 안정성을 향상시키기 위해 트랜스포머의 각 서브레이어의 출력이 아닌 입력을 정규화하는 방식입니다. 정규화 함수로는 Zhang과 Sennrich가 제안한 RMSNorm을 사용했습니다. RMSNorm은 평균과 분산을 모두 사용하는 LayerNorm과 달리 RMS(Root Mean Square) 통계량만을 사용하여 계산 효율성을 높였습니다.
-
-$$\text{RMSNorm}(x) = \gamma \odot \frac{x}{\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}}$$
+  
+$$\text{RMSNorm}(x) = \gamma \odot \frac{x}{\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}}$$  
 여기서 \\(\gamma\\)는 학습 가능한 파라미터이며, \\(\odot\\)는 요소별 곱셈(element-wise multiplication)을 나타냅니다.
 
 두 번째로, PaLM에서 영감을 받아 ReLU 비선형성을 Shazeer가 제안한 SwiGLU 활성화 함수로 대체했습니다. 이는 모델의 성능을 향상시키기 위한 선택이었으며, 피드포워드 네트워크의 중간 차원으로 PaLM에서 사용된 \\(4d\\) 대신 \\(\frac{2}{3}4d\\) 차원을 사용했습니다.
-
-$$\text{SwiGLU}(x, W, V, b, c) = \text{swish}(xW + b) \odot (xV + c)$$
+  
+$$\text{SwiGLU}(x, W, V, b, c) = \text{swish}(xW + b) \odot (xV + c)$$  
 여기서 \\(\text{swish}(x) = x \odot \sigma(\beta x)\\)이며, \\(\sigma\\)는 시그모이드 함수이고 \\(\beta\\)는 일반적으로 1로 설정됩니다.
 
 LLaMA 모델이 \\(\frac{8d}{3}\\)(약 \\(2.67d\\))를 채택한 이유는 파라미터 수와 계산 비용을 줄이기 위한 설계 선택으로 보입니다. 이러한 차원 축소를 통해 동일한 모델 크기 내에서 계산 자원을 절약하고, 더 많은 레이어나 어텐션 헤드에 할당할 수 있습니다. 그 결과, 모델의 학습 및 추론 속도가 향상되었을 것으로 예상됩니다.
 
 마지막으로, GPTNeo의 접근 방식을 따라 절대 위치 임베딩을 제거하고 대신 Su와 연구진이 제안한 회전 위치 임베딩(RoPE)을 네트워크의 각 층에 추가했습니다. RoPE는 위치 정보를 회전 행렬을 통해 인코딩하며, 상대적 위치 의존성을 명시적으로 모델링할 수 있다는 장점이 있습니다.
-
-$$\text{RoPE}(x, p)_{i,i+1} = [x_i\cos(p\theta_i) - x_{i+1}\sin(p\theta_i), x_i\sin(p\theta_i) + x_{i+1}\cos(p\theta_i)]$$
+  
+$$\text{RoPE}(x, p)_{i,i+1} = [x_i\cos(p\theta_i) - x_{i+1}\sin(p\theta_i), x_i\sin(p\theta_i) + x_{i+1}\cos(p\theta_i)]$$  
 여기서 \\(\theta_i = 10000^{-2i/d}\\)이며, \\(p\\)는 위치, \\(d\\)는 임베딩 차원입니다. 이 방식은 각 차원 쌍에 회전 변환을 적용하여 위치 정보를 인코딩합니다.
 
 ![Training Loss Graph](https://ar5iv.labs.arxiv.org//html/2302.13971/assets/x1.png)
