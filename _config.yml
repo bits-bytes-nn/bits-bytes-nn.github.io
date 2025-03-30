@@ -31,7 +31,7 @@ simple_jekyll_search:
     - search.md
     - index.html
 
-disqus_shortname: bits-bytes-nn
+disqus_shortname: # bits-bytes-nn
 
 ga_tracking_id: G-MRH9Z5ETSQ
 
