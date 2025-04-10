@@ -2,7 +2,7 @@
 layout: post
 title: "Gemma 2: Improving Open Language Models at a Practical Size"
 date: 2024-07-31 19:13:07
-author: "Google DeepMind"
+author: "Google"
 categories: "Language-Models"
 tags: ["Knowledge-Distillation-for-Small-Language-Models", "Interleaving-Local-Global-Attention", "Grouped-Query-Attention", "Logit-Soft-Capping", "RMSNorm-Stabilization", "Multi-Turn-Instruction-Tuning", "Sliding-Window-Attention-Optimization", "Model-Merging-through-Weight-Averaging", "Enhanced-Safety-Alignment", "Responsible-Open-Model-Development"]
 cover: /assets/images/language-models.jpg

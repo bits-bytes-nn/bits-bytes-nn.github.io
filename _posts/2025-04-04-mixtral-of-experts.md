@@ -342,3 +342,4 @@ Mixtral의 성공은 희소 전문가 혼합 모델이 대규모 언어 모델 �
 - - -
 ### References
 * [Mixtral of Experts](http://arxiv.org/pdf/2401.04088v1)
+* [Mistral Inference (GitHub)](https://github.com/mistralai/mistral-inference)

@@ -2,7 +2,7 @@
 layout: post
 title: "DeepSeek-V3 Technical Report"
 date: 2024-12-27 04:03:16
-author: "DeepSeek-AI"
+author: "DeepSeek AI"
 categories: "Language-Models"
 tags: ["Auxiliary-Loss-Free-Load-Balancing", "FP8-Training", "Multi-Token-Prediction", "Efficient-Cross-Node-All-to-All-Communication", "Distillation-of-Reasoning-Capability"]
 cover: /assets/images/language-models.jpg
