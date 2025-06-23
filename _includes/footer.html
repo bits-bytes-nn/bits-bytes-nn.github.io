@@ -70,6 +70,43 @@ $(document).ready(function() {
     });
   });
 
+  // Highlight current page in navigation
+  var currentPath = window.location.pathname;
+  $('.nav-link a').each(function() {
+    var linkPath = $(this).attr('href');
+    if (currentPath === linkPath || 
+        (currentPath.indexOf(linkPath) === 0 && linkPath !== '/') ||
+        (currentPath === '/' && linkPath === '/')) {
+      $(this).addClass('active');
+    }
+  });
+
+  // Smooth scroll for navigation links
+  $('a[href^="#"]').on('click', function(e) {
+    e.preventDefault();
+    var target = $($(this).attr('href'));
+    if (target.length) {
+      $('html, body').animate({
+        scrollTop: target.offset().top - 80
+      }, 300);
+    }
+  });
+
+  // Enhanced navigation bar on scroll
+  var lastScrollTop = 0;
+  var navigation = $('.navigation');
+  $(window).scroll(function() {
+    var scrollTop = $(this).scrollTop();
+    
+    if (scrollTop > 50) {
+      navigation.addClass('scrolled');
+    } else {
+      navigation.removeClass('scrolled');
+    }
+    
+    lastScrollTop = scrollTop;
+  });
+
 	// Enable tooltips via Tippy.js
 	if (Array.isArray(window.tooltips)) {
 		window.tooltips.forEach(function(tooltip) {
@@ -79,7 +116,6 @@ $(document).ready(function() {
 		})
 	}
 });
-
 </script>
 
 {% if page.custom_js %}

@@ -19,7 +19,7 @@ label {
 
   &.required::after {
     content: "*";
-    color: $error-red;
+    color: $red;
     margin-left: 0.2em;
   }
 

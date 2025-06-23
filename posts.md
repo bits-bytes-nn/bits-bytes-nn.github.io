@@ -1,127 +1,42 @@
 ---
 layout: page
-title: "Posts"
-permalink: /posts/
+title: "Long Reads"
+permalink: /long-reads/
 main_nav: true
+nav_order: 3
 ---
 
-{% assign sorted_cats = site.categories | sort %}
-{% for category in sorted_cats %}
-{% capture cat %}{{ category | first }}{% endcapture %}
-<div class="category-section" style="min-height: 65vh">
-  <h2 id="{{cat}}" class="category-title">{{ cat | replace: '-', ' ' }}</h2>
-
-  {% for desc in site.descriptions %}
-  {% if desc.cat == cat %}
-  <p class="category-description"><em>{{ desc.desc }}</em></p>
-  {% endif %}
+{% for category in site.categories %}
+  {% capture cat %}{{ category | first }}{% endcapture %}
+  {% assign cat_temp = cat | replace: "-", " " | replace: "_", " " %}
+  {% assign words = cat_temp | split: " " %}
+  {% assign cat_display = "" %}
+  {% for word in words %}
+    {% capture capitalized_word %}{{ word | capitalize }}{% endcapture %}
+    {% if forloop.first %}
+      {% assign cat_display = capitalized_word %}
+    {% else %}
+      {% assign cat_display = cat_display | append: " " | append: capitalized_word %}
+    {% endif %}
   {% endfor %}
-
+  {% assign cat_display = cat_display | replace: "language", "Language" | replace: "models", "Models" | replace: "machine", "Machine" | replace: "learning", "Learning" %}
+  <h2 id="{{cat}}">{{ cat_display }}</h2>
+  {% for desc in site.descriptions %}
+    {% if desc.cat == cat %}
+      <p class="desc"><em>{{ desc.desc }}</em></p>
+    {% endif %}
+  {% endfor %}
   <ul class="posts-list">
-    {% for post in site.categories[cat] %}
-    <li class="post-item">
+  {% for post in site.categories[cat] %}
+    <li>
       <strong>
-        <a href="{{ post.url | prepend: site.baseurl }}" class="post-link">{{ post.title }}</a>
+        <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </strong>
-      <span class="post-date">{{ post.date | date: "%B %-d, %Y"  }}</span>
+      <span class="post-date">- {{ post.date | date_to_long_string }}</span>
     </li>
-    {% endfor %}
+  {% endfor %}
   </ul>
-</div>
-
-{% if forloop.last == false %}
-<hr class="category-divider" />
-{% endif %}
+  {% if forloop.last == false %}<hr>{% endif %}
 {% endfor %}
+<br>
 
-<style>
-  .category-section {
-    margin: #{$base-spacing} 0;
-    padding: #{$base-spacing};
-    background: linear-gradient(
-      135deg,
-      rgba($light-gray, 0.85),
-      rgba($white, 0.95)
-    );
-    border-radius: #{$base-border-radius * 2};
-    box-shadow: 0 6px 12px rgba($dark-gray, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .category-section:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba($dark-gray, 0.1);
-  }
-
-  .category-title {
-    color: $dark-gray;
-    margin-bottom: #{$base-spacing};
-    padding-bottom: #{$small-spacing};
-    border-bottom: $base-border;
-    font-family: $heading-font-family;
-    line-height: $heading-line-height;
-  }
-
-  .category-description {
-    color: $medium-gray;
-    font-size: 0.95rem;
-    margin-bottom: #{$base-spacing};
-    font-family: $base-font-family;
-    line-height: $base-line-height;
-  }
-
-  .posts-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .post-item {
-    margin: #{$small-spacing} 0;
-    padding: #{$small-spacing};
-    border-radius: $base-border-radius;
-    transition: all 0.3s ease;
-    background: linear-gradient(
-      135deg,
-      rgba($white, 0.95),
-      rgba($light-gray, 0.85)
-    );
-  }
-
-  .post-item:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, rgba($blue, 0.1), rgba($white, 0.95));
-    box-shadow: 0 4px 8px rgba($blue, 0.1);
-  }
-
-  .post-link {
-    color: $blue;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-family: $heading-font-family;
-    font-weight: 500;
-  }
-
-  .post-link:hover {
-    color: $deep-blue;
-    text-shadow: 0 0 20px rgba($blue, 0.15);
-  }
-
-  .post-date {
-    color: $medium-gray;
-    font-size: 0.9rem;
-    margin-left: #{$small-spacing};
-    font-family: $base-font-family;
-  }
-
-  .category-divider {
-    margin: #{$base-spacing} 0;
-    border: 0;
-    height: 1px;
-    background: linear-gradient(
-      to right,
-      rgba($light-gray, 0),
-      rgba($base-border-color, 1),
-      rgba($light-gray, 0)
-    );
-  }
-</style>

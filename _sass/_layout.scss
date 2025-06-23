@@ -65,11 +65,7 @@ pre code.hljs {
 		height: 18px;
 		margin: 0 auto;
 		border-radius: 50%;
-		transition: transform 0.3s ease;
-
-		&:hover {
-			transform: scale(1.1);
-		}
+		@include hover-transform(1.1);
 	}
 
 	.two {
@@ -81,11 +77,7 @@ pre code.hljs {
 		height: 16px;
 		margin: 0 auto;
 		border-radius: 50%;
-		transition: transform 0.3s ease;
-
-		&:hover {
-			transform: scale(1.1);
-		}
+		@include hover-transform(1.1);
 	}
 }
 
@@ -150,10 +142,16 @@ pre code.hljs {
 	background: rgba($white, 0.98);
 	backdrop-filter: blur(10px);
 	z-index: 1000;
-	transition: box-shadow 0.3s ease;
+	transition: all 0.3s ease;
 
 	&:hover {
 		box-shadow: 0 3px 6px rgba($dark-gray, 0.15);
+	}
+
+	&.scrolled {
+		background: rgba($white, 0.95);
+		backdrop-filter: blur(15px);
+		box-shadow: 0 4px 12px rgba($dark-gray, 0.15);
 	}
 
 	/*
@@ -269,15 +267,42 @@ pre code.hljs {
 		a {
 			display: inline-block;
 			transition: color 0.3s ease;
+			position: relative;
 
 			@include media ($tablet) {
 				padding-right: 1.5em;
+			}
+
+			&.active {
+				color: $action-color;
+				font-weight: 600;
+			}
+
+			&.active::after {
+				content: '';
+				position: absolute;
+				bottom: -5px;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: $action-color;
+				border-radius: 1px;
+
+				@include media ($tablet) {
+					right: 1.5em;
+				}
 			}
 		}
 
 		&:last-child a {
 			@include media ($tablet) {
 				padding-right: 1em;
+			}
+
+			&.active::after {
+				@include media ($tablet) {
+					right: 1em;
+				}
 			}
 		}
 	}
@@ -334,7 +359,7 @@ pre code.hljs {
 			transition: color 0.3s ease;
 
 			&:hover {
-				color: $deep-blue;
+				color: $blue;
 			}
 		}
 	}
@@ -363,7 +388,9 @@ pre code.hljs {
 	img {
 		display: block;
 		margin: auto;
-		width: 90%;
+		max-width: 100%;
+		height: auto;
+		@include hover-transform-shadow(1.05, $shadow-image-hover);
 	}
 
 	/*
@@ -420,7 +447,7 @@ pre code.hljs {
 				transition: color 0.3s ease;
 
 				&:hover {
-					color: $deep-blue;
+					color: $blue;
 				}
 			}
 		}

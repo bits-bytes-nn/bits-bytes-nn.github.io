@@ -22,19 +22,18 @@ $small-spacing: $base-spacing / 2;
 $base-z-index: 0;
 
 // Colors
-$white: #ffffff;
-$light-gray: #ecf0f1;     // Clouds
-$medium-gray: #7f8c8d;    // Asbestos
-$dark-gray: #2c3e50;      // Midnight Blue
-
-// Brand Colors
-$blue: #2980b9;           // Primary
-$deep-blue: #1a5581;      // Dark variant
-$soft-blue: #3498db;      // Light variant
-$accent-purple: #6c5ce7;  // Accent
-$accent-teal: #00b894;    // Success
-$warning-orange: #e17055; // Warning
-$error-red: #d63031;      // Error
+$dark-gray: #333;
+$medium-gray: #999;
+$light-gray: #ddd;
+$white: #fff;
+// Flat UI Colors. For more, see http://flatuicolors.com/
+$turquoise: #1abc9c;	// Turqoise
+$green: #27ae60;	  	// Nephritis
+$blue: #2980b9;				// Belize Hole
+$purple: #8e44ad;			// Wisteria
+$orange: #d35400;			// Pumpkin
+$red:	#c0392b;				// Pomegranate
+$gray: #7f8c8d;				// Asbestos
 
 // Theme Colors
 $base-background-color: $white;
@@ -45,6 +44,20 @@ $highlight-color: mix($action-color, $white, 85%);
 // Border
 $base-border-color: $light-gray;
 $base-border: 1px solid $base-border-color;
+
+// Transitions
+$transition-fast: 0.2s ease-in-out;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.5s ease;
+$transition-transform: transform 0.3s ease;
+$transition-color: color 0.3s ease;
+$transition-all: all 0.3s ease;
+
+// Shadows
+$shadow-light: 0 2px 4px rgba($dark-gray, 0.1);
+$shadow-medium: 0 3px 6px rgba($dark-gray, 0.15);
+$shadow-heavy: 0 4px 12px rgba($dark-gray, 0.15);
+$shadow-image-hover: 0 4px 20px rgba(#000, 0.15);
 
 // Forms
 $form-box-shadow: inset 0 1px 3px rgba(#000, 0.06);
