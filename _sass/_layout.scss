@@ -1,0 +1,549 @@
+// Primary site layout for Centrinium Theme
+
+/*
+*	Globals
+*/
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+ol.default {
+	@extend %default-ol;
+}
+
+ul.default {
+	@extend %default-ul;
+}
+
+code {
+	background-color: $light-gray;
+	display: inline-block;
+	border-radius: $base-border-radius;
+	padding: 0.2em 0.5em;
+	font-size: 0.9em;
+}
+
+blockquote {
+	color: $medium-gray;
+	font-style: italic;
+	border-left: 3px solid $light-gray;
+	margin-left: 0;
+	padding-left: 2em;
+	line-height: 1.6;
+}
+
+pre code.hljs {
+	font-size: modular-scale(-1);
+	border-radius: $base-border-radius;
+}
+
+.page-divider {
+	$divider-color: $light-gray;
+	display: block;
+	width: 50%;
+	margin: 2em auto;
+	border-top: 1px solid $divider-color;
+
+	.one {
+		position: relative;
+		top: -9px;
+		display: block;
+		background: $divider-color;
+		width: 18px;
+		height: 18px;
+		margin: 0 auto;
+		border-radius: 50%;
+		@include hover-transform(1.1);
+	}
+
+	.two {
+		position: relative;
+		top: -26px;
+		display: block;
+		background: $white;
+		width: 16px;
+		height: 16px;
+		margin: 0 auto;
+		border-radius: 50%;
+		@include hover-transform(1.1);
+	}
+}
+
+.tooltip {
+	border-bottom: 1px dotted $medium-gray;
+	cursor: help;
+}
+
+.site-header-container, .post-header-container {
+	width: 100%;
+	text-align: center;
+
+	&.has-cover {
+		color: $white;
+		text-shadow: 0 2px 2px rgba(0,0,0,0.4);
+		background-position: 50% 50%;
+		background-size: cover;
+
+		.title {
+			font-size: modular-scale(6);
+			letter-spacing: -0.02em;
+		}
+
+		.subtitle, .info {
+			font-size: modular-scale(1);
+			font-weight: 500;
+			letter-spacing: 0.01em;
+			text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+		}
+	}
+
+	.scrim {
+		padding: 3em 1em;
+		transition: background-color 0.3s ease;
+
+		&.has-cover {
+			background-color: rgba(0,0,0,0.3);
+			padding: 6em 1em !important;
+
+			@include media($tablet) {
+				padding: 9em 1em !important;
+			}
+
+			&:hover {
+				background-color: rgba(0,0,0,0.4);
+			}
+		}
+	}
+}
+
+/*
+*	Header
+*/
+.navigation {
+	box-shadow: 0 2px 4px rgba($dark-gray, 0.1);
+	padding: 0 1em;
+	margin: 0;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: rgba($white, 0.98);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	z-index: 1000;
+	transition: all 0.3s ease;
+
+	&:hover {
+		box-shadow: 0 3px 6px rgba($dark-gray, 0.15);
+	}
+
+	&.scrolled {
+		background: rgba($white, 0.95);
+		backdrop-filter: blur(15px);
+		box-shadow: 0 4px 12px rgba($dark-gray, 0.15);
+	}
+
+	/*
+	*	Navigation Menu - http://refills.bourbon.io/unstyled/ (see "Navigation")
+	*/
+	.navigation-menu-button {
+		display: block;
+		float: right;
+		margin: 0;
+		font-size: 1.5em;
+		padding-top: 0.5em;
+		transition: transform 0.3s ease;
+
+		&:hover {
+			transform: scale(1.1);
+		}
+
+		@include media ($tablet) {
+			display: none;
+		}
+	}
+
+	.navigation-wrapper {
+		@include outer-container;
+		@include clearfix;
+		position: relative;
+	}
+
+	.logo {
+		float: left;
+		height: 4em;
+		transition: opacity 0.3s ease;
+
+		&:hover {
+			opacity: 0.8;
+		}
+
+		@include media ($tablet) {
+			padding-left: $em-base;
+		}
+
+		img {
+			max-height: 2.5em;
+			margin-top: 0.75em;
+			padding-right: 1em;
+			transition: transform 0.3s ease;
+
+			&:hover {
+				transform: scale(1.05);
+			}
+		}
+
+		span {
+			font-size: 1.25em;
+			font-weight: 500;
+		}
+	}
+
+	nav {
+		float: none;
+		padding: 1.25em 0;
+
+		@include media ($tablet) {
+			float: right;
+			line-height: 1.5em;
+		}
+	}
+
+	ul.navigation-menu {
+		clear: both;
+		display: none;
+		margin: 0 auto;
+		overflow: visible;
+		padding: 0;
+		width: 100%;
+
+		@include media ($tablet) {
+			display: block;
+			margin: 0;
+			padding: 0;
+		}
+
+		&.show {
+			display: block;
+		}
+	}
+
+	ul li.nav-link {
+		font-size: 1.1em;
+		display: block;
+		text-align: right;
+		width: 100%;
+		padding: 0.25em 0;
+		transition: transform 0.3s ease;
+
+		&:hover {
+			transform: translateX(-3px);
+		}
+
+		@include media ($tablet) {
+			background: transparent;
+			display: inline;
+			text-decoration: none;
+			width: auto;
+
+			&:hover {
+				transform: translateY(-2px);
+			}
+		}
+	}
+
+	li.nav-link {
+		a {
+			display: inline-block;
+			transition: color 0.3s ease;
+			position: relative;
+
+			@include media ($tablet) {
+				padding-right: 1.5em;
+			}
+
+			&.active {
+				color: $action-color;
+				font-weight: 600;
+			}
+
+			&.active::after {
+				content: '';
+				position: absolute;
+				bottom: -5px;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: $action-color;
+				border-radius: 1px;
+
+				@include media ($tablet) {
+					right: 1.5em;
+				}
+			}
+		}
+
+		&:last-child a {
+			@include media ($tablet) {
+				padding-right: 1em;
+			}
+
+			&.active::after {
+				@include media ($tablet) {
+					right: 1em;
+				}
+			}
+		}
+	}
+}
+
+/*
+*	Body
+*/
+.page-content {
+	margin-top: 66px;
+
+	.wrapper {
+		@include outer-container;
+		padding: 1em;
+	}
+
+	/*
+	*	index.html
+	*/
+	.post-list {
+		padding-top: 1em !important;
+		@extend %default-ul;
+	}
+
+	.post-meta {
+		@include outer-container;
+		color: $medium-gray;
+
+		.post-date {
+			@include span-columns(6);
+			text-align: left;
+			font-size: 0.9em;
+		}
+
+		.post-categories {
+			@include span-columns(6);
+			margin-right: 0;
+			text-align: right;
+			font-size: 0.9em;
+		}
+	}
+
+	.pagination {
+		padding-top: 2em;
+		text-align: center;
+		color: $medium-gray;
+
+		.page-number {
+			padding: 0 1em;
+		}
+
+		a.newer-posts {
+			text-decoration: none;
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: $blue;
+			}
+		}
+	}
+
+	.site-header-container {
+		color: $white;
+		text-shadow: 0 2px 2px rgba(0,0,0,0.4);
+		background-color: $highlight-color;
+
+		.site-header {
+			.title {
+				font-size: modular-scale(6);
+				letter-spacing: -0.02em;
+			}
+
+			.subtitle {
+				font-style: italic;
+				font-size: modular-scale(1);
+				font-weight: 500;
+				letter-spacing: 0.01em;
+				text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+			}
+		}
+	}
+
+	img {
+		display: block;
+		margin: auto;
+		max-width: 100%;
+		height: auto;
+		@include hover-transform-shadow(1.05, $shadow-image-hover);
+	}
+
+	
+
+	/*
+	*	Pages
+	*/
+	.page {
+		.post-header {
+			padding: 0.5em 1em 1em 1em;
+			text-align: center;
+		}
+
+		.posts-list {
+			@extend %default-ul;
+
+			li {
+				padding: modular-scale(-4);
+				padding-left: 0;
+				transition: transform 0.3s ease;
+
+				&:hover {
+					transform: translateX(3px);
+				}
+			}
+
+			.desc {
+				font-size: 0.9em;
+			}
+
+			.post-date {
+				color: $medium-gray;
+			}
+		}
+
+		.profile {
+			max-width: 320px;
+			margin: auto;
+			padding-bottom: 0.5em;
+			border-radius: $base-border-radius;
+			transition: transform 0.3s ease;
+
+			&:hover {
+				transform: scale(1.02);
+			}
+		}
+	}
+}
+
+/*
+*	Footer
+*/
+.site-footer {
+	$link-color: $white;
+	padding: 1em 1em 2em 1em;
+	background-color: $highlight-color;
+	color: $white;
+
+	a {
+		color: $link-color;
+		transition: all 0.3s ease;
+		position: relative;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: -2px;
+			left: 0;
+			width: 100%;
+			height: 1px;
+			background: $white;
+			transform: scaleX(0);
+			transition: transform 0.3s ease;
+		}
+
+		&:hover {
+			color: darken($link-color, 10%);
+
+			&::after {
+				transform: scaleX(1);
+			}
+		}
+
+		&:focus {
+			outline: 2px solid $white;
+			outline-offset: 2px;
+		}
+	}
+
+	.wrapper {
+		@include outer-container;
+	}
+
+	/*
+	*	Site Navigation (left)
+	*/
+	.site-navigation {
+		@include span-columns(12);
+
+		@include media ($mobile) {
+			@include span-columns(6);
+		}
+
+		@include media ($tablet) {
+			@include span-columns(4);
+		}
+
+		font-size: 0.9em;
+
+		ul {
+			@extend %default-ul;
+		}
+	}
+
+	/*
+	*	Contact Info (center)
+	*/
+	.site-contact {
+		margin-top: 1em;
+		@include span-columns(12);
+
+		@include media ($mobile) {
+			@include span-columns(6);
+			margin-top: 0;
+			margin-right: 0;
+		}
+
+		@include media ($tablet) {
+			@include span-columns(4);
+			margin-top: 0;
+		}
+
+		font-size: 0.9em;
+
+		i {
+			width: 1.25em;
+			text-align: center;
+			transition: transform 0.3s ease;
+
+			&:hover {
+				transform: scale(1.2);
+			}
+		}
+
+		ul {
+			@extend %default-ul;
+		}
+	}
+
+	/*
+	*	Site Description/Signature (right)
+	*/
+	.site-signature {
+		margin-top: 1em;
+		@include span-columns(12);
+
+		@include media ($tablet) {
+			@include span-columns(4);
+			margin-right: 0;
+			margin-top: 0;
+		}
+
+		font-size: 0.9em;
+	}
+}

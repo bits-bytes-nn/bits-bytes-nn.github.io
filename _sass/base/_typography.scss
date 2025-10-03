@@ -1,0 +1,91 @@
+body {
+  @include font-feature-settings("kern", "liga", "pnum");
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: $base-font-color;
+  font-family: $base-font-family;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $heading-font-family;
+  font-size: $base-font-size;
+  line-height: $heading-line-height;
+  margin: 0 0 $base-font-size;
+}
+
+h1 {
+  font-size: modular-scale(4);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: modular-scale(3);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: modular-scale(2);
+  font-weight: 700;
+}
+
+h4 {
+  font-size: modular-scale(1);
+  font-weight: 600;
+}
+
+h5 {
+  font-size: modular-scale(-1);
+  font-weight: 600;
+}
+
+h6 {
+  font-size: modular-scale(-2);
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 $small-spacing;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: $action-color;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+
+  &:active,
+  &:focus,
+  &:hover {
+    color: darken($action-color, 15%);
+    text-decoration: underline;
+  }
+
+  &:active,
+  &:focus {
+    outline: 2px solid rgba($action-color, 0.4);
+    outline-offset: 2px;
+  }
+}
+
+hr {
+  border: none;
+  border-bottom: $base-border;
+  margin: $base-spacing 0;
+}
+
+img, picture {
+  margin: 0;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+code {
+  font-family: monospace;
+  background: $light-gray;
+  padding: 0.2em 0.4em;
+  border-radius: $base-border-radius;
+}

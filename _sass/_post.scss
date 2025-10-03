@@ -1,0 +1,184 @@
+// Styles for posts and post listings
+
+.page-content .post {
+
+  // General post elements
+  ul {
+    margin-bottom: 1em;
+  }
+
+  .post-header-container .scrim {
+    padding: 2em 1em 1em 1em;
+  }
+
+  .post-content {
+    padding: 1em 0;
+
+    img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  .post-header {
+    margin-bottom: 30px;
+  }
+
+  .post-title {
+    font-size: 42px;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  // Post metadata section
+  .post-meta {
+    margin: 2.5rem 0;
+    padding: 1em;
+    background: $light-gray;
+    border-radius: $base-border-radius;
+    box-shadow: 0 2px 4px rgba($dark-gray, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 3px 6px rgba($dark-gray, 0.15);
+    }
+  }
+
+  .post-header-info {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  .post-date, .post-categories, .post-tags {
+    margin: 0.5em 0;
+    color: $medium-gray;
+    font-family: $base-font-family;
+    font-size: 1.0em;
+    line-height: 1.5;
+  }
+
+  // Tags and categories
+  .tags {
+    font-size: 0.9em;
+  }
+
+  .category, .post-tags .tag {
+    display: inline-block;
+    background: $white;
+    padding: 0.25em 0.5em;
+    margin: 0.25em;
+    border-radius: $base-border-radius;
+    font-size: 0.95em;
+    color: $medium-gray;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: $base-border;
+
+    &:hover {
+      color: $action-color;
+      border-color: $action-color;
+      transform: translateY(-2px);
+    }
+  }
+
+  // Post utilities (share, rss, etc)
+  .rss {
+    margin: 1em 0 0 0;
+    @include span-columns(12);
+
+    @include media ($tablet) {
+      margin: 1em 0;
+      @include span-columns(6);
+    }
+  }
+
+  .share {
+    font-weight: bold;
+    margin: 0 0 1em 0;
+    @include span-columns(12);
+
+    @include media ($tablet) {
+      @include span-columns(6);
+      margin: 1em 0;
+      text-align: right;
+    }
+
+    a {
+      width: 1em;
+      padding: 0 0.25em;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $blue;
+      }
+    }
+  }
+
+  .disqus {
+    @include span-columns(12);
+  }
+
+  // Post navigation
+  .post-navigation {
+    margin: 2em 0;
+    padding: 1em 0;
+    border-top: $base-border;
+    border-bottom: $base-border;
+    background: $light-gray;
+    font-size: 0.9em;
+    display: block;
+    width: auto;
+
+    .prev-post {
+      display: block;
+      width: 50%;
+      float: left;
+      margin: 1em 0;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateX(-3px);
+      }
+    }
+
+    .next-post {
+      display: block;
+      width: 50%;
+      float: left;
+      margin: 1em 0;
+      text-align: right;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  .nav-link {
+    color: $medium-gray;
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $action-color;
+    }
+  }
+
+  .social-link {
+    margin: 0 0.5em;
+    color: $medium-gray;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $action-color;
+      transform: scale(1.1);
+    }
+  }
+}

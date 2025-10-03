@@ -1,0 +1,104 @@
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-feed
+
+exclude:
+  - /vendor/
+  - google7fc3fddc69d5a4bf.html
+  - naver1dddc70a302fb7cd8ad5cba29819b600.html
+
+title: Bits, Bytes and Neural Networks
+subtitle: A Data Scientist's Digital Playground
+email: aldente0630@gmail.com
+name: Jonas Kim
+description: |
+  A tech blog focusing on AI/ML paper reviews and latest research trends
+baseurl: ''
+url: https://bits-bytes-nn.github.io
+cover: /assets/my_header_image.jpg
+logo: /assets/my_logo.png
+
+markdown: kramdown
+kramdown:
+  parse_block_html: true
+  parse_span_html: true
+  smart_quotes: ["apos", "apos", "quot", "quot"]
+  syntax_highlighter: rouge
+inter_post_navigation: false
+highlightjs_theme: monokai-sublime
+
+paginate: 5
+paginate_path: /page/:num/
+
+simple_jekyll_search:
+  exclude:
+    - about.md
+    - search.md
+    - index.html
+
+disqus_shortname: # bits-bytes-nn
+
+ga_tracking_id: G-MRH9Z5ETSQ
+
+social:
+  - name: Facebook
+    icon: facebook
+    username: aldente0630
+    url: https://www.facebook.com/aldente0630
+    desc: Friend me on Facebook
+    share: true
+    share_url: https://www.facebook.com/sharer.php
+    share_params:
+      - key: t
+        value: TITLE
+      - key: u
+        value: URL
+
+  - name: Twitter
+    icon: twitter
+    username: 
+    url: https://twitter.com/
+    desc: Follow me on Twitter
+    share: true
+    share_url: https://twitter.com/share
+    share_params:
+      - key: text
+        value: TITLE
+      - key: url
+        value: URL
+      - key: via
+        value: USERNAME
+
+  - name: GitHub
+    icon: github
+    username: bits-bytes-nn
+    url: https://github.com/bits-bytes-nn
+    desc: Fork me on GitHub
+    share: true
+
+  - name: LinkedIn
+    icon: linkedin
+    username: Jonas Kim
+    url: https://www.linkedin.com/in/aldente0630
+    desc: Connect with me on LinkedIn
+    share: true
+    share_url: https://www.linkedin.com/shareArticle
+    share_params:
+      - key: mini
+        value: true
+      - key: url
+        value: URL
+
+
+protocols:
+  fb_image: /assets/my_logo.png
+  fb_image_width: 612
+  fb_image_height: 605
+  fb_image_type: image/png
+
+  twitter_image: /assets/my_logo.png
+
+  os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
+  os_rcs_type: git
+  os_src: git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git

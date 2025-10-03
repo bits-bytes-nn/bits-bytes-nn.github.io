@@ -1,0 +1,6 @@
+{% assign nav_pages = site.pages | where: "main_nav", true | sort: "nav_order" %}
+{% for page in nav_pages %}
+<li class="nav-link">
+	<a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+</li>
+{% endfor %}

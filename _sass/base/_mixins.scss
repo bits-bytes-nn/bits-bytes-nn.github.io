@@ -1,0 +1,41 @@
+// Hover Transform Mixin
+@mixin hover-transform($scale: 1.05, $transition: $transition-transform) {
+  transition: $transition;
+  cursor: pointer;
+  
+  &:hover {
+    transform: scale($scale);
+  }
+}
+
+// Hover Transform with Shadow
+@mixin hover-transform-shadow($scale: 1.05, $shadow: $shadow-medium) {
+  transition: $transition-transform, box-shadow 0.3s ease;
+  cursor: pointer;
+  will-change: transform, box-shadow;
+  
+  &:hover {
+    transform: scale($scale);
+    box-shadow: $shadow;
+  }
+}
+
+// Smooth Color Transition
+@mixin hover-color($color: $action-color, $transition: $transition-color) {
+  transition: $transition;
+  
+  &:hover {
+    color: $color;
+  }
+}
+
+// Button Hover Effect
+@mixin button-hover($bg-color: $action-color, $text-color: $white) {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  
+  &:hover,
+  &:focus {
+    background-color: $bg-color;
+    color: $text-color;
+  }
+}
