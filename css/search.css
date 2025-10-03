@@ -53,3 +53,10 @@
   margin: 0.5em 0;
   color: #333;
 }
+
+mark {
+  background-color: #fff59d;
+  padding: 0 2px;
+  font-weight: bold;
+  color: #333;
+}

@@ -80,7 +80,10 @@
 	MathJax = {
 	  tex: {
 	    inlineMath: [['$', '$'], ['\\(', '\\)']],
-	    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+	    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+	    macros: {
+	      '|': '\\vert'
+	    }
 	  },
       chtml: {
         linebreaks: { automatic: true }
