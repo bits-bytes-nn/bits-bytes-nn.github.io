@@ -8,6 +8,7 @@ nav_order: 3
 
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}
+  {% if cat != "Paper Reviews" %}
   {% assign cat_temp = cat | replace: "-", " " | replace: "_", " " %}
   {% assign words = cat_temp | split: " " %}
   {% assign cat_display = "" %}
@@ -36,6 +37,7 @@ nav_order: 3
   {% endfor %}
   </ul>
   {% if forloop.last == false %}<hr>{% endif %}
+  {% endif %}
 {% endfor %}
 <br>
 
