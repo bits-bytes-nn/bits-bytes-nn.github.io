@@ -21,10 +21,15 @@ logo: /assets/my_logo.png
 
 markdown: kramdown
 kramdown:
+  input: GFM
   parse_block_html: true
   parse_span_html: true
   smart_quotes: ["apos", "apos", "quot", "quot"]
   syntax_highlighter: rouge
+  math_engine: mathjax
+  math_engine_opts:
+    preview: true
+    preview_as_code: false
 inter_post_navigation: false
 highlightjs_theme: monokai-sublime
 

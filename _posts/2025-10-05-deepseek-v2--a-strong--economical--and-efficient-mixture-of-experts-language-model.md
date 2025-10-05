@@ -3,9 +3,9 @@ layout: post
 title: "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model"
 date: 2024-05-07 15:56:43
 author: "DeepSeek AI Research"
-categories: ["Paper Reviews", "Training & Inference Optimization"]
+categories: ["Paper Reviews", "Language-Models"]
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Low-Rank-Key-Value-Joint-Compression", "Decoupled-Rotary-Position-Embedding", "Device-Limited-Routing", "Auxiliary-Loss-for-Load-Balance", "Token-Dropping-Strategy", "Sparse-Mixture-of-Experts", "Expert-Parallelism", "Efficient-Long-Context-Attention-Mechanism"]
-cover: /assets/images/default.jpg
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR
@@ -90,7 +90,7 @@ DeepSeek-V2는 8.1T 토큰으로 구성된 고품질 다중 소스 사전 훈련
 
 특히 주목할 만한 성과는 다음과 같습니다.
 - AlpacaEval 2.0에서 38.9의 길이 제어 승률
-- MT-Bench에서 8.97의 전체 점수  
+- MT-Bench에서 8.97의 전체 점수
 - AlignBench에서 7.91의 전체 점수
 
 이러한 영어 개방형 대화 평가는 DeepSeek-V2 Chat(RL)이 오픈소스 채팅 모델 중 최고 수준의 성능을 가지고 있음을 보여줍니다. 또한 AlignBench 평가는 중국어에서 DeepSeek-V2 Chat(RL)이 모든 오픈소스 모델을 능가하고 심지어 대부분의 폐쇄형 모델도 이긴다는 것을 나타냅니다.
@@ -195,12 +195,12 @@ $$\mathbf{o}_{t,i} = \sum_{j=1}^t \text{Softmax}_j\left(\frac{\mathbf{q}_{t,i}^T
 
 다음 표는 서로 다른 어텐션 메커니즘 간의 토큰당 KV 캐시를 비교한 것입니다.
 
-| 어텐션 메커니즘 | 토큰당 KV 캐시 (요소 수) | 성능 |
-|---|---|---|
-| Multi-Head Attention (MHA) | $2 n_h d_h l$ | 강함 |
-| Grouped-Query Attention (GQA) | $2 n_g d_h l$ | 보통 |
-| Multi-Query Attention (MQA) | $2 d_h l$ | 약함 |
-| MLA (제안 방법) | $(d_c + d_h^R) l \approx \frac{9}{2} d_h l$ | 더 강함 |
+| 어텐션 메커니즘               | 토큰당 KV 캐시 (요소 수)                    | 성능    |
+| ----------------------------- | ------------------------------------------- | ------- |
+| Multi-Head Attention (MHA)    | $2 n_h d_h l$                               | 강함    |
+| Grouped-Query Attention (GQA) | $2 n_g d_h l$                               | 보통    |
+| Multi-Query Attention (MQA)   | $2 d_h l$                                   | 약함    |
+| MLA (제안 방법)               | $(d_c + d_h^R) l \approx \frac{9}{2} d_h l$ | 더 강함 |
 
 여기서 $n_h$는 어텐션 헤드 수, $d_h$는 어텐션 헤드당 차원, $l$은 레이어 수, $n_g$는 GQA의 그룹 수를 나타냅니다. DeepSeek-V2에서는 $d_c$를 $4d_h$로, $d_h^R$를 $\frac{d_h}{2}$로 설정했습니다. 따라서 KV 캐시는 단 2.25개 그룹을 가진 GQA와 동일하지만, 성능은 MHA보다 강력합니다.
 
@@ -219,14 +219,14 @@ $$\mathbf{h}_t' = \mathbf{u}_t + \sum_{i=1}^{N_s} \text{FFN}_i^{(s)}(\mathbf{u}_
 
 게이트 값 $g_{i,t}$는 다음과 같이 계산됩니다.
 
-$$g_{i,t} = \begin{cases} 
+$$g_{i,t} = \begin{cases}
 s_{i,t}, & s_{i,t} \in \text{Topk}(\{s_{j,t}|1 \leqslant j \leqslant N_r\}, K_r) \\
 0, & \text{otherwise}
 \end{cases}$$
 
 $$s_{i,t} = \text{Softmax}_i(\mathbf{u}_t^T \mathbf{e}_i)$$
 
-여기서 $N_s$와 $N_r$는 각각 공유 전문가와 라우팅된 전문가의 수를 나타내고, $\text{FFN}_i^{(s)}(\cdot)$와 $\text{FFN}_i^{(r)}(\cdot)$는 각각 $i$번째 공유 전문가와 $i$번째 라우팅된 전문가를 나타냅니다. $K_r$는 활성화된 라우팅된 전문가의 수이고, $g_{i,t}$는 $i$번째 전문가에 대한 게이트 값입니다. $s_{i,t}$는 토큰-전문가 친화도이고, $\mathbf{e}_i$는 이 레이어에서 $i$번째 라우팅된 전문가의 중심점입니다.
+여기서 $N_s$와 $N_r$는 각각 공유 전문가와 라우팅된 전문가의 수를 나타내고, $\text{FFN}\_i^{(s)}(\cdot)$와 $\text{FFN}\_i^{(r)}(\cdot)$는 각각 $i$번째 공유 전문가와 $i$번째 라우팅된 전문가를 나타냅니다. $K_r$는 활성화된 라우팅된 전문가의 수이고, $g_{i,t}$는 $i$번째 전문가에 대한 게이트 값입니다. $s_{i,t}$는 토큰-전문가 친화도이고, $\mathbf{e}_i$는 이 레이어에서 $i$번째 라우팅된 전문가의 중심점입니다.
 
 이 메커니즘의 핵심은 각 토큰이 모든 공유 전문가의 출력을 받으면서 동시에 자신에게 가장 적합한 소수의 라우팅된 전문가만을 선택적으로 활용한다는 것입니다. 이는 마치 모든 학생이 공통 기초 과목을 수강하면서 동시에 자신의 관심사에 맞는 전공 과목을 선택하는 것과 유사합니다.
 
@@ -242,7 +242,7 @@ DeepSeekMoE의 세밀한 전문가 분할로 인해 활성화된 전문가의 �
 
 자동으로 학습된 라우팅 전략에 대해 로드 밸런스를 고려합니다. 첫째, 불균형한 로드는 라우팅 붕괴의 위험을 증가시켜 일부 전문가가 완전히 훈련되고 활용되는 것을 방해합니다. 둘째, 전문가 병렬성이 사용될 때 불균형한 로드는 계산 효율성을 감소시킵니다.
 
-DeepSeek-V2의 훈련 중에 전문가 수준 로드 밸런스($\mathcal{L}_{\text{ExpBal}}$), 장치 수준 로드 밸런스($\mathcal{L}_{\text{DevBal}}$), 통신 밸런스($\mathcal{L}_{\text{CommBal}}$)를 각각 제어하기 위한 세 가지 보조 손실을 설계했습니다.
+DeepSeek-V2의 훈련 중에 전문가 수준 로드 밸런스($\mathcal{L}\_{\text{ExpBal}}$), 장치 수준 로드 밸런스($\mathcal{L}\_{\text{DevBal}}$), 통신 밸런스($\mathcal{L}\_{\text{CommBal}}$)를 각각 제어하기 위한 세 가지 보조 손실을 설계했습니다.
 
 **전문가 수준 밸런스 손실**
 
@@ -390,43 +390,43 @@ DeepSeek-V2는 이중 언어 코퍼스에서 사전 훈련되었기 때문에 �
 
 #### 평가 결과
 
-| 벤치마크 (메트릭) | # Shots | DeepSeek 67B | Qwen1.5 72B | Mixtral 8x22B | LLaMA 3 70B | DeepSeek-V2 |
-|---|---|---|---|---|---|---|
-| 아키텍처 | - | Dense | Dense | MoE | Dense | MoE |
-| # 활성화된 파라미터 | - | 67B | 72B | 39B | 70B | 21B |
-| # 총 파라미터 | - | 67B | 72B | 141B | 70B | 236B |
-| **영어** | | | | | | |
-| Pile-test (BPB) | - | 0.642 | 0.637 | 0.623 | 0.602 | 0.606 |
-| BBH (EM) | 3-shot | 68.7 | 59.9 | 78.9 | 81.0 | 78.9 |
-| MMLU (Acc.) | 5-shot | 71.3 | 77.2 | 77.6 | 78.9 | 78.5 |
-| DROP (F1) | 3-shot | 69.7 | 71.5 | 80.4 | 82.5 | 80.1 |
-| ARC-Easy (Acc.) | 25-shot | 95.3 | 97.1 | 97.3 | 97.9 | 97.6 |
-| ARC-Challenge (Acc.) | 25-shot | 86.4 | 92.8 | 91.2 | 93.3 | 92.4 |
-| HellaSwag (Acc.) | 10-shot | 86.3 | 85.8 | 86.6 | 87.9 | 84.2 |
-| PIQA (Acc.) | 0-shot | 83.6 | 83.3 | 83.6 | 85.0 | 83.7 |
-| WinoGrande (Acc.) | 5-shot | 84.9 | 82.4 | 83.7 | 85.7 | 84.9 |
-| RACE-Middle (Acc.) | 5-shot | 69.9 | 63.4 | 73.3 | 73.3 | 73.1 |
-| RACE-High (Acc.) | 5-shot | 50.7 | 47.0 | 56.7 | 57.9 | 52.7 |
-| TriviaQA (EM) | 5-shot | 78.9 | 73.1 | 82.1 | 81.6 | 79.9 |
-| NaturalQuestions (EM) | 5-shot | 36.6 | 35.6 | 39.6 | 40.2 | 38.7 |
-| AGIEval (Acc.) | 0-shot | 41.3 | 64.4 | 43.4 | 49.8 | 51.2 |
-| **코드** | | | | | | |
-| HumanEval (Pass@1) | 0-shot | 45.1 | 43.9 | 53.1 | 48.2 | 48.8 |
-| MBPP (Pass@1) | 3-shot | 57.4 | 53.6 | 64.2 | 68.6 | 66.6 |
-| CRUXEval-I (Acc.) | 2-shot | 42.5 | 44.3 | 52.4 | 49.4 | 52.8 |
-| CRUXEval-O (Acc.) | 2-shot | 41.0 | 42.3 | 52.8 | 54.3 | 49.8 |
-| **수학** | | | | | | |
-| GSM8K (EM) | 8-shot | 63.4 | 77.9 | 80.3 | 83.0 | 79.2 |
-| MATH (EM) | 4-shot | 18.7 | 41.4 | 42.5 | 42.2 | 43.6 |
-| CMath (EM) | 3-shot | 63.0 | 77.8 | 72.3 | 73.9 | 78.7 |
-| **중국어** | | | | | | |
-| CLUEWSC (EM) | 5-shot | 81.0 | 80.5 | 77.5 | 78.3 | 82.2 |
-| C-Eval (Acc.) | 5-shot | 66.1 | 83.7 | 59.6 | 67.5 | 81.7 |
-| CMMLU (Acc.) | 5-shot | 70.8 | 84.3 | 60.0 | 69.3 | 84.0 |
-| CMRC (EM) | 1-shot | 73.4 | 66.6 | 73.1 | 73.3 | 77.5 |
-| C3 (Acc.) | 0-shot | 75.3 | 78.2 | 71.4 | 74.0 | 77.4 |
-| CHID (Acc.) | 0-shot | 92.1 | - | 57.0 | 83.2 | 92.7 |
-| CCPM (Acc.) | 0-shot | 88.5 | 88.1 | 61.0 | 68.1 | 93.1 |
+| 벤치마크 (메트릭)     | # Shots | DeepSeek 67B | Qwen1.5 72B | Mixtral 8x22B | LLaMA 3 70B | DeepSeek-V2 |
+| --------------------- | ------- | ------------ | ----------- | ------------- | ----------- | ----------- |
+| 아키텍처              | -       | Dense        | Dense       | MoE           | Dense       | MoE         |
+| # 활성화된 파라미터   | -       | 67B          | 72B         | 39B           | 70B         | 21B         |
+| # 총 파라미터         | -       | 67B          | 72B         | 141B          | 70B         | 236B        |
+| **영어**              |         |              |             |               |             |             |
+| Pile-test (BPB)       | -       | 0.642        | 0.637       | 0.623         | 0.602       | 0.606       |
+| BBH (EM)              | 3-shot  | 68.7         | 59.9        | 78.9          | 81.0        | 78.9        |
+| MMLU (Acc.)           | 5-shot  | 71.3         | 77.2        | 77.6          | 78.9        | 78.5        |
+| DROP (F1)             | 3-shot  | 69.7         | 71.5        | 80.4          | 82.5        | 80.1        |
+| ARC-Easy (Acc.)       | 25-shot | 95.3         | 97.1        | 97.3          | 97.9        | 97.6        |
+| ARC-Challenge (Acc.)  | 25-shot | 86.4         | 92.8        | 91.2          | 93.3        | 92.4        |
+| HellaSwag (Acc.)      | 10-shot | 86.3         | 85.8        | 86.6          | 87.9        | 84.2        |
+| PIQA (Acc.)           | 0-shot  | 83.6         | 83.3        | 83.6          | 85.0        | 83.7        |
+| WinoGrande (Acc.)     | 5-shot  | 84.9         | 82.4        | 83.7          | 85.7        | 84.9        |
+| RACE-Middle (Acc.)    | 5-shot  | 69.9         | 63.4        | 73.3          | 73.3        | 73.1        |
+| RACE-High (Acc.)      | 5-shot  | 50.7         | 47.0        | 56.7          | 57.9        | 52.7        |
+| TriviaQA (EM)         | 5-shot  | 78.9         | 73.1        | 82.1          | 81.6        | 79.9        |
+| NaturalQuestions (EM) | 5-shot  | 36.6         | 35.6        | 39.6          | 40.2        | 38.7        |
+| AGIEval (Acc.)        | 0-shot  | 41.3         | 64.4        | 43.4          | 49.8        | 51.2        |
+| **코드**              |         |              |             |               |             |             |
+| HumanEval (Pass@1)    | 0-shot  | 45.1         | 43.9        | 53.1          | 48.2        | 48.8        |
+| MBPP (Pass@1)         | 3-shot  | 57.4         | 53.6        | 64.2          | 68.6        | 66.6        |
+| CRUXEval-I (Acc.)     | 2-shot  | 42.5         | 44.3        | 52.4          | 49.4        | 52.8        |
+| CRUXEval-O (Acc.)     | 2-shot  | 41.0         | 42.3        | 52.8          | 54.3        | 49.8        |
+| **수학**              |         |              |             |               |             |             |
+| GSM8K (EM)            | 8-shot  | 63.4         | 77.9        | 80.3          | 83.0        | 79.2        |
+| MATH (EM)             | 4-shot  | 18.7         | 41.4        | 42.5          | 42.2        | 43.6        |
+| CMath (EM)            | 3-shot  | 63.0         | 77.8        | 72.3          | 73.9        | 78.7        |
+| **중국어**            |         |              |             |               |             |             |
+| CLUEWSC (EM)          | 5-shot  | 81.0         | 80.5        | 77.5          | 78.3        | 82.2        |
+| C-Eval (Acc.)         | 5-shot  | 66.1         | 83.7        | 59.6          | 67.5        | 81.7        |
+| CMMLU (Acc.)          | 5-shot  | 70.8         | 84.3        | 60.0          | 69.3        | 84.0        |
+| CMRC (EM)             | 1-shot  | 73.4         | 66.6        | 73.1          | 73.3        | 77.5        |
+| C3 (Acc.)             | 0-shot  | 75.3         | 78.2        | 71.4          | 74.0        | 77.4        |
+| CHID (Acc.)           | 0-shot  | 92.1         | -           | 57.0          | 83.2        | 92.7        |
+| CCPM (Acc.)           | 0-shot  | 88.5         | 88.1        | 61.0          | 68.1        | 93.1        |
 
 위 표에서 DeepSeek-V2와 다른 대표적인 오픈소스 모델들을 비교했습니다. 모든 모델은 내부 평가 프레임워크에서 평가되었으며 동일한 평가 설정을 공유합니다. 굵은 글씨는 최고 성능을, 밑줄은 두 번째 성능을 나타냅니다. 0.3 미만의 차이를 가진 점수는 동일한 수준으로 간주됩니다. 단 21B개의 활성화된 파라미터로 DeepSeek-V2는 오픈소스 모델 중 최고 수준의 성능을 달성했습니다.
 
@@ -527,35 +527,35 @@ $$r_i = c_1 \cdot RM_{helpful}(o_i) + c_2 \cdot RM_{safety}(o_i) + c_3 \cdot RM_
 
 먼저 표준 벤치마크에서 DeepSeek-V2 Chat(SFT)와 DeepSeek-V2 Chat(RL)을 평가했습니다. 주목할 만한 점은 DeepSeek-V2 Chat(SFT)가 기본 버전과 비교하여 GSM8K, MATH, HumanEval 평가에서 상당한 개선을 보여준다는 것입니다. 이러한 진전은 상당한 양의 수학 및 코드 관련 콘텐츠를 포함하는 SFT 데이터의 포함에 기인할 수 있습니다. 또한 DeepSeek-V2 Chat(RL)은 수학 및 코드 벤치마크에서 성능을 더욱 향상시켰습니다.
 
-| 벤치마크 | # Shots | DeepSeek 67B Chat | Qwen1.5 72B Chat | LLaMA3 70B Inst. | Mixtral 8x22B Inst. | DeepSeek-V2 Chat (SFT) | DeepSeek-V2 Chat (RL) |
-|---|---|---|---|---|---|---|---|
-| 컨텍스트 길이 | - | 4K | 32K | 8K | 64K | 128K | 128K |
-| 아키텍처 | - | Dense | Dense | Dense | MoE | MoE | MoE |
-| # 활성화된 파라미터 | - | 67B | 72B | 70B | 39B | 21B | 21B |
-| # 총 파라미터 | - | 67B | 72B | 70B | 141B | 236B | 236B |
-| **영어** | | | | | | | |
-| TriviaQA | 5-shot | 81.5 | 79.6 | 69.1 | 80.0 | 85.4 | 86.7 |
-| NaturalQuestions | 5-shot | 47.0 | 46.9 | 44.6 | 54.9 | 51.9 | 53.4 |
-| MMLU | 5-shot | 71.1 | 76.2 | 80.3 | 77.8 | 78.4 | 77.8 |
-| ARC-Easy | 25-shot | 96.6 | 96.8 | 96.9 | 97.1 | 97.6 | 98.1 |
-| ARC-Challenge | 25-shot | 88.9 | 91.7 | 92.6 | 90.0 | 92.5 | 92.3 |
-| BBH | 3-shot | 71.7 | 65.9 | 80.1 | 78.4 | 81.3 | 79.7 |
-| AGIEval | 0-shot | 46.4 | 62.8 | 56.6 | 41.4 | 63.2 | 61.4 |
-| IFEval | 0-shot | 55.5 | 57.3 | 79.7 | 72.1 | 64.1 | 63.8 |
-| **코드** | | | | | | | |
-| HumanEval | 0-shot | 73.8 | 68.9 | 76.2 | 75.0 | 76.8 | 81.1 |
-| MBPP | 3-shot | 61.4 | 52.2 | 69.8 | 64.4 | 70.4 | 72.0 |
-| CRUXEval-I-COT | 2-shot | 49.1 | 51.4 | 61.1 | 59.4 | 59.5 | 61.5 |
-| CRUXEval-O-COT | 2-shot | 50.9 | 56.5 | 63.6 | 63.6 | 60.7 | 63.0 |
-| LiveCodeBench | 0-shot | 18.3 | 18.8 | 30.5 | 25.0 | 28.7 | 32.5 |
-| **수학** | | | | | | | |
-| GSM8K | 8-shot | 84.1 | 81.9 | 93.2 | 87.9 | 90.8 | 92.2 |
-| MATH | 4-shot | 32.6 | 40.6 | 48.5 | 49.8 | 52.7 | 53.9 |
-| CMath | 0-shot | 80.3 | 82.8 | 79.2 | 75.1 | 82.0 | 81.9 |
-| **중국어** | | | | | | | |
-| CLUEWSC | 5-shot | 78.5 | 90.1 | 85.4 | 75.8 | 88.6 | 89.9 |
-| C-Eval | 5-shot | 65.2 | 82.2 | 67.9 | 60.0 | 80.9 | 78.0 |
-| CMMLU | 5-shot | 67.8 | 82.9 | 70.7 | 61.0 | 82.4 | 81.6 |
+| 벤치마크            | # Shots | DeepSeek 67B Chat | Qwen1.5 72B Chat | LLaMA3 70B Inst. | Mixtral 8x22B Inst. | DeepSeek-V2 Chat (SFT) | DeepSeek-V2 Chat (RL) |
+| ------------------- | ------- | ----------------- | ---------------- | ---------------- | ------------------- | ---------------------- | --------------------- |
+| 컨텍스트 길이       | -       | 4K                | 32K              | 8K               | 64K                 | 128K                   | 128K                  |
+| 아키텍처            | -       | Dense             | Dense            | Dense            | MoE                 | MoE                    | MoE                   |
+| # 활성화된 파라미터 | -       | 67B               | 72B              | 70B              | 39B                 | 21B                    | 21B                   |
+| # 총 파라미터       | -       | 67B               | 72B              | 70B              | 141B                | 236B                   | 236B                  |
+| **영어**            |         |                   |                  |                  |                     |                        |                       |
+| TriviaQA            | 5-shot  | 81.5              | 79.6             | 69.1             | 80.0                | 85.4                   | 86.7                  |
+| NaturalQuestions    | 5-shot  | 47.0              | 46.9             | 44.6             | 54.9                | 51.9                   | 53.4                  |
+| MMLU                | 5-shot  | 71.1              | 76.2             | 80.3             | 77.8                | 78.4                   | 77.8                  |
+| ARC-Easy            | 25-shot | 96.6              | 96.8             | 96.9             | 97.1                | 97.6                   | 98.1                  |
+| ARC-Challenge       | 25-shot | 88.9              | 91.7             | 92.6             | 90.0                | 92.5                   | 92.3                  |
+| BBH                 | 3-shot  | 71.7              | 65.9             | 80.1             | 78.4                | 81.3                   | 79.7                  |
+| AGIEval             | 0-shot  | 46.4              | 62.8             | 56.6             | 41.4                | 63.2                   | 61.4                  |
+| IFEval              | 0-shot  | 55.5              | 57.3             | 79.7             | 72.1                | 64.1                   | 63.8                  |
+| **코드**            |         |                   |                  |                  |                     |                        |                       |
+| HumanEval           | 0-shot  | 73.8              | 68.9             | 76.2             | 75.0                | 76.8                   | 81.1                  |
+| MBPP                | 3-shot  | 61.4              | 52.2             | 69.8             | 64.4                | 70.4                   | 72.0                  |
+| CRUXEval-I-COT      | 2-shot  | 49.1              | 51.4             | 61.1             | 59.4                | 59.5                   | 61.5                  |
+| CRUXEval-O-COT      | 2-shot  | 50.9              | 56.5             | 63.6             | 63.6                | 60.7                   | 63.0                  |
+| LiveCodeBench       | 0-shot  | 18.3              | 18.8             | 30.5             | 25.0                | 28.7                   | 32.5                  |
+| **수학**            |         |                   |                  |                  |                     |                        |                       |
+| GSM8K               | 8-shot  | 84.1              | 81.9             | 93.2             | 87.9                | 90.8                   | 92.2                  |
+| MATH                | 4-shot  | 32.6              | 40.6             | 48.5             | 49.8                | 52.7                   | 53.9                  |
+| CMath               | 0-shot  | 80.3              | 82.8             | 79.2             | 75.1                | 82.0                   | 81.9                  |
+| **중국어**          |         |                   |                  |                  |                     |                        |                       |
+| CLUEWSC             | 5-shot  | 78.5              | 90.1             | 85.4             | 75.8                | 88.6                   | 89.9                  |
+| C-Eval              | 5-shot  | 65.2              | 82.2             | 67.9             | 60.0                | 80.9                   | 78.0                  |
+| CMMLU               | 5-shot  | 67.8              | 82.9             | 70.7             | 61.0                | 82.4                   | 81.6                  |
 
 다른 모델들과의 비교에서, 먼저 DeepSeek-V2 Chat(SFT)를 Qwen1.5 72B Chat과 비교하면, DeepSeek-V2 Chat(SFT)가 거의 모든 영어, 수학, 코드 벤치마크에서 Qwen1.5 72B Chat을 능가한다는 것을 발견했습니다. 중국어 벤치마크에서는 DeepSeek-V2 Chat(SFT)가 다중 주제 객관식 작업에서 Qwen1.5 72B Chat보다 약간 낮은 점수를 보여주며, 이는 기본 버전에서 관찰된 성능과 일치합니다.
 
@@ -567,14 +567,14 @@ $$r_i = c_1 \cdot RM_{helpful}(o_i) + c_2 \cdot RM_{safety}(o_i) + c_3 \cdot RM_
 
 표준 벤치마크 외에도 개방형 대화 벤치마크에서 모델들을 추가로 평가했습니다. 영어 개방형 대화 생성을 위해서는 MT-Bench와 AlpacaEval 2.0을 벤치마크로 활용했습니다.
 
-| 모델 | MT-Bench | AlpacaEval 2.0 |
-|---|---|---|
-| DeepSeek 67B Chat | 8.35 | 16.6 |
-| Mistral 8x22B Instruct v0.1 | 8.66 | 30.9 |
-| Qwen1.5 72B Chat | 8.61 | 36.6 |
-| LLaMA3 70B Instruct | 8.95 | 34.4 |
-| DeepSeek-V2 Chat (SFT) | 8.62 | 30.0 |
-| DeepSeek-V2 Chat (RL) | 8.97 | 38.9 |
+| 모델                        | MT-Bench | AlpacaEval 2.0 |
+| --------------------------- | -------- | -------------- |
+| DeepSeek 67B Chat           | 8.35     | 16.6           |
+| Mistral 8x22B Instruct v0.1 | 8.66     | 30.9           |
+| Qwen1.5 72B Chat            | 8.61     | 36.6           |
+| LLaMA3 70B Instruct         | 8.95     | 34.4           |
+| DeepSeek-V2 Chat (SFT)      | 8.62     | 30.0           |
+| DeepSeek-V2 Chat (RL)       | 8.97     | 38.9           |
 
 평가 결과는 DeepSeek-V2 Chat(RL)이 DeepSeek-V2 Chat(SFT)에 비해 상당한 성능 우위를 보여준다는 것을 나타냅니다. 이러한 결과는 개선된 정렬을 달성하는 데 있어서 RL 훈련의 효과를 보여줍니다. 다른 오픈소스 모델들과 비교하면, DeepSeek-V2 Chat(RL)은 두 벤치마크 모두에서 Mistral 8x22B Instruct와 Qwen1.5 72B Chat보다 우수한 성능을 보여줍니다. LLaMA3 70B Instruct와 비교할 때, DeepSeek-V2 Chat(RL)은 MT-Bench에서 경쟁력 있는 성능을 보이고 AlpacaEval 2.0에서 현저히 뛰어난 성능을 보입니다.
 
@@ -646,16 +646,6 @@ DeepSeek-V2의 기술적 혁신은 대규모 언어 모델 분야에서 중요�
 DeepSeek-V2는 강력한 성능, 경제적인 훈련, 효율적인 추론이라는 세 가지 핵심 목표를 동시에 달성함으로써, 차세대 대규모 언어 모델의 새로운 패러다임을 제시했습니다. 이러한 성과는 향후 AI 연구와 개발에 중요한 방향성을 제공하며, 인공일반지능을 향한 여정에서 의미 있는 진전을 나타냅니다.
 ## 부록
 
-### 기여자 및 감사의 말
-
-DeepSeek-V2 프로젝트는 연구 및 엔지니어링, 데이터 주석, 비즈니스 및 컴플라이언스 등 다양한 분야의 전문가들이 참여한 대규모 협업 프로젝트입니다. 각 역할 내에서 기여자들은 이름의 알파벳 순으로 나열되어 있으며, 특히 Huazuo Gao와 Wangding Zeng은 MLA 아키텍처 연구에서 핵심적인 혁신을 이루어냈습니다.
-
-연구 및 엔지니어링 팀에는 Aixin Liu, Bingxuan Wang, Bo Liu 등을 포함하여 총 80여 명의 연구자와 엔지니어가 참여했습니다. 이들은 모델 아키텍처 설계, 훈련 알고리즘 개발, 시스템 최적화 등 프로젝트의 핵심 기술적 측면을 담당했습니다. 데이터 주석 팀은 Bei Feng, Hui Li 등 30여 명으로 구성되어 고품질 훈련 데이터 구축과 평가 데이터셋 준비를 담당했습니다.
-
-비즈니스 및 컴플라이언스 팀은 Bin Wang, Dongjie Ji 등으로 구성되어 모델의 상용화와 규정 준수를 위한 업무를 수행했습니다. 또한 위치 임베딩에 대한 유용한 논의를 제공한 Jianlin Su에게 특별한 감사를 표합니다.
-
-DeepSeek은 혁신, 참신함, 호기심이 AGI로 가는 길에서 필수적이라고 믿으며, 논문에 언급되지 않았지만 DeepSeek-V2에 기여한 모든 분들께 감사드립니다.
-
 ### DeepSeek-V2-Lite: MLA와 DeepSeekMoE를 갖춘 16B 모델
 
 #### 모델 설명
@@ -686,36 +676,34 @@ DeepSeek-V2-Lite는 DeepSeek-V2와 동일한 사전 훈련 코퍼스에서 처�
 
 **기본 모델**
 
-![표 6: DeepSeek-V2-Lite, DeepSeekMoE 16B, DeepSeek 7B의 성능 비교](https://arxiv.org/html/2405.04434v5#A2.T6)
+| 벤치마크            | DeepSeek 7B | DeepSeekMoE 16B | DeepSeek-V2-Lite |
+| ------------------- | ----------- | --------------- | ---------------- |
+| 아키텍처            | MHA+Dense   | MHA+MoE         | MLA+MoE          |
+| 컨텍스트 길이       | 4K          | 4K              | 32K              |
+| # 활성화된 파라미터 | 6.9B        | 2.8B            | 2.4B             |
+| # 총 파라미터       | 6.9B        | 16.4B           | 15.7B            |
+| # 훈련 토큰         | 2T          | 2T              | 5.7T             |
+| **영어**            |             |                 |                  |
+| MMLU                | 48.2        | 45.0            | 58.3             |
+| BBH                 | 39.5        | 38.9            | 44.1             |
+| TriviaQA            | 59.7        | 64.8            | 64.2             |
+| NaturalQuestions    | 22.2        | 25.5            | 26.0             |
+| ARC-Easy            | 67.9        | 68.1            | 70.9             |
+| ARC-Challenge       | 48.1        | 49.8            | 51.2             |
+| AGIEval             | 26.4        | 17.4            | 33.2             |
+| **코드**            |             |                 |                  |
+| HumanEval           | 26.2        | 26.8            | 29.9             |
+| MBPP                | 39.0        | 39.2            | 43.2             |
+| **수학**            |             |                 |                  |
+| GSM8K               | 17.4        | 18.8            | 41.1             |
+| MATH                | 3.3         | 4.3             | 17.1             |
+| CMath               | 34.5        | 40.4            | 58.4             |
+| **중국어**          |             |                 |                  |
+| CLUEWSC             | 73.1        | 72.1            | 74.3             |
+| C-Eval              | 45.0        | 40.6            | 60.3             |
+| CMMLU               | 47.2        | 42.5            | 64.3             |
 
-| 벤치마크 | DeepSeek 7B | DeepSeekMoE 16B | DeepSeek-V2-Lite |
-|---|---|---|---|
-| 아키텍처 | MHA+Dense | MHA+MoE | MLA+MoE |
-| 컨텍스트 길이 | 4K | 4K | 32K |
-| # 활성화된 파라미터 | 6.9B | 2.8B | 2.4B |
-| # 총 파라미터 | 6.9B | 16.4B | 15.7B |
-| # 훈련 토큰 | 2T | 2T | 5.7T |
-| **영어** | | | |
-| MMLU | 48.2 | 45.0 | 58.3 |
-| BBH | 39.5 | 38.9 | 44.1 |
-| TriviaQA | 59.7 | 64.8 | 64.2 |
-| NaturalQuestions | 22.2 | 25.5 | 26.0 |
-| ARC-Easy | 67.9 | 68.1 | 70.9 |
-| ARC-Challenge | 48.1 | 49.8 | 51.2 |
-| AGIEval | 26.4 | 17.4 | 33.2 |
-| **코드** | | | |
-| HumanEval | 26.2 | 26.8 | 29.9 |
-| MBPP | 39.0 | 39.2 | 43.2 |
-| **수학** | | | |
-| GSM8K | 17.4 | 18.8 | 41.1 |
-| MATH | 3.3 | 4.3 | 17.1 |
-| CMath | 34.5 | 40.4 | 58.4 |
-| **중국어** | | | |
-| CLUEWSC | 73.1 | 72.1 | 74.3 |
-| C-Eval | 45.0 | 40.6 | 60.3 |
-| CMMLU | 47.2 | 42.5 | 64.3 |
-
-DeepSeek-V2-Lite의 성능을 이전 소규모 기본 모델들과 비교한 결과, DeepSeek-V2-Lite는 압도적인 성능 우위를 보여줍니다. 특히 추론, 코딩, 수학 분야에서 현저한 개선을 보입니다. 
+DeepSeek-V2-Lite의 성능을 이전 소규모 기본 모델들과 비교한 결과, DeepSeek-V2-Lite는 압도적인 성능 우위를 보여줍니다. 특히 추론, 코딩, 수학 분야에서 현저한 개선을 보입니다.
 
 영어 벤치마크에서 DeepSeek-V2-Lite는 MMLU에서 58.3점을 달성하여 DeepSeek 7B의 48.2점과 DeepSeekMoE 16B의 45.0점을 크게 능가합니다. BBH에서도 44.1점으로 이전 모델들의 39.5점과 38.9점보다 우수한 성능을 보입니다.
 
@@ -725,34 +713,32 @@ DeepSeek-V2-Lite의 성능을 이전 소규모 기본 모델들과 비교한 결
 
 **채팅 모델**
 
-![표 7: DeepSeek-V2-Lite Chat, DeepSeekMoE 16B Chat, DeepSeek 7B Chat의 성능 비교](https://arxiv.org/html/2405.04434v5#A2.T7)
-
-| 벤치마크 | DeepSeek 7B Chat | DeepSeekMoE 16B Chat | DeepSeek-V2-Lite Chat |
-|---|---|---|---|
-| 아키텍처 | MHA+Dense | MHA+MoE | MLA+MoE |
-| 컨텍스트 길이 | 4K | 4K | 32K |
-| # 활성화된 파라미터 | 6.9B | 2.8B | 2.4B |
-| # 총 파라미터 | 6.9B | 16.4B | 15.7B |
-| # 훈련 토큰 | 2T | 2T | 5.7T |
-| **영어** | | | |
-| MMLU | 49.7 | 47.2 | 55.7 |
-| BBH | 43.1 | 42.2 | 48.1 |
-| TriviaQA | 59.5 | 63.3 | 65.2 |
-| NaturalQuestions | 32.7 | 35.1 | 35.5 |
-| ARC-Easy | 70.2 | 69.9 | 74.3 |
-| ARC-Challenge | 50.2 | 50.0 | 51.5 |
-| AGIEval | 17.6 | 19.7 | 42.8 |
-| **코드** | | | |
-| HumanEval | 45.1 | 45.7 | 57.3 |
-| MBPP | 39.0 | 46.2 | 45.8 |
-| **수학** | | | |
-| GSM8K | 62.6 | 62.2 | 72.0 |
-| MATH | 14.7 | 15.2 | 27.9 |
-| CMath | 66.4 | 67.9 | 71.7 |
-| **중국어** | | | |
-| CLUEWSC | 66.2 | 68.2 | 80.0 |
-| C-Eval | 44.7 | 40.0 | 60.1 |
-| CMMLU | 51.2 | 49.3 | 62.5 |
+| 벤치마크            | DeepSeek 7B Chat | DeepSeekMoE 16B Chat | DeepSeek-V2-Lite Chat |
+| ------------------- | ---------------- | -------------------- | --------------------- |
+| 아키텍처            | MHA+Dense        | MHA+MoE              | MLA+MoE               |
+| 컨텍스트 길이       | 4K               | 4K                   | 32K                   |
+| # 활성화된 파라미터 | 6.9B             | 2.8B                 | 2.4B                  |
+| # 총 파라미터       | 6.9B             | 16.4B                | 15.7B                 |
+| # 훈련 토큰         | 2T               | 2T                   | 5.7T                  |
+| **영어**            |                  |                      |                       |
+| MMLU                | 49.7             | 47.2                 | 55.7                  |
+| BBH                 | 43.1             | 42.2                 | 48.1                  |
+| TriviaQA            | 59.5             | 63.3                 | 65.2                  |
+| NaturalQuestions    | 32.7             | 35.1                 | 35.5                  |
+| ARC-Easy            | 70.2             | 69.9                 | 74.3                  |
+| ARC-Challenge       | 50.2             | 50.0                 | 51.5                  |
+| AGIEval             | 17.6             | 19.7                 | 42.8                  |
+| **코드**            |                  |                      |                       |
+| HumanEval           | 45.1             | 45.7                 | 57.3                  |
+| MBPP                | 39.0             | 46.2                 | 45.8                  |
+| **수학**            |                  |                      |                       |
+| GSM8K               | 62.6             | 62.2                 | 72.0                  |
+| MATH                | 14.7             | 15.2                 | 27.9                  |
+| CMath               | 66.4             | 67.9                 | 71.7                  |
+| **중국어**          |                  |                      |                       |
+| CLUEWSC             | 66.2             | 68.2                 | 80.0                  |
+| C-Eval              | 44.7             | 40.0                 | 60.1                  |
+| CMMLU               | 51.2             | 49.3                 | 62.5                  |
 
 채팅 모델 버전에서도 DeepSeek-V2-Lite Chat은 이전 소규모 채팅 모델들을 큰 폭으로 능가합니다. 특히 코드 생성 능력에서 HumanEval에서 57.3점을 달성하여 이전 모델들의 45.1점과 45.7점보다 현저히 우수한 성능을 보입니다.
 
@@ -789,7 +775,7 @@ $$\mathbf{o}_{t,i} = \sum_{j=1}^t \text{Softmax}_j\left(\frac{\mathbf{q}_{t,i}^T
 
 $$\mathbf{u}_t = W^O[\mathbf{o}_{t,1}; \mathbf{o}_{t,2}; ...; \mathbf{o}_{t,n_h}]$$
 
-파란색 박스로 표시된 벡터들은 생성을 위해 캐시되어야 하는 요소들입니다. 추론 중에는 순진한 수식이 어텐션을 위해 $\mathbf{c}_t^{KV}$에서 $\mathbf{k}_t^C$와 $\mathbf{v}_t^C$를 복구해야 합니다.
+박스로 표시된 벡터들은 생성을 위해 캐시되어야 하는 요소들입니다. 추론 중에는 순진한 수식이 어텐션을 위해 $\mathbf{c}_t^{KV}$에서 $\mathbf{k}_t^C$와 $\mathbf{v}_t^C$를 복구해야 합니다.
 
 다행히 행렬 곱셈의 결합법칙으로 인해 $W^{UK}$를 $W^{UQ}$에 흡수시킬 수 있고, $W^{UV}$를 $W^O$에 흡수시킬 수 있습니다. 따라서 각 쿼리에 대해 키와 값을 실제로 계산할 필요가 없습니다. 이러한 최적화를 통해 추론 중 $\mathbf{k}_t^C$와 $\mathbf{v}_t^C$를 재계산하는 계산 오버헤드를 피할 수 있습니다.
 
