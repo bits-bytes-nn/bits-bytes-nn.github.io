@@ -2,7 +2,7 @@
 layout: post
 title: "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model"
 date: 2024-05-07 15:56:43
-author: "DeepSeek AI Research"
+author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Low-Rank-Key-Value-Joint-Compression", "Decoupled-Rotary-Position-Embedding", "Device-Limited-Routing", "Auxiliary-Loss-for-Load-Balance", "Token-Dropping-Strategy", "Sparse-Mixture-of-Experts", "Expert-Parallelism", "Efficient-Long-Context-Attention-Mechanism"]
 cover: /assets/images/language-models.jpg
@@ -134,7 +134,7 @@ $$[\mathbf{q}_{t,1}; \mathbf{q}_{t,2}; ...; \mathbf{q}_{t,n_h}] = \mathbf{q}_t$$
 $$[\mathbf{k}_{t,1}; \mathbf{k}_{t,2}; ...; \mathbf{k}_{t,n_h}] = \mathbf{k}_t$$
 $$[\mathbf{v}_{t,1}; \mathbf{v}_{t,2}; ...; \mathbf{v}_{t,n_h}] = \mathbf{v}_t$$
 
-여기서 $\mathbf{q}_{t,i}, \mathbf{k}_{t,i}, \mathbf{v}_{t,i} \in \mathbb{R}^{d_h}$는 각각 $i$번째 어텐션 헤드의 쿼리, 키, 값을 나타냅니다. 각 헤드에서 어텐션 출력은 다음과 같이 계산됩니다.
+여기서 $\mathbf{q}\_{t,i}, \mathbf{k}\_{t,i}, \mathbf{v}\_{t,i} \in \mathbb{R}^{d_h}$는 각각 $i$번째 어텐션 헤드의 쿼리, 키, 값을 나타냅니다. 각 헤드에서 어텐션 출력은 다음과 같이 계산됩니다.
 
 $$\mathbf{o}_{t,i} = \sum_{j=1}^t \text{Softmax}_j\left(\frac{\mathbf{q}_{t,i}^T \mathbf{k}_{j,i}}{\sqrt{d_h}}\right) \mathbf{v}_{j,i}$$
 
