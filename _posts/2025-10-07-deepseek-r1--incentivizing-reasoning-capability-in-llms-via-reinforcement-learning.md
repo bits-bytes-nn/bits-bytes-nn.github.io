@@ -3,9 +3,9 @@ layout: post
 title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
 date: 2025-01-22 15:19:35
 author: "DeepSeek AI Research"
-categories: ["Paper Reviews", "Reinforcement Learning"]
+categories: ["Paper Reviews", "Language-Models"]
 tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Reinforcement-Learning-with-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Iterative-Reinforcement-Learning", "Verifiable-Rewards-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning"]
-cover: /assets/images/default.jpg
+cover: /assets/images/language-models.jpg
 use_math: true
 ---
 ### TL;DR
@@ -33,7 +33,6 @@ DeepSeek-R1은 다양한 벤치마크에서 OpenAI-o1-1217과 비교할 만한 �
 
 이 연구는 단순한 기술적 성과를 넘어 인공지능의 자율학습 가능성에 대한 중요한 통찰을 제공합니다. 지도 학습 데이터 없이도 모델이 스스로 복잡한 추론 전략을 개발할 수 있음을 보여주었으며, 강화학습이 대규모 언어 모델의 능력 향상에 있어 강력한 도구가 될 수 있음을 입증했습니다. 향후 연구에서는 일반 능력 향상, 언어 혼용 문제 해결, 프롬프트 엔지니어링 최적화 등을 통해 더욱 발전된 추론 모델을 개발할 수 있을 것으로 기대됩니다.
 
-</summary></reasoning_process>
 - - -
 # DeepSeek-R1: 강화학습을 통한 대규모 언어 모델의 추론 능력 향상
 
@@ -124,12 +123,12 @@ $$A_{i}=\frac{r_{i}-\mathrm{mean}(\{r_{1},r_{2},\cdots,r_{G}\})}{\mathrm{std}(\{
 
 DeepSeek-R1-Zero를 훈련하기 위해 연구진은 기본 모델이 지정된 지시사항을 준수하도록 안내하는 간단한 템플릿을 설계했습니다. 이 템플릿은 DeepSeek-R1-Zero가 먼저 추론 과정을 생성한 다음 최종 답을 제공하도록 요구합니다.
 
-| 템플릿 구성 요소 | 내용 |
-|-----------------|------|
-| 대화 형식 | 사용자와 어시스턴트 간의 대화 |
-| 사고 과정 | `<think>` 태그 내에 추론 과정 포함 |
-| 최종 답변 | `<answer>` 태그 내에 답변 포함 |
-| 프롬프트 | 구체적인 추론 질문으로 대체됨 |
+| 템플릿 구성 요소 | 내용                               |
+| ---------------- | ---------------------------------- |
+| 대화 형식        | 사용자와 어시스턴트 간의 대화      |
+| 사고 과정        | `<think>` 태그 내에 추론 과정 포함 |
+| 최종 답변        | `<answer>` 태그 내에 답변 포함     |
+| 프롬프트         | 구체적인 추론 질문으로 대체됨      |
 
 연구진은 의도적으로 제약을 이러한 구조적 형식으로 제한하고, 성찰적 추론을 의무화하거나 특정 문제 해결 전략을 촉진하는 것과 같은 내용별 편향을 피했습니다. 이는 강화학습 과정에서 모델의 자연스러운 진행을 정확히 관찰할 수 있도록 하기 위함입니다.
 
@@ -141,12 +140,12 @@ DeepSeek-R1-Zero는 강력한 추론 능력을 보여주며 예상치 못한 강
 
 위 그래프는 강화학습 훈련 과정 동안 DeepSeek-R1-Zero의 AIME 2024 벤치마크 성능 궤적을 보여줍니다. DeepSeek-R1-Zero는 강화학습 훈련이 진행됨에 따라 꾸준하고 일관된 성능 향상을 보여줍니다. 특히 AIME 2024에서 평균 pass@1 점수가 초기 15.6%에서 인상적인 71.0%로 크게 증가하여 OpenAI-o1-0912와 비교할 만한 성능 수준에 도달했습니다.
 
-| 모델 | AIME 2024 | MATH-500 | GPQA | LiveCode | CodeForces | Diamond |
-|------|-----------|----------|------|----------|------------|---------|
-| | pass@1 | cons@64 | pass@1 | pass@1 | pass@1 | rating |
-| OpenAI-o1-mini | 63.6 | 80.0 | 90.0 | 60.0 | 53.8 | 1820 |
-| OpenAI-o1-0912 | 74.4 | 83.3 | 94.8 | 77.3 | 63.4 | 1843 |
-| DeepSeek-R1-Zero | 71.0 | 86.7 | 95.9 | 73.3 | 50.0 | 1444 |
+| 모델             | AIME 2024 | MATH-500 | GPQA   | LiveCode | CodeForces | Diamond |
+| ---------------- | --------- | -------- | ------ | -------- | ---------- | ------- |
+|                  | pass@1    | cons@64  | pass@1 | pass@1   | pass@1     | rating  |
+| OpenAI-o1-mini   | 63.6      | 80.0     | 90.0   | 60.0     | 53.8       | 1820    |
+| OpenAI-o1-0912   | 74.4      | 83.3     | 94.8   | 77.3     | 63.4       | 1843    |
+| DeepSeek-R1-Zero | 71.0      | 86.7     | 95.9   | 73.3     | 50.0       | 1444    |
 
 이 표는 DeepSeek-R1-Zero와 OpenAI o1 모델들 간의 추론 관련 벤치마크 비교를 제공합니다. 결과는 강화학습이 DeepSeek-R1-Zero가 지도 학습 미세 조정 데이터 없이도 강력한 추론 능력을 달성할 수 있게 한다는 것을 보여줍니다. 또한 다수결 투표를 적용하면 DeepSeek-R1-Zero의 성능을 더욱 향상시킬 수 있습니다. 예를 들어, AIME 벤치마크에서 다수결 투표를 사용하면 DeepSeek-R1-Zero의 성능이 71.0%에서 86.7%로 상승하여 OpenAI-o1-0912의 성능을 능가합니다.
 
@@ -164,7 +163,7 @@ DeepSeek-R1-Zero 훈련 중 관찰된 특히 흥미로운 현상은 "아하 모�
 
 **질문**: $a > 1$일 때, $\sqrt{a-\sqrt{a+x}}=x$의 실근의 합은?
 
-**응답**: 
+**응답**:
 ```
 <think>
 방정식 $\sqrt{a-\sqrt{a+x}}=x$를 풀기 위해 양변을 제곱하는 것부터 시작해보겠습니다...
@@ -289,36 +288,36 @@ $$\text{pass@1} = \frac{1}{k}\sum_{i=1}^{k}p_{i}$$
 
 ![DeepSeek-R1 성능 비교](https://arxiv.org/html/2501.12948/x1.png)
 
-| 벤치마크 (지표) | Claude-3.5-Sonnet-1022 | GPT-4o-0513 | DeepSeek-V3 | OpenAI-o1-mini | OpenAI-o1-1217 | DeepSeek-R1 |
-|---|---|---|---|---|---|---|
-| **아키텍처** | - | - | MoE | - | - | MoE |
-| **활성화된 파라미터** | - | - | 37B | - | - | 37B |
-| **전체 파라미터** | - | - | 671B | - | - | 671B |
-| **영어** | | | | | | |
-| MMLU (Pass@1) | 88.3 | 87.2 | 88.5 | 85.2 | 91.8 | 90.8 |
-| MMLU-Redux (EM) | 88.9 | 88.0 | 89.1 | 86.7 | - | 92.9 |
-| MMLU-Pro (EM) | 78.0 | 72.6 | 75.9 | 80.3 | - | 84.0 |
-| DROP (3-shot F1) | 88.3 | 83.7 | 91.6 | 83.9 | 90.2 | 92.2 |
-| IF-Eval (Prompt Strict) | 86.5 | 84.3 | 86.1 | 84.8 | - | 83.3 |
-| GPQA Diamond (Pass@1) | 65.0 | 49.9 | 59.1 | 60.0 | 75.7 | 71.5 |
-| SimpleQA (Correct) | 28.4 | 38.2 | 24.9 | 7.0 | 47.0 | 30.1 |
-| FRAMES (Acc.) | 72.5 | 80.5 | 73.3 | 76.9 | - | 82.5 |
-| AlpacaEval2.0 (LC-winrate) | 52.0 | 51.1 | 70.0 | 57.8 | - | 87.6 |
-| ArenaHard (GPT-4-1106) | 85.2 | 80.4 | 85.5 | 92.0 | - | 92.3 |
-| **코드** | | | | | | |
-| LiveCodeBench (Pass@1-COT) | 38.9 | 32.9 | 36.2 | 53.8 | 63.4 | 65.9 |
-| Codeforces (Percentile) | 20.3 | 23.6 | 58.7 | 93.4 | 96.6 | 96.3 |
-| Codeforces (Rating) | 717 | 759 | 1134 | 1820 | 2061 | 2029 |
-| SWE Verified (Resolved) | 50.8 | 38.8 | 42.0 | 41.6 | 48.9 | 49.2 |
-| Aider-Polyglot (Acc.) | 45.3 | 16.0 | 49.6 | 32.9 | 61.7 | 53.3 |
-| **수학** | | | | | | |
-| AIME 2024 (Pass@1) | 16.0 | 9.3 | 39.2 | 63.6 | 79.2 | 79.8 |
-| MATH-500 (Pass@1) | 78.3 | 74.6 | 90.2 | 90.0 | 96.4 | 97.3 |
-| CNMO 2024 (Pass@1) | 13.1 | 10.8 | 43.2 | 67.6 | - | 78.8 |
-| **중국어** | | | | | | |
-| CLUE-WSC (EM) | 85.4 | 87.9 | 90.9 | 89.9 | - | 92.8 |
-| C-Eval (EM) | 76.7 | 76.0 | 86.5 | 68.9 | - | 91.8 |
-| C-SimpleQA (Correct) | 55.4 | 58.7 | 68.0 | 40.3 | - | 63.7 |
+| 벤치마크 (지표)            | Claude-3.5-Sonnet-1022 | GPT-4o-0513 | DeepSeek-V3 | OpenAI-o1-mini | OpenAI-o1-1217 | DeepSeek-R1 |
+| -------------------------- | ---------------------- | ----------- | ----------- | -------------- | -------------- | ----------- |
+| **아키텍처**               | -                      | -           | MoE         | -              | -              | MoE         |
+| **활성화된 파라미터**      | -                      | -           | 37B         | -              | -              | 37B         |
+| **전체 파라미터**          | -                      | -           | 671B        | -              | -              | 671B        |
+| **영어**                   |                        |             |             |                |                |             |
+| MMLU (Pass@1)              | 88.3                   | 87.2        | 88.5        | 85.2           | 91.8           | 90.8        |
+| MMLU-Redux (EM)            | 88.9                   | 88.0        | 89.1        | 86.7           | -              | 92.9        |
+| MMLU-Pro (EM)              | 78.0                   | 72.6        | 75.9        | 80.3           | -              | 84.0        |
+| DROP (3-shot F1)           | 88.3                   | 83.7        | 91.6        | 83.9           | 90.2           | 92.2        |
+| IF-Eval (Prompt Strict)    | 86.5                   | 84.3        | 86.1        | 84.8           | -              | 83.3        |
+| GPQA Diamond (Pass@1)      | 65.0                   | 49.9        | 59.1        | 60.0           | 75.7           | 71.5        |
+| SimpleQA (Correct)         | 28.4                   | 38.2        | 24.9        | 7.0            | 47.0           | 30.1        |
+| FRAMES (Acc.)              | 72.5                   | 80.5        | 73.3        | 76.9           | -              | 82.5        |
+| AlpacaEval2.0 (LC-winrate) | 52.0                   | 51.1        | 70.0        | 57.8           | -              | 87.6        |
+| ArenaHard (GPT-4-1106)     | 85.2                   | 80.4        | 85.5        | 92.0           | -              | 92.3        |
+| **코드**                   |                        |             |             |                |                |             |
+| LiveCodeBench (Pass@1-COT) | 38.9                   | 32.9        | 36.2        | 53.8           | 63.4           | 65.9        |
+| Codeforces (Percentile)    | 20.3                   | 23.6        | 58.7        | 93.4           | 96.6           | 96.3        |
+| Codeforces (Rating)        | 717                    | 759         | 1134        | 1820           | 2061           | 2029        |
+| SWE Verified (Resolved)    | 50.8                   | 38.8        | 42.0        | 41.6           | 48.9           | 49.2        |
+| Aider-Polyglot (Acc.)      | 45.3                   | 16.0        | 49.6        | 32.9           | 61.7           | 53.3        |
+| **수학**                   |                        |             |             |                |                |             |
+| AIME 2024 (Pass@1)         | 16.0                   | 9.3         | 39.2        | 63.6           | 79.2           | 79.8        |
+| MATH-500 (Pass@1)          | 78.3                   | 74.6        | 90.2        | 90.0           | 96.4           | 97.3        |
+| CNMO 2024 (Pass@1)         | 13.1                   | 10.8        | 43.2        | 67.6           | -              | 78.8        |
+| **중국어**                 |                        |             |             |                |                |             |
+| CLUE-WSC (EM)              | 85.4                   | 87.9        | 90.9        | 89.9           | -              | 92.8        |
+| C-Eval (EM)                | 76.7                   | 76.0        | 86.5        | 68.9           | -              | 91.8        |
+| C-SimpleQA (Correct)       | 55.4                   | 58.7        | 68.0        | 40.3           | -              | 63.7        |
 
 교육 지향적 지식 벤치마크인 MMLU, MMLU-Pro, GPQA Diamond에서 DeepSeek-R1은 DeepSeek-V3 대비 우수한 성능을 보여줍니다. 이러한 개선은 주로 STEM 관련 질문에서의 정확도 향상에 기인하며, 대규모 강화학습을 통해 상당한 성과를 달성했습니다.
 
@@ -338,19 +337,19 @@ AlpacaEval2.0과 ArenaHard에서 주목할 만한 성능이 관찰되어 DeepSee
 
 ## 증류된 모델 평가
 
-| 모델 | AIME 2024 | MATH-500 | GPQA Diamond | LiveCodeBench | CodeForces |
-|---|---|---|---|---|---|
-| | pass@1 | cons@64 | pass@1 | pass@1 | pass@1 | rating |
-| GPT-4o-0513 | 9.3 | 13.4 | 74.6 | 49.9 | 32.9 | 759 |
-| Claude-3.5-Sonnet-1022 | 16.0 | 26.7 | 78.3 | 65.0 | 38.9 | 717 |
-| OpenAI-o1-mini | 63.6 | 80.0 | 90.0 | 60.0 | 53.8 | 1820 |
-| QwQ-32B-Preview | 50.0 | 60.0 | 90.6 | 54.5 | 41.9 | 1316 |
-| DeepSeek-R1-Distill-Qwen-1.5B | 28.9 | 52.7 | 83.9 | 33.8 | 16.9 | 954 |
-| DeepSeek-R1-Distill-Qwen-7B | 55.5 | 83.3 | 92.8 | 49.1 | 37.6 | 1189 |
-| DeepSeek-R1-Distill-Qwen-14B | 69.7 | 80.0 | 93.9 | 59.1 | 53.1 | 1481 |
-| DeepSeek-R1-Distill-Qwen-32B | 72.6 | 83.3 | 94.3 | 62.1 | 57.2 | 1691 |
-| DeepSeek-R1-Distill-Llama-8B | 50.4 | 80.0 | 89.1 | 49.0 | 39.6 | 1205 |
-| DeepSeek-R1-Distill-Llama-70B | 70.0 | 86.7 | 94.5 | 65.2 | 57.5 | 1633 |
+| 모델                          | AIME 2024 | MATH-500 | GPQA Diamond | LiveCodeBench | CodeForces |
+| ----------------------------- | --------- | -------- | ------------ | ------------- | ---------- |
+|                               | pass@1    | cons@64  | pass@1       | pass@1        | pass@1     | rating |
+| GPT-4o-0513                   | 9.3       | 13.4     | 74.6         | 49.9          | 32.9       | 759    |
+| Claude-3.5-Sonnet-1022        | 16.0      | 26.7     | 78.3         | 65.0          | 38.9       | 717    |
+| OpenAI-o1-mini                | 63.6      | 80.0     | 90.0         | 60.0          | 53.8       | 1820   |
+| QwQ-32B-Preview               | 50.0      | 60.0     | 90.6         | 54.5          | 41.9       | 1316   |
+| DeepSeek-R1-Distill-Qwen-1.5B | 28.9      | 52.7     | 83.9         | 33.8          | 16.9       | 954    |
+| DeepSeek-R1-Distill-Qwen-7B   | 55.5      | 83.3     | 92.8         | 49.1          | 37.6       | 1189   |
+| DeepSeek-R1-Distill-Qwen-14B  | 69.7      | 80.0     | 93.9         | 59.1          | 53.1       | 1481   |
+| DeepSeek-R1-Distill-Qwen-32B  | 72.6      | 83.3     | 94.3         | 62.1          | 57.2       | 1691   |
+| DeepSeek-R1-Distill-Llama-8B  | 50.4      | 80.0     | 89.1         | 49.0          | 39.6       | 1205   |
+| DeepSeek-R1-Distill-Llama-70B | 70.0      | 86.7     | 94.5         | 65.2          | 57.5       | 1633   |
 
 위 표에서 보듯이 단순히 DeepSeek-R1의 출력을 증류하는 것만으로도 효율적인 DeepSeek-R1-7B(즉, DeepSeek-R1-Distill-Qwen-7B, 이하 유사하게 축약)가 GPT-4o-0513과 같은 비추론 모델들을 전반적으로 능가할 수 있게 됩니다.
 
@@ -365,12 +364,12 @@ DeepSeek-R1의 개발 과정에서 중요한 질문이 제기되었습니다. 3.
 
 이 질문에 답하기 위해 연구진은 Qwen-32B-Base에 수학, 코드, STEM 데이터를 사용하여 10,000단계 이상의 대규모 강화학습 훈련을 수행하여 DeepSeek-R1-Zero-Qwen-32B를 개발했습니다.
 
-| 모델 | AIME 2024 | MATH-500 | GPQA Diamond | LiveCodeBench | pass@1 |
-|---|---|---|---|---|---|
-| | pass@1 | cons@64 | pass@1 | pass@1 | |
-| QwQ-32B-Preview | 50.0 | 60.0 | 90.6 | 54.5 | 41.9 |
-| DeepSeek-R1-Zero-Qwen-32B | 47.0 | 60.0 | 91.6 | 55.0 | 40.2 |
-| DeepSeek-R1-Distill-Qwen-32B | 72.6 | 83.3 | 94.3 | 62.1 | 57.2 |
+| 모델                         | AIME 2024 | MATH-500 | GPQA Diamond | LiveCodeBench | pass@1 |
+| ---------------------------- | --------- | -------- | ------------ | ------------- | ------ |
+|                              | pass@1    | cons@64  | pass@1       | pass@1        |        |
+| QwQ-32B-Preview              | 50.0      | 60.0     | 90.6         | 54.5          | 41.9   |
+| DeepSeek-R1-Zero-Qwen-32B    | 47.0      | 60.0     | 91.6         | 55.0          | 40.2   |
+| DeepSeek-R1-Distill-Qwen-32B | 72.6      | 83.3     | 94.3         | 62.1          | 57.2   |
 
 실험 결과는 32B 기본 모델이 대규모 강화학습 훈련 후 QwQ-32B-Preview와 동등한 성능을 달성함을 보여줍니다. 하지만 DeepSeek-R1에서 증류된 DeepSeek-R1-Distill-Qwen-32B는 모든 벤치마크에서 DeepSeek-R1-Zero-Qwen-32B를 크게 능가하는 성능을 보였습니다.
 
@@ -426,13 +425,6 @@ DeepSeek-R1의 향후 연구를 위해 다음과 같은 방향에 투자할 계�
 
 특히 주목할 만한 것은 OpenAI의 o1 시리즈 모델들과 관련된 최신 연구들, 그리고 수학적 추론과 코드 생성 능력을 평가하기 위한 다양한 벤치마크들이 포함되어 있다는 점입니다. 이러한 참고문헌들은 DeepSeek-R1의 성능을 객관적으로 평가하고 기존 연구와의 비교 분석을 가능하게 하는 중요한 기준점들을 제공합니다.
 
-## 부록: 기여자 및 감사의 말
-
-DeepSeek-R1 프로젝트는 다양한 전문 분야의 연구자들과 엔지니어들의 협력을 통해 완성되었습니다. 핵심 기여자들은 모델 아키텍처 설계, 강화학습 알고리즘 개발, 대규모 훈련 파이프라인 구축, 그리고 종합적인 평가 시스템 개발에 중요한 역할을 담당했습니다.
-
-프로젝트의 성공적인 완수를 위해 기여한 모든 연구자들과 엔지니어들의 전문성과 헌신이 DeepSeek-R1의 혁신적인 추론 능력 개발을 가능하게 했습니다. 특히 강화학습 기반 추론 모델 개발이라는 도전적인 과제를 해결하기 위해 다학제적 접근법을 통해 이론적 연구와 실용적 구현을 성공적으로 결합했습니다.
-
-이러한 협력적 연구 환경은 DeepSeek-R1이 단순히 기술적 성과를 넘어서 AI 연구 커뮤니티 전체에 기여할 수 있는 오픈소스 모델로 발전할 수 있는 기반을 제공했습니다. 연구진의 다양한 배경과 전문성이 결합되어 추론 능력 향상이라는 복잡한 문제에 대한 포괄적이고 혁신적인 해결책을 제시할 수 있었습니다.
 - - -
 ### References
 * [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](http://arxiv.org/pdf/2501.12948v1)
