@@ -2,7 +2,7 @@
 layout: post
 title: "DeepSeek-V3 Technical Report"
 date: 2024-12-27 04:03:16
-author: "DeepSeek AI Research"
+author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE-Architecture", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding"]
 cover: /assets/images/language-models.jpg
