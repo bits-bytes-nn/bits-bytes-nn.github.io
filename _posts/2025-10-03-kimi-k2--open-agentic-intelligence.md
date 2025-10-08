@@ -88,7 +88,7 @@ Kimi K2는 가중치 감쇠와 일관된 업데이트 RMS 스케일링을 통합
 
 $$\mathbf{Q}^{h}=\mathbf{X}\mathbf{W}_{q}^{h},\quad\mathbf{K}^{h}=\mathbf{X}\mathbf{W}_{k}^{h},\quad\mathbf{V}^{h}=\mathbf{X}\mathbf{W}_{v}^{h}$$
 
-여기서 $\mathbf{W}_{q}, \mathbf{W}_{k}, \mathbf{W}_{v}$는 모델 파라미터입니다. 어텐션 출력은 다음과 같습니다.
+여기서 $\mathbf{W}\_{q}, \mathbf{W}\_{k}, \mathbf{W}_{v}$는 모델 파라미터입니다. 어텐션 출력은 다음과 같습니다.
 
 $$\mathbf{O}^{h}=\operatorname{softmax}\left(\frac{1}{\sqrt{d}}\mathbf{Q}^{h}\mathbf{K}^{h\top}\right)\mathbf{V}^{h}$$
 
@@ -98,7 +98,7 @@ $$S_{\max}^{h}=\frac{1}{\sqrt{d}}\max_{\mathbf{X}\in B}\max_{i,j}\mathbf{Q}_{i}^
 
 여기서 $i, j$는 훈련 샘플 $\mathbf{X}$에서 서로 다른 토큰의 인덱스입니다.
 
-QK-Clip의 핵심 아이디어는 $S_{\max}^{h}$가 목표 임계값 $\tau$를 초과할 때마다 $\mathbf{W}_{k}, \mathbf{W}_{q}$를 재스케일링하는 것입니다. 중요한 점은 이 연산이 현재 단계의 순방향/역방향 계산을 변경하지 않는다는 것입니다. 단지 최대 로짓을 가중치 증가를 제어하는 강도를 결정하는 안내 신호로 사용할 뿐입니다.
+QK-Clip의 핵심 아이디어는 $S_{\max}^{h}$가 목표 임계값 $\tau$를 초과할 때마다 $\mathbf{W}\_{k}, \mathbf{W}_{q}$를 재스케일링하는 것입니다. 중요한 점은 이 연산이 현재 단계의 순방향/역방향 계산을 변경하지 않는다는 것입니다. 단지 최대 로짓을 가중치 증가를 제어하는 강도를 결정하는 안내 신호로 사용할 뿐입니다.
 
 단순한 구현은 모든 헤드를 동시에 클리핑합니다.
 
