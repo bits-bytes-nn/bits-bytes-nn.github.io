@@ -3,7 +3,7 @@ layout: post
 title: "The Llama 3 Herd of Models"
 date: 2024-07-31 17:54:27
 author: "Meta AI"
-categories: ["Paper Reviews", "Language Models"]
+categories: ["Paper Reviews", "Language-Models"]
 tags: ["Direct-Preference-Optimization", "Scaling-Laws-for-Large-Language-Models", "Multimodal-Knowledge-Distillation", "Efficient-Long-Context-Attention-Mechanism", "Multilingual-Multimodal-Understanding", "Safety-Alignment", "Synthetic-Data-Generation-for-Mathematics", "Tool-Use-Emergence", "Rejection-Sampling-Fine-Tuning", "Multi-Stage-Post-Training-Recipe"]
 cover: /assets/images/language-models.jpg
 use_math: true
