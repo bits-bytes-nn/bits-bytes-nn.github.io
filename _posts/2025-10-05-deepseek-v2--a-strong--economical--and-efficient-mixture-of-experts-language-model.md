@@ -123,7 +123,9 @@ DeepSeek-V2에서는 Multi-head Latent Attention(MLA)이라는 혁신적인 어�
 표준 MHA는 먼저 세 개의 행렬 $W^Q, W^K, W^V \in \mathbb{R}^{d_h n_h \times d}$를 통해 $\mathbf{q}_t, \mathbf{k}_t, \mathbf{v}_t \in \mathbb{R}^{d_h n_h}$를 생성합니다.
 
 $$\mathbf{q}_t = W^Q \mathbf{h}_t$$
+
 $$\mathbf{k}_t = W^K \mathbf{h}_t$$
+
 $$\mathbf{v}_t = W^V \mathbf{h}_t$$
 
 이해를 돕기 위해 이 과정을 구체적으로 설명하면, 각 토큰의 숨겨진 표현 $\mathbf{h}_t$가 세 개의 서로 다른 선형 변환을 거쳐 쿼리, 키, 값 벡터로 변환됩니다. 이는 마치 하나의 정보를 세 가지 다른 관점에서 바라보는 것과 같습니다.
@@ -131,7 +133,9 @@ $$\mathbf{v}_t = W^V \mathbf{h}_t$$
 그 다음, $\mathbf{q}_t, \mathbf{k}_t, \mathbf{v}_t$는 멀티헤드 어텐션 계산을 위해 $n_h$개의 헤드로 분할됩니다.
 
 $$[\mathbf{q}_{t,1}; \mathbf{q}_{t,2}; ...; \mathbf{q}_{t,n_h}] = \mathbf{q}_t$$
+
 $$[\mathbf{k}_{t,1}; \mathbf{k}_{t,2}; ...; \mathbf{k}_{t,n_h}] = \mathbf{k}_t$$
+
 $$[\mathbf{v}_{t,1}; \mathbf{v}_{t,2}; ...; \mathbf{v}_{t,n_h}] = \mathbf{v}_t$$
 
 여기서 $\mathbf{q}\_{t,i}, \mathbf{k}\_{t,i}, \mathbf{v}\_{t,i} \in \mathbb{R}^{d_h}$는 각각 $i$번째 어텐션 헤드의 쿼리, 키, 값을 나타냅니다. 각 헤드에서 어텐션 출력은 다음과 같이 계산됩니다.
@@ -153,10 +157,12 @@ $$\mathbf{u}_t = W^O [\mathbf{o}_{t,1}; \mathbf{o}_{t,2}; ...; \mathbf{o}_{t,n_h
 MLA의 핵심은 KV 캐시를 줄이기 위한 키와 값의 저랭크 공동 압축입니다. 이 혁신적인 접근법은 키와 값을 별도로 처리하는 대신 공동으로 압축하여 더 효율적인 표현을 만듭니다.
 
 $$\mathbf{c}_t^{KV} = W^{DKV} \mathbf{h}_t$$
+
 $$\mathbf{k}_t^C = W^{UK} \mathbf{c}_t^{KV}$$
+
 $$\mathbf{v}_t^C = W^{UV} \mathbf{c}_t^{KV}$$
 
-여기서 $\mathbf{c}_t^{KV} \in \mathbb{R}^{d_c}$는 키와 값을 위한 압축된 잠재 벡터이고, $d_c (\ll d_h n_h)$는 KV 압축 차원을 나타냅니다. $W^{DKV} \in \mathbb{R}^{d_c \times d}$는 다운 투영 행렬이고, $W^{UK}, W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$는 각각 키와 값을 위한 업 투영 행렬입니다.
+여기서 $\mathbf{c}_t^{KV} \in \mathbb{R}^{d_c}$는 키와 값을 위한 압축된 잠재 벡터이고, $d_c (\ll d_h n_h)$는 KV 압축 차원을 나타냅니다. $W^{DKV} \in \mathbb{R}^{d_c \times d}$는 압축 행렬이고, $W^{UK}, W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$는 각각 키와 값을 위한 복원 행렬입니다.
 
 이 압축 과정을 직관적으로 이해하면, 원래의 고차원 키-값 정보를 훨씬 작은 차원의 잠재 공간으로 압축한 다음, 필요할 때 이를 다시 복원하는 것입니다. 이는 정보의 핵심적인 부분만을 보존하면서 메모리 사용량을 크게 줄이는 효과적인 방법입니다.
 
@@ -165,13 +171,14 @@ $$\mathbf{v}_t^C = W^{UV} \mathbf{c}_t^{KV}$$
 훈련 중 활성화 메모리를 줄이기 위해 KV 캐시를 줄일 수는 없지만 쿼리에 대해서도 저랭크 압축을 수행합니다.
 
 $$\mathbf{c}_t^Q = W^{DQ} \mathbf{h}_t$$
+
 $$\mathbf{q}_t^C = W^{UQ} \mathbf{c}_t^Q$$
 
 여기서 $\mathbf{c}_t^Q \in \mathbb{R}^{d_c'}$는 쿼리를 위한 압축된 잠재 벡터이고, $d_c' (\ll d_h n_h)$는 쿼리 압축 차원을 나타냅니다.
 
 #### 분리된 회전 위치 임베딩
 
-DeepSeek 67B를 따라 DeepSeek-V2에서도 Rotary Position Embedding(RoPE)을 사용하려고 했습니다. 그러나 RoPE는 저랭크 KV 압축과 호환되지 않습니다. 구체적으로, RoPE는 키와 쿼리 모두에 대해 위치에 민감합니다. 키 $\mathbf{k}_t^C$에 RoPE를 적용하면, 식 (10)의 $W^{UK}$가 위치에 민감한 RoPE 행렬과 결합됩니다.
+DeepSeek 67B를 따라 DeepSeek-V2에서도 Rotary Position Embedding(RoPE)을 사용하려고 했습니다. 그러나 RoPE는 저랭크 KV 압축과 호환되지 않습니다. 구체적으로, RoPE는 키와 쿼리 모두에 대해 위치에 민감합니다. 키 $\mathbf{k}_t^C$에 RoPE를 적용하면, $W^{UK}$가 위치에 민감한 RoPE 행렬과 결합됩니다.
 
 이 문제를 해결하기 위해 분리된 RoPE 전략을 제안합니다. 이 전략은 RoPE를 수행하기 위해 추가적인 멀티헤드 쿼리 $\mathbf{q}_{t,i}^R \in \mathbb{R}^{d_h^R}$와 공유 키 $\mathbf{k}_t^R \in \mathbb{R}^{d_h^R}$를 사용합니다. 여기서 $d_h^R$는 분리된 쿼리와 키의 헤드당 차원을 나타냅니다.
 
@@ -183,6 +190,7 @@ $$\mathbf{k}_t^R = \text{RoPE}(W^{KR} \mathbf{h}_t)$$
 그 다음 압축된 부분과 RoPE 부분을 연결합니다.
 
 $$\mathbf{q}_{t,i} = [\mathbf{q}_{t,i}^C; \mathbf{q}_{t,i}^R]$$
+
 $$\mathbf{k}_{t,i} = [\mathbf{k}_{t,i}^C; \mathbf{k}_t^R]$$
 
 최종 어텐션 계산은 다음과 같습니다.
@@ -751,6 +759,7 @@ DeepSeek-V2-Lite의 성능을 이전 소규모 기본 모델들과 비교한 결
 MLA의 완전한 계산 과정을 보여주기 위해 전체 수식을 제공합니다. 이는 MLA 메커니즘의 구현과 최적화 전략을 이해하는 데 도움이 됩니다.
 
 쿼리 계산:
+
 $$\mathbf{c}_t^Q = W^{DQ}\mathbf{h}_t$$
 
 $$[\mathbf{q}_{t,1}^C; \mathbf{q}_{t,2}^C; ...; \mathbf{q}_{t,n_h}^C] = \mathbf{q}_t^C = W^{UQ}\mathbf{c}_t^Q$$
@@ -760,6 +769,7 @@ $$[\mathbf{q}_{t,1}^R; \mathbf{q}_{t,2}^R; ...; \mathbf{q}_{t,n_h}^R] = \mathbf{
 $$\mathbf{q}_{t,i} = [\mathbf{q}_{t,i}^C; \mathbf{q}_{t,i}^R]$$
 
 키-값 계산:
+
 $$\boxed{\mathbf{c}_t^{KV}} = W^{DKV}\mathbf{h}_t$$
 
 $$[\mathbf{k}_{t,1}^C; \mathbf{k}_{t,2}^C; ...; \mathbf{k}_{t,n_h}^C] = \mathbf{k}_t^C = W^{UK}\mathbf{c}_t^{KV}$$
@@ -771,6 +781,7 @@ $$\mathbf{k}_{t,i} = [\mathbf{k}_{t,i}^C; \mathbf{k}_t^R]$$
 $$[\mathbf{v}_{t,1}^C; \mathbf{v}_{t,2}^C; ...; \mathbf{v}_{t,n_h}^C] = \mathbf{v}_t^C = W^{UV}\mathbf{c}_t^{KV}$$
 
 어텐션 출력 계산:
+
 $$\mathbf{o}_{t,i} = \sum_{j=1}^t \text{Softmax}_j\left(\frac{\mathbf{q}_{t,i}^T\mathbf{k}_{j,i}}{\sqrt{d_h+d_h^R}}\right)\mathbf{v}_{j,i}^C$$
 
 $$\mathbf{u}_t = W^O[\mathbf{o}_{t,1}; \mathbf{o}_{t,2}; ...; \mathbf{o}_{t,n_h}]$$
