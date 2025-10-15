@@ -24,10 +24,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.6.3'
+          bundler: '2.6.2'
           bundler-cache: true
           cache-version: 0
-      - name: Install specific Bundler version
-        run: gem install bundler:2.6.2
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
