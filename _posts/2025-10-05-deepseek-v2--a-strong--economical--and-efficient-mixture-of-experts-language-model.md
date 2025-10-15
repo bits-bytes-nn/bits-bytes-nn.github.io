@@ -185,6 +185,7 @@ DeepSeek 67B를 따라 DeepSeek-V2에서도 Rotary Position Embedding(RoPE)을 �
 분리된 RoPE 전략을 갖춘 MLA는 다음과 같은 계산을 수행합니다.
 
 $$[\mathbf{q}_{t,1}^R; \mathbf{q}_{t,2}^R; ...; \mathbf{q}_{t,n_h}^R] = \mathbf{q}_t^R = \text{RoPE}(W^{QR} \mathbf{c}_t^Q)$$
+
 $$\mathbf{k}_t^R = \text{RoPE}(W^{KR} \mathbf{h}_t)$$
 
 그 다음 압축된 부분과 RoPE 부분을 연결합니다.
