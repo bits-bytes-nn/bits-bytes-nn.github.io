@@ -29,8 +29,8 @@ jobs:
         with:
           ruby-version: '2.7'
           bundler: '2.6.2'
-          bundler-cache: true
-          cache-version: 0
+      - name: Install Dependencies
+        run: bundle install --jobs 4 --retry 3
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
