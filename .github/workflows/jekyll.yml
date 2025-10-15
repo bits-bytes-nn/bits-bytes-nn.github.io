@@ -30,7 +30,9 @@ jobs:
           ruby-version: '2.7'
           bundler: '2.2.33'
       - name: Install Dependencies
-        run: bundle install --jobs 4 --retry 3
+        run: |
+          rm -f Gemfile.lock
+          bundle install --jobs 4 --retry 3
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
