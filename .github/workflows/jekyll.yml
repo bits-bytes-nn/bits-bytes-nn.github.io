@@ -28,7 +28,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
-          bundler: '2.6.2'
+          bundler: '2.2.33'
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3
       - name: Setup Pages
