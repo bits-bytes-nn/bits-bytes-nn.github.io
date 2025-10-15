@@ -38,7 +38,6 @@ _site
 .sass-cache
 
 .claude/
-.github/
 .idea/
 .run/
 _posts_bak/
