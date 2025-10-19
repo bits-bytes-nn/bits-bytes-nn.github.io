@@ -3,21 +3,19 @@ layout: post
 title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"
 date: 2023-05-29 17:57:46
 author: "Stanford University"
-categories: ["Paper Reviews", "Reinforcement-Learning"]
+categories: ["Paper Reviews", "Finetuning"]
 tags: ["Direct-Preference-Optimization", "Implicit-Reward-Modeling", "Bradley-Terry-Preference-Framework", "KL-Constrained-Reward-Maximization", "Binary-Cross-Entropy-Policy-Optimization", "Reward-Reparameterization", "Policy-Implicit-Reward-Function", "Closed-Form-Optimal-Policy-Extraction", "RL-Free-Preference-Learning", "Dynamic-Per-Example-Importance-Weighting"]
-cover: /assets/images/default.jpg
+cover: /assets/images/finetuning.jpg
 use_math: true
 ---
 ### TL;DR
-# Direct Preference Optimization: 언어 모델은 비밀리에 보상 모델입니다
-
-## 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
+#### 이 연구를 시작하게 된 배경과 동기는 무엇입니까?
 
 대규모 언어 모델은 방대한 비지도 학습 데이터로부터 광범위한 세계 지식과 추론 능력을 습득하지만, 이러한 모델의 행동을 인간의 선호도에 맞춰 정밀하게 제어하는 것은 매우 어려운 과제입니다. 현재 표준적인 접근법인 인간 피드백 기반 강화학습(RLHF)은 먼저 인간 선호도 데이터로부터 보상 모델을 학습한 후, 강화학습 알고리즘을 사용하여 이 보상을 최대화하도록 언어 모델을 최적화합니다. 이 파이프라인은 여러 언어 모델을 동시에 훈련시켜야 하고, 훈련 루프에서 언어 모델 정책으로부터 샘플링을 수행해야 하므로 상당한 계산 비용이 발생합니다. 또한 보상 모델과 정책 모델을 별도로 유지하고 업데이트해야 하므로 구현이 복잡하며, 훈련 과정에서 불안정성이 발생할 수 있습니다.
 
 이 논문의 핵심 동기는 이러한 복잡한 강화학습 파이프라인을 단순화하면서도 동일한 이론적 목적 함수를 최적화할 수 있는 방법을 찾는 것입니다. 저자들은 기존 RLHF 방법들이 사용하는 강화학습 기반 목적 함수를 단순한 이진 교차 엔트로피 목적 함수로 정확하게 최적화할 수 있음을 발견했습니다. 이를 통해 선호도 학습 파이프라인을 크게 단순화할 수 있으며, 명시적인 보상 모델 학습과 강화학습 훈련 루프를 제거하면서도 기존 방법들과 동등하거나 더 나은 성능을 달성할 수 있습니다. 이러한 접근법은 인간 선호도로부터 더 많은 언어 모델을 훈련시키는 데 있어 장벽을 의미 있게 낮추고, 선호도 기반 학습의 접근성을 크게 향상시킵니다.
 
-## 이 연구에서 제시하는 새로운 해결 방법은 무엇입니까?
+#### 이 연구에서 제시하는 새로운 해결 방법은 무엇입니까?
 
 **Direct Preference Optimization(DPO)**는 기존 RLHF 알고리즘과 동일한 목적 함수(KL 발산 제약이 있는 보상 최대화)를 암묵적으로 최적화하지만 구현이 간단하고 훈련이 직관적인 알고리즘입니다. DPO의 핵심 통찰은 보상 함수에서 최적 정책으로의 분석적 매핑을 활용하는 것입니다. 이를 통해 보상 함수에 대한 손실 함수를 정책에 대한 손실 함수로 변환할 수 있으며, 명시적이고 독립적인 보상 모델을 학습시키는 것을 피하면서도 Bradley-Terry 모델과 같은 기존의 인간 선호도 모델 하에서 최적화를 수행합니다. 본질적으로 정책 네트워크는 언어 모델과 암묵적 보상을 모두 표현하게 됩니다.
 
@@ -27,15 +25,16 @@ $$\mathcal{L}_{\text{DPO}}(\pi_\theta; \pi_{\text{ref}}) = -\mathbb{E}_{(x, y_w,
 
 DPO 업데이트의 메커니즘적 이해를 위해 손실 함수의 그래디언트를 분석하면, 선호되는 응답의 우도를 증가시키고 선호되지 않는 응답의 우도를 감소시키되, 예제들이 암묵적 보상 모델이 선호되지 않는 완성을 얼마나 더 높게 평가하는지에 따라 동적으로 가중치가 부여됨을 알 수 있습니다. 이러한 예제별 중요도 가중치는 순진한 확률 비율 목적 함수에서 발생하는 모델 퇴화를 방지하는 데 매우 중요합니다.
 
-## 제안된 방법은 어떻게 구현되었습니까?
+#### 제안된 방법은 어떻게 구현되었습니까?
 
-DPO의 파이프라인은 두 단계로 진행됩니다. 첫 번째 단계에서는 모든 프롬프트 $x$에 대해 완성 $y_1, y_2 \sim \pi_{\text{ref}}(\cdot \mid x)$를 샘플링하고, 인간 선호도로 레이블을 달아 오프라인 선호도 데이터셋 $\mathcal{D} = \{x^{(i)}, y_w^{(i)}, y_l^{(i)}\}_{i=1}^N$을 구성합니다. 두 번째 단계에서는 주어진 $\pi_{\text{ref}}$와 $\mathcal{D}$, 그리고 원하는 $\beta$에 대해 $\mathcal{L}_{\text{DPO}}$를 최소화하도록 언어 모델 $\pi_\theta$를 최적화합니다. 실제로는 공개적으로 사용 가능한 선호도 데이터셋을 재사용하며, 선호도 데이터셋이 $\pi^{\text{SFT}}$를 사용하여 샘플링되었으므로 가능한 경우 $\pi_{\text{ref}} = \pi^{\text{SFT}}$로 초기화합니다. $\pi^{\text{SFT}}$를 사용할 수 없는 경우, 선호되는 완성의 우도를 최대화하여 $\pi_{\text{ref}}$를 초기화합니다.
+
+/\pi_{\text{ref}}$를 초기화합니다.
 
 실험은 세 가지 서로 다른 개방형 텍스트 생성 작업을 탐구합니다. **통제된 감정 생성** 작업에서는 IMDb 데이터셋의 영화 리뷰 접두사로부터 긍정적인 감정을 가진 텍스트를 생성하도록 훈련하며, 사전학습된 감정 분류기를 사용하여 선호도 쌍을 생성합니다. **요약** 작업에서는 Reddit TL;DR 데이터셋을 사용하여 포럼 게시물의 주요 요점을 요약하도록 훈련하며, 인간이 수집한 선호도 데이터를 활용합니다. **단일 턴 대화** 작업에서는 Anthropic Helpful and Harmless 데이터셋을 사용하여 다양한 인간 질의에 대해 매력적이고 유용한 응답을 생성하도록 훈련합니다. 모든 실험에서 기본 하이퍼파라미터는 $\beta = 0.1$, 배치 크기 64, 학습률 1e-6의 RMSprop 옵티마이저를 사용하며, 학습률은 0에서 1e-6까지 150 스텝에 걸쳐 선형적으로 워밍업합니다.
 
 평가 방법론은 작업의 특성에 따라 다릅니다. 통제된 감정 생성 설정에서는 진짜 보상 함수(감정 분류기)에 접근할 수 있기 때문에 각 알고리즘이 달성한 보상과 참조 정책으로부터의 KL 발산의 프론티어로 평가합니다. 요약 및 단일 턴 대화 설정에서는 베이스라인 정책에 대한 승률로 알고리즘을 평가하며, 요약 품질과 응답 유용성에 대한 인간 평가의 대리 지표로 GPT-4를 사용합니다. GPT-4 평가의 신뢰성을 검증하기 위해 인간 연구를 수행했으며, 결과는 GPT-4가 인간이 서로 일치하는 만큼 인간과 일치하는 경향이 있어 인간 평가의 합리적인 대리 지표임을 보여줍니다.
 
-## 이 연구의 결과가 가지는 의미는 무엇입니까?
+#### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
 DPO는 모든 실험 설정에서 기존 방법들과 비교하여 우수한 성능을 달성했습니다. **통제된 감정 생성** 실험에서 DPO는 가장 효율적인 보상-KL 프론티어를 생성하여 낮은 KL을 유지하면서 가장 높은 보상을 달성했습니다. 특히 DPO의 보상/KL 트레이드오프는 PPO를 엄격하게 지배했으며, PPO가 진짜 보상에 접근할 수 있는 경우(PPO-GT)에도 DPO가 더 나은 프론티어를 달성했습니다. **요약 작업**에서 DPO는 온도 0.0에서 약 61%의 승률을 달성하여 최적 샘플링 온도 0.0에서 57%의 PPO 성능을 초과했으며, Best of $N$ 베이스라인과 비교하여도 더 높은 최대 승률을 달성했습니다. 더욱이 DPO는 PPO보다 샘플링 온도에 훨씬 더 강건한 것으로 나타났으며, 다양한 온도에서 일관된 성능을 유지했습니다. **단일 턴 대화** 작업에서 DPO는 Anthropic-HH 데이터셋의 선호되는 완성을 개선하는 유일한 계산적으로 효율적인 방법이었으며, 계산적으로 까다로운 Best of 128 베이스라인과 유사하거나 더 나은 성능을 제공했습니다.
 
@@ -131,7 +130,7 @@ $$p^*(y_1 \succ y_2 \mid x) = \frac{\exp(r^*(x, y_1))}{\exp(r^*(x, y_1)) + \exp(
 
 이 수식은 두 응답 간의 선호도를 보상 함수의 지수 함수 비율로 모델링합니다. 직관적으로 이해하면, 보상이 높은 응답일수록 선호될 확률이 기하급수적으로 증가하는 구조입니다. 이는 체스나 스포츠 경기에서 선수들의 상대적 실력을 평가하는 Elo 레이팅 시스템과 유사한 원리를 따릅니다.
 
-$p^*$로부터 샘플링된 비교 데이터의 정적 데이터셋 $\mathcal{D} = \{x^{(i)}, y_w^{(i)}, y_l^{(i)}\}_{i=1}^N$에 접근할 수 있다고 가정하면, 보상 모델 $r_\phi(x, y)$를 파라미터화하고 최대 우도 추정을 통해 파라미터를 추정할 수 있습니다. 이 문제를 이진 분류 문제로 프레이밍하면 다음과 같은 음의 로그 우도 손실 함수를 얻습니다.
+$p^*$로부터 샘플링된 비교 데이터의 정적 데이터셋 $\mathcal{D} = \{x^{(i)}, y_w^{(i)}, y_l^{(i)}\}\_{i=1}^N$에 접근할 수 있다고 가정하면, 보상 모델 $r_\phi(x, y)$를 파라미터화하고 최대 우도 추정을 통해 파라미터를 추정할 수 있습니다. 이 문제를 이진 분류 문제로 프레이밍하면 다음과 같은 음의 로그 우도 손실 함수를 얻습니다.
 
 $$\mathcal{L}_R(r_\phi, \mathcal{D}) = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}}[\log\sigma(r_\phi(x, y_w) - r_\phi(x, y_l))]$$
 
@@ -139,7 +138,7 @@ $$\mathcal{L}_R(r_\phi, \mathcal{D}) = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{
 
 언어 모델의 맥락에서 보상 네트워크 $r_\phi(x, y)$는 종종 SFT 모델 $\pi^{\text{SFT}}(y \mid x)$로부터 초기화되며, 최종 트랜스포머 레이어 위에 단일 스칼라 보상 값을 생성하는 선형 레이어를 추가합니다. 이러한 구조는 사전학습된 언어 모델의 표현 능력을 활용하면서도 보상 예측이라는 새로운 작업에 적응할 수 있도록 합니다.
 
-보상 함수의 분산을 낮추기 위해 선행 연구들은 보상을 정규화하여 모든 $x$에 대해 $\mathbb{E}_{x, y \sim \mathcal{D}}[r_\phi(x, y)] = 0$이 되도록 합니다. 이러한 정규화는 보상 값의 절대적 크기보다는 상대적 순서가 중요하다는 점을 반영하며, 훈련의 안정성을 향상시킵니다.
+보상 함수의 분산을 낮추기 위해 선행 연구들은 보상을 정규화하여 모든 $x$에 대해 $\mathbb{E}\_{x, y \sim \mathcal{D}}[r_\phi(x, y)] = 0$이 되도록 합니다. 이러한 정규화는 보상 값의 절대적 크기보다는 상대적 순서가 중요하다는 점을 반영하며, 훈련의 안정성을 향상시킵니다.
 
 ### 강화학습 파인튜닝 단계
 
@@ -182,7 +181,7 @@ $$r(x, y) = \beta \log \frac{\pi_r(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \bet
 
 이 재매개변수화는 보상 함수를 정책의 로그 확률 비율과 분배 함수의 로그의 합으로 표현합니다. 이는 보상이 정책이 참조 정책으로부터 얼마나 벗어났는지를 측정하는 항과 정규화 항으로 분해됨을 의미합니다.
 
-이 재매개변수화를 진짜 보상 $r^*$과 대응하는 최적 모델 $\pi^*$에 적용할 수 있습니다. 다행히도 Bradley-Terry 모델은 두 완성 간의 보상 차이에만 의존합니다. $p^*(y_1 \succ y_2 \mid x) = \sigma(r^*(x, y_1) - r^*(x, y_2))$. 앞서 유도한 재매개변수화를 $r^*(x, y)$에 대입하여 선호도 모델에 대입하면, 분배 함수가 소거되고 인간 선호도 확률을 최적 정책 $\pi^*$과 참조 정책 $\pi_{\text{ref}}$만의 관점에서 표현할 수 있습니다.
+이 재매개변수화를 진짜 보상 $r^\*$과 대응하는 최적 모델 $\pi^\*$에 적용할 수 있습니다. 다행히도 Bradley-Terry 모델은 두 완성 간의 보상 차이에만 의존합니다. $p^\*(y_1 \succ y_2 \mid x) = \sigma(r^\*(x, y_1) - r^\*(x, y_2))$. 앞서 유도한 재매개변수화를 $r^\*(x, y)$에 대입하여 선호도 모델에 대입하면, 분배 함수가 소거되고 인간 선호도 확률을 최적 정책 $\pi^\*$과 참조 정책 $\pi_{\text{ref}}$만의 관점에서 표현할 수 있습니다.
 
 이것이 가능한 이유는 두 응답에 대한 보상 차이를 계산할 때 $\beta \log Z(x)$ 항이 양쪽에 모두 나타나 소거되기 때문입니다. 이는 매우 중요한 수학적 트릭으로, 계산하기 어려운 분배 함수를 제거할 수 있게 해줍니다.
 
@@ -208,17 +207,17 @@ DPO의 메커니즘적 이해를 위해서는 손실 함수 $\mathcal{L}_{\text{
 
 $$\nabla_\theta \mathcal{L}_{\text{DPO}}(\pi_\theta; \pi_{\text{ref}}) = -\beta \mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}}\left[\underbrace{\sigma(\hat{r}_\theta(x, y_l) - \hat{r}_\theta(x, y_w))}_{\text{보상 추정이 틀렸을 때 더 높은 가중치}} \left[\underbrace{\nabla_\theta \log \pi(y_w \mid x)}_{\text{$y_w$의 우도 증가}} - \underbrace{\nabla_\theta \log \pi(y_l \mid x)}_{\text{$y_l$의 우도 감소}}\right]\right]$$
 
-여기서 $\hat{r}_\theta(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}$는 언어 모델 $\pi_\theta$와 참조 모델 $\pi_{\text{ref}}$에 의해 암묵적으로 정의된 보상입니다.
+여기서 $\hat{r}\_\theta(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}$는 언어 모델 $\pi_\theta$와 참조 모델 $\pi_{\text{ref}}$에 의해 암묵적으로 정의된 보상입니다.
 
 이 그래디언트 수식을 자세히 살펴보면, 손실 함수의 그래디언트는 선호되는 완성 $y_w$의 우도를 증가시키고 선호되지 않는 완성 $y_l$의 우도를 감소시킵니다. 중요한 점은 예제들이 암묵적 보상 모델 $\hat{r}_\theta$가 선호되지 않는 완성을 얼마나 더 높게 평가하는지에 따라 가중치가 부여된다는 것입니다. 이는 $\beta$로 스케일되며, 즉 암묵적 보상 모델이 완성들을 얼마나 잘못 순서 지었는지를 나타내며 KL 제약의 강도를 고려합니다.
 
-구체적으로 로지스틱 함수 $\sigma(\hat{r}_\theta(x, y_l) - \hat{r}_\theta(x, y_w))$는 모델이 선호되지 않는 응답에 더 높은 보상을 부여할수록 1에 가까워지고, 올바르게 순서를 매길수록 0에 가까워집니다. 따라서 모델이 틀렸을 때 더 큰 업데이트가 이루어지고, 이미 올바른 순서를 학습했을 때는 작은 업데이트가 이루어집니다.
+구체적으로 로지스틱 함수 $\sigma(\hat{r}\_\theta(x, y_l) - \hat{r}_\theta(x, y_w))$는 모델이 선호되지 않는 응답에 더 높은 보상을 부여할수록 1에 가까워지고, 올바르게 순서를 매길수록 0에 가까워집니다. 따라서 모델이 틀렸을 때 더 큰 업데이트가 이루어지고, 이미 올바른 순서를 학습했을 때는 작은 업데이트가 이루어집니다.
 
 실험 결과는 이러한 가중치의 중요성을 시사하며, 가중치 계수가 없는 순진한 버전의 이 방법은 언어 모델을 퇴화시킬 수 있습니다. 가중치가 없다면 모델은 선호되는 응답의 확률을 무한정 증가시키고 선호되지 않는 응답의 확률을 무한정 감소시키려 할 수 있으며, 이는 모드 붕괴나 의미 없는 출력으로 이어질 수 있습니다.
 
 ### DPO 파이프라인
 
-일반적인 DPO 파이프라인은 다음과 같이 진행됩니다. 첫 번째 단계에서는 모든 프롬프트 $x$에 대해 완성 $y_1, y_2 \sim \pi_{\text{ref}}(\cdot \mid x)$를 샘플링하고, 인간 선호도로 레이블을 달아 오프라인 선호도 데이터셋 $\mathcal{D} = \{x^{(i)}, y_w^{(i)}, y_l^{(i)}\}_{i=1}^N$을 구성합니다. 두 번째 단계에서는 주어진 $\pi_{\text{ref}}$와 $\mathcal{D}$, 그리고 원하는 $\beta$에 대해 $\mathcal{L}_{\text{DPO}}$를 최소화하도록 언어 모델 $\pi_\theta$를 최적화합니다.
+일반적인 DPO 파이프라인은 다음과 같이 진행됩니다. 첫 번째 단계에서는 모든 프롬프트 $x$에 대해 완성 $y_1, y_2 \sim \pi_{\text{ref}}(\cdot \mid x)$를 샘플링하고, 인간 선호도로 레이블을 달아 오프라인 선호도 데이터셋 $\mathcal{D} = \{x^{(i)}, y_w^{(i)}, y_l^{(i)}\}\_{i=1}^N$을 구성합니다. 두 번째 단계에서는 주어진 $\pi_{\text{ref}}$와 $\mathcal{D}$, 그리고 원하는 $\beta$에 대해 $\mathcal{L}\_{\text{DPO}}$를 최소화하도록 언어 모델 $\pi_\theta$를 최적화합니다.
 
 실제로는 공개적으로 사용 가능한 선호도 데이터셋을 재사용하고자 하며, 샘플을 생성하고 인간 선호도를 수집하는 것보다 이것이 더 효율적입니다. 선호도 데이터셋이 $\pi^{\text{SFT}}$를 사용하여 샘플링되었으므로, 가능한 경우 $\pi_{\text{ref}} = \pi^{\text{SFT}}$로 초기화합니다.
 
@@ -287,7 +286,7 @@ DPO 알고리즘의 핵심 통찰은 과소 명세된 Plackett-Luce, 특히 Brad
 
 이론적 프레임워크를 사용하여 PPO와 같은 RLHF에 사용되는 표준 액터-크리틱 알고리즘의 불안정성을 진단할 수 있습니다. RLHF 파이프라인을 따라 강화학습 파인튜닝 단계에 초점을 맞춥니다.
 
-제약된 강화학습 문제에 대한 제어-추론 프레임워크(control as inference framework)와의 연결을 도출할 수 있습니다. 파라미터화된 모델 $\pi_\theta(y \mid x)$를 가정하고, 보상 함수 $r_\phi(y, x)$에 의해 유도된 최적 정책 $\pi^*$와 $\pi_\theta(y \mid x)$ 사이의 KL 발산 $\mathbb{D}_{\text{KL}}[\pi_\theta(y|x) \mid\mid \pi^*(y \mid x)]$를 최소화합니다. 대수적 조작을 통해 다음의 최적화 목적 함수를 얻습니다.
+제약된 강화학습 문제에 대한 제어-추론 프레임워크(control as inference framework)와의 연결을 도출할 수 있습니다. 파라미터화된 모델 $\pi_\theta(y \mid x)$를 가정하고, 보상 함수 $r_\phi(y, x)$에 의해 유도된 최적 정책 $\pi^\*$와 $\pi_\theta(y \mid x)$ 사이의 KL 발산 $\mathbb{D}\_{\text{KL}}[\pi_\theta(y \vert x) \mid\mid \pi^*(y \mid x)]$를 최소화합니다. 대수적 조작을 통해 다음의 최적화 목적 함수를 얻습니다.
 
 $$\max_{\pi_\theta} \mathbb{E}_{\pi_\theta(y \mid x)}\bigg[\underbrace{r_\phi(x, y) - \beta \log \sum_y \pi_{\text{ref}}(y \mid x) \exp\left(\frac{1}{\beta} r_\phi(x, y)\right)}_{f(r_\phi, \pi_{\text{ref}}, \beta)} - \underbrace{\beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}}_{\text{KL}}\bigg]$$
 
@@ -369,9 +368,9 @@ Anthropic HH 데이터셋에서 PPO로 훈련된 RLHF 모델도 평가했지만,
 분포 이동 하에서 PPO와 DPO의 성능을 추가로 비교하기 위해, Reddit TL;DR 요약 실험의 PPO 및 DPO 정책을 다른 분포인 CNN/DailyMail 데이터셋의 테스트 분할에 있는 뉴스 기사에서 평가하며, TL;DR에서 최상의 샘플링 온도(0과 0.25)를 사용합니다.
 
 | 알고리즘 | 온도 0 | 온도 0.25 |
-|---------|--------|-----------|
-| DPO | 0.36 | 0.31 |
-| PPO | 0.26 | 0.23 |
+| -------- | ------ | --------- |
+| DPO      | 0.36   | 0.31      |
+| PPO      | 0.26   | 0.23      |
 
 위 표는 분포 외 CNN/DailyMail 입력 기사에 대한 진짜 요약과의 GPT-4 승률을 보여줍니다. 데이터셋의 진짜 요약에 대한 GPT-4 승률을 계산했으며, Reddit TL;DR에 사용한 것과 동일한 GPT-4 프롬프트를 사용하되 "포럼 게시물"이라는 단어를 "뉴스 기사"로 대체했습니다.
 
@@ -383,15 +382,15 @@ GPT-4 판단의 신뢰성을 검증하기 위해 TL;DR 요약 실험의 결과�
 
 세 가지 비교를 수행하는데, 가장 높은 성능(DPO, 온도 0.25), 가장 낮은 성능(PPO, 온도 1.0), 그리고 중간 성능(SFT, 온도 0.25) 방법을 사용하여 다양한 샘플 품질을 다루는 것을 목표로 합니다. 세 방법 모두 탐욕적으로 샘플링된 PPO(최상 성능 온도)와 비교됩니다.
 
-| 비교 | DPO vs PPO-1 | SFT vs PPO-1 | PPO-1 vs PPO-N |
-|------|--------------|--------------|----------------|
-| 응답자 수 | 27 | 21 | 22 |
-| GPT-4 (S) 승률 % | 47 | 27 | 13 |
-| GPT-4 (C) 승률 % | 54 | 32 | 12 |
-| 인간 승률 % | 58 | 43 | 17 |
-| GPT-4 (S)-인간 일치 % | 70 | 77 | 86 |
-| GPT-4 (C)-인간 일치 % | 67 | 79 | 85 |
-| 인간-인간 일치 % | 65 | - | 87 |
+| 비교                  | DPO vs PPO-1 | SFT vs PPO-1 | PPO-1 vs PPO-N |
+| --------------------- | ------------ | ------------ | -------------- |
+| 응답자 수             | 27           | 21           | 22             |
+| GPT-4 (S) 승률 %      | 47           | 27           | 13             |
+| GPT-4 (C) 승률 %      | 54           | 32           | 12             |
+| 인간 승률 %           | 58           | 43           | 17             |
+| GPT-4 (S)-인간 일치 % | 70           | 77           | 86             |
+| GPT-4 (C)-인간 일치 % | 67           | 79           | 85             |
+| 인간-인간 일치 %      | 65           | -            | 87             |
 
 위 표는 TL;DR 요약 샘플에 대한 인간과 GPT-4 승률 및 판단별 일치도를 비교합니다. 인간은 서로 일치하는 만큼 GPT-4와 일치합니다. 각 실험은 명시된 방법의 요약을 온도 0의 PPO 요약과 비교합니다.
 
@@ -421,13 +420,6 @@ DPO는 하이퍼파라미터 튜닝이 거의 없이도 PPO를 기반으로 하�
 DPO의 성공은 선호도 학습 분야에서 중요한 패러다임 전환을 나타냅니다. 강화학습이 필수적이라는 기존의 가정에 도전하여, 더 단순하고 직접적인 접근법이 동등하거나 더 나은 결과를 달성할 수 있음을 보여주었습니다. 이는 향후 연구자들이 복잡한 문제를 해결할 때 더 단순한 해결책을 먼저 탐구하도록 장려하며, 때로는 문제를 다시 정식화하는 것이 더 효과적인 알고리즘으로 이어질 수 있음을 시사합니다.
 
 결론적으로, DPO는 인간 선호도로부터 언어 모델을 훈련시키는 실용적이고 효과적인 방법을 제공하며, 이 분야의 접근성을 크게 향상시킵니다. 향후 연구를 통해 DPO의 한계를 더 잘 이해하고, 더 큰 규모로 확장하며, 다양한 응용 분야로 확장함으로써, 선호도 기반 학습이 AI 정렬의 표준 접근법이 될 수 있는 기반을 마련할 것입니다.
-## 참고문헌
-
-이 논문은 인간 피드백 기반 강화학습, 선호도 모델링, 대규모 언어 모델 훈련, 평가 방법론 등 다양한 연구 분야의 51개 참고문헌을 인용하고 있습니다. 주요 인용 논문들은 DPO 방법론의 이론적 기반과 실증적 검증을 위한 비교 기준을 제공합니다.
-
-핵심적으로 [Ouyang et al.](https://proceedings.neurips.cc/paper_files/paper/2022/file/b1efde53be364a73914f58805a001731-Paper-Conference.pdf)의 InstructGPT 연구는 표준적인 RLHF 파이프라인을 확립했으며 DPO가 개선하고자 하는 기존 방법론의 기반을 제공합니다. [Bradley and Terry](https://doi.org/10.2307/2334029)와 [Plackett](https://doi.org/10.2307/2346567)의 연구는 선호도 모델링의 이론적 토대인 Bradley-Terry 모델과 Plackett-Luce 모델을 제시했습니다. [Schulman et al.](https://arxiv.org/pdf/1707.06347v2)의 PPO 알고리즘은 DPO가 비교하는 주요 베이스라인 방법입니다.
-
-언어 모델 아키텍처와 관련하여 [Brown et al.](https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf)의 GPT-3 연구와 [Touvron et al.](https://arxiv.org/pdf/2302.13971)의 LLaMA 모델은 실험에 사용된 기본 모델들의 배경을 제공합니다. 평가 방법론과 관련해서는 [Stiennon et al.](https://arxiv.org/pdf/2009.01325v3)의 요약 학습 연구와 [Bai et al.](https://arxiv.org/pdf/2212.08073v1)의 Constitutional AI 연구가 인간 선호도 데이터셋과 평가 프로토콜을 제공했습니다.
 
 ## 수학적 유도
 
@@ -447,7 +439,7 @@ $$\max_{\pi} \mathbb{E}_{x \sim \mathcal{D}} \mathbb{E}_{y \sim \pi(y \mid x)} \
 
 $$\min_{\pi} \mathbb{E}_{x \sim \mathcal{D}} \mathbb{E}_{y \sim \pi(y \mid x)} \left[\log \frac{\pi(y \mid x)}{\frac{1}{Z(x)} \pi_{\text{ref}}(y \mid x) \exp\left(\frac{1}{\beta} r(x, y)\right)} - \log Z(x)\right]$$
 
-여기서 핵심 통찰은 $Z(x)$가 $x$만의 함수이고 정책 $\pi$에 의존하지 않는다는 점입니다. 최적 정책 $\pi^*(y \mid x) = \frac{1}{Z(x)} \pi_{\text{ref}}(y \mid x) \exp\left(\frac{1}{\beta} r(x, y)\right)$를 정의하면, 이는 유효한 확률 분포가 됩니다. 왜냐하면 모든 $y$에 대해 $\pi^*(y \mid x) \geq 0$이고 $\sum_y \pi^*(y \mid x) = 1$이기 때문입니다.
+여기서 핵심 통찰은 $Z(x)$가 $x$만의 함수이고 정책 $\pi$에 의존하지 않는다는 점입니다. 최적 정책 $\pi^\*(y \mid x) = \frac{1}{Z(x)} \pi_{\text{ref}}(y \mid x) \exp\left(\frac{1}{\beta} r(x, y)\right)$를 정의하면, 이는 유효한 확률 분포가 됩니다. 왜냐하면 모든 $y$에 대해 $\pi^*(y \mid x) \geq 0$이고 $\sum_y \pi^\*(y \mid x) = 1$이기 때문입니다.
 
 목적 함수를 KL 발산으로 재구성하면:
 
@@ -485,7 +477,7 @@ $K=2$일 때 이는 Bradley-Terry 모델로 축소됩니다. 동일한 보상 �
 
 $$p^*(\tau \mid y_1, \ldots, y_K, x) = \prod_{k=1}^K \frac{\exp\left(\beta \log \frac{\pi^*(y_{\tau(k)} \mid x)}{\pi_{\text{ref}}(y_{\tau(k)} \mid x)}\right)}{\sum_{j=k}^K \exp\left(\beta \log \frac{\pi^*(y_{\tau(j)} \mid x)}{\pi_{\text{ref}}(y_{\tau(j)} \mid x)}\right)}$$
 
-순위가 매겨진 선호도 데이터셋 $\mathcal{D} = \{\tau^{(i)}, y_1^{(i)}, \ldots, y_K^{(i)}, x^{(i)}\}_{i=1}^N$이 주어지면, 파라미터화된 정책 $\pi_\theta$에 대한 최대 우도 목적 함수는:
+순위가 매겨진 선호도 데이터셋 $\mathcal{D} = \{\tau^{(i)}, y_1^{(i)}, \ldots, y_K^{(i)}, x^{(i)}\}\_{i=1}^N$이 주어지면, 파라미터화된 정책 $\pi_\theta$에 대한 최대 우도 목적 함수는:
 
 $$\mathcal{L}_{\text{DPO}}(\pi_\theta, \pi_{\text{ref}}) = -\mathbb{E}_{\tau, y_1, \ldots, y_K, x \sim \mathcal{D}} \left[\log \prod_{k=1}^K \frac{\exp\left(\beta \log \frac{\pi_\theta(y_{\tau(k)} \mid x)}{\pi_{\text{ref}}(y_{\tau(k)} \mid x)}\right)}{\sum_{j=k}^K \exp\left(\beta \log \frac{\pi_\theta(y_{\tau(j)} \mid x)}{\pi_{\text{ref}}(y_{\tau(j)} \mid x)}\right)}\right]$$
 
@@ -493,7 +485,7 @@ $$\mathcal{L}_{\text{DPO}}(\pi_\theta, \pi_{\text{ref}}) = -\mathbb{E}_{\tau, y_
 
 ### DPO 목적 함수의 그래디언트
 
-DPO 손실 함수의 그래디언트를 명시적으로 계산합니다. 암묵적 보상을 $\hat{r}_\theta(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}$로 정의하고, $u = \hat{r}_\theta(x, y_l) - \hat{r}_\theta(x, y_w)$로 놓으면:
+DPO 손실 함수의 그래디언트를 명시적으로 계산합니다. 암묵적 보상을 $\hat{r}\_\theta(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}$로 정의하고, $u = \hat{r}\_\theta(x, y_l) - \hat{r}_\theta(x, y_w)$로 놓으면:
 
 $$\nabla_\theta \mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}} \left[\frac{\sigma'(u)}{\sigma(u)} \nabla_\theta u\right]$$
 
@@ -501,7 +493,7 @@ $$\nabla_\theta \mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l) \sim \math
 
 $$\nabla_\theta \mathcal{L}_{\text{DPO}} = -\beta \mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}} \left[\sigma(\hat{r}_\theta(x, y_w) - \hat{r}_\theta(x, y_l)) \left[\nabla_\theta \log \pi(y_w \mid x) - \nabla_\theta \log \pi(y_l \mid x)\right]\right]$$
 
-이 그래디언트 형태는 중요한 통찰을 제공합니다. 선호되는 완성 $y_w$의 로그 우도를 증가시키고 선호되지 않는 완성 $y_l$의 로그 우도를 감소시키는데, 가중치는 암묵적 보상 모델이 얼마나 잘못 순서를 매겼는지에 비례합니다. $\sigma(\hat{r}_\theta(x, y_w) - \hat{r}_\theta(x, y_l))$ 항은 모델이 이미 올바른 선호도를 학습했을 때는 0에 가까워지고, 잘못된 순서를 예측할 때는 1에 가까워져 더 큰 업데이트를 유도합니다.
+이 그래디언트 형태는 중요한 통찰을 제공합니다. 선호되는 완성 $y_w$의 로그 우도를 증가시키고 선호되지 않는 완성 $y_l$의 로그 우도를 감소시키는데, 가중치는 암묵적 보상 모델이 얼마나 잘못 순서를 매겼는지에 비례합니다. $\sigma(\hat{r}\_\theta(x, y_w) - \hat{r}_\theta(x, y_l))$ 항은 모델이 이미 올바른 선호도를 학습했을 때는 0에 가까워지고, 잘못된 순서를 예측할 때는 1에 가까워져 더 큰 업데이트를 유도합니다.
 
 ### 보조정리 1과 2의 증명
 
@@ -569,18 +561,18 @@ def dpo_loss(pi_logps, ref_logps, yw_idxs, yl_idxs, beta):
     yw_idxs: [0, B-1] 범위의 선호되는 완성 인덱스, 형태 (T,)
     yl_idxs: [0, B-1] 범위의 선호되지 않는 완성 인덱스, 형태 (T,)
     beta: KL 페널티 강도를 제어하는 온도 파라미터
-    
+
     각 (yw_idxs[i], yl_idxs[i]) 쌍은 단일 선호도 쌍의 인덱스를 나타냅니다.
     """
     pi_yw_logps, pi_yl_logps = pi_logps[yw_idxs], pi_logps[yl_idxs]
     ref_yw_logps, ref_yl_logps = ref_logps[yw_idxs], ref_logps[yl_idxs]
-    
+
     pi_logratios = pi_yw_logps - pi_yl_logps
     ref_logratios = ref_yw_logps - ref_yl_logps
-    
+
     losses = -F.logsigmoid(beta * (pi_logratios - ref_logratios))
     rewards = beta * (pi_logps - ref_logps).detach()
-    
+
     return losses, rewards
 ```
 
@@ -609,7 +601,7 @@ def dpo_loss(pi_logps, ref_logps, yw_idxs, yl_idxs, beta):
 **요약을 위한 GPT-4 승률 프롬프트 (S - Simple)**:
 
 ```
-Which of the following summaries does a better job of summarizing the most 
+Which of the following summaries does a better job of summarizing the most
 important points in the given forum post?
 
 Post: <post>
@@ -618,8 +610,8 @@ Summary A: <Summary A>
 
 Summary B: <Summary B>
 
-FIRST provide a one-sentence comparison of the two summaries, explaining which 
-you prefer and why. SECOND, on a new line, state only "A" or "B" to indicate your 
+FIRST provide a one-sentence comparison of the two summaries, explaining which
+you prefer and why. SECOND, on a new line, state only "A" or "B" to indicate your
 choice. Your response should use the format:
 Comparison: <one-sentence comparison and explanation>
 Preferred: <"A" or "B">
@@ -628,8 +620,8 @@ Preferred: <"A" or "B">
 **요약을 위한 GPT-4 승률 프롬프트 (C - Concise)**:
 
 ```
-Which of the following summaries does a better job of summarizing the most 
-important points in the given forum post, without including unimportant or 
+Which of the following summaries does a better job of summarizing the most
+important points in the given forum post, without including unimportant or
 irrelevant details? A good summary is both precise and concise.
 
 Post: <post>
@@ -638,8 +630,8 @@ Summary A: <Summary A>
 
 Summary B: <Summary B>
 
-FIRST provide a one-sentence comparison of the two summaries, explaining which 
-you prefer and why. SECOND, on a new line, state only "A" or "B" to indicate your 
+FIRST provide a one-sentence comparison of the two summaries, explaining which
+you prefer and why. SECOND, on a new line, state only "A" or "B" to indicate your
 choice. Your response should use the format:
 Comparison: <one-sentence comparison and explanation>
 Preferred: <"A" or "B">
@@ -656,9 +648,9 @@ Response A: <either the test method or baseline>
 
 Response B: <the other response>
 
-FIRST provide a one-sentence comparison of the two responses and explain 
-which you feel is more helpful. SECOND, on a new line, state only "A" or 
-"B" to indicate which response is more helpful. Your response should use 
+FIRST provide a one-sentence comparison of the two responses and explain
+which you feel is more helpful. SECOND, on a new line, state only "A" or
+"B" to indicate which response is more helpful. Your response should use
 the format:
 Comparison: <one-sentence comparison and explanation>
 More helpful: <"A" or "B">
@@ -672,10 +664,10 @@ Unlikelihood 베이스라인은 감정 실험에 포함했지만, 요약이나 �
 
 다음 표는 TL;DR 프롬프트에서 온도 1.0으로 샘플링된 Unlikelihood 샘플들을 보여줍니다.
 
-| 프롬프트 | Unlikelihood 생성 응답 |
-|---------|----------------------|
+| 프롬프트                                                                                                                                                                                                                                                                                                                                                                                    | Unlikelihood 생성 응답                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | SUBREDDIT: r/relationships<br>TITLE: The girl [26 F] I [22 M] have been seeing for a month didn't respond to me at all yesterday while hanging out with a friend...<br>POST: She gets terrible service while at her house, but I texted her 3 times yesterday, 4-5 hours apart. She didn't call me until early this morning and left a voicemail that she was busy all day with a friend... | TL;DR: girl when when when when when when when when when when when when when when when when when when when when when when when when when when when when when when when when... |
-| SUBREDDIT: r/tifu<br>TITLE: TIFU by accidently kicking an old woman<br>POST: So this didn't happen today but actually about a year or two ago. I was at my granddads funeral so of course it was all very sad and full of lots of crying old people... | TL;DR: when an old woman was tripping the when when when when when when when when when when when when when when when when when when when when when when when when... |
+| SUBREDDIT: r/tifu<br>TITLE: TIFU by accidently kicking an old woman<br>POST: So this didn't happen today but actually about a year or two ago. I was at my granddads funeral so of course it was all very sad and full of lots of crying old people...                                                                                                                                      | TL;DR: when an old woman was tripping the when when when when when when when when when when when when when when when when when when when when when when when when...           |
 
 일반적으로 Unlikelihood는 요약 및 대화와 같은 더 복잡한 문제에 대해 의미 있는 응답을 생성하지 못합니다. 이는 선호되지 않는 응답의 확률을 무한정 감소시키려는 목적 함수의 특성 때문에, 모델이 반복적이고 의미 없는 토큰을 생성하는 방향으로 수렴하기 때문입니다.
 
@@ -757,15 +749,15 @@ DPO 대 PPO-0 비교의 150개 무작위 샘플과 PPO-1 대 PPO-0 비교의 100
 
 다음 표는 TL;DR 요약 샘플에 대한 인간과 GPT-4 승률 및 판단별 일치도를 비교합니다.
 
-| 비교 | DPO vs PPO-1 | SFT vs PPO-1 | PPO-1 vs PPO-0 |
-|------|--------------|--------------|----------------|
-| 응답자 수 | 27 | 21 | 22 |
-| GPT-4 (S) 승률 % | 47 | 27 | 13 |
-| GPT-4 (C) 승률 % | 54 | 32 | 12 |
-| 인간 승률 % | 58 | 43 | 17 |
-| GPT-4 (S)-인간 일치 % | 70 | 77 | 86 |
-| GPT-4 (C)-인간 일치 % | 67 | 79 | 85 |
-| 인간-인간 일치 % | 65 | - | 87 |
+| 비교                  | DPO vs PPO-1 | SFT vs PPO-1 | PPO-1 vs PPO-0 |
+| --------------------- | ------------ | ------------ | -------------- |
+| 응답자 수             | 27           | 21           | 22             |
+| GPT-4 (S) 승률 %      | 47           | 27           | 13             |
+| GPT-4 (C) 승률 %      | 54           | 32           | 12             |
+| 인간 승률 %           | 58           | 43           | 17             |
+| GPT-4 (S)-인간 일치 % | 70           | 77           | 86             |
+| GPT-4 (C)-인간 일치 % | 67           | 79           | 85             |
+| 인간-인간 일치 %      | 65           | -            | 87             |
 
 두 프롬프트 모두에서 GPT-4는 인간이 서로 일치하는 만큼 인간과 일치하는 경향이 있어, GPT-4가 인간 평가의 합리적인 대리 지표임을 시사합니다. 제한된 인간 평가자로 인해 DPO 대 PPO-1 비교에 대해서만 여러 인간 판단을 수집했습니다. 전반적으로 GPT-4 (C) 프롬프트는 일반적으로 인간을 더 잘 대표하는 승률을 제공하므로 주요 결과에서 이 프롬프트를 사용했습니다.
 
