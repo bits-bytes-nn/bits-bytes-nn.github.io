@@ -1,6 +1,11 @@
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function highlightKeyword(text, keyword) {
   if (!keyword || !text) return text;
-  const regex = new RegExp(`(${keyword})`, 'gi');
+  const escapedKeyword = escapeRegExp(keyword);
+  const regex = new RegExp(`(${escapedKeyword})`, 'gi');
   return text.replace(regex, '<mark>$1</mark>');
 }
 

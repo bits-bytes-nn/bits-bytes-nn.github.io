@@ -3,6 +3,10 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
 
+feed:
+  excerpt_only: true
+  posts_limit: 20
+
 exclude:
   - /vendor/
   - google7fc3fddc69d5a4bf.html
@@ -62,18 +66,10 @@ social:
 
   - name: Twitter
     icon: twitter
-    username: 
-    url: https://twitter.com/
+    username:
+    url:
     desc: Follow me on Twitter
-    share: true
-    share_url: https://twitter.com/share
-    share_params:
-      - key: text
-        value: TITLE
-      - key: url
-        value: URL
-      - key: via
-        value: USERNAME
+    share: false
 
   - name: GitHub
     icon: github
