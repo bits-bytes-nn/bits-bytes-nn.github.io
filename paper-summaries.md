@@ -1,14 +1,14 @@
 ---
 layout: page
-title: Summaries
-permalink: /summaries/
+title: Paper Summaries
+permalink: /paper-summaries/
 main_nav: true
 nav_order: 2
 ---
 
 {% assign summary_posts = site.posts | where: "categories", "Summaries" %}
 {% if site.categories['Summaries'].size > 0 %}
-  <h2 id="summaries">Summaries</h2>
+  <h2 id="paper-summaries">Paper Summaries</h2>
   <p class="desc"><em>Concise summaries of AI/ML research papers, blog posts, videos, and other resources, highlighting main contributions and insights.</em></p>
   <ul class="posts-list">
   {% for post in site.categories['Summaries'] %}
@@ -21,8 +21,8 @@ nav_order: 2
   {% endfor %}
   </ul>
 {% else %}
-  <h2 id="summaries">Summaries</h2>
+  <h2 id="paper-summaries">Paper Summaries</h2>
   <p class="desc"><em>Concise summaries of AI/ML research papers, blog posts, videos, and other resources, highlighting main contributions and insights.</em></p>
-  <p><em>Coming Soon! Summaries are being prepared. Check back soon for concise insights from various AI/ML resources.</em></p>
+  <p><em>Coming Soon! Paper summaries are being prepared. Check back soon for concise insights from various AI/ML resources.</em></p>
 {% endif %}
 <br>

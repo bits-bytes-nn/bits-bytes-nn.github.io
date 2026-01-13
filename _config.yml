@@ -51,11 +51,17 @@ disqus_shortname: # bits-bytes-nn
 ga_tracking_id: G-MRH9Z5ETSQ
 
 social:
+  # Contact: GitHub - LinkedIn - Threads (in order)
+  - name: GitHub
+    icon: github
+    username: bits-bytes-nn
+    url: https://github.com/bits-bytes-nn
+    desc: Fork me on GitHub
+    share: false
+
+  # Share only (no url = not shown in Contact)
   - name: Facebook
     icon: facebook
-    username: aldente0630
-    url: https://www.facebook.com/aldente0630
-    desc: Friend me on Facebook
     share: true
     share_url: https://www.facebook.com/sharer.php
     share_params:
@@ -63,20 +69,6 @@ social:
         value: TITLE
       - key: u
         value: URL
-
-  - name: Twitter
-    icon: twitter
-    username:
-    url:
-    desc: Follow me on Twitter
-    share: false
-
-  - name: GitHub
-    icon: github
-    username: bits-bytes-nn
-    url: https://github.com/bits-bytes-nn
-    desc: Fork me on GitHub
-    share: true
 
   - name: LinkedIn
     icon: linkedin
@@ -90,6 +82,24 @@ social:
         value: true
       - key: url
         value: URL
+
+  # Share only (no url = not shown in Contact)
+  - name: X
+    icon: x-twitter
+    share: true
+    share_url: https://twitter.com/share
+    share_params:
+      - key: text
+        value: TITLE
+      - key: url
+        value: URL
+
+  - name: Threads
+    icon: threads
+    username: aldente0630
+    url: https://www.threads.com/@aldente0630
+    desc: Follow me on Threads
+    share: false
 
 
 protocols:
