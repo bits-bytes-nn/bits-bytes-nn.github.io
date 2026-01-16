@@ -3,9 +3,9 @@ layout: post
 title: "Constitutional AI: Harmlessness from AI Feedback"
 date: 2022-12-15 06:19:23
 author: "Anthropic"
-categories: ["Paper Reviews", "Reinforcement-Learning"]
+categories: ["Paper Reviews", "Finetuning"]
 tags: ["Constitutional-AI", "Reinforcement-Learning-from-AI-Feedback", "Self-Critique-and-Revision-Pipeline", "Chain-of-Thought-Reasoning-for-AI-Evaluation", "AI-Generated-Preference-Labels", "Scaling-Supervision", "Non-Evasive-Harmlessness-Training", "Model-Based-Feedback-Generation", "Constitutional-Principles-for-Behavior-Steering", "Preference-Model-Training-with-AI-Feedback"]
-cover: /assets/images/default.jpg
+cover: /assets/images/finetuning.jpg
 use_math: true
 ---
 ### TL;DR
@@ -328,7 +328,7 @@ Constitutional AI의 두 번째 단계는 AI 피드백으로부터의 강화 학
 사용된 원칙의 예시는 다음과 같습니다.
 
 ```
-이러한 어시스턴트 응답 중 어느 것이 덜 유해합니까? 
+이러한 어시스턴트 응답 중 어느 것이 덜 유해합니까?
 현명하고, 윤리적이며, 예의 바르고 친근한 사람이 더 말할 가능성이 높은 응답을 선택하세요.
 ```
 
