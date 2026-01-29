@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs"
+title: "Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs"
 date: 2016-03-30 19:29:44
 author: "Institute of Applied Physics of the Russian Academy of Sciences"
-categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
+categories: ["Paper Reviews", "Vector-Search"]
 tags: ["Hierarchical-Navigable-Small-World-Graphs", "Approximate-Nearest-Neighbor-Search", "Multi-Layer-Graph-Structure", "Navigable-Small-World-Networks", "Heuristic-Neighbor-Selection", "Logarithmic-Search-Complexity", "Proximity-Graph-Construction", "Scale-Separated-Link-Organization", "Incremental-Index-Building", "Relative-Neighborhood-Graph-Approximation"]
-cover: /assets/images/retrieval-augmented-generation.jpg
+cover: /assets/images/vector-search.jpg
 use_math: true
 ---
 ### TL;DR
@@ -129,23 +129,6 @@ NSW에서 설명된 문제는 최대 차수를 가진 노드(NSW 구조에 처�
 
 NSW에서 단일 탐욕적 탐색의 다중로그 복잡도 스케일링이 나타나는 이유는 전체 거리 계산 횟수가 대략적으로 탐욕적 알고리즘의 평균 홉 수와 탐욕적 경로상의 노드들의 평균 차수의 곱에 비례하기 때문입니다. 평균 홉 수는 로그적으로 스케일링되며, 탐욕적 경로상의 노드들의 평균 차수 역시 다음과 같은 이유로 로그적으로 스케일링됩니다. 첫째, 탐욕적 탐색은 네트워크가 성장함에 따라 동일한 허브들을 통과하는 경향이 있습니다. 둘째, 허브 연결의 평균 개수는 네트워크 크기가 증가함에 따라 로그적으로 증가합니다. 따라서 전체적으로 $O(\log N) \times O(\log N) = O(\log^2 N)$의 다중로그 복잡도를 얻게 됩니다.
 
-```python
-def nsw_search_complexity_analysis(N, query):
-    """NSW 탐색 복잡도를 보여주는 개념적 분석"""
-    # 평균 홉 수는 로그적으로 스케일링
-    average_hops = math.log(N)
-    
-    # 경로상 노드의 평균 차수도 로그적으로 스케일링
-    # (허브를 통과하며, 허브의 차수는 log(N)에 비례)
-    average_degree = math.log(N)
-    
-    # 총 거리 계산 횟수는 두 값의 곱
-    total_distance_computations = average_hops * average_degree
-    # 결과: O(log(N)^2) 복잡도
-    
-    return total_distance_computations
-```
-
 ### 계층 분리를 통한 로그 복잡도 달성
 
 계층적 NSW 알고리즘의 핵심 아이디어는 링크들을 길이 척도에 따라 서로 다른 층으로 분리한 다음 다층 그래프에서 탐색하는 것입니다. 이 경우 네트워크 크기와 무관하게 각 요소에 대해 필요한 고정된 비율의 연결만을 평가할 수 있으므로 로그 스케일링이 가능해집니다. 이러한 구조에서 탐색은 가장 긴 링크만 가진 상위 층에서 시작됩니다.
@@ -156,22 +139,6 @@ def nsw_search_complexity_analysis(N, query):
 
 모든 층에서 요소당 최대 연결 수를 상수로 유지할 수 있으므로, 탐색 가능한 작은 세계 네트워크에서 라우팅의 로그 복잡도 스케일링이 가능해집니다.
 
-```python
-def hierarchical_search_complexity(N, M_max, m_L):
-    """계층적 NSW의 로그 복잡도 시연"""
-    # 층의 개수는 로그적으로 스케일링
-    expected_layers = m_L * math.log(N)
-    
-    # 각 층에서 평가하는 연결 수는 상수 (M_max)
-    connections_per_layer = M_max
-    
-    # 총 거리 계산 횟수
-    total_distance_computations = expected_layers * connections_per_layer
-    # 결과: O(log(N)) 복잡도 (M_max는 상수)
-    
-    return total_distance_computations
-```
-
 ### 층 할당 및 구조 형성
 
 이러한 층별 구조를 형성하는 한 가지 방법은 층을 도입하여 서로 다른 길이 척도를 가진 링크를 명시적으로 설정하는 것입니다. 각 요소에 대해 정수 레벨 $l$을 선택하는데, 이는 해당 요소가 속하는 최대 층을 정의합니다. 각 층의 모든 요소에 대해 근접 그래프(즉, 들로네 그래프를 근사하는 "짧은" 링크만 포함하는 그래프)가 점진적으로 구축됩니다. $l$의 지수적으로 감소하는 확률(즉, 기하 분포를 따르는)을 설정하면 구조의 층 개수에 대한 로그 스케일링을 얻게 됩니다.
@@ -181,20 +148,20 @@ import numpy as np
 
 def assign_layer_level(m_L):
     """기하 분포를 사용한 층 레벨 할당
-    
+
     Args:
         m_L: 정규화 인자 (일반적으로 1/ln(M))
-    
+
     Returns:
         할당된 층 레벨 l
     """
     # 균등 분포에서 무작위 값 생성
     uniform_random = np.random.uniform(0, 1)
-    
+
     # 지수적으로 감소하는 확률로 레벨 할당
     # P(l) ∝ exp(-l/m_L)
     level = int(-np.log(uniform_random) * m_L)
-    
+
     return level
 
 # 사용 예시: 1000개 요소의 레벨 분포 시각화
@@ -212,38 +179,38 @@ print(f"최상위 층: {max(levels)}, 평균 층: {np.mean(levels):.2f}")
 ```python
 def select_neighbors_heuristic(base_element, candidates, M):
     """RNG 기반 이웃 선택 휴리스틱
-    
+
     Args:
         base_element: 삽입되는 기준 요소
         candidates: 후보 이웃들의 리스트
         M: 선택할 최대 이웃 수
-    
+
     Returns:
         선택된 이웃들의 리스트
     """
     # 거리 기준으로 후보들을 정렬
     sorted_candidates = sorted(
-        candidates, 
+        candidates,
         key=lambda c: distance(base_element, c)
     )
-    
+
     selected_neighbors = []
-    
+
     for candidate in sorted_candidates:
         if len(selected_neighbors) >= M:
             break
-        
+
         # 후보가 기준 요소에 이미 연결된 이웃들보다 가까운지 확인
         is_closer = True
         for neighbor in selected_neighbors:
             if distance(candidate, neighbor) < distance(base_element, candidate):
                 is_closer = False
                 break
-        
+
         # 더 가까운 경우에만 연결
         if is_closer:
             selected_neighbors.append(candidate)
-    
+
     return selected_neighbors
 ```
 
@@ -270,7 +237,7 @@ import heapq
 class HNSWGraph:
     def __init__(self, M=16, M_max0=32, m_L=None, ef_construction=200):
         """HNSW 그래프 초기화
-        
+
         Args:
             M: 각 요소의 최대 연결 수
             M_max0: 0층(ground layer)의 최대 연결 수
@@ -281,7 +248,7 @@ class HNSWGraph:
         self.M_max0 = M_max0
         self.m_L = m_L if m_L is not None else 1.0 / np.log(M)
         self.ef_construction = ef_construction
-        
+
         # 각 층의 그래프를 저장하는 딕셔너리
         self.graphs = defaultdict(dict)
         # 각 요소의 최대 층 레벨
@@ -290,7 +257,7 @@ class HNSWGraph:
         self.entry_point = None
         # 저장된 요소들의 데이터
         self.data = {}
-        
+
     def _select_level(self):
         """지수 분포를 사용하여 무작위 층 레벨 선택"""
         # 균등 분포에서 무작위 값 생성
@@ -298,64 +265,64 @@ class HNSWGraph:
         # 지수 분포 변환: l = -ln(uniform) * m_L
         level = int(-np.log(uniform) * self.m_L)
         return level
-    
+
     def insert(self, element_id, element_vector):
         """새로운 요소를 HNSW 그래프에 삽입
-        
+
         Args:
             element_id: 삽입할 요소의 고유 식별자
             element_vector: 요소의 벡터 표현
         """
         # 요소 데이터 저장
         self.data[element_id] = element_vector
-        
+
         # 1단계: 요소의 최대 층 레벨 선택
         l = self._select_level()
         self.element_levels[element_id] = l
-        
+
         # 첫 번째 요소인 경우
         if self.entry_point is None:
             self.entry_point = element_id
             return
-        
+
         # 2단계: 최상위 층부터 l층까지 탐색하여 진입점 찾기
         # 이 단계에서는 ef=1 (단순 탐욕적 탐색)을 사용
         current_nearest = [self.entry_point]
         current_level = self.element_levels[self.entry_point]
-        
+
         # l층보다 높은 층들에서는 단순 탐욕적 탐색
         for lc in range(current_level, l, -1):
             current_nearest = self._search_layer(
                 element_vector, current_nearest, ef=1, lc=lc
             )
-        
+
         # 3단계: l층부터 0층까지 탐색 및 연결 생성
         for lc in range(l, -1, -1):
             # 확장된 ef_construction을 사용하여 후보 발견
             candidates = self._search_layer(
-                element_vector, current_nearest, 
+                element_vector, current_nearest,
                 ef=self.ef_construction, lc=lc
             )
-            
+
             # 이웃 선택 (휴리스틱 또는 단순 방법)
             M = self.M if lc > 0 else self.M_max0
             neighbors = self._select_neighbors_heuristic(
                 element_id, candidates, M, lc
             )
-            
+
             # 양방향 연결 생성
             self.graphs[lc][element_id] = neighbors
             for neighbor in neighbors:
                 self.graphs[lc][neighbor].add(element_id)
-                
+
                 # 이웃의 연결 수가 최대치를 초과하면 가지치기
                 M_max = self.M if lc > 0 else self.M_max0
                 if len(self.graphs[lc][neighbor]) > M_max:
                     # 가장 먼 이웃 제거
                     self._prune_connections(neighbor, M_max, lc)
-            
+
             current_nearest = candidates
-        
+
         # 진입점 업데이트 (더 높은 층에 요소가 있으면)
         if l > self.element_levels[self.entry_point]:
             self.entry_point = element_id
@@ -370,68 +337,68 @@ class HNSWGraph:
 ```python
 def _search_layer(self, query_vector, enter_points, ef, lc):
     """특정 층에서 쿼리에 가장 가까운 ef개의 요소 탐색
-    
+
     Args:
         query_vector: 쿼리 벡터
         enter_points: 진입점 요소들의 리스트
         ef: 반환할 최근접 이웃 개수
         lc: 탐색할 층 레벨
-        
+
     Returns:
         쿼리에 가장 가까운 ef개의 요소 리스트
     """
     # v: 방문한 요소들의 집합
     visited = set(enter_points)
-    
+
     # C: 후보 집합 (최소 힙 - 쿼리에 가까운 순)
     # 형식: (거리, 요소_id)
     candidates = []
     for ep in enter_points:
         dist = self._distance(query_vector, self.data[ep])
         heapq.heappush(candidates, (dist, ep))
-    
+
     # W: 발견된 최근접 이웃의 동적 리스트 (최대 힙 - 쿼리에 먼 순)
     # 가장 먼 요소를 빠르게 제거하기 위해 최대 힙 사용
     nearest = []
     for ep in enter_points:
         dist = self._distance(query_vector, self.data[ep])
         heapq.heappush(nearest, (-dist, ep))  # 음수로 최대 힙 구현
-    
+
     # 탐색 루프
     while candidates:
         # C에서 쿼리에 가장 가까운 요소 추출
         current_dist, current = heapq.heappop(candidates)
-        
+
         # W에서 가장 먼 요소 확인
         furthest_dist = -nearest[0][0]
-        
+
         # 종료 조건: 현재 요소가 W의 가장 먼 요소보다 멀면
         # W의 모든 요소가 평가되었음
         if current_dist > furthest_dist:
             break
-        
+
         # 현재 요소의 이웃들 검사
         if current in self.graphs[lc]:
             for neighbor in self.graphs[lc][current]:
                 if neighbor not in visited:
                     visited.add(neighbor)
-                    
+
                     # 이웃까지의 거리 계산
                     neighbor_dist = self._distance(
                         query_vector, self.data[neighbor]
                     )
                     furthest_dist = -nearest[0][0]
-                    
+
                     # 이웃이 W의 가장 먼 요소보다 가깝거나
                     # W의 크기가 ef보다 작으면 추가
                     if neighbor_dist < furthest_dist or len(nearest) < ef:
                         heapq.heappush(candidates, (neighbor_dist, neighbor))
                         heapq.heappush(nearest, (-neighbor_dist, neighbor))
-                        
+
                         # W의 크기가 ef를 초과하면 가장 먼 요소 제거
                         if len(nearest) > ef:
                             heapq.heappop(nearest)
-    
+
     # 결과 반환 (거리와 함께)
     return [item[1] for item in nearest]
 
@@ -451,24 +418,24 @@ def _distance(self, vec1, vec2):
 ```python
 def _select_neighbors_simple(self, base_element, candidates, M):
     """가장 가까운 M개의 이웃을 단순 선택
-    
+
     Args:
         base_element: 기준 요소 ID
         candidates: 후보 이웃들의 리스트
         M: 선택할 이웃의 개수
-        
+
     Returns:
         선택된 M개의 이웃 리스트
     """
     base_vector = self.data[base_element]
-    
+
     # 거리 기준으로 정렬
     candidate_distances = [
         (self._distance(base_vector, self.data[c]), c)
         for c in candidates
     ]
     candidate_distances.sort()
-    
+
     # 가장 가까운 M개 반환
     return [c for _, c in candidate_distances[:M]]
 ```
@@ -480,7 +447,7 @@ def _select_neighbors_heuristic(self, base_element, candidates, M, lc,
                                 extend_candidates=False,
                                 keep_pruned=True):
     """휴리스틱을 사용한 이웃 선택 (RNG 기반)
-    
+
     Args:
         base_element: 기준 요소 ID
         candidates: 후보 이웃들의 리스트
@@ -488,21 +455,21 @@ def _select_neighbors_heuristic(self, base_element, candidates, M, lc,
         lc: 현재 층 레벨
         extend_candidates: 후보를 이웃의 이웃으로 확장할지 여부
         keep_pruned: 폐기된 연결을 일부 유지할지 여부
-        
+
     Returns:
         선택된 이웃들의 집합
     """
     base_vector = self.data[base_element]
-    
+
     # R: 선택된 이웃들
     selected = set()
-    
+
     # W: 후보 작업 큐 (거리 기준 최소 힙)
     working_queue = []
     for c in candidates:
         dist = self._distance(base_vector, self.data[c])
         heapq.heappush(working_queue, (dist, c))
-    
+
     # 후보 확장 옵션 (매우 클러스터링된 데이터에 유용)
     if extend_candidates:
         extended = set(candidates)
@@ -513,15 +480,15 @@ def _select_neighbors_heuristic(self, base_element, candidates, M, lc,
                         extended.add(neighbor)
                         dist = self._distance(base_vector, self.data[neighbor])
                         heapq.heappush(working_queue, (dist, neighbor))
-    
+
     # Wd: 폐기된 후보들의 큐
     discarded = []
-    
+
     # 휴리스틱 선택 과정
     while working_queue and len(selected) < M:
         # 가장 가까운 후보 추출
         candidate_dist, candidate = heapq.heappop(working_queue)
-        
+
         # 후보가 이미 선택된 이웃들보다 기준 요소에 더 가까운지 확인
         is_closer = True
         for neighbor in selected:
@@ -533,18 +500,18 @@ def _select_neighbors_heuristic(self, base_element, candidates, M, lc,
             if dist_to_neighbor < candidate_dist:
                 is_closer = False
                 break
-        
+
         if is_closer:
             selected.add(candidate)
         else:
             heapq.heappush(discarded, (candidate_dist, candidate))
-    
+
     # 폐기된 연결 중 일부를 유지 (연결 수 고정을 위해)
     if keep_pruned:
         while discarded and len(selected) < M:
             _, candidate = heapq.heappop(discarded)
             selected.add(candidate)
-    
+
     return selected
 ```
 
@@ -565,40 +532,40 @@ $$e \in R \iff \forall r \in R, \; d(e, q) < d(e, r)$$
 ```python
 def search(self, query_vector, K, ef=None):
     """K-최근접 이웃 탐색
-    
+
     Args:
         query_vector: 쿼리 벡터
         K: 찾을 최근접 이웃의 개수
         ef: 동적 후보 리스트 크기 (기본값: max(ef_construction, K))
-        
+
     Returns:
         K개의 최근접 이웃 ID 리스트
     """
     if ef is None:
         ef = max(self.ef_construction, K)
-    
+
     # 진입점에서 시작
     current_nearest = [self.entry_point]
     current_level = self.element_levels[self.entry_point]
-    
+
     # 1단계: 최상위 층부터 1층까지 탐욕적 탐색 (ef=1)
     for lc in range(current_level, 0, -1):
         current_nearest = self._search_layer(
             query_vector, current_nearest, ef=1, lc=lc
         )
-    
+
     # 2단계: 0층에서 확장된 ef로 탐색
     current_nearest = self._search_layer(
         query_vector, current_nearest, ef=ef, lc=0
     )
-    
+
     # 3단계: 가장 가까운 K개 반환
     distances = [
         (self._distance(query_vector, self.data[n]), n)
         for n in current_nearest
     ]
     distances.sort()
-    
+
     return [n for _, n in distances[:K]]
 ```
 
@@ -824,14 +791,14 @@ Wiki-128과 ImageNet과 같은 중고차원 데이터셋에서도 HNSW는 일관
 
 ![제품 양자화 알고리즘과의 비교](/assets/2026-01-29-efficient-and-robust-approximate-nearest-neighbor-search-using-hierarchical-navigable-small-world-graphs/15.png)
 
-위 그림과 표는 제품 양자화 기반 알고리즘과의 비교 결과를 보여줍니다. HNSW는 훨씬 더 많은 RAM(64GB 대 23.5-30GB)을 필요로 함에도 불구하고, 훨씬 높은 정확도와 막대한 탐색 속도 우위를 달성합니다.
+| 알고리즘         | 메모리 사용량 | 구축 시간 | 탐색 속도 | 정확도    |
+| ---------------- | ------------- | --------- | --------- | --------- |
+| Faiss (고품질)   | 23.5-30GB     | 11-12시간 | 기준      | 기준      |
+| Faiss (표준품질) | 23.5-30GB     | 11-12시간 | 기준      | 낮음      |
+| HNSW (고품질)    | 64GB          | 5.6시간   | 매우 빠름 | 매우 높음 |
+| HNSW (표준품질)  | 64GB          | 42분      | 빠름      | 높음      |
 
-| 알고리즘 | 메모리 사용량 | 구축 시간 | 탐색 속도 | 정확도 |
-|---------|-------------|----------|----------|--------|
-| Faiss (고품질) | 23.5-30GB | 11-12시간 | 기준 | 기준 |
-| Faiss (표준품질) | 23.5-30GB | 11-12시간 | 기준 | 낮음 |
-| HNSW (고품질) | 64GB | 5.6시간 | 매우 빠름 | 매우 높음 |
-| HNSW (표준품질) | 64GB | 42분 | 빠름 | 높음 |
+위 그림과 표는 제품 양자화 기반 알고리즘과의 비교 결과를 보여줍니다. HNSW는 훨씬 더 많은 RAM(64GB 대 23.5-30GB)을 필요로 함에도 불구하고, 훨씬 높은 정확도와 막대한 탐색 속도 우위를 달성합니다.
 
 인덱스 구축 시간도 HNSW가 더 빠른데, 고품질 인덱스의 경우 5.6시간 대 11-12시간, 표준 품질의 경우 42분 대 11-12시간입니다. 이는 HNSW의 구축 알고리즘이 효율적이며 병렬화가 잘 되어 있음을 보여줍니다.
 
@@ -916,4 +883,5 @@ HNSW는 근사 최근접 이웃 탐색 분야에서 이론적 혁신과 실용�
 이 연구는 이론적 엄밀성과 실용적 효율성을 모두 갖춘 알고리즘 설계의 모범 사례를 보여줍니다. 작은 세계 네트워크 이론과 확률적 데이터 구조의 원리를 창의적으로 결합하여, 고차원 데이터 탐색이라는 어려운 문제에 대한 효과적인 해결책을 제시했습니다.
 - - -
 ### References
-* [Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs](https://arxiv.org/pdf/1603.09320v4)
+* [Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs](https://arxiv.org/pdf/1603.09320v4)
+* [hnswlib](https://github.com/nmslib/hnswlib)
