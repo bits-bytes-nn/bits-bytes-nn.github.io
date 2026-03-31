@@ -17,7 +17,6 @@ permalink: /categories/
       {% assign cat_display = cat_display | append: " " | append: capitalized_word %}
     {% endif %}
   {% endfor %}
-  {% assign cat_display = cat_display | replace: "language", "Language" | replace: "models", "Models" | replace: "machine", "Machine" | replace: "learning", "Learning" %}
   <h2 id="{{cat}}">{{ cat_display }}</h2>
   {% for desc in site.descriptions %}
     {% if desc.cat == cat %}

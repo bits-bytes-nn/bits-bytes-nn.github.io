@@ -6,9 +6,10 @@ main_nav: true
 nav_order: 3
 ---
 
+{% assign dedicated_pages = "Paper Reviews,Summaries,Insights" | split: "," %}
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}
-  {% if cat != "Paper Reviews" %}
+  {% unless dedicated_pages contains cat %}
   {% assign cat_temp = cat | replace: "-", " " | replace: "_", " " %}
   {% assign words = cat_temp | split: " " %}
   {% assign cat_display = "" %}
@@ -37,7 +38,6 @@ nav_order: 3
   {% endfor %}
   </ul>
   {% if forloop.last == false %}<hr>{% endif %}
-  {% endif %}
+  {% endunless %}
 {% endfor %}
 <br>
-
