@@ -23,7 +23,7 @@ use_math: false
 
 ## 1. What Happened
 
-On March 31, 2026, security researcher Chaofan Shou posted a few screenshots on X. The entire internal source code of Anthropic's Claude Code was sitting right there inside the npm package. The source map files — `.map` files — that should have been stripped from the production build were left intact.
+On March 31, 2026, security researcher Chaofan Shou posted a few screenshots on X. The entire internal source code of Anthropic's Claude Code was sitting right there inside the npm package. Source map (`.map`) files are debugging artifacts that map minified/bundled code back to the original source — they should always be stripped from production builds, but these were left intact.
 
 [Reddit r/LocalLLaMA](https://www.reddit.com/r/LocalLLaMA/comments/1s8ijfb/claude_code_source_code_has_been_leaked_via_a_map/) exploded, and the community began dissecting the entire codebase within hours.
 
@@ -53,12 +53,12 @@ Open the leaked code and that notion shatters.
 
 | Layer | Technology | Why This Choice |
 |-------|-----------|-----------------|
-| Runtime | **Bun** | Faster startup than Node.js with native TypeScript support. The `feature()` bundling API enables build-time dead code elimination |
+| Runtime | **Bun** | Faster startup than Node.js with native TypeScript support. The `feature()` bundling API enables build-time dead code elimination (detailed in Section 6.1) |
 | Language | **TypeScript** (strict mode) | Type safety is not optional in a 4,600+ file codebase |
 | UI | **React 18 + [Ink](https://github.com/vadimdemedes/ink)** | Renders React components in the terminal. Complex UI elements like permission dialogs, progress bars, and multi-panel layouts justify this choice |
 | API Client | `@anthropic-ai/sdk` | Official Anthropic SDK |
-| MCP Client | `@modelcontextprotocol/sdk` | Standard protocol for external tool server integration |
-| Feature Flags | **GrowthBook** | Server-side feature control and A/B testing |
+| MCP Client | `@modelcontextprotocol/sdk` | An open protocol for LLMs to communicate with external tools and data sources in a standardized way ([Model Context Protocol](https://modelcontextprotocol.io/)) |
+| Feature Flags | **GrowthBook** | Server-side feature control and A/B testing — from security kill switches to unreleased feature gates (Sections 6.2, 7) |
 | Bundler | **Bun bundler** | `feature()`-based dead code elimination separates internal and external builds |
 
 Using React for a terminal app might seem like overkill. But when you look at the code — permission dialogs (`PermissionDialog.tsx`), Worker badges (`WorkerBadge`), multi-panel layouts, real-time streaming UI — these complex interactions make the choice understandable. It is a terminal, but far from simple text output. The UI is remarkably rich.
@@ -147,13 +147,13 @@ type State = {
 }
 ```
 
-The pattern to note here is the **"Continue Site."** The source code comments explain it directly:
+The pattern to note here is the **"Continue Site"** — the term refers to points in the loop where state is updated and execution continues to the next iteration. The source code comments explain it directly:
 
 ```typescript
 // Continue sites write `state = { ... }` instead of 9 separate assignments.
 ```
 
-Instead of modifying 9 individual fields one by one when changing state, the entire state object is reassigned.
+Instead of modifying 9 individual fields one by one, the entire state object is reassigned at once.
 
 ```typescript
 state = {
@@ -164,7 +164,7 @@ state = {
 }
 ```
 
-This pattern has two advantages. First, state transitions are **atomic** — there is no intermediate state where only 5 of 9 fields have been updated before an error occurs. Second, the `transition` field tracks **why** execution continued, enabling tests to assert that recovery paths worked correctly without inspecting message contents.
+This pattern has two advantages. First, state transitions are **atomic** — there is no incomplete intermediate state where some fields have been updated before an error occurs. Second, the `transition` field tracks **why** execution continued, enabling tests to assert that recovery paths worked correctly without inspecting message contents.
 
 React's `setState` philosophy has permeated all the way into the backend loop — a glimpse into the Anthropic engineers' love for React.
 
@@ -176,10 +176,11 @@ Each turn goes through the following 6 stages. We will examine them alongside th
 
 #### Stage 1: Pre-Request Compaction (lines 365-548)
 
-Conversation history is cleaned up *before* calling the API. Five compaction mechanisms are applied **in sequence**.
+Conversation history is cleaned up *before* calling the API. Five compaction mechanisms are applied **in sequence** — each is covered in detail in Section 4. Here we focus on the pipeline flow.
 
 ```typescript
 // 1. Apply Tool Result Budget (lines 369-394)
+// A budget system that caps oversized tool results to use the context window efficiently
 messagesForQuery = await applyToolResultBudget(
   messagesForQuery,
   toolUseContext.contentReplacementState,
@@ -269,7 +270,7 @@ if (innerError instanceof FallbackTriggeredError && fallbackModel) {
 }
 ```
 
-Tombstone messages leave a record saying "this tool call was discarded due to model fallback." It is a mechanism for maintaining conversation history consistency.
+Tombstone messages — a term borrowed from databases where they mark entries as "deleted/invalidated" — leave a record saying "this tool call was discarded due to model fallback," maintaining conversation history consistency.
 
 #### Stage 3: Error Recovery Cascade (lines 1062-1256)
 
@@ -429,7 +430,7 @@ An asymmetric strategy is applied to transcript recording:
 // User messages: blocking save (essential for --resume restoration)
 await recordTranscript(userMessage)
 
-// Assistant messages: fire-and-forget (async, non-blocking)
+// Assistant messages: fire-and-forget (start the operation, don't wait for it to complete)
 recordTranscript(assistantMessage)  // No await
 ```
 
@@ -450,7 +451,7 @@ The greatest enemy of an agentic AI tool is the context window limit. In long co
 Cost: **Free** (no API calls)
 Information loss: **High**
 
-Removes entire blocks of older internal messages and keeps only recent context. Gated behind the `HISTORY_SNIP` feature flag, primarily used in headless sessions.
+True to its name ("snip" as in cutting), it removes entire blocks of older messages and keeps only recent context. Gated behind the `HISTORY_SNIP` feature flag, primarily used in headless (UI-less, background) sessions.
 
 ```typescript
 const snipResult = snipModule!.snipCompactIfNeeded(messagesForQuery)
@@ -472,7 +473,7 @@ If Snip has already freed a significant amount, this prevents Auto-Compact from 
 Cost: **Free** (no API calls)
 Information loss: **Medium**
 
-Selectively clears tool results — not all tool results, only specific ones.
+The "micro" in the name reflects that it operates on individual tool results rather than the entire conversation — selectively clearing only specific tools' outputs.
 
 ```typescript
 // Clearing targets: file_read, shell, grep, glob, web_search, web_fetch, file_edit, file_write
@@ -481,7 +482,7 @@ Selectively clears tool results — not all tool results, only specific ones.
 // Text: rough token count estimation
 ```
 
-The real core of this layer is **cache edit block pinning**. Behind the `CACHED_MICROCOMPACT` feature flag, this feature is designed to work in harmony with the API's prompt caching.
+The real core of this layer is **cache edit block pinning**. The Anthropic API has a **prompt caching** feature where, if the prefix of a prompt matches the previous request, the server skips recomputation. Behind the `CACHED_MICROCOMPACT` feature flag, this feature is designed to work in harmony with that caching.
 
 ```typescript
 const pendingCacheEdits = feature('CACHED_MICROCOMPACT')
@@ -507,7 +508,7 @@ The source comments explain the core of this design:
 // across turns: projectView() replays the commit log on every entry.
 ```
 
-The collapsed view is a **read-time projection** over the REPL's full history. Original messages remain intact; only the collapse results are stored separately. Conceptually similar to Git's snapshot storage approach — providing a different "view" without touching the originals.
+The collapsed view is a **read-time projection** over the REPL's full history — meaning the original data is never modified; instead, a reduced "view" is computed on-the-fly each time it is read. Collapse results are stored separately while originals remain intact. Conceptually similar to how Git shows different branch snapshots without modifying the underlying files.
 
 The advantage of this approach is maximizing prompt caching cache hits. Since original messages do not change, cached prefixes are not invalidated.
 
@@ -527,15 +528,15 @@ function getAutoCompactThreshold(model: string): number {
 
 Reserves 13K tokens from the context window, and triggers auto-compaction when the rest fills up.
 
-There is a **circuit breaker**:
+There is a **circuit breaker** — like an electrical breaker that trips when it detects overcurrent, this software pattern stops retrying after consecutive failures:
 
 ```typescript
 MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3
 ```
 
-Auto-compaction itself can fail — when the conversation is so long that even the summarization request exceeds the context limit. This can lead to an infinite loop of "compact fails → retry → fails again." After 3 consecutive failures, it gives up cleanly. A textbook example of defensive programming.
+When the conversation is so long that even the summarization request exceeds the context limit, auto-compaction fails. This can lead to an infinite loop of "compact fails → retry → fails again." After 3 consecutive failures, the circuit breaker trips and gives up cleanly. A textbook example of defensive programming.
 
-### 4.5 Full Compaction (1,705 lines) — The Final Card
+### 4.5 Full Compaction (1,705 lines) — Auto-Compact's Engine Room
 
 This is the full compaction logic called internally when Auto-Compact executes.
 
@@ -576,7 +577,7 @@ The 4-tier compaction is not simply "compress progressively harder." Each tier h
 - **Context Collapse**: Reduces the view while preserving originals
 - **Auto-Compact**: Minimal information loss but incurs API costs
 
-This is a problem of finding the Pareto optimum along two axes: "minimize cost" and "maximize information preservation." The 4 layers represent different points on that Pareto frontier.
+This is a problem of finding the Pareto optimum along two axes: "minimize cost" and "maximize information preservation." The Pareto frontier is the boundary where improving one axis necessarily worsens the other. The 4 layers represent different balance points along that frontier.
 
 ---
 
@@ -618,7 +619,7 @@ type ToolPermissionContext = DeepImmutable<{
 }>
 ```
 
-Wrapped in `DeepImmutable`. The permission context is read-only and cannot be accidentally modified.
+Wrapped in `DeepImmutable` — a TypeScript utility type that recursively locks every nested property as read-only. The permission context cannot be accidentally modified.
 
 ### 5.2 Three-Tier Tool Registration Structure
 
@@ -644,7 +645,7 @@ Why does this 3-tier structure matter? In agentic AI tools, "which capabilities 
 
 ### 5.3 Tool Pool Assembly: Designed with Cache Stability in Mind
 
-The `assembleToolPool()` function merges built-in and MCP tools, and here we see interesting processing for prompt cache stability:
+The `assembleToolPool()` function merges built-in and MCP tools, and here we see interesting processing for the prompt caching stability discussed in Section 4.2:
 
 ```typescript
 export function assembleToolPool(permissionContext, mcpTools): Tools {
@@ -716,7 +717,7 @@ const REPLTool =
 
 ### 6.2 Layer 2: Feature Flags — Server-Side Kill Switches
 
-Even after the build, features can be controlled server-side. GrowthBook-based flags with the `tengu_` prefix serve this role.
+Even after the build, features can be controlled server-side. GrowthBook-based flags with the `tengu_` prefix serve this role. (`tengu` is presumably Claude Code's internal project codename at Anthropic.)
 
 | Flag | Role |
 |------|------|
@@ -778,7 +779,7 @@ The fallback mechanism in denial tracking is important. If the classifier acts t
 
 For debugging, setting the `CLAUDE_CODE_DUMP_AUTO_MODE=1` environment variable dumps the classifier's requests/responses as JSON to `/tmp/claude-code/auto-mode/`. A useful tip when you want to understand why Claude Code's auto mode is rejecting certain operations.
 
-What if the classifier returns an API error? **It falls back to prompting** — not automatic denial. A fail-open strategy of "when in doubt, ask the user." Fail-open is typically dangerous in security, but here the fallback is "let the user decide," which is reasonable.
+What if the classifier returns an API error? **It falls back to prompting** — not automatic denial. A fail-open — allowing passage on failure rather than blocking (fail-closed) — strategy of "when in doubt, ask the user." Fail-open is typically dangerous in security, but here the fallback is "let the user decide," which is reasonable.
 
 ### 6.5 Layer 5: Dangerous Pattern Detection
 
@@ -993,15 +994,6 @@ const WorkflowTool = feature('WORKFLOW_SCRIPTS')
 
 There are bundled workflows (pre-built automation scripts) with an initialization system. Recursive execution is blocked inside sub-agents (included in `ALL_AGENT_DISALLOWED_TOOLS`).
 
-### Insight: What Unreleased Features Reveal About Direction
-
-Synthesizing these features reveals Anthropic's strategy:
-
-1. **CLI → Platform**: From a single terminal tool to a multi-device, multi-agent platform
-2. **Reactive → Proactive**: From awaiting user commands to autonomous monitoring and notifications
-3. **Text → Multimodal**: From typing to voice and browser automation
-4. **Single → Orchestration**: From one agent to an agent swarm managed by a Coordinator
-
 ### 7.8 Bridge — Remote Control System (33+ Files)
 
 The Bridge system is a large subsystem comprising 33+ files. It is the backend for the "Remote Control" feature that controls the local machine's Claude Code from the Claude.ai web interface.
@@ -1042,6 +1034,15 @@ Session lifecycle is managed by `sessionRunner.ts`, maintaining session handoff 
 The noteworthy aspect of the Bridge system is its **session isolation strategy**. Using Git worktree as the session isolation unit is a pragmatic choice that leverages existing infrastructure (Git) to achieve filesystem-level isolation. It has lower overhead than container or VM-level isolation while still giving each session its own independent working directory.
 
 The 2-tier authentication structure (Standard/Elevated) is also instructive. Requiring maximum authentication for all remote operations degrades user experience; requiring only the minimum weakens security. Varying the authentication level based on operation sensitivity is a realistic approach to balancing security and convenience.
+
+### Insight: What Unreleased Features Reveal About Direction
+
+Synthesizing these features reveals Anthropic's strategy:
+
+1. **CLI → Platform**: From a single terminal tool to a multi-device, multi-agent platform
+2. **Reactive → Proactive**: From awaiting user commands to autonomous monitoring and notifications
+3. **Text → Multimodal**: From typing to voice and browser automation
+4. **Single → Orchestration**: From one agent to an agent swarm managed by a Coordinator
 
 ---
 
