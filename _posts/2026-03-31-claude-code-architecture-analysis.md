@@ -41,8 +41,8 @@ This post sets aside the legal and ethical debates. Instead, it digs deep into t
 
 ## 2. Overall Architecture: Much Bigger Than You Think
 
-<a href="/assets/images/claude-code-analysis/architecture-overview.png" data-lightbox="claude-code" data-title="Overall System Architecture">
-  <img src="/assets/images/claude-code-analysis/architecture-overview.png" alt="Overall System Architecture" />
+<a href="/assets/images/architecture-overview.png" data-lightbox="claude-code" data-title="Overall System Architecture">
+  <img src="/assets/images/architecture-overview.png" alt="Overall System Architecture" />
 </a>
 
 When you first encounter Claude Code, it is easy to think: "Isn't this just an API wrapper?" You talk to Claude in the terminal, Claude fixes your code, done. Looks simple.
@@ -83,8 +83,8 @@ Using React for a terminal app might seem like overkill. But when you look at th
 
 ## 3. The Agentic Loop: Opening the Heart
 
-<a href="/assets/images/claude-code-analysis/agentic-loop.png" data-lightbox="claude-code" data-title="Agentic Loop State Machine">
-  <img src="/assets/images/claude-code-analysis/agentic-loop.png" alt="Agentic Loop State Machine" />
+<a href="/assets/images/agentic-loop.png" data-lightbox="claude-code" data-title="Agentic Loop State Machine">
+  <img src="/assets/images/agentic-loop.png" alt="Agentic Loop State Machine" />
 </a>
 
 The heart of Claude Code is `query.ts` — a 1,729-line `while(true)` loop. This "agentic loop" governs the entire cycle: receiving user input, executing tools, and feeding results back to Claude.
@@ -453,8 +453,8 @@ Not all messages are saved with equal priority. User messages are required for `
 
 ## 4. Message Compaction: A Sophisticated War Against the Context Window
 
-<a href="/assets/images/claude-code-analysis/compaction-layers.png" data-lightbox="claude-code" data-title="Message Compaction Layers">
-  <img src="/assets/images/claude-code-analysis/compaction-layers.png" alt="Message Compaction Layers" />
+<a href="/assets/images/compaction-layers.png" data-lightbox="claude-code" data-title="Message Compaction Layers">
+  <img src="/assets/images/compaction-layers.png" alt="Message Compaction Layers" />
 </a>
 
 The greatest enemy of an agentic AI tool is the context window limit. There is an upper bound on the total text that can be sent to an LLM, and as conversations grow longer, earlier content gets truncated or the API returns a 413 (Prompt Too Long) error. Claude Code's compaction system addresses this with 4 layers, each with different costs and levels of information loss. The core principle: **"always start with the cheapest option."**
@@ -723,8 +723,8 @@ The phrase "optimistic check" stands out. At tool registration time, ToolSearchT
 
 ## 6. Multi-Layer Security: Peeling the Onion
 
-<a href="/assets/images/claude-code-analysis/security-layers.png" data-lightbox="claude-code" data-title="Security Layers">
-  <img src="/assets/images/claude-code-analysis/security-layers.png" alt="Security Layers" />
+<a href="/assets/images/security-layers.png" data-lightbox="claude-code" data-title="Security Layers">
+  <img src="/assets/images/security-layers.png" alt="Security Layers" />
 </a>
 
 "An AI agent accessing my filesystem and executing terminal commands" — a sentence sufficient to make any security researcher shudder. A single poorly crafted prompt could execute `rm -rf /`, and a malicious prompt injection could exfiltrate sensitive files. Looking at how Claude Code handles this problem reveals an onion-like multi-layered defense. Eight layers deep.

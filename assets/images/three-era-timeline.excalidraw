@@ -1,0 +1,150 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "title", "type": "text", "x": 150, "y": 10, "width": 600, "height": 40,
+      "text": "AI 에이전틱 패턴의 진화: 엄밀함은 어디로 이동했는가",
+      "fontSize": 22, "fontFamily": 1, "textAlign": "center", "baseline": 28,
+      "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": [], "roundness": null, "seed": 1, "version": 1, "versionNonce": 1,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era1-box", "type": "rectangle", "x": 30, "y": 70, "width": 260, "height": 300,
+      "strokeColor": "#1971c2", "backgroundColor": "#d0ebff", "fillStyle": "solid",
+      "strokeWidth": 2, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era1"], "roundness": {"type": 3}, "seed": 2, "version": 1, "versionNonce": 2,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era1-title", "type": "text", "x": 60, "y": 80, "width": 200, "height": 30,
+      "text": "🔵 Prompt Engineering\n      2022-2024",
+      "fontSize": 16, "fontFamily": 1, "textAlign": "center", "baseline": 22,
+      "strokeColor": "#1971c2", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era1"], "roundness": null, "seed": 3, "version": 1, "versionNonce": 3,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era1-q", "type": "text", "x": 50, "y": 130, "width": 220, "height": 25,
+      "text": "\"어떤 말을 해야 하나?\"",
+      "fontSize": 14, "fontFamily": 1, "textAlign": "center", "baseline": 18,
+      "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era1"], "roundness": null, "seed": 4, "version": 1, "versionNonce": 4,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era1-events", "type": "text", "x": 45, "y": 165, "width": 230, "height": 180,
+      "text": "2022.06  GitHub Copilot 출시\n2022.11  ChatGPT 공개\n2022.01  Chain-of-Thought\n2022.10  ReAct\n2023.03  Cursor 등장\n2023.05  Tree-of-Thought\n2024.03  Ng 4 Patterns\n2024.12  Anthropic Agents 가이드\n\n엄밀함 위치: 프롬프트 텍스트\n 사인: Blind Prompting",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left", "baseline": 14,
+      "strokeColor": "#495057", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era1"], "roundness": null, "seed": 5, "version": 1, "versionNonce": 5,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era2-box", "type": "rectangle", "x": 320, "y": 70, "width": 260, "height": 300,
+      "strokeColor": "#2f9e44", "backgroundColor": "#d8f5a2", "fillStyle": "solid",
+      "strokeWidth": 2, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era2"], "roundness": {"type": 3}, "seed": 6, "version": 1, "versionNonce": 6,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era2-title", "type": "text", "x": 340, "y": 80, "width": 220, "height": 30,
+      "text": "🟢 Context Engineering\n           2025",
+      "fontSize": 16, "fontFamily": 1, "textAlign": "center", "baseline": 22,
+      "strokeColor": "#2f9e44", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era2"], "roundness": null, "seed": 7, "version": 1, "versionNonce": 7,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era2-q", "type": "text", "x": 340, "y": 130, "width": 220, "height": 25,
+      "text": "\"어떤 정보를 넣어야 하나?\"",
+      "fontSize": 14, "fontFamily": 1, "textAlign": "center", "baseline": 18,
+      "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era2"], "roundness": null, "seed": 8, "version": 1, "versionNonce": 8,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era2-events", "type": "text", "x": 335, "y": 165, "width": 230, "height": 180,
+      "text": "2025.02  Vibe Coding (Karpathy)\n2025.06  Lütke 트윗\n2025.06  Karpathy 화답\n2025.07  Manus 6원칙\n2025.09  Anthropic CE 가이드\n2025.10  ACE 논문\n2025.12  Google ADK\n\n 엄밀함 위치: 컨텍스트 윈도우\n 사인: 시스템 부재",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left", "baseline": 14,
+      "strokeColor": "#495057", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era2"], "roundness": null, "seed": 9, "version": 1, "versionNonce": 9,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era3-box", "type": "rectangle", "x": 610, "y": 70, "width": 260, "height": 300,
+      "strokeColor": "#e8590c", "backgroundColor": "#ffe8cc", "fillStyle": "solid",
+      "strokeWidth": 2, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era3"], "roundness": {"type": 3}, "seed": 10, "version": 1, "versionNonce": 10,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era3-title", "type": "text", "x": 630, "y": 80, "width": 220, "height": 30,
+      "text": "🟠 Harness Engineering\n          2026~",
+      "fontSize": 16, "fontFamily": 1, "textAlign": "center", "baseline": 22,
+      "strokeColor": "#e8590c", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era3"], "roundness": null, "seed": 11, "version": 1, "versionNonce": 11,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era3-q", "type": "text", "x": 630, "y": 130, "width": 220, "height": 25,
+      "text": "\"어떤 시스템을 만들어야 하나?\"",
+      "fontSize": 14, "fontFamily": 1, "textAlign": "center", "baseline": 18,
+      "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era3"], "roundness": null, "seed": 12, "version": 1, "versionNonce": 12,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "era3-events", "type": "text", "x": 625, "y": 165, "width": 230, "height": 180,
+      "text": "2026.01  Schmid Agent Harness\n2026.02  Hashimoto 명명\n2026.02  OpenAI Codex 실험\n2026.02  Fowler 2×2 체계\n2026.02  Mollick 프레임워크\n2026.03  Anthropic 3-Agent\n\n 엄밀함 위치: 시스템 아키텍처\n Agent = Model + Harness",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left", "baseline": 14,
+      "strokeColor": "#495057", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": ["era3"], "roundness": null, "seed": 13, "version": 1, "versionNonce": 13,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "arrow1", "type": "text", "x": 295, "y": 200, "width": 20, "height": 30,
+      "text": "→",
+      "fontSize": 24, "fontFamily": 1, "textAlign": "center", "baseline": 22,
+      "strokeColor": "#868e96", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": [], "roundness": null, "seed": 14, "version": 1, "versionNonce": 14,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "arrow2", "type": "text", "x": 585, "y": 200, "width": 20, "height": 30,
+      "text": "→",
+      "fontSize": 24, "fontFamily": 1, "textAlign": "center", "baseline": 22,
+      "strokeColor": "#868e96", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": [], "roundness": null, "seed": 15, "version": 1, "versionNonce": 15,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    },
+    {
+      "id": "bottom-note", "type": "text", "x": 200, "y": 390, "width": 500, "height": 30,
+      "text": "각 시대는 이전 시대를 대체하지 않고 포함(subsume)한다 — Chad Fowler, \"Relocating Rigor\"",
+      "fontSize": 13, "fontFamily": 1, "textAlign": "center", "baseline": 18,
+      "strokeColor": "#868e96", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 1, "roughness": 1, "opacity": 100, "angle": 0,
+      "groupIds": [], "roundness": null, "seed": 16, "version": 1, "versionNonce": 16,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 440" font-family="'Virgil', 'Segoe Print', 'Comic Sans MS', cursive">
+  <rect width="820" height="440" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="410" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e1e1e">KV-cache: Why Prefix Stability Matters More Than Prompt Quality</text>
+
+  <!-- GOOD CASE -->
+  <text x="30" y="68" font-size="14" font-weight="bold" fill="#2f9e44">Prefix unchanged = Cache hit = 1/10 cost</text>
+
+  <!-- Turn 1 -->
+  <text x="30" y="100" font-size="12" fill="#868e96">Turn 1</text>
+  <path d="M78 85 Q250 82 428 85 Q432 86 428 120 Q250 123 78 120 Q74 119 78 85Z" fill="#d8f5a2" stroke="#69db7c" stroke-width="2" stroke-linejoin="round"/>
+  <text x="253" y="107" text-anchor="middle" font-size="11" fill="#1e1e1e">System prompt + Tool definitions</text>
+  <path d="M438 85 Q560 82 688 85 Q692 86 688 120 Q560 123 438 120 Q434 119 438 85Z" fill="#d0ebff" stroke="#4dabf7" stroke-width="2" stroke-linejoin="round"/>
+  <text x="563" y="107" text-anchor="middle" font-size="11" fill="#1e1e1e">User input A + Tool results</text>
+
+  <!-- Turn 2 -->
+  <text x="30" y="155" font-size="12" fill="#868e96">Turn 2</text>
+  <path d="M78 140 Q250 137 428 140 Q432 141 428 175 Q250 178 78 175 Q74 174 78 140Z" fill="#d8f5a2" stroke="#69db7c" stroke-width="2" stroke-dasharray="8,4" stroke-linejoin="round"/>
+  <text x="253" y="162" text-anchor="middle" font-size="11" fill="#2f9e44">System prompt + Tool defs  --  CACHED</text>
+  <path d="M438 140 Q560 137 688 140 Q692 141 688 175 Q560 178 438 175 Q434 174 438 140Z" fill="#e5dbff" stroke="#7950f2" stroke-width="2" stroke-linejoin="round"/>
+  <text x="563" y="162" text-anchor="middle" font-size="11" fill="#1e1e1e">User input B + Tool results</text>
+
+  <!-- Cost badge good -->
+  <path d="M710 108 Q712 95 800 98 Q805 100 802 158 Q800 163 712 160 Q708 158 710 108Z" fill="#ebfbee" stroke="#69db7c" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="756" y="125" text-anchor="middle" font-size="12" font-weight="bold" fill="#2f9e44">Cost</text>
+  <text x="756" y="150" text-anchor="middle" font-size="20" font-weight="bold" fill="#2f9e44">1/10</text>
+
+  <!-- Divider -->
+  <path d="M30 200 Q410 196 790 200" stroke="#ced4da" stroke-width="1.5" stroke-dasharray="6,4" fill="none"/>
+
+  <!-- BAD CASE -->
+  <text x="30" y="235" font-size="14" font-weight="bold" fill="#c92a2a">Prefix changed by 1 token = Full cache miss = 10/10 cost</text>
+
+  <!-- Turn 2 (context) -->
+  <text x="30" y="267" font-size="12" fill="#868e96">Turn 2</text>
+  <path d="M78 252 Q250 249 428 252 Q432 253 428 287 Q250 290 78 287 Q74 286 78 252Z" fill="#d8f5a2" stroke="#69db7c" stroke-width="2" stroke-linejoin="round"/>
+  <text x="253" y="274" text-anchor="middle" font-size="11" fill="#1e1e1e">System prompt + Tool definitions</text>
+  <path d="M438 252 Q560 249 688 252 Q692 253 688 287 Q560 290 438 287 Q434 286 438 252Z" fill="#d0ebff" stroke="#4dabf7" stroke-width="2" stroke-linejoin="round"/>
+  <text x="563" y="274" text-anchor="middle" font-size="11" fill="#1e1e1e">User input B + Tool results</text>
+
+  <!-- Turn 3 (broken!) -->
+  <text x="30" y="322" font-size="12" fill="#868e96">Turn 3</text>
+  <path d="M78 307 Q250 304 428 307 Q432 308 428 342 Q250 345 78 342 Q74 341 78 307Z" fill="#ffe3e3" stroke="#c92a2a" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="253" y="329" text-anchor="middle" font-size="11" fill="#c92a2a">System prompt + Tool defs + [NEW TOOL]</text>
+  <path d="M438 307 Q560 304 688 307 Q692 308 688 342 Q560 345 438 342 Q434 341 438 307Z" fill="#ffe3e3" stroke="#c92a2a" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="563" y="329" text-anchor="middle" font-size="11" fill="#c92a2a">Everything recomputed</text>
+
+  <!-- Break indicator -->
+  <text x="432" y="358" text-anchor="middle" font-size="11" font-weight="bold" fill="#c92a2a">1 token changed!</text>
+
+  <!-- Cost badge bad -->
+  <path d="M710 275 Q712 262 800 265 Q805 267 802 325 Q800 330 712 327 Q708 325 710 275Z" fill="#fff5f5" stroke="#c92a2a" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="756" y="292" text-anchor="middle" font-size="12" font-weight="bold" fill="#c92a2a">Cost</text>
+  <text x="756" y="317" text-anchor="middle" font-size="20" font-weight="bold" fill="#c92a2a">10/10</text>
+
+  <!-- Legend -->
+  <path d="M30 370 Q410 366 790 370 Q794 371 790 430 Q410 434 30 430 Q26 429 30 370Z" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="50" y="385" width="14" height="14" rx="2" fill="#d8f5a2" stroke="#69db7c" stroke-width="1"/>
+  <text x="72" y="397" font-size="11" fill="#495057">Stable Prefix — keep identical every turn</text>
+  <rect x="50" y="408" width="14" height="14" rx="2" fill="#d0ebff" stroke="#4dabf7" stroke-width="1"/>
+  <text x="72" y="420" font-size="11" fill="#495057">Variable Suffix — changes each turn (OK)</text>
+  <rect x="420" y="385" width="14" height="14" rx="2" fill="#ffe3e3" stroke="#c92a2a" stroke-width="1"/>
+  <text x="442" y="397" font-size="11" fill="#495057">Modified Prefix — invalidates all downstream cache</text>
+  <text x="442" y="420" font-size="11" font-style="italic" fill="#868e96">Takeaway: In production, prompt stability > prompt quality</text>
+</svg>

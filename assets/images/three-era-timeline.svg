@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="'Virgil', 'Segoe Print', 'Comic Sans MS', cursive">
+  <rect width="900" height="500" fill="#fff"/>
+
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" font-size="19" font-weight="bold" fill="#1e1e1e">Evolution of AI Agentic Patterns — Where Did Engineering Rigor Go?</text>
+
+  <!-- Timeline bar (hand-drawn feel with roughness) -->
+  <path d="M50 62 Q200 58 350 62 Q500 66 590 62 Q700 58 850 62" stroke="#adb5bd" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M50 62 Q120 58 200 62 Q280 66 350 62" stroke="#4dabf7" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M350 62 Q420 58 470 62 Q530 66 590 62" stroke="#69db7c" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M590 62 Q680 58 750 62 Q820 66 850 62" stroke="#ff922b" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- Year markers -->
+  <text x="50" y="85" font-size="11" fill="#868e96">2022</text>
+  <text x="200" y="85" font-size="11" fill="#868e96">2023</text>
+  <text x="350" y="85" font-size="11" fill="#868e96">2024</text>
+  <text x="470" y="85" font-size="11" fill="#868e96">early 2025</text>
+  <text x="590" y="85" font-size="11" fill="#868e96">mid 2025</text>
+  <text x="750" y="85" font-size="11" fill="#868e96">2026</text>
+
+  <!-- ERA 1: Prompt Engineering (hand-drawn rect) -->
+  <path d="M32 102 Q33 98 308 100 Q312 101 310 278 Q309 282 32 280 Q28 279 32 102Z" fill="#dbe4ff" stroke="#4dabf7" stroke-width="2" stroke-linejoin="round"/>
+  <text x="170" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#1971c2">Prompt Engineering</text>
+  <text x="170" y="145" text-anchor="middle" font-size="11" fill="#495057">"What should I say?"</text>
+  <path d="M48 152 Q170 150 292 152" stroke="#4dabf7" stroke-width="0.8" fill="none"/>
+  <text x="45" y="172" font-size="10.5" fill="#495057">2022.06  GitHub Copilot launch</text>
+  <text x="45" y="188" font-size="10.5" fill="#495057">2022.11  ChatGPT release</text>
+  <text x="45" y="204" font-size="10.5" fill="#495057">2022       CoT / ReAct papers</text>
+  <text x="45" y="220" font-size="10.5" fill="#495057">2023       ToT / Reflexion / Cursor</text>
+  <text x="45" y="236" font-size="10.5" fill="#495057">2024.03  Ng's 4 Agentic Patterns</text>
+  <text x="45" y="252" font-size="10.5" fill="#495057">2024.11  MCP released</text>
+  <text x="45" y="268" font-size="10.5" font-style="italic" fill="#c92a2a">Cause of death: Blind Prompting</text>
+
+  <!-- ERA 2: Context Engineering -->
+  <path d="M322 102 Q323 98 568 100 Q572 101 570 278 Q569 282 322 280 Q318 279 322 102Z" fill="#e9fac8" stroke="#69db7c" stroke-width="2" stroke-linejoin="round"/>
+  <text x="445" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#2f9e44">Context Engineering</text>
+  <text x="445" y="145" text-anchor="middle" font-size="11" fill="#495057">"What info should I feed?"</text>
+  <path d="M338 152 Q445 150 552 152" stroke="#69db7c" stroke-width="0.8" fill="none"/>
+  <text x="335" y="172" font-size="10.5" fill="#495057">2025.02  Vibe Coding coined</text>
+  <text x="335" y="188" font-size="10.5" fill="#495057">2025.06  Lutke / Karpathy tweets</text>
+  <text x="335" y="204" font-size="10.5" fill="#495057">2025.07  Manus 5 principles</text>
+  <text x="335" y="220" font-size="10.5" fill="#495057">2025.09  Anthropic CE guide</text>
+  <text x="335" y="236" font-size="10.5" fill="#495057">2025.12  Google ADK</text>
+  <text x="335" y="252" font-size="10.5" fill="#495057">2025.04  A2A protocol (Google)</text>
+  <text x="335" y="268" font-size="10.5" font-style="italic" fill="#c92a2a">Cause of death: No system design</text>
+
+  <!-- ERA 3: Harness Engineering -->
+  <path d="M582 102 Q583 98 858 100 Q862 101 860 278 Q859 282 582 280 Q578 279 582 102Z" fill="#fff4e6" stroke="#ff922b" stroke-width="2" stroke-linejoin="round"/>
+  <text x="720" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#e8590c">Harness Engineering</text>
+  <text x="720" y="145" text-anchor="middle" font-size="11" fill="#495057">"What system should I build?"</text>
+  <path d="M598 152 Q720 150 842 152" stroke="#ff922b" stroke-width="0.8" fill="none"/>
+  <text x="595" y="172" font-size="10.5" fill="#495057">2026.01  Schmid: Agent Harness</text>
+  <text x="595" y="188" font-size="10.5" fill="#495057">2026.02  Hashimoto coins term</text>
+  <text x="595" y="204" font-size="10.5" fill="#495057">2026.02  OpenAI Codex experiment</text>
+  <text x="595" y="220" font-size="10.5" fill="#495057">2026.02  Fowler's 2x2 taxonomy</text>
+  <text x="595" y="236" font-size="10.5" fill="#495057">2026.03  Anthropic 3-Agent</text>
+  <text x="595" y="258" font-size="10.5" font-weight="bold" fill="#e8590c">Agent = Model + Harness</text>
+
+  <!-- Arrows between eras -->
+  <line x1="312" y1="185" x2="320" y2="185" stroke="#868e96" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M316 180 L323 185 L316 190" fill="none" stroke="#868e96" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="572" y1="185" x2="580" y2="185" stroke="#868e96" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M576 180 L583 185 L576 190" fill="none" stroke="#868e96" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Rigor relocation bar -->
+  <path d="M32 292 Q450 288 868 292 Q872 293 868 338 Q450 342 32 338 Q28 337 32 292Z" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="450" y="312" text-anchor="middle" font-size="13" font-weight="bold" fill="#495057">Where Rigor Lives</text>
+  <text x="170" y="333" text-anchor="middle" font-size="11" fill="#1971c2">Prompt text</text>
+  <line x1="255" y1="330" x2="305" y2="330" stroke="#868e96" stroke-width="2" stroke-linecap="round"/>
+  <path d="M300 325 L310 330 L300 335" fill="none" stroke="#868e96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="445" y="333" text-anchor="middle" font-size="11" fill="#2f9e44">Context window composition</text>
+  <line x1="570" y1="330" x2="620" y2="330" stroke="#868e96" stroke-width="2" stroke-linecap="round"/>
+  <path d="M615 325 L625 330 L615 335" fill="none" stroke="#868e96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="720" y="333" text-anchor="middle" font-size="11" fill="#e8590c">System architecture</text>
+
+  <!-- Subsumption diagram (nested hand-drawn boxes) -->
+  <path d="M32 355 Q450 351 868 355 Q872 356 868 485 Q450 489 32 485 Q28 484 32 355Z" fill="#f1f3f5" stroke="#ced4da" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="450" y="378" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e1e1e">Key Lesson: Subsumption (not Replacement)</text>
+
+  <!-- Outer: Harness -->
+  <path d="M190 390 Q450 386 710 390 Q714 391 710 465 Q450 469 190 465 Q186 464 190 390Z" fill="#fff4e6" stroke="#ff922b" stroke-width="2" stroke-linejoin="round"/>
+  <text x="695" y="410" text-anchor="end" font-size="10" fill="#e8590c">Harness Eng.</text>
+
+  <!-- Middle: Context -->
+  <path d="M230 400 Q420 397 600 400 Q603 401 600 455 Q420 458 230 455 Q227 454 230 400Z" fill="#e9fac8" stroke="#69db7c" stroke-width="2" stroke-linejoin="round"/>
+  <text x="588" y="418" text-anchor="end" font-size="10" fill="#2f9e44">Context Eng.</text>
+
+  <!-- Inner: Prompt -->
+  <path d="M280 410 Q390 408 490 410 Q493 411 490 445 Q390 447 280 445 Q277 444 280 410Z" fill="#dbe4ff" stroke="#4dabf7" stroke-width="2" stroke-linejoin="round"/>
+  <text x="385" y="432" text-anchor="middle" font-size="10" fill="#1971c2">Prompt Eng.</text>
+
+  <text x="450" y="497" text-anchor="middle" font-size="11" font-style="italic" fill="#868e96">"Each era subsumes the previous one, not replaces it." — Chad Fowler, Relocating Rigor</text>
+</svg>
