@@ -164,17 +164,17 @@ How Cursor understands a codebase is technically interesting. It recursively sca
 
 Early Cursor centered on chat-based code editing, but when **Composer mode** arrived in late 2024, the game changed. A three-panel layout (`CMD+SHIFT+I`) — progress, files, chat — where you type "add a user auth system" in natural language and it creates and modifies multiple files simultaneously. Beyond single-file edits: **project-level changes**. Cursor 2.0 in 2025 added mixture-of-experts models and reinforcement learning, with up to 8 agents running simultaneously in Git worktree isolation. Most tasks complete at ~250 tokens/second within 30 seconds.
 
-Growth was the fastest in SaaS history. By 2025: **$1.2B ARR**, **$29.3B valuation**. Shopify, Vercel, Linear, and other major tech companies adopted it.
+Growth was the fastest in SaaS history. By 2025: **\$1.2B ARR**, **\$29.3B valuation**. Shopify, Vercel, Linear, and other major tech companies adopted it.
 
 ### 3.2 The Cambrian Explosion of AI Coding Tools
 
 Cursor's success triggered a Cambrian explosion of AI coding tools.
 
-**Devin (Cognition Labs, 2024.03).** Arrived with the title "first AI software engineer." Claimed to build and deploy apps end-to-end. The promo video showed it completing Upwork freelancer tasks, but YouTuber Carl Brown analyzed it and revealed key claims were overstated. Independent testing by Answer.AI researchers: **3 out of 20 tasks succeeded**. Yet Cognition acquired Windsurf for $250M in July 2025 and reached a **$10.2B valuation** by September. The gap between hype and substance was a defining feature of this era.
+**Devin (Cognition Labs, 2024.03).** Arrived with the title "first AI software engineer." Claimed to build and deploy apps end-to-end. The promo video showed it completing Upwork freelancer tasks, but YouTuber Carl Brown analyzed it and revealed key claims were overstated. Independent testing by Answer.AI researchers: **3 out of 20 tasks succeeded**. Yet Cognition acquired Windsurf for \$250M in July 2025 and reached a **\\$10.2B valuation** by September. The gap between hype and substance was a defining feature of this era.
 
-**Windsurf (formerly Codeium).** Started as an AI autocomplete extension, rebranded as a full AI IDE in late 2024. Its agentic assistant "Cascade" was the differentiator. Hit $82M ARR, but after the CEO was recruited to Google via a $2.4B licensing deal, it was acquired by Cognition.
+**Windsurf (formerly Codeium).** Started as an AI autocomplete extension, rebranded as a full AI IDE in late 2024. Its agentic assistant "Cascade" was the differentiator. Hit \$82M ARR, but after the CEO was recruited to Google via a \$2.4B licensing deal, it was acquired by Cognition.
 
-**Others**: Void Editor (open-source Cursor alternative, privacy-focused), Augment Code ($250M funding, enterprise-focused), Sourcegraph Cody (code-search-based), Aider (terminal-based open-source pair programmer), Cline (VS Code extension, autonomous coding).
+**Others**: Void Editor (open-source Cursor alternative, privacy-focused), Augment Code (\$250M funding, enterprise-focused), Sourcegraph Cody (code-search-based), Aider (terminal-based open-source pair programmer), Cline (VS Code extension, autonomous coding).
 
 Between 2024 and 2025, AI agent framework GitHub repos (1,000+ stars) grew from 14 to 89 — a **535% increase**. [GitHub's 2024 survey](https://github.blog/news-insights/octoverse/octoverse-2024/) found **92% of developers were using AI coding tools**.
 
@@ -412,7 +412,7 @@ So, inspired by GANs (Generative Adversarial Networks — where a generator and 
 - **Generator**: Implements one feature at a time. React, Vite, FastAPI, SQLite stack. Self-evaluates each sprint, then hands off to QA. Working in sprints means periodically resetting context.
 - **Evaluator**: Runs E2E tests via Playwright (a browser automation framework). Grades UI functionality, API endpoints, and database state against criteria for product depth, functionality, visual design, and code quality. Below threshold? Back to the Generator with specific feedback.
 
-Cost? A solo run takes 20 minutes and $9. The full harness: 6 hours and $200. A 22x increase. But the quality of the output is incomparable. This isn't just a cost increase — it's a **relocation of cost**. From humans fixing things after the fact to the system verifying beforehand.
+Cost? A solo run takes 20 minutes and \$9. The full harness: 6 hours and \$200. A 22x increase. But the quality of the output is incomparable. This isn't just a cost increase — it's a **relocation of cost**. From humans fixing things after the fact to the system verifying beforehand.
 
 **The OpenAI Codex Experiment.** This one deserves a closer look. Let's start with the scale that OpenAI revealed in "[Harness Engineering](https://openai.com/index/harness-engineering/)." Five months. An engineering team that grew from 3 to 7. Lines of manually written code: zero. Generated code: approximately 1 million lines. Around 1,500 PRs. Roughly 10x faster than manual.
 
