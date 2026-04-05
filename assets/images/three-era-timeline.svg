@@ -1,4 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&amp;display=swap');
+      text { font-family: 'Caveat', 'Segoe Print', 'Comic Sans MS', cursive; }
+    </style>
+  </defs>
   <rect width="900" height="500" fill="#fff"/>
 
   <!-- Title -->
