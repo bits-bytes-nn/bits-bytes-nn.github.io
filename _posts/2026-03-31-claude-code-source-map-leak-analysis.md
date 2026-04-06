@@ -651,23 +651,7 @@ type ToolPermissionContext = DeepImmutable<{
 }>
 ```
 
-바깥을 감싸는 `DeepImmutable`이 중요합니다. 구체적인 예로 비교하면 이렇습니다.
-
-```typescript
-// Readonly — 1층만 잠금
-type Shallow = Readonly<{ rules: { allow: string[] } }>
-const a: Shallow = { rules: { allow: ["read"] } }
-a.rules = {}           // 컴파일 에러 (1층은 잠겨 있음)
-a.rules.allow.push("write")  // 통과! (2층은 안 잠겨 있음 — 위험)
-
-// DeepImmutable — 모든 층을 재귀적으로 잠금
-type Deep = DeepImmutable<{ rules: { allow: string[] } }>
-const b: Deep = { rules: { allow: ["read"] } }
-b.rules = {}           // 컴파일 에러
-b.rules.allow.push("write")  // 컴파일 에러 (2층도 잠겨 있음 — 안전)
-```
-
-`Readonly`는 객체의 최상위 속성만 읽기 전용으로 만들지만, 그 안에 중첩된 배열이나 객체는 여전히 수정할 수 있습니다. `DeepImmutable`은 중첩된 모든 속성까지 재귀적으로 잠급니다. 권한 규칙은 시스템의 보안 경계이므로, 코드 어디에서든 실수로 `alwaysAllowRules`에 항목을 추가하거나 변경하는 것을 타입 시스템 차원에서 원천 차단하는 것입니다.
+바깥을 감싸는 `DeepImmutable`이 중요합니다. TypeScript의 `Readonly`는 객체의 최상위 속성만 읽기 전용으로 만듭니다. 예를 들어 `rules` 자체를 다른 객체로 교체하는 건 막아주지만, `rules.alwaysAllowRules` 배열에 항목을 추가하는 건 막지 못합니다. 겉문은 잠갔지만 안쪽 방문은 열려 있는 셈입니다. `DeepImmutable`은 이 문제를 해결합니다. 최상위뿐 아니라 중첩된 모든 속성, 배열, 배열 안의 객체까지 재귀적으로 읽기 전용으로 잠급니다. 권한 규칙은 시스템의 보안 경계이므로, 코드 어디에서든 실수로 변경되는 것을 타입 시스템 차원에서 원천 차단하는 것입니다.
 
 ### 5.2 도구 등록의 3계층 구조
 
