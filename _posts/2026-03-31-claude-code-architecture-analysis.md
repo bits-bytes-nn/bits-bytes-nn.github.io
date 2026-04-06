@@ -605,7 +605,7 @@ The 4-tier compaction is not simply "compress progressively harder." Each tier *
 |-------|------|-----------------|--------------|----------------|
 | **Snip** | Free | High | None | Discards the past wholesale but preserves current cache |
 | **Microcompact** | Free | Medium | Minimized via pinning | Clears individual results while respecting cache ranges |
-| **Context Collapse** | Low | Medium | None (originals unchanged) | Reduces the view only; originals untouched |
+| **Context Collapse** | Low | Medium | Minimal (one-time reset, then stable) | Originals preserved, but collapsed view causes cache reset at application. Cache re-accumulates on new stable prefix |
 | **Auto-Compact** | High | Low | Full reset | AI summarizes so information is preserved, but incurs API costs |
 
 This is a problem of finding the Pareto optimum along two axes: "minimize cost" and "maximize information preservation." The Pareto frontier is the boundary where improving one axis necessarily worsens the other. The 4 layers represent different balance points along that frontier, and no single strategy can be optimal in every dimension — so the appropriate strategy is applied in sequence based on the situation.
