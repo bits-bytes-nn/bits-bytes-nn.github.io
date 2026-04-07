@@ -1100,52 +1100,17 @@ Synthesizing these features reveals Anthropic's strategy:
 
 ---
 
-## 8. What This Architecture Means for the Industry
+## 8. Conclusion: What the Leak Tells Us
 
-Seeing inside Claude Code through leaked code is a rare opportunity to examine the real-world architecture of an agentic AI tool. Here are several key lessons.
+Claude Code's internals, revealed through the absurd channel of an npm source map, turned out to be not a simple API wrapper but a full-stack agent platform spanning 4,600 files. "Call the LLM API and execute tools — done" is a demo-level understanding. Production demands 4-tier compaction layers, cache edit block pinning, cost-aware error recovery, 8-layer security, and streaming parallel tool execution. Competing products like OpenAI's Codex, Cursor, and Devin likely harbor similar levels of complexity internally. Their code simply has never been made public.
 
-### Agentic Systems Are More Complex Than You Think
-
-"Call the LLM API and execute tools — done" is a demo-level understanding. Production agentic systems require:
-
-- **Context management**: 4-tier compaction layers, cache edit block pinning, tool sorting for cache stability, server-client budget synchronization
-- **Error recovery**: Cost-aware cascades, diminishing returns detection, circuit breakers
-- **Security**: 8 layers of defense in depth, ML-based auto-classification, build-time code elimination
-- **Performance**: Parallel tool execution during streaming, prefetching kicked off early in the pipeline and harvested at the end, asymmetric transcript saving
-
-Claude Code's 4,600 files are evidence of this complexity. Competing products like OpenAI's Codex, Cursor, and Devin likely harbor similar levels of complexity internally. Their code simply has never been made public.
-
-### Cost Drives Architecture
-
-If there is one principle running through Claude Code's architecture, it is **cost-awareness**.
-
-- Error recovery starts with free options first
-- Message compaction starts with methods that require no API calls
-- Token waste stops when diminishing returns are detected
-- Tool sorting optimizes prompt cache hit rates
-- Tools are loaded only when needed
-
-In an LLM system where every API call is a cost, "cheapest method first" is not technical elegance — it is an economic survival strategy. Every team building agentic systems will eventually face this problem.
-
-### We Need a New Definition of "Open Source"
-
-The Claude Code case raises questions about what "open source" means in the AI era. The official repository contains only the plugin interface (279 files), while the core engine (4,600+ files) sits behind a commercial license. Can we call this "open source"?
-
-This is not solely Anthropic's issue. Many AI products publish only extension interfaces under the "open" label while keeping the core proprietary. It is important for users and the developer community to recognize this distinction.
-
----
-
-## 9. Conclusion: What the Leak Tells Us
-
-Claude Code's internals, revealed through the absurd channel of an npm source map, turned out to be not a simple API wrapper but a full-stack agent platform spanning 4,600 files.
-
-Eight layers of defense-in-depth security, 4-tier message compaction, diminishing returns detection, cost-aware error recovery, tool sorting for cache stability — these details are production-level engineering that simply cannot emerge from an "API wrapper."
+If there is one principle running through this architecture, it is **cost-awareness**. Error recovery starts with free options first. Compaction starts with methods that require no API calls. Tool search loads only when needed. In a system where every API call is a cost, "cheapest method first" is not elegance — it is survival.
 
 The unreleased features reveal Anthropic's direction: voice mode, web browser automation, multi-agent Coordinator, proactive Kairos mode. The transition from "coding assistant" to "autonomous software engineering platform" is already underway at the code level.
 
-There is irony here. They implemented a sophisticated security mechanism for build-time dead code elimination, then forgot to strip source maps from that same build pipeline. They built 8 layers of onion-like protection around users' filesystems, while uploading their own source code to npm.
+And a question lingers about "open source." The official repository contains only the plugin interface (279 files), while the core engine (4,600+ files) sits behind a commercial license. This is not solely Anthropic's issue. Many AI products publish only extension interfaces under the "open" label while keeping the core proprietary.
 
-The patterns discussed in this analysis — cost-aware error recovery, multi-tier context compaction, build-time feature gates, diminishing returns detection — are not exclusive to Claude Code. They serve as reference for anyone building agentic AI systems. The principle of "try the cheapest recovery first" in particular applies to any LLM application where API cost is a key variable.
+There is irony here. They implemented a sophisticated security mechanism for build-time dead code elimination, then forgot to strip source maps from that same build pipeline. They built 8 layers of onion-like protection around users' filesystems, while uploading their own source code to npm.
 
 Perhaps this is the essence of software engineering. Even the most sophisticated systems fall to the simplest mistakes. What Anthropic's engineers built is undeniably an impressive agentic architecture. Just next time, hopefully they will remember to add `*.map` to their `.npmignore`.
 
