@@ -116,6 +116,7 @@
       align-items: baseline;
       gap: 0.5em;
       color: $base-font-color;
+      font-weight: 600;
       text-decoration: none;
       transition: $transition-color;
       &:hover { color: $action-color; }
