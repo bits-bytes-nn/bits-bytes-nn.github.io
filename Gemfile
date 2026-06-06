@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
 
-# Matches CI (.github/workflows/jekyll.yml) and .ruby-version. Lower bound only,
-# so newer local Rubies (3.3/3.4) still resolve.
-ruby '>= 3.2'
+# Matches CI (.github/workflows/jekyll.yml) and .ruby-version. 3.3+ is required
+# by html-proofer's async→console dependency. Lower bound only, so newer local
+# Rubies (3.4) still resolve.
+ruby '>= 3.3'
 
 gem 'jekyll', '~> 4.3'
 # Pin to the libsass-based converter (2.x). The 3.x line switched to dart-sass,

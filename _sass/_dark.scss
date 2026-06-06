@@ -57,7 +57,13 @@
     box-shadow: 0 2px 4px rgba(#000, 0.3);
   }
 
-  .post-date, .post-categories, .post-tags, .post-readtime { color: $fg-muted; }
+  .page-content .post {
+    .post-date, .post-categories, .post-tags, .post-readtime { color: $fg-muted; }
+    .post-meta { border-color: $border; border-left-color: $link; }
+    .post-tags { border-top-color: $border; }
+    .meta-value { color: $fg; }
+    .meta-label { color: $fg-muted; }
+  }
 
   // Table of contents
   .page-content .post .post-toc {
