@@ -80,7 +80,7 @@ search.json        Full-text search index (consumed by simple-jekyll-search)
 
 ## Writing a post
 
-The easiest path is the **`/write-post` skill**, which runs the whole
+The easiest path is the `/write-post` skill, which runs the whole
 research → draft → proofread workflow. To add one by hand, create
 `_posts/YYYY-MM-DD-slug.md` starting with this front matter:
 
@@ -119,7 +119,7 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 
 ### Math: always use `$$…$$`
 
-Write **`$$…$$`** for both inline and display math, and set `use_math: true`.
+Write `$$…$$` for both inline and display math, and set `use_math: true`.
 
 **Never use single `$…$`.** kramdown doesn't treat single `$` as math, so its
 Markdown pass turns `_`/`*` inside the span into `<em>`/`<strong>` *before*

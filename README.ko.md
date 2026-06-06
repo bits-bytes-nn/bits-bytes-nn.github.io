@@ -78,7 +78,7 @@ search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 
 ## 글 작성하기
 
-가장 쉬운 방법은 **`/write-post` 스킬**입니다. 리서치 → 초안 → 퇴고까지 한 번에 진행해 줍니다.
+가장 쉬운 방법은 `/write-post` 스킬입니다. 리서치 → 초안 → 퇴고까지 한 번에 진행해 줍니다.
 직접 만들 때는 `_posts/YYYY-MM-DD-slug.md` 파일을 만들고 아래 프런트매터로 시작하세요.
 
 ```yaml
@@ -115,7 +115,7 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 
 ### 수식은 반드시 `$$…$$`로
 
-인라인이든 디스플레이든 **`$$…$$`**로 쓰고 `use_math: true`를 켜세요.
+인라인이든 디스플레이든 `$$…$$`로 쓰고 `use_math: true`를 켜세요.
 
 **단일 `$…$`는 절대 쓰지 마세요.** kramdown은 단일 `$`를 수식으로 보지 않습니다.
 그래서 MathJax가 돌기 *전에* 마크다운 단계가 `$` 안의 `_`·`*`를 `<em>`·`<strong>`으로
