@@ -6,6 +6,8 @@ categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
 cover: /assets/images/insights.png
 use_math: false
+lang: en
+translation_id: claude-code-architecture-analysis
 ---
 
 # Claude Code Exposed: Anatomy of an Agentic AI Through an npm Source Map Leak

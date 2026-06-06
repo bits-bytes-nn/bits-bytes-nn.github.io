@@ -6,6 +6,8 @@ categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
 cover: /assets/images/insights.png
 use_math: false
+lang: ko
+translation_id: claude-code-architecture-analysis
 ---
 
 # Claude Code의 속살이 드러났습니다. npm Source Map 유출로 본 에이전틱 AI의 해부학.
