@@ -328,4 +328,63 @@
       color: $action-color;
     }
   }
+
+  // Copy button on code blocks (injected by JS)
+  .code-copy {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    padding: 0.2em 0.6em;
+    font-size: 0.75rem;
+    font-family: $base-font-family;
+    color: #c9d1d9;
+    background: rgba(#fff, 0.1);
+    border: 1px solid rgba(#fff, 0.15);
+    border-radius: $base-border-radius;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity $transition-normal, background-color $transition-normal;
+  }
+
+  .highlight:hover .code-copy,
+  .code-copy:focus { opacity: 1; }
+  .code-copy:hover { background: rgba(#fff, 0.2); }
+
+  // Previous / next post navigation
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    margin: 2.5em 0;
+
+    @include media($mobile) { grid-template-columns: 1fr; }
+  }
+
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    padding: 0.9em 1.1em;
+    border: 1px solid $base-border-color;
+    border-radius: $base-border-radius;
+    text-decoration: none;
+    transition: border-color $transition-normal;
+
+    &:hover { border-color: $action-color; }
+    &.next { text-align: right; }
+
+    .post-nav-dir {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: $medium-gray;
+    }
+
+    .post-nav-title {
+      color: $action-color;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+  }
 }

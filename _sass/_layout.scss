@@ -65,12 +65,13 @@ blockquote {
 // Rouge code blocks (.highlight wraps <pre><code>); theme colors live in _syntax.scss
 .highlight pre,
 .highlighter-rouge .highlight {
-	font-size: modular-scale(-1);
+	font-size: 0.9em; // ~14.4px on 16px body — was modular-scale(-1) (13.3px), too small
+	line-height: 1.6;
 	border-radius: $base-border-radius;
 }
 
 .highlight pre.highlight {
-	padding: 1em;
+	padding: 1em 1.2em;
 	overflow-x: auto;
 }
 
@@ -208,6 +209,28 @@ blockquote {
 
 		@include media ($tablet) {
 			display: none;
+		}
+	}
+
+	// Dark-mode toggle — last item in the nav list (after Search)
+	.theme-toggle {
+		margin: 0;
+		padding: 0;
+		font-size: 1.15em;
+		line-height: 1;
+		color: $medium-gray;
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: $transition-color;
+
+		&:hover { color: $action-color; }
+	}
+
+	li.theme-toggle-item {
+		@include media ($tablet) {
+			padding-right: 0;
+			&:hover { transform: none; } // no slide; it's a control, not a link
 		}
 	}
 

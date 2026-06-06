@@ -45,7 +45,7 @@ layout: default
 
     {% include language_switcher.html %}
 
-    <details id="post-toc" class="post-toc" hidden>
+    <details id="post-toc" class="post-toc" open hidden>
       <summary>
         <span class="post-toc-title">Contents</span>
         <span class="post-toc-count"></span>
@@ -57,6 +57,23 @@ layout: default
     <article class="post-content">
       {{ content }}
     </article>
+
+    {% if page.previous.url or page.next.url %}
+    <nav class="post-nav" aria-label="Adjacent posts">
+      {% if page.previous.url %}
+      <a class="post-nav-link prev" href="{{ page.previous.url | prepend: site.baseurl }}" rel="prev">
+        <span class="post-nav-dir">← Previous</span>
+        <span class="post-nav-title">{{ page.previous.title }}</span>
+      </a>
+      {% else %}<span></span>{% endif %}
+      {% if page.next.url %}
+      <a class="post-nav-link next" href="{{ page.next.url | prepend: site.baseurl }}" rel="next">
+        <span class="post-nav-dir">Next →</span>
+        <span class="post-nav-title">{{ page.next.title }}</span>
+      </a>
+      {% else %}<span></span>{% endif %}
+    </nav>
+    {% endif %}
 
     <section class="rss">
       <p class="rss-subscribe text"><strong>Subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></strong></p>

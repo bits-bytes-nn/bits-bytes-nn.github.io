@@ -1,12 +1,16 @@
-// Dark mode — opt-in via the OS/browser `prefers-color-scheme: dark`.
+// Dark mode.
 //
-// The theme hardcodes light colors throughout, so rather than rewrite every
-// rule as a CSS custom property, this partial overrides the handful of surfaces
-// that actually carry background/text color. Loaded last so it wins the cascade.
-// Header/footer already use a deep blue ($highlight-color) that works on dark,
-// and code blocks are already dark (Rouge monokai), so both are left alone.
+// Supports BOTH the OS setting (prefers-color-scheme) and a manual toggle that
+// writes data-theme="dark|light" on <html> (see the header toggle + footer JS).
+// Manual choice wins over the OS:
+//   [data-theme="dark"]                                  → forced dark
+//   prefers dark AND not [data-theme="light"]            → dark
+// The rules live in one mixin so both selectors stay in sync.
+//
+// The base theme hardcodes light colors, so rather than rewrite every rule as a
+// CSS custom property, this overrides the surfaces that actually carry color.
 
-@media (prefers-color-scheme: dark) {
+@mixin dark-theme {
   $bg:        #0d1117; // page background (GitHub dark dim)
   $surface:   #161b22; // raised panels (meta box, chips)
   $fg:        #c9d1d9; // body text
@@ -14,18 +18,14 @@
   $border:    #30363d; // hairlines
   $link:      #58a6ff; // accessible blue on dark
 
-  body {
-    background-color: $bg;
-    color: $fg;
-  }
+  background-color: $bg;
+  color: $fg;
 
   a {
     color: $link;
-
     &:active, &:focus, &:hover { color: lighten($link, 8%); }
   }
 
-  // Inline code: swap the light-gray chip for a dark surface
   code {
     background-color: $surface;
     color: #e6edf3;
@@ -38,20 +38,16 @@
 
   hr { border-bottom-color: $border; }
 
-  // Page divider dots
   .page-divider { border-top-color: $border; }
   .page-divider .one { background: $border; }
   .page-divider .two { background: $bg; }
 
-  // Sticky nav bar
   .navigation {
     background: rgba($bg, 0.95);
     box-shadow: 0 2px 4px rgba(#000, 0.4);
-
     &.scrolled { background: rgba($bg, 0.92); }
   }
 
-  // Post meta panel
   .page-content .post .post-meta {
     background: $surface;
     box-shadow: 0 2px 4px rgba(#000, 0.3);
@@ -65,37 +61,55 @@
     .meta-label { color: $fg-muted; }
   }
 
-  // Table of contents
   .page-content .post .post-toc {
     background: $surface;
     border-color: $border;
-
     .post-toc-title { color: $link; }
     .post-toc-chevron { border-color: $link; }
     a { color: $fg; &:hover { color: $link; } }
     .toc-num { color: $link; }
   }
 
-  // Tag chip (outlined) on dark
   .page-content .post .post-tags .tag {
     background: $surface;
     border-color: $border;
     color: $fg-muted;
-
     &:hover { color: $link; border-color: $link; }
   }
 
-  // Category chip (filled accent) — nudge for dark contrast
   .page-content .post .category {
     background: rgba($link, 0.15);
     border-color: rgba($link, 0.4);
     color: $link;
-
     &:hover { background: $link; color: $bg; }
   }
 
-  // Post navigation / listing wrappers that used $light-gray backgrounds
-  .post-navigation { background: $surface; border-color: $border; }
+  // Tags listing page
+  .tag-title { color: $fg; border-bottom-color: rgba($link, 0.3); }
+  .tag-description { color: $fg-muted; }
+  .tag-section .post-item { border-bottom-color: $border; }
+  .tag-section .post-link { color: $link; &:hover { color: lighten($link, 8%); } }
+  .tag-section .post-date { color: $fg-muted; }
+
+  // Post navigation (prev/next)
+  .post-nav .post-nav-link {
+    background: $surface;
+    border-color: $border;
+    &:hover { border-color: $link; }
+    .post-nav-dir { color: $fg-muted; }
+    .post-nav-title { color: $fg; }
+  }
+
+  // Code copy button
+  .code-copy {
+    background: rgba($fg, 0.1);
+    color: $fg;
+    border-color: $border;
+    &:hover { background: rgba($fg, 0.2); }
+  }
+
+  // Theme toggle button
+  .theme-toggle { color: inherit; }
 
   // Search UI
   #search-input {
@@ -105,8 +119,17 @@
   }
   .search-result { border-bottom-color: $border; }
   .search-result h3 a { color: $fg; }
+  .search-status { color: $fg-muted; }
+  .result-snippet { color: $fg; }
   mark { background-color: #b8860b; color: #fff; }
 
-  // Home/listing post cards
   .post-list hr, .posts-list li { border-color: $border; }
+}
+
+// Manual override: forced dark
+html[data-theme="dark"] { @include dark-theme; }
+
+// OS preference, unless the user forced light
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) { @include dark-theme; }
 }
