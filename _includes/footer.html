@@ -107,6 +107,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Wrap plain Markdown images in a .glightbox anchor so they're zoomable too
+  // (hand-written <a class="glightbox"> images are already covered).
+  document.querySelectorAll('.post-content img').forEach(function (img) {
+    if (img.closest('a')) return;                 // already linked (e.g. glightbox)
+    var src = img.getAttribute('src');
+    if (!src) return;
+    var a = document.createElement('a');
+    a.href = src;
+    a.className = 'glightbox';
+    a.setAttribute('data-gallery', 'post-images');
+    if (img.alt) a.setAttribute('data-glightbox', 'title: ' + img.alt);
+    img.parentNode.insertBefore(a, img);
+    a.appendChild(img);
+  });
+
   // Image zoom (GLightbox reads .glightbox elements)
   if (window.GLightbox) GLightbox({ selector: '.glightbox' });
 
@@ -115,21 +130,24 @@ document.addEventListener('DOMContentLoaded', function () {
     window.tooltips.forEach(function (t) { tippy(t[0], t[1]); });
   }
 
-  // Build a table of contents from post h2 headings (shown only when 3+)
+  // Build a collapsible table of contents from post h2 headings (3+ only)
   var toc = document.getElementById('post-toc');
   if (toc) {
     var heads = document.querySelectorAll('.post-content h2[id]');
     if (heads.length >= 3) {
       var ul = toc.querySelector('ul');
-      heads.forEach(function (h) {
+      heads.forEach(function (h, i) {
         var li = document.createElement('li');
         var a = document.createElement('a');
         a.href = '#' + h.id;
-        a.textContent = h.textContent;
+        a.innerHTML = '<span class="toc-num">' + (i + 1) + '</span>' + h.textContent;
+        // Smooth-scroll handled by the global anchor handler above
         li.appendChild(a);
         ul.appendChild(li);
       });
-      toc.hidden = false;
+      var count = toc.querySelector('.post-toc-count');
+      if (count) count.textContent = heads.length;
+      toc.hidden = false; // stays collapsed (details has no `open`)
     }
   }
 });

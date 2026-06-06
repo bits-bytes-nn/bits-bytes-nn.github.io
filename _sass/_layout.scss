@@ -364,7 +364,9 @@ blockquote {
 		@extend %default-ul;
 	}
 
-	.post-meta {
+	// Home/listing card meta (index.html). Scoped to .post-list so it doesn't
+	// bleed into the post page's .post .post-meta panel (which is full width).
+	.post-list .post-meta {
 		@include outer-container;
 		color: $medium-gray;
 

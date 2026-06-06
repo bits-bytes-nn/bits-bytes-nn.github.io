@@ -50,41 +50,84 @@
     color: $medium-gray;
   }
 
-  // Table of contents (populated by JS from h2 headings; hidden if < 3)
+  // Collapsible table of contents (<details>; populated by JS; hidden if < 3)
   .post-toc {
     margin: 2em 0;
-    padding: 1.1em 1.4em;
     background: rgba($action-color, 0.04);
     border: 1px solid rgba($action-color, 0.15);
     border-radius: $base-border-radius * 2;
+    overflow: hidden;
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
+      padding: 0.9em 1.4em;
+      cursor: pointer;
+      list-style: none;            // hide default disclosure marker
+      user-select: none;
+      &::-webkit-details-marker { display: none; }
+
+      &:hover .post-toc-title { color: darken($action-color, 8%); }
+    }
 
     .post-toc-title {
-      margin: 0 0 0.6em;
       font-family: $base-font-family;
-      font-size: 0.7rem;
-      font-weight: 600;
+      font-size: 0.72rem;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: $action-color;
     }
 
+    .post-toc-count {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: $medium-gray;
+      &::before { content: "("; }
+      &::after  { content: ")"; }
+    }
+
+    // Chevron rotates when open
+    .post-toc-chevron {
+      margin-left: auto;
+      width: 0.5em;
+      height: 0.5em;
+      border-right: 2px solid $action-color;
+      border-bottom: 2px solid $action-color;
+      transform: rotate(45deg);
+      transition: transform $transition-normal;
+    }
+    &[open] .post-toc-chevron { transform: rotate(-135deg); }
+
     ul {
       margin: 0;
-      padding: 0;
+      padding: 0 1.4em 1em;
       list-style: none;
     }
 
     li {
-      margin: 0.4em 0;
+      margin: 0.45em 0;
       font-size: 0.92em;
     }
 
     a {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.5em;
       color: $base-font-color;
       text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: $transition-color, border-color $transition-normal;
-      &:hover { color: $action-color; border-bottom-color: rgba($action-color, 0.4); }
+      transition: $transition-color;
+      &:hover { color: $action-color; }
+    }
+
+    .toc-num {
+      flex: none;
+      min-width: 1.4em;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: $action-color;
+      opacity: 0.7;
     }
   }
 

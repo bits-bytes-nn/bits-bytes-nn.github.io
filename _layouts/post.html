@@ -45,10 +45,14 @@ layout: default
 
     {% include language_switcher.html %}
 
-    <nav id="post-toc" class="post-toc" hidden aria-label="Table of contents">
-      <p class="post-toc-title">Contents</p>
+    <details id="post-toc" class="post-toc" hidden>
+      <summary>
+        <span class="post-toc-title">Contents</span>
+        <span class="post-toc-count"></span>
+        <span class="post-toc-chevron" aria-hidden="true"></span>
+      </summary>
       <ul></ul>
-    </nav>
+    </details>
 
     <article class="post-content">
       {{ content }}

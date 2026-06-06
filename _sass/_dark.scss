@@ -68,10 +68,12 @@
   // Table of contents
   .page-content .post .post-toc {
     background: $surface;
-    border-left-color: $link;
+    border-color: $border;
 
-    .post-toc-title { color: $fg; }
-    a { color: $fg-muted; &:hover { color: $link; } }
+    .post-toc-title { color: $link; }
+    .post-toc-chevron { border-color: $link; }
+    a { color: $fg; &:hover { color: $link; } }
+    .toc-num { color: $link; }
   }
 
   // Tag chip (outlined) on dark
