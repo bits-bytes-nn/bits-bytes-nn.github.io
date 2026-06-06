@@ -45,7 +45,7 @@
   hr { border-bottom-color: $border; }
 
   .page-divider { border-top-color: $border; }
-  .page-divider .one { background: $border; }
+  .page-divider .one { background: $link; box-shadow: 0 0 8px rgba($link, 0.5); }
   .page-divider .two { background: $bg; }
 
   .navigation {
@@ -53,6 +53,13 @@
     box-shadow: 0 2px 4px rgba(#000, 0.4);
     &.scrolled { background: rgba($bg, 0.92); }
   }
+
+  // Logo: the black-disc astronaut PNG disappears on the dark header — invert it
+  // to a light disc so it stays visible.
+  .logo img { filter: invert(1) hue-rotate(180deg); }
+
+  // Profile is now a transparent PNG (background flood-filled out), so it sits
+  // directly on the dark page with no white panel — no extra framing needed.
 
   .page-content .post .post-meta {
     background: $surface;

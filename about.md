@@ -6,7 +6,7 @@ main_nav: true
 nav_order: 1
 ---
 
-![Profile Picture]({{ site.baseurl }}/assets/my-profile.jpeg "Profile Picture"){:.profile}
+![Profile Picture]({{ site.baseurl }}/assets/my-profile.png "Profile Picture"){:.profile}
 
 # Hello, I'm Youngmin (Jonas) Kim
 

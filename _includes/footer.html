@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // (hand-written <a class="glightbox"> images are already covered).
   document.querySelectorAll('.post-content img').forEach(function (img) {
     if (img.closest('a')) return;                 // already linked (e.g. glightbox)
+    if (img.classList.contains('profile')) return; // about-page portrait: not zoomable
     var src = img.getAttribute('src');
     if (!src) return;
     var a = document.createElement('a');
