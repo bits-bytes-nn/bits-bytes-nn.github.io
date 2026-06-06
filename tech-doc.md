@@ -1,0 +1,117 @@
+# 기술 문서 — 내부 구조와 아키텍처
+
+이 문서는 블로그가 어떻게 빌드되고 맞물려 돌아가는지를 설명한다. 렌더링 파이프라인, URL과 내비게이션을 결정하는 분류 체계, 수식 파이프라인(과 그 함정), 검색, 스타일, 배포까지 — 글을 읽는 독자가 아니라 **템플릿을 고치거나 빌드를 디버깅하는 관리자**를 대상으로 한다.
+
+설치와 글 작성 워크플로우는 [README.md](README.md)를 참고하라.
+
+---
+
+## 1. 기술 스택
+
+| 영역 | 선택 |
+|------|------|
+| 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`), kramdown (GFM 입력) |
+| 플러그인 | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` |
+| 신택스 하이라이팅 | Rouge (서버사이드, kramdown 내장); 테마는 `_sass/_syntax.scss` |
+| 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 |
+| 스타일 | Sass (`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크. `jekyll-sass-converter` 2.x(libsass) 고정 — 3.x의 dart-sass는 Bourbon/Neat의 구식 `/` 나눗셈에서 에러 |
+| 자바스크립트 | 바닐라 JS (jQuery 없음). 이미지 확대는 GLightbox, 툴팁은 Tippy.js |
+| 검색 | 생성된 `search.json` 위에서 동작하는 `simple-jekyll-search` |
+| 다크모드 | `prefers-color-scheme: dark` 대응 (`_sass/_dark.scss`) |
+| 호스팅/CI | GitHub Actions를 통한 GitHub Pages (`.github/workflows/jekyll.yml`) |
+
+## 2. 빌드 파이프라인
+
+![빌드 파이프라인](assets/images/build-pipeline.png)
+
+1. **프런트매터** — 각 포스트의 YAML(`categories`, `date`, `title` 등)이 출력 경로와 템플릿 변수를 모두 결정한다.
+2. **마크다운 → HTML** — GFM 입력의 kramdown. Rouge가 펜스 코드 블록을 토큰화한다.
+3. **Liquid** — `_layouts/default.html`이 모든 페이지를 감싼다(`head` + `header` + 본문 + `footer`). `post`, `page`, `archive`가 이를 확장한다.
+4. **출력** — `_site/` 아래 `<category>/<subcategory>/YYYY/MM/DD/<slug>.html` 경로로 기록된다(§3 참조).
+
+`_site/`는 git에서 제외된다. 로컬의 `_posts/_site/`, `.sass-cache/`, `.jekyll-cache/`는 스테일 빌드 산출물로 역시 무시되며 삭제해도 안전하다.
+
+## 3. 분류 체계 → URL과 내비게이션
+
+포스트는 **2단계** 카테고리를 가진다: `categories: ["<유형>", "<주제>"]`.
+
+- **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights`. 각각 전용 페이지/탭을 가진다.
+- **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI` 등(자유롭게 확장).
+
+이 둘과 날짜가 합쳐져 출력 경로가 된다:
+
+![카테고리 + 날짜 → URL](assets/images/category-url-mapping.png)
+
+내비게이션은 데이터 기반이다. `_includes/nav_links.html`이 `main_nav: true`인 모든 페이지를 `nav_order` 순으로 렌더링한다. 현재 순서:
+
+| nav_order | 페이지 | 소스 |
+|-----------|--------|------|
+| 1 | About | `about.md` |
+| 2 | Paper Summaries | `paper-summaries.md` — `site.categories['Paper Summaries']` 필터 |
+| 3 | Paper Reviews | `paper-reviews.md` — `site.categories['Paper Reviews']` 필터, 주제별 그룹화 |
+| 4 | Tech Guides | `tech-guides.md` — `site.categories['Tech Guides']` 필터 |
+| 5 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
+| 6 | Search | `search.md` |
+
+`categories.html`(`/categories/`)과 `tags.html`(`/tags/`)은 *모든* 카테고리/태그를 가로지르는 전체 색인이며, 메인 내비가 아니라 포스트 메타데이터에서 링크된다.
+
+> **누수 주의.** *모든* `site.categories`를 순회하는 페이지는, 다른 유형의 포스트가 1단계 주제를 공유할 때 그 포스트까지 끌어온다(예: `Agentic-AI` 태그가 붙은 `Insights` 글이 Paper Reviews에 노출). 유형 페이지들은 `site.categories['<유형>']`을 먼저 필터링한 뒤 그룹화하는 방식으로 이를 막는다 — 절대 그 반대로 하지 않는다.
+>
+> 또한 메타데이터 앵커 링크(카테고리/태그)는 `slugify`로 통일했다. 과거에는 `downcase`(공백 유지)와 H2 id(`Paper Reviews`, 원본 케이스)가 어긋나 앵커 점프가 깨졌다(html-proofer가 128건 적발).
+
+## 4. 수식 렌더링
+
+**수식은 항상 `$$...$$`로 작성한다** — 인라인이든 디스플레이든. kramdown의 *유일한* 수식 구분자가 `$$`다. `$$`를 쓰면 kramdown이 내용을 그대로 보존해 `\(...\)`(인라인) 또는 `\[...\]`(디스플레이)로 내보내고, MathJax 3(`_includes/head.html`에 설정)가 브라우저에서 렌더링한다.
+
+![수식 렌더링 파이프라인](assets/images/math-rendering.png)
+
+### 단일 `$`가 깨지는 이유
+
+kramdown은 단일 `$`를 수식으로 취급하지 **않는다** — `$x_i + y_j$`는 그냥 일반 텍스트다. GFM 강조 문법이 먼저 실행되므로, 구간 *안*의 짝지어진 `_`…`_`나 `*`…`*`가 `<em>`/`<strong>`으로 변해 MathJax에 깨진 입력이 전달된다(위 그림 빨강 경로).
+
+과거 우회책은 모든 언더스코어를 `\_`로 손수 이스케이프하는 것이었다. 근본 해결은 `$$`를 쓰는 것 — 구간 안의 마크다운 처리를 완전히 끈다. 저장소는 일괄 마이그레이션되었다(git 히스토리 참조). 코드 블록 안의 단일 `$` 수식(예: DeepSeek-R1의 `<think>` 트레이스)은 verbatim 코드로 그대로 표시되므로 무관하다.
+
+> **통화 표기 주의.** 본문의 달러 기호(`$1.2B`, `$250M`)는 수식이 아니므로 단일 `$`로 둬야 한다. MathJax 설정에서 `$`는 인라인 구분자에서 **제거**했다(`\(...\)`만 사용) — 그러지 않으면 한 줄에 통화 `$`가 둘 있을 때 MathJax가 그 사이를 수식으로 잘못 렌더링한다. `processEscapes: true`로 `\$`는 달러 기호로 출력된다.
+
+MathJax 설정은 `head.html`에 있으며 `{% if page.use_math %}`로 감싸 **수식이 있는 포스트에서만** 로드한다(§8).
+
+## 5. 검색
+
+- `search.json`은 Liquid 템플릿(`layout: null`)으로, 각 포스트를 `{title, url, date, category, tags, snippet}`로 내보낸다. `snippet`은 HTML을 제거한 본문 **40단어 발췌**다 — 과거에는 본문 전체를 인라인해 2.6 MB였으나 약 32 KB로 줄였다.
+- `js/search.js`가 `simple-jekyll-search`(CDN 버전 **고정**: `1.10.0`)를 `search.md`의 `#search-input`에 연결한다. 결과는 템플릿 문자열로 렌더링하고, 키워드를 `<mark>`로 강조하며, 매칭 개수를 라이브 상태줄에 표시한다. 강조 로직은 렌더 후 **디바운스**로 한 번만 실행된다(과거에는 키 입력마다 `setTimeout`을 쌓아 자기 자신과 경합했다).
+- `category`와 `tags`도 JSON에 포함되므로 제목·본문뿐 아니라 메타로도 검색·강조된다.
+- `_config.yml`의 `simple_jekyll_search.exclude`가 About/Search/index를 결과에서 제외한다.
+
+## 6. 스타일
+
+`css/main.scss`가 Sass 진입점이며 다음 순서로 임포트한다: Bourbon → `base/` → Neat → `_layout` → `_post` → `_tags` → `_syntax`(Rouge 코드 테마) → `_dark`(다크모드 오버라이드, 마지막에 로드해 캐스케이드 우선).
+
+- **수정 대상**: `_sass/_layout.scss`, `_sass/_post.scss`, `_sass/_tags.scss`, `_sass/base/*`(특히 색상·간격·브레이크포인트를 담은 `_variables.scss`).
+- **수정 금지**: `_sass/bourbon/**`, `_sass/neat/**`(벤더 프레임워크), `_sass/_syntax.scss`(생성물 — `rougify style monokai.sublime`로 재생성).
+- **디자인 토큰 사용**: 전환은 `$transition-*`, 그림자는 `$shadow-*`, 강조/메타 텍스트는 `$action-color`/`$medium-gray`를 쓰고 `0.3s ease`나 hex를 하드코딩하지 않는다. `$medium-gray`는 `#767676`(흰 배경에서 WCAG AA), `$highlight-color`는 흰 텍스트가 읽히는 진한 파랑(헤더/푸터 배경).
+- **절대 금지**: 인라인 HTML `<style>` 블록에 SCSS 변수를 넣지 말 것. Jekyll은 거기서 Sass를 실행하지 않아 `$base-spacing` 등이 리터럴 깨진 CSS로 나간다(원래 `tags.html` 버그였고, 지금은 `_sass/_tags.scss`로 옮겼다).
+
+접근성 기준(`_layout.scss`): 상호작용 요소에 `:focus-visible` 아웃라인, 테마의 호버 transform을 무력화하는 `prefers-reduced-motion` 블록. 모바일 메뉴 버튼은 `aria-label`/`aria-expanded`/`aria-controls`를 갖고 JS가 `aria-expanded`를 동기화하며, 활성 내비 링크는 `aria-current="page"`를 받는다.
+
+## 7. 배포 및 SEO
+
+- **CI** — `.github/workflows/jekyll.yml`이 `main` 푸시 시 `JEKYLL_ENV=production`으로 빌드하고 `actions/deploy-pages`로 배포한다. 빌드 후 **html-proofer**가 내부 링크·이미지·앵커를 검증하며, 깨진 것이 있으면 배포를 막는다(외부 링크는 건너뛴다).
+- **사이트맵/피드** — `jekyll-sitemap`(`/sitemap.xml`)과 `jekyll-feed`(`/feed.xml`)가 생성한다. `robots.txt`가 크롤러를 사이트맵으로 안내하고, `head.html`이 `<link rel="alternate">`로 피드를 알린다.
+- **소유권 인증 토큰** — 루트의 `google*.html`, `naver*.html`은 Search Console / 네이버가 소유권을 확인하고 사이트맵을 크롤링하도록 사이트 루트에 그대로 서빙돼야 한다. 그래서 `_config.yml`의 `exclude`에 **넣지 않는다**. 다시 제외하면 검색 색인이 조용히 망가진다 — 증상은 "구글이 사이트맵을 못 읽음"이다.
+
+## 8. 알려진 이슈 / 백로그
+
+- **날짜 드리프트** — 대부분 포스트의 파일명 날짜가 프런트매터 `date:`(보통 원 논문 날짜)와 다르다. Jekyll은 URL/정렬에 프런트매터 날짜를 쓰므로 파일명은 외형일 뿐이다. 포스트 추가 시 일관성을 유지하라. (자동 수정 안 함: 날짜를 고치면 이미 게시된 URL이 바뀌어 인바운드 링크/SEO가 깨진다.)
+- **브랜딩 자산 중복** — `assets/`에 `header_image.jpg`(2000×1094, 미사용)와 `my_header_image.jpg`(1920×600, `site.cover`로 사용), `logo.png`/`my_logo.png`가 공존한다. 실제 쓰는 것만 남기고 정리하면 좋다.
+
+### 해결됨 (설계 노트로 보존)
+
+- **`use_math`로 MathJax 게이팅** — `head.html`이 `page.use_math`가 참일 때만 MathJax를 로드한다. 수식 포함 포스트는 모두 이 값을 설정함을 검증했고, 페이지와 산문 전용 포스트는 약 1 MB 스크립트를 건너뛴다. 수식은 `$$...$$`로 작성한다(§4).
+- **단일 패스 신택스 하이라이팅** — Rouge가 빌드 시점에 서버사이드로 토큰화하며, 테마는 `_sass/_syntax.scss`에 있다(`rougify style monokai.sublime`로 생성). 과거의 클라이언트사이드 highlight.js 패스(JS+CSS)는 제거했다 — 중복이었고 Rouge 출력을 다시 처리했다. 이제 코드 채색에 JS가 필요 없다.
+- **ko/en 연결** — 번역 쌍은 `translation_id` 프런트매터 키를 공유하고 `lang: ko|en`을 설정한다. `_includes/language_switcher.html`이 페이지 내 전환 링크를 렌더링하고, `head.html`이 상호 `<link rel="alternate" hreflang>` 태그를 내보낸다. 짝이 없는 포스트는 둘 다 렌더링하지 않는다.
+- **검색 페이로드 경량화** — `search.json`이 본문 전체 대신 40단어 발췌를 실어 2.6 MB → 32 KB로 줄었고, 태그/카테고리 검색이 추가됐다(§5).
+- **카테고리 앵커 통일** — 메타 링크와 H2 id를 `slugify`로 맞춰 깨진 앵커 128건을 없앴다(§3).
+- **Jekyll 4.x 업그레이드** — 3.9 → 4.4. `jekyll-sass-converter`를 2.x(libsass)로 고정해 Bourbon/Neat 호환을 유지했다. URL·수식·피드 모두 동일하게 빌드됨을 검증.
+- **jQuery 제거** — `footer.html`의 모든 jQuery 스크립트(메뉴 토글·스무스 스크롤·스크롤 클래스·공유 팝업)를 바닐라 JS로 재작성. jQuery 의존이던 lightbox2는 GLightbox로 교체하고 20개 마크업을 일괄 변환했다.
+- **다크모드** — `_sass/_dark.scss`가 `prefers-color-scheme: dark`에서 본문·메타·칩·검색·인라인코드 표면을 재정의한다(모든 대비 WCAG AA 이상). 헤더/푸터(딥블루)와 코드블록(monokai)은 이미 다크라 그대로 둔다. `head.html`에 `color-scheme` + media별 `theme-color` 메타 추가.
+- **본문 너비** — 포스트 본문 `.wrapper`만 Neat 기본 48em → 60em으로 넓혀 한글 가독성(줄당 글자 수)을 개선. 목록/홈은 48em 유지.
