@@ -10,14 +10,15 @@
 
 | 영역 | 선택 |
 |------|------|
-| 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`), kramdown (GFM 입력) |
-| 플러그인 | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` |
+| 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown (GFM 입력) |
+| 플러그인 (gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` |
+| 로컬 플러그인 (`_plugins/`) | `reading_time.rb`(한·영 읽기시간), `lazy_images.rb`(`<img>` lazy-load) |
 | 신택스 하이라이팅 | Rouge (서버사이드, kramdown 내장); 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 |
 | 스타일 | Sass (`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크. `jekyll-sass-converter` 2.x(libsass) 고정 — 3.x의 dart-sass는 Bourbon/Neat의 구식 `/` 나눗셈에서 에러 |
-| 자바스크립트 | 바닐라 JS (jQuery 없음). 이미지 확대는 GLightbox, 툴팁은 Tippy.js |
-| 검색 | 생성된 `search.json` 위에서 동작하는 `simple-jekyll-search` |
-| 다크모드 | `prefers-color-scheme: dark` 대응 (`_sass/_dark.scss`) |
+| 자바스크립트 | 바닐라 JS (`js/main.js`, jQuery 없음). 이미지 확대 GLightbox, 툴팁 Tippy.js. 외부 CDN은 SRI(`integrity`)로 검증 |
+| 검색 | 생성된 `search.json`(전체 본문 색인) 위 `simple-jekyll-search` |
+| 다크모드 | 라이트가 기본, 토글로 opt-in (`_sass/_dark.scss`, `[data-theme="dark"]`). OS 설정은 따르지 않음 |
 | 호스팅/CI | GitHub Actions를 통한 GitHub Pages (`.github/workflows/jekyll.yml`) |
 
 ## 2. 빌드 파이프라인
@@ -77,10 +78,10 @@ MathJax 설정은 `head.html`에 있으며 `{% if page.use_math %}`로 감싸 **
 
 ## 5. 검색
 
-- `search.json`은 Liquid 템플릿(`layout: null`)으로, 각 포스트를 `{title, url, date, category, tags, snippet}`로 내보낸다. `snippet`은 HTML을 제거한 본문 **40단어 발췌**다 — 과거에는 본문 전체를 인라인해 2.6 MB였으나 약 32 KB로 줄였다.
-- `js/search.js`가 `simple-jekyll-search`(CDN 버전 **고정**: `1.10.0`)를 `search.md`의 `#search-input`에 연결한다. 결과는 템플릿 문자열로 렌더링하고, 키워드를 `<mark>`로 강조하며, 매칭 개수를 라이브 상태줄에 표시한다. 강조 로직은 렌더 후 **디바운스**로 한 번만 실행된다(과거에는 키 입력마다 `setTimeout`을 쌓아 자기 자신과 경합했다).
-- `category`와 `tags`도 JSON에 포함되므로 제목·본문뿐 아니라 메타로도 검색·강조된다.
-- `_config.yml`의 `simple_jekyll_search.exclude`가 About/Search/index를 결과에서 제외한다.
+- `search.json`은 Liquid 템플릿(`layout: null`)으로, 각 포스트를 `{title, url, date, category, tags, snippet, content}`로 내보낸다. `snippet`은 결과 카드에 보여줄 40단어 발췌이고, `content`는 매칭용 **전체 본문**(HTML 제거)이다.
+- **왜 전체 본문인가** — `simple-jekyll-search`는 부분문자열 매칭이라 색인에 없는 단어는 못 찾는다. snippet만 색인했을 때 `어텐션`·`트랜스포머`가 본문엔 18개 포스트에 있는데 발췌(앞 40단어)엔 없어 **0건**이 나왔다. `content`로 전체를 색인해 한글 재현율을 회복했다. 파일은 약 2.7 MB지만 gzip 후 ~786 KB이며 `/search/`에서만 로드된다.
+- `js/search.js`가 `simple-jekyll-search`(CDN 버전 **고정 + SRI**: `1.10.0`)를 `search.md`의 `#search-input`에 연결한다. 키워드를 `<mark>`로 강조하고 매칭 개수를 라이브 상태줄에 표시하며, 강조는 렌더 후 **디바운스**로 한 번만 실행한다(과거엔 키 입력마다 `setTimeout`을 쌓아 자기 자신과 경합했다).
+- `category`/`tags`도 색인되므로 제목·본문뿐 아니라 메타로도 검색된다. `_config.yml`의 `simple_jekyll_search.exclude`가 About/Search/index를 결과에서 제외한다.
 
 ## 6. 스타일
 
@@ -102,7 +103,7 @@ MathJax 설정은 `head.html`에 있으며 `{% if page.use_math %}`로 감싸 **
 ## 8. 알려진 이슈 / 백로그
 
 - **날짜 드리프트** — 대부분 포스트의 파일명 날짜가 프런트매터 `date:`(보통 원 논문 날짜)와 다르다. Jekyll은 URL/정렬에 프런트매터 날짜를 쓰므로 파일명은 외형일 뿐이다. 포스트 추가 시 일관성을 유지하라. (자동 수정 안 함: 날짜를 고치면 이미 게시된 URL이 바뀌어 인바운드 링크/SEO가 깨진다.)
-- **브랜딩 자산 중복** — `assets/`에 `header_image.jpg`(2000×1094, 미사용)와 `my_header_image.jpg`(1920×600, `site.cover`로 사용), `logo.png`/`my_logo.png`가 공존한다. 실제 쓰는 것만 남기고 정리하면 좋다.
+- **한글 검색 라이브러리** — `simple-jekyll-search`는 형태소 분석 없는 부분문자열 매칭이라, 띄어쓰기로 분리된 한글 복합어의 부분 검색에는 한계가 있다. 전체 본문 색인으로 재현율은 확보했으나 더 정교한 검색이 필요하면 Lunr 등으로 교체를 검토한다.
 
 ### 해결됨 (설계 노트로 보존)
 
@@ -113,5 +114,7 @@ MathJax 설정은 `head.html`에 있으며 `{% if page.use_math %}`로 감싸 **
 - **카테고리 앵커 통일** — 메타 링크와 H2 id를 `slugify`로 맞춰 깨진 앵커 128건을 없앴다(§3).
 - **Jekyll 4.x 업그레이드** — 3.9 → 4.4. `jekyll-sass-converter`를 2.x(libsass)로 고정해 Bourbon/Neat 호환을 유지했다. URL·수식·피드 모두 동일하게 빌드됨을 검증.
 - **jQuery 제거** — `footer.html`의 모든 jQuery 스크립트(메뉴 토글·스무스 스크롤·스크롤 클래스·공유 팝업)를 바닐라 JS로 재작성. jQuery 의존이던 lightbox2는 GLightbox로 교체하고 20개 마크업을 일괄 변환했다.
-- **다크모드** — `_sass/_dark.scss`가 `prefers-color-scheme: dark`에서 본문·메타·칩·검색·인라인코드 표면을 재정의한다(모든 대비 WCAG AA 이상). 헤더/푸터(딥블루)와 코드블록(monokai)은 이미 다크라 그대로 둔다. `head.html`에 `color-scheme` + media별 `theme-color` 메타 추가.
-- **본문 너비** — 포스트 본문 `.wrapper`만 Neat 기본 48em → 60em으로 넓혀 한글 가독성(줄당 글자 수)을 개선. 목록/홈은 48em 유지.
+- **다크모드 (라이트가 기본)** — `_sass/_dark.scss`의 규칙은 mixin으로 묶여 `html[data-theme="dark"]`에서만 적용된다. **OS의 `prefers-color-scheme`는 따르지 않는다** — 라이트가 항상 기본이고, 헤더 토글로 다크를 켜면 `<html>`에 `data-theme="dark"`가 붙고 `localStorage`에 저장된다. `head.html` 상단 인라인 스크립트가 저장값을 페인트 전에 적용해 깜빡임(FOUC)을 막는다. 본문·메타·칩·검색·인라인코드·로고(반전)·프로필 표면을 다크로 재정의하며 모든 대비 WCAG AA 이상. (주의: `_typography.scss`의 `body { color:#333 }`이 특정성이 높아, 다크 mixin에서 `body`·헤딩 색을 명시하지 않으면 어두운 배경에 어두운 글자가 된다.)
+- **본문 너비** — 포스트 본문 `.wrapper`만 Neat 기본 48em → 60em으로 넓혀 한글 가독성(줄당 글자 수)을 개선. 목록/홈은 48em 유지. (홈 카드 `.post-meta`는 `.post-list` 스코프로 분리해 포스트 메타 패널과 너비가 겹치지 않게 했다.)
+- **UX 추가** — 읽기시간(한·영 인식 `reading_time` 필터), 접는 목차(`<details>`, h2 3개+), 이전/다음 글 네비, 코드블록 복사 버튼(clipboard + execCommand 폴백), 전체 이미지 클릭 확대(마크다운 이미지를 JS가 GLightbox 앵커로 감쌈, `.profile` 제외).
+- **자산·보안 정리** — 미사용 브랜딩/자산 제거, 프로필을 투명 PNG(640px)로, 외부 CDN에 SRI, 폰트는 미사용 weight(300) 제거. 폰트 self-host는 비채택(한글 Noto는 Google의 unicode-range 서브셋이 더 효율적).
