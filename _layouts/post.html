@@ -18,7 +18,7 @@ layout: default
       <div class="post-header-info">
         <div class="post-date">
           <span class="meta-label">Published</span>
-          <span class="meta-value">{{ page.date | date: "%B %-d, %Y" }}</span>
+          <time class="meta-value" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
         </div>
         <div class="post-readtime">
           <span class="meta-label">Read time</span>

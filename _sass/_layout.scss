@@ -97,7 +97,9 @@ blockquote {
 		position: relative;
 		top: -9px;
 		display: block;
-		background: $divider-color;
+		background: $action-color;
+		// Subtle "star" glow — a nod to the space-exploration theme
+		box-shadow: 0 0 8px rgba($action-color, 0.45);
 		width: 18px;
 		height: 18px;
 		margin: 0 auto;

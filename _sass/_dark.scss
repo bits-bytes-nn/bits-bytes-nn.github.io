@@ -21,6 +21,12 @@
   background-color: $bg;
   color: $fg;
 
+  // _typography.scss sets `body { color: #333 }` (higher specificity than the
+  // html selector this mixin lands on), so set body + headings explicitly or
+  // dark text stays dark-on-dark and vanishes.
+  body { background-color: $bg; color: $fg; }
+  h1, h2, h3, h4, h5, h6 { color: $fg; }
+
   a {
     color: $link;
     &:active, &:focus, &:hover { color: lighten($link, 8%); }

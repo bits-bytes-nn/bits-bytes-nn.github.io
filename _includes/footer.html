@@ -98,10 +98,22 @@ document.addEventListener('DOMContentLoaded', function () {
     block.appendChild(btn);
     btn.addEventListener('click', function () {
       var code = pre.innerText;
-      navigator.clipboard.writeText(code).then(function () {
-        btn.textContent = 'Copied';
+      var done = function (ok) {
+        btn.textContent = ok ? 'Copied' : 'Failed';
         setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
-      });
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function () { done(true); }, function () { done(false); });
+      } else {
+        // Fallback for non-secure contexts / older browsers
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          done(document.execCommand('copy'));
+          document.body.removeChild(ta);
+        } catch (e) { done(false); }
+      }
     });
   });
 

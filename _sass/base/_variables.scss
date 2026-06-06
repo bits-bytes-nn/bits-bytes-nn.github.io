@@ -28,10 +28,12 @@ $dark-gray: #333;
 $medium-gray: #767676; // WCAG AA (4.5:1) on white — was #999 (2.85:1)
 $light-gray: #ddd;
 $white: #fff;
-// Brand colors (Flat UI palette). Only the two actually used are kept; the rest
-// of the palette was dead. Add back from flatuicolors.com if a use arises.
-$blue: #2980b9;				// Belize Hole — primary accent
-$red:	#c0392b;				// Pomegranate — error/warning accents
+// Brand colors. The blog's identity is space exploration (astronaut logo, James
+// Webb nebula cover), so the accent is a deeper "cosmic blue" than the old
+// generic #2980b9, with a cosmic-purple secondary for hover/highlight accents.
+$blue:   #1c5d99;			// Cosmic blue — primary accent (link-on-white 6.83:1)
+$purple: #6a4c93;			// Cosmic purple — secondary accent (6.85:1)
+$red:    #c0392b;			// Pomegranate — error/warning accents
 
 // Theme Colors
 $base-background-color: $white;
