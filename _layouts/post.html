@@ -19,6 +19,9 @@ layout: default
         <div class="post-date">
           <strong>Published Date</strong> {{ page.date | date: "%B %-d, %Y" }}
         </div>
+        <div class="post-readtime">
+          <strong>Read Time</strong> {{ content | reading_time }} min
+        </div>
         {% if page.categories.size > 0 %}
         <div class="post-categories">
           <strong>Category</strong>
@@ -39,6 +42,11 @@ layout: default
     </section>
 
     {% include language_switcher.html %}
+
+    <nav id="post-toc" class="post-toc" hidden aria-label="Table of contents">
+      <p class="post-toc-title">Contents</p>
+      <ul></ul>
+    </nav>
 
     <article class="post-content">
       {{ content }}

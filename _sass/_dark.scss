@@ -57,7 +57,16 @@
     box-shadow: 0 2px 4px rgba(#000, 0.3);
   }
 
-  .post-date, .post-categories, .post-tags { color: $fg-muted; }
+  .post-date, .post-categories, .post-tags, .post-readtime { color: $fg-muted; }
+
+  // Table of contents
+  .page-content .post .post-toc {
+    background: $surface;
+    border-left-color: $link;
+
+    .post-toc-title { color: $fg; }
+    a { color: $fg-muted; &:hover { color: $link; } }
+  }
 
   // Tag chip (outlined) on dark
   .page-content .post .post-tags .tag {

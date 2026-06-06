@@ -114,6 +114,24 @@ document.addEventListener('DOMContentLoaded', function () {
   if (Array.isArray(window.tooltips)) {
     window.tooltips.forEach(function (t) { tippy(t[0], t[1]); });
   }
+
+  // Build a table of contents from post h2 headings (shown only when 3+)
+  var toc = document.getElementById('post-toc');
+  if (toc) {
+    var heads = document.querySelectorAll('.post-content h2[id]');
+    if (heads.length >= 3) {
+      var ul = toc.querySelector('ul');
+      heads.forEach(function (h) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      toc.hidden = false;
+    }
+  }
 });
 </script>
 

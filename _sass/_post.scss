@@ -39,6 +39,35 @@
     line-height: 1.15;
   }
 
+  // Table of contents (populated by JS from h2 headings; hidden if < 3)
+  .post-toc {
+    margin: 2em 0;
+    padding: 1em 1.25em;
+    background: $light-gray;
+    border-left: 4px solid $action-color;
+    border-radius: $base-border-radius;
+    font-size: 0.95em;
+
+    .post-toc-title {
+      margin: 0 0 0.5em;
+      font-family: $heading-font-family;
+      font-weight: 600;
+      color: $dark-gray;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.2em;
+    }
+
+    li { margin: 0.2em 0; }
+
+    a {
+      color: $medium-gray;
+      &:hover { color: $action-color; }
+    }
+  }
+
   // Post metadata section (static info panel — no hover motion)
   .post-meta {
     margin: 2.5rem 0;
