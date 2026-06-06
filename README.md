@@ -11,7 +11,7 @@ A Jekyll static site, deployed to GitHub Pages.
 ![Jekyll](https://img.shields.io/badge/SSG-Jekyll-CC0000)
 ![GitHub Pages](https://img.shields.io/badge/hosting-GitHub%20Pages-222)
 
-🇰🇷 [한국어 README](./README.ko.md) · 📖 [Technical reference](./docs/tech-doc.md)
+🇰🇷 [한국어 README](./README.ko.md)
 
 ![Bits, Bytes and Neural Networks](assets/my_header_image_full.jpg)
 
@@ -137,7 +137,7 @@ Write `$$…$$` for both inline and display math, and set `use_math: true`.
 Markdown pass turns `_`/`*` inside the span into `<em>`/`<strong>` *before*
 MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. With
 `$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
-dollar signs like `$10M` are fine — they're not math.) See [docs/tech-doc.md](docs/tech-doc.md).
+dollar signs like `$10M` are fine — they're not math.)
 
 ### Validate before pushing
 

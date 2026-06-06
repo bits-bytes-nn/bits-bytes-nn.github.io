@@ -11,7 +11,7 @@ Jekyll 정적 사이트로 만들어 GitHub Pages에 배포합니다.
 ![Jekyll](https://img.shields.io/badge/SSG-Jekyll-CC0000)
 ![GitHub Pages](https://img.shields.io/badge/hosting-GitHub%20Pages-222)
 
-🇺🇸 [English README](./README.md) · 📖 [기술 문서](./docs/tech-doc.md)
+🇺🇸 [English README](./README.md)
 
 ![Bits, Bytes and Neural Networks](assets/my_header_image_full.jpg)
 
@@ -134,7 +134,7 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 그래서 MathJax가 돌기 *전에* 마크다운 단계가 `$` 안의 `_`·`*`를 `<em>`·`<strong>`으로
 바꿔 버립니다 — 예를 들어 `$a*b*c$`가 `$a<em>b</em>c$`가 되어 깨집니다. `$$`로 감싸면
 kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합니다. (`$10M` 같은 본문 속
-달러 표기는 수식이 아니니 그대로 둬도 됩니다.) 자세한 내용은 [docs/tech-doc.md](docs/tech-doc.md).
+달러 표기는 수식이 아니니 그대로 둬도 됩니다.)
 
 ### 푸시 전에 확인하세요
 
