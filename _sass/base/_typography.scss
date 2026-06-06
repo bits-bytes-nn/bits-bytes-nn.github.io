@@ -3,6 +3,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%; // prevent mobile auto-zoom from rescaling text
+  background-color: $base-background-color; // explicit white — don't rely on UA default
   color: $base-font-color;
   font-family: $base-font-family;
   font-size: $base-font-size;

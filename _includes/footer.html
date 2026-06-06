@@ -56,32 +56,23 @@
 
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function () {
-  // Dark-mode toggle: cycles the manual override and remembers it.
-  // No saved value = follow the OS (prefers-color-scheme).
+  // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
+  // The OS setting is intentionally NOT followed.
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     var icon = themeToggle.querySelector('i');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    function effectiveTheme() {
-      var t = document.documentElement.getAttribute('data-theme');
-      if (t) return t;
-      return prefersDark.matches ? 'dark' : 'light';
+    function isDark() {
+      return document.documentElement.getAttribute('data-theme') === 'dark';
     }
     function syncIcon() {
-      if (!icon) return;
-      var dark = effectiveTheme() === 'dark';
-      icon.className = dark ? 'fa-solid fa-sun' : 'fa-regular fa-moon';
+      if (icon) icon.className = isDark() ? 'fa-solid fa-sun' : 'fa-regular fa-moon';
     }
     syncIcon();
     themeToggle.addEventListener('click', function () {
-      var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+      var next = isDark() ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
       syncIcon();
-    });
-    // If following the OS, react to OS changes live
-    prefersDark.addEventListener('change', function () {
-      if (!document.documentElement.getAttribute('data-theme')) syncIcon();
     });
   }
 

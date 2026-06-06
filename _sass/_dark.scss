@@ -1,11 +1,10 @@
 // Dark mode.
 //
-// Supports BOTH the OS setting (prefers-color-scheme) and a manual toggle that
-// writes data-theme="dark|light" on <html> (see the header toggle + footer JS).
-// Manual choice wins over the OS:
-//   [data-theme="dark"]                                  → forced dark
-//   prefers dark AND not [data-theme="light"]            → dark
-// The rules live in one mixin so both selectors stay in sync.
+// Light is ALWAYS the default — the site does NOT auto-follow the OS setting.
+// Dark applies only when the visitor opts in via the header toggle, which writes
+// data-theme="dark" on <html> (persisted in localStorage). So:
+//   [data-theme="dark"]   → dark
+//   (anything else)       → light, even if the OS prefers dark
 //
 // The base theme hardcodes light colors, so rather than rewrite every rule as a
 // CSS custom property, this overrides the surfaces that actually carry color.
@@ -139,10 +138,5 @@
   .post-list hr, .posts-list li { border-color: $border; }
 }
 
-// Manual override: forced dark
+// Opt-in only: dark applies solely when the visitor toggles it on.
 html[data-theme="dark"] { @include dark-theme; }
-
-// OS preference, unless the user forced light
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) { @include dark-theme; }
-}

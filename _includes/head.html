@@ -11,9 +11,9 @@
 	</script>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="color-scheme" content="light dark" />
-	<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-	<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+	<!-- Light is the default; dark is opt-in via the toggle, not the OS setting. -->
+	<meta name="color-scheme" content="light" />
+	<meta name="theme-color" content="#ffffff" />
 
 	<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 	<meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
