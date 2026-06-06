@@ -16,10 +16,11 @@ exclude:
   - circle.yml
   - stackbit.yaml
   - README.md
-  - tech-doc.md
+  - README.ko.md
+  - docs/
   - Gemfile
   - Gemfile.lock
-  - LICENSE.md
+  - LICENSE
 
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground

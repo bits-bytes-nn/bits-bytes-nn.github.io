@@ -1,9 +1,21 @@
-# Bits, Bytes and Neural Networks
+<div align="center">
 
-> In-depth AI/ML paper reviews and notes on emerging research — a Jekyll blog,
-> deployed to GitHub Pages.
+# 🧠 Bits, Bytes and Neural Networks
+
+**In-depth AI/ML paper reviews, summaries, and tech guides — published as a blog.**
+
+A Jekyll static site, deployed to GitHub Pages.
+
+[![Deploy](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml/badge.svg)](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml)
+![Ruby](https://img.shields.io/badge/ruby-3.3%2B-red)
+![Jekyll](https://img.shields.io/badge/SSG-Jekyll-CC0000)
+![GitHub Pages](https://img.shields.io/badge/hosting-GitHub%20Pages-222)
+
+🇰🇷 [한국어 README](./README.ko.md) · 📖 [Technical reference](./docs/tech-doc.md)
 
 ![Bits, Bytes and Neural Networks](assets/my_header_image_full.jpg)
+
+</div>
 
 ---
 
@@ -125,7 +137,7 @@ Write `$$…$$` for both inline and display math, and set `use_math: true`.
 Markdown pass turns `_`/`*` inside the span into `<em>`/`<strong>` *before*
 MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. With
 `$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
-dollar signs like `$10M` are fine — they're not math.) See [tech-doc.md](tech-doc.md).
+dollar signs like `$10M` are fine — they're not math.) See [docs/tech-doc.md](docs/tech-doc.md).
 
 ### Validate before pushing
 
@@ -159,5 +171,5 @@ exactly which link or image is broken. No manual deploy step is needed.
 
 ## License
 
-MIT — see [LICENSE.md](LICENSE.md). Built on the
+MIT — see [LICENSE](LICENSE). Built on the
 [Centrarium](http://jekyllthemes.org/themes/centrarium/) Jekyll theme.
