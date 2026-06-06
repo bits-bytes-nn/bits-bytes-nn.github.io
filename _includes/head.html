@@ -2,6 +2,9 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="color-scheme" content="light dark" />
+	<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+	<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
 
 	<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 	<meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
@@ -18,8 +21,6 @@
 	<!-- External libraries -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/v4-shims.min.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/{{ site.highlightjs_theme }}.min.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" />
 
 	<!-- Favicon and other icons -->
 	<link rel="shortcut icon" href="{{ '/assets/icons/favicon.ico' | prepend: site.baseurl }}" type="image/x-icon">
@@ -40,7 +41,7 @@
 	<link rel="manifest" href="{{ '/assets/icons/manifest.json' | prepend: site.baseurl }}">
 	<meta name="msapplication-TileColor" content="#ffffff" />
 	<meta name="msapplication-TileImage" content="{{ '/assets/icons/ms-icon-144x144.png' | prepend: site.baseurl }}">
-	<meta name="theme-color" content="#ffffff" />
+	<!-- theme-color declared at top of <head> with prefers-color-scheme media queries -->
 
 	<!-- Facebook OGP cards -->
 	{% if site.protocols.fb_image %}
@@ -48,11 +49,17 @@
 	<meta property="og:url" content="{% if page.url %}{{ site.url }}{{ page.url }}{% else %}{{ site.url }}{% endif %}" />
 	<meta property="og:site_name" content="{{ site.title }}" />
 	<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}" />
-	<meta property="og:type" content="website" />
+	<meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}" />
 	<meta property="og:image" content="{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.fb_image | prepend: site.baseurl | prepend: site.url }}{% endif %}" />
 	<meta property="og:image:type" content="{{ site.protocols.fb_image_type }}" />
 	<meta property="og:image:width" content="{{ site.protocols.fb_image_width }}" />
 	<meta property="og:image:height" content="{{ site.protocols.fb_image_height }}" />
+	{% if page.layout == 'post' %}
+	<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
+	{% if page.author %}<meta property="article:author" content="{{ page.author }}" />{% endif %}
+	{% for cat in page.categories %}<meta property="article:section" content="{{ cat }}" />
+	{% endfor %}{% for tag in page.tags %}<meta property="article:tag" content="{{ tag | replace: '-', ' ' }}" />
+	{% endfor %}{% endif %}
 	{% endif %}
 
 	<!-- Twitter: card tags -->
@@ -76,12 +83,59 @@
 	<link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}" />
 	<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
-	<!-- MathJax 3 -->
+	<!-- Structured data (schema.org JSON-LD) for rich search results -->
+	{% if page.layout == 'post' %}
+	<script type="application/ld+json">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "BlogPosting",
+	  "headline": {{ page.title | jsonify }},
+	  "url": "{{ page.url | prepend: site.baseurl | prepend: site.url }}",
+	  "mainEntityOfPage": "{{ page.url | prepend: site.baseurl | prepend: site.url }}",
+	  "datePublished": "{{ page.date | date_to_xmlschema }}",
+	  "dateModified": "{{ page.date | date_to_xmlschema }}",
+	  "description": {% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 | jsonify }}{% else %}{{ site.description | strip_newlines | jsonify }}{% endif %},
+	  "image": "{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.fb_image | prepend: site.baseurl | prepend: site.url }}{% endif %}",
+	  "author": { "@type": "{% if page.author %}Organization{% else %}Person{% endif %}", "name": {% if page.author %}{{ page.author | jsonify }}{% else %}{{ site.name | jsonify }}{% endif %} },
+	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
+	  "keywords": {{ page.tags | join: ', ' | jsonify }}
+	}
+	</script>
+	{% else %}
+	<script type="application/ld+json">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "WebSite",
+	  "name": {{ site.title | jsonify }},
+	  "url": "{{ site.url }}{{ site.baseurl }}/",
+	  "description": {{ site.description | strip_newlines | jsonify }},
+	  "author": { "@type": "Person", "name": {{ site.name | jsonify }} }
+	}
+	</script>
+	{% endif %}
+
+	<!-- hreflang alternates for translated posts (paired by translation_id) -->
+	{% if page.translation_id %}
+	<link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />
+	{% for post in site.posts %}
+	  {% if post.translation_id == page.translation_id and post.url != page.url %}
+	<link rel="alternate" hreflang="{{ post.lang }}" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />
+	  {% endif %}
+	{% endfor %}
+	{% endif %}
+
+	<!-- MathJax 3 (loaded only on posts that opt in via `use_math: true`) -->
+	{% if page.use_math %}
 	<script>
 	MathJax = {
 	  tex: {
-	    inlineMath: [['$', '$'], ['\\(', '\\)']],
+	    // NOTE: single '$' is intentionally NOT an inline delimiter. kramdown emits
+	    // all math as \(...\) / \[...\], so '$' is unneeded here — and enabling it
+	    // makes MathJax mis-render prose currency on a line (e.g. "$1.2B ... $29B")
+	    // as a formula. processEscapes lets a literal "\$" render as a dollar sign.
+	    inlineMath: [['\\(', '\\)']],
 	    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+	    processEscapes: true,
 	    macros: {
 	      '|': '\\vert'
 	    }
@@ -95,6 +149,7 @@
 	};
 	</script>
 	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+	{% endif %}
 
 	<!-- Tooltips -->
 	<script type="text/javascript">

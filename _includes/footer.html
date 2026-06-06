@@ -47,75 +47,73 @@
 </footer>
 
 <!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<!-- Code is highlighted server-side by Rouge (theme in _sass/_syntax.scss); no client-side highlighter needed. -->
+<!-- GLightbox (vanilla, no jQuery) for image zoom; Tippy.js for tooltips. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
 
 <script type="text/javascript">
-$(document).ready(function() {
-  // Default syntax highlighting
-  hljs.highlightAll();
+document.addEventListener('DOMContentLoaded', function () {
+  // Mobile menu toggle
+  var menuToggle = document.getElementById('js-mobile-menu');
+  var menu = document.getElementById('js-navigation-menu');
+  if (menu) menu.classList.remove('show');
+  if (menuToggle && menu) {
+    menuToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      var open = menu.classList.toggle('show');
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
 
-  // Header
-  var menuToggle = $('#js-mobile-menu');
-  $('#js-navigation-menu').removeClass("show");
+  // Highlight the current page in the nav
+  var here = window.location.pathname;
+  document.querySelectorAll('.nav-link a').forEach(function (link) {
+    var path = new URL(link.getAttribute('href'), window.location.origin).pathname;
+    if (here === path) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+    }
+  });
 
-  menuToggle.off('click').on('click', function(e) {
-    e.preventDefault();
-    $('#js-navigation-menu').slideToggle(function(){
-      if($('#js-navigation-menu').is(':hidden')) {
-        $('#js-navigation-menu').removeAttr('style');
-      }
+  // Smooth scroll for in-page anchors, offset for the fixed header
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      if (id.length < 2) return;
+      var target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      var top = target.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: top, behavior: 'smooth' });
     });
   });
 
-  // Highlight current page in navigation
-  var currentPath = window.location.pathname;
-  $('.nav-link a').each(function() {
-    var link = $(this);
-    var linkPath = new URL(link.attr('href'), window.location.origin).pathname;
-    if (currentPath === linkPath) {
-      link.addClass('active');
-    }
+  // Add a class to the nav once the page is scrolled
+  var nav = document.querySelector('.navigation');
+  if (nav) {
+    window.addEventListener('scroll', function () {
+      nav.classList.toggle('scrolled', window.pageYOffset > 50);
+    }, { passive: true });
+  }
+
+  // Share links open in a small popup window
+  document.querySelectorAll('.js-share-popup').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.open(a.getAttribute('href'), 'Share', 'width=550,height=255');
+    });
   });
 
-  // Smooth scroll for navigation links
-  $('a[href^="#"]').on('click', function(e) {
-    e.preventDefault();
-    var target = $(this.hash);
-    if (target.length) {
-      $('html, body').animate({
-        scrollTop: target.offset().top - 80
-      }, 300);
-    }
-  });
+  // Image zoom (GLightbox reads .glightbox elements)
+  if (window.GLightbox) GLightbox({ selector: '.glightbox' });
 
-  // Enhanced navigation bar on scroll
-  $(window).on('scroll', function() {
-    var navigation = $('.navigation');
-    if ($(this).scrollTop() > 50) {
-      navigation.addClass('scrolled');
-    } else {
-      navigation.removeClass('scrolled');
-    }
-  });
-
-  // Share popups
-  $('.js-share-popup').on('click', function(e) {
-    e.preventDefault();
-    window.open($(this).attr('href'), 'Share', 'width=550,height=255');
-  });
-
-	// Enable tooltips via Tippy.js
-	if (Array.isArray(window.tooltips)) {
-		window.tooltips.forEach(function(tooltip) {
-			var selector = tooltip[0];
-			var config = tooltip[1];
-			tippy(selector, config);
-		});
-	}
+  // Tooltips via Tippy.js
+  if (Array.isArray(window.tooltips)) {
+    window.tooltips.forEach(function (t) { tippy(t[0], t[1]); });
+  }
 });
 </script>
 

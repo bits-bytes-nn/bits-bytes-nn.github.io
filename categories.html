@@ -17,12 +17,7 @@ permalink: /categories/
       {% assign cat_display = cat_display | append: " " | append: capitalized_word %}
     {% endif %}
   {% endfor %}
-  <h2 id="{{cat}}">{{ cat_display }}</h2>
-  {% for desc in site.descriptions %}
-    {% if desc.cat == cat %}
-      <p class="desc"><em>{{ desc.desc }}</em></p>
-    {% endif %}
-  {% endfor %}
+  <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">
   {% for post in site.categories[cat] %}
     <li>

@@ -1,0 +1,21 @@
+{%- comment -%}
+  Renders the post list for one top-level category, or an empty-state message.
+  Params:
+    include.category  — exact category name, e.g. "Paper Summaries"
+    include.empty     — message shown when the category has no posts
+{%- endcomment -%}
+{% assign posts = site.categories[include.category] %}
+{% if posts.size > 0 %}
+  <ul class="posts-list">
+  {% for post in posts %}
+    <li>
+      <strong>
+        <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+      </strong>
+      <span class="post-date">- {{ post.date | date_to_long_string }}</span>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p><em>{{ include.empty }}</em></p>
+{% endif %}

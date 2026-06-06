@@ -1,0 +1,22 @@
+{%- comment -%}
+  Renders a ko/en language switcher for posts that have a translation.
+  Pairs are matched by a shared `translation_id` front-matter key; each post
+  also sets `lang: ko|en`. Outputs nothing for posts without a counterpart.
+{%- endcomment -%}
+{% if page.translation_id %}
+  {% assign counterpart = nil %}
+  {% for post in site.posts %}
+    {% if post.translation_id == page.translation_id and post.url != page.url %}
+      {% assign counterpart = post %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if counterpart %}
+    {% if page.lang == 'ko' %}{% assign other_label = 'English' %}{% else %}{% assign other_label = '한국어' %}{% endif %}
+    <div class="language-switcher">
+      <a href="{{ counterpart.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ counterpart.lang }}">
+        {{ other_label }}로 읽기 →
+      </a>
+    </div>
+  {% endif %}
+{% endif %}
