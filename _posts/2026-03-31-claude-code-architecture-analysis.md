@@ -41,7 +41,7 @@ This post sets aside the legal and ethical debates. Instead, it digs deep into t
 
 ## 2. Overall Architecture: Much Bigger Than You Think
 
-<a href="/assets/images/architecture-overview.png" data-lightbox="claude-code" data-title="Overall System Architecture">
+<a href="/assets/images/architecture-overview.png" class="glightbox" data-gallery="claude-code" data-glightbox="title: Overall System Architecture">
   <img src="/assets/images/architecture-overview.png" alt="Overall System Architecture" />
 </a>
 
@@ -83,7 +83,7 @@ Using React for a terminal app might seem like overkill. But when you look at th
 
 ## 3. The Agentic Loop: Opening the Heart
 
-<a href="/assets/images/agentic-loop.png" data-lightbox="claude-code" data-title="Agentic Loop State Machine">
+<a href="/assets/images/agentic-loop.png" class="glightbox" data-gallery="claude-code" data-glightbox="title: Agentic Loop State Machine">
   <img src="/assets/images/agentic-loop.png" alt="Agentic Loop State Machine" />
 </a>
 
@@ -453,7 +453,7 @@ Not all messages are saved with equal priority. User messages are required for `
 
 ## 4. Message Compaction: A Sophisticated War Against the Context Window
 
-<a href="/assets/images/compaction-layers.png" data-lightbox="claude-code" data-title="Message Compaction Layers">
+<a href="/assets/images/compaction-layers.png" class="glightbox" data-gallery="claude-code" data-glightbox="title: Message Compaction Layers">
   <img src="/assets/images/compaction-layers.png" alt="Message Compaction Layers" />
 </a>
 
@@ -723,7 +723,7 @@ The phrase "optimistic check" stands out. At tool registration time, ToolSearchT
 
 ## 6. Multi-Layer Security: Peeling the Onion
 
-<a href="/assets/images/security-layers.png" data-lightbox="claude-code" data-title="Security Layers">
+<a href="/assets/images/security-layers.png" class="glightbox" data-gallery="claude-code" data-glightbox="title: Security Layers">
   <img src="/assets/images/security-layers.png" alt="Security Layers" />
 </a>
 

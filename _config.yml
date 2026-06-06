@@ -7,10 +7,19 @@ feed:
   excerpt_only: true
   posts_limit: 20
 
+# NOTE: the Google/Naver site-verification HTML files are intentionally NOT
+# excluded — they must be served at the site root for Search Console / Naver
+# to verify ownership and crawl sitemap.xml + feed.xml. Excluding them silently
+# breaks search indexing.
 exclude:
   - /vendor/
-  - google7fc3fddc69d5a4bf.html
-  - naver1dddc70a302fb7cd8ad5cba29819b600.html
+  - circle.yml
+  - stackbit.yaml
+  - README.md
+  - tech-doc.md
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE.md
 
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
@@ -34,8 +43,6 @@ kramdown:
   math_engine_opts:
     preview: true
     preview_as_code: false
-inter_post_navigation: false
-highlightjs_theme: monokai-sublime
 
 paginate: 5
 paginate_path: /page/:num/
@@ -45,8 +52,6 @@ simple_jekyll_search:
     - about.md
     - search.md
     - index.html
-
-disqus_shortname: # bits-bytes-nn
 
 ga_tracking_id: G-MRH9Z5ETSQ
 
