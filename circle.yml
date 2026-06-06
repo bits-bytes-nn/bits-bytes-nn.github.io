@@ -1,6 +1,0 @@
-machine:
-  ruby:
-    version: 2.6.3
-test:
-  override:
-    - JEKYLL_ENV=production bundle exec jekyll build
