@@ -14,6 +14,7 @@ head_extra: <link rel="stylesheet" href="/css/search.css">
   <div id="results-container"></div>
 </div>
 
-<!-- Pinned version for reproducible builds (was @latest). -->
-<script src="https://unpkg.com/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script>
+<!-- Pinned version + SRI for reproducible, tamper-evident loading (was @latest). -->
+<script src="https://unpkg.com/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"
+	integrity="sha384-UN+lyciv8Ta643YxZ9sY2tdTSmk3KE61Qq84ZIXG9NRTbD9+NFXy38m9h6Exxx3n" crossorigin="anonymous"></script>
 <script src="/js/search.js"></script>
