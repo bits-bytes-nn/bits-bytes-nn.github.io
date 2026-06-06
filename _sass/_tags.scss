@@ -1,0 +1,81 @@
+// Styles for the Tags listing page (tags.html)
+// Previously these lived in an inline <style> block in tags.html using SCSS
+// variables — which ship to the browser as literal, invalid CSS because Jekyll
+// does not run Sass over inline <style>. Moved here so the variables compile.
+
+.tag-section {
+	margin: $base-spacing 0;
+	padding: $base-spacing;
+	background: linear-gradient(135deg, rgba($light-gray, 0.85), rgba($white, 0.95));
+	border-radius: $base-border-radius * 2;
+	box-shadow: 0 6px 12px rgba($dark-gray, 0.06);
+	transition: $transition-transform, box-shadow $transition-normal;
+
+	&:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 10px 20px rgba($dark-gray, 0.1);
+	}
+}
+
+.tag-title {
+	color: $dark-gray;
+	margin-bottom: $base-spacing;
+	padding-bottom: $small-spacing;
+	border-bottom: $base-border;
+	font-family: $heading-font-family;
+	line-height: $heading-line-height;
+}
+
+.tag-description {
+	color: $medium-gray;
+	font-size: 0.95rem;
+	margin-bottom: $base-spacing;
+	font-family: $base-font-family;
+	line-height: $base-line-height;
+}
+
+.tag-section .posts-list {
+	list-style: none;
+	padding: 0;
+}
+
+.tag-section .post-item {
+	margin: $small-spacing 0;
+	padding: $small-spacing;
+	border-radius: $base-border-radius;
+	transition: $transition-all;
+	background: linear-gradient(135deg, rgba($white, 0.95), rgba($light-gray, 0.85));
+
+	&:hover {
+		transform: translateY(-2px);
+		background: linear-gradient(135deg, rgba($blue, 0.1), rgba($white, 0.95));
+		box-shadow: 0 4px 8px rgba($blue, 0.1);
+	}
+}
+
+.tag-section .post-link {
+	color: $action-color;
+	text-decoration: none;
+	transition: $transition-all;
+	font-family: $heading-font-family;
+	font-weight: 500;
+
+	&:hover {
+		color: darken($action-color, 12%); // was the undefined $deep-blue
+		text-shadow: 0 0 20px rgba($blue, 0.15);
+	}
+}
+
+.tag-section .post-date {
+	color: $medium-gray;
+	font-size: 0.9rem;
+	margin-left: $small-spacing;
+	font-family: $base-font-family;
+}
+
+.tag-divider {
+	margin: $base-spacing 0;
+	border: 0;
+	height: 1px;
+	background: linear-gradient(to right, rgba($light-gray, 0), rgba($base-border-color, 1), rgba($light-gray, 0));
+}

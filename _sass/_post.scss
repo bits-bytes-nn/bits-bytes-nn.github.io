@@ -2,6 +2,13 @@
 
 .page-content .post {
 
+  // Post body reads better a bit wider than Neat's 48em default — Korean text
+  // runs ~48 chars/line at 48em; 60em lands closer to the 75-char sweet spot
+  // and gives code blocks and diagrams more room. Listing pages keep 48em.
+  .wrapper {
+    max-width: 60em;
+  }
+
   // General post elements
   ul {
     margin-bottom: 1em;
@@ -27,24 +34,18 @@
   }
 
   .post-title {
-    font-size: 42px;
-    letter-spacing: -1px;
-    line-height: 1;
+    font-size: modular-scale(5); // was hardcoded 42px — keep on the type scale
+    letter-spacing: -0.02em;
+    line-height: 1.15;
   }
 
-  // Post metadata section
+  // Post metadata section (static info panel — no hover motion)
   .post-meta {
     margin: 2.5rem 0;
     padding: 1em;
     background: $light-gray;
     border-radius: $base-border-radius;
-    box-shadow: 0 2px 4px rgba($dark-gray, 0.1);
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 3px 6px rgba($dark-gray, 0.15);
-    }
+    box-shadow: $shadow-light;
   }
 
   .post-header-info {
@@ -67,22 +68,64 @@
     font-size: 0.9em;
   }
 
+  // Shared chip shape; category vs tag differ in fill so the two metadata
+  // levels read as distinct at a glance.
   .category, .post-tags .tag {
     display: inline-block;
-    background: $white;
-    padding: 0.25em 0.5em;
+    padding: 0.25em 0.6em;
     margin: 0.25em;
     border-radius: $base-border-radius;
     font-size: 0.95em;
-    color: $medium-gray;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: $transition-color, background-color $transition-normal, border-color $transition-normal;
+  }
+
+  // Category = primary classification → filled accent chip
+  .category {
+    background: rgba($action-color, 0.1);
+    border: 1px solid rgba($action-color, 0.35);
+    color: darken($action-color, 8%);
+    font-weight: 500;
+
+    &:hover {
+      background: $action-color;
+      border-color: $action-color;
+      color: $white;
+    }
+  }
+
+  // Tag = secondary keyword → neutral outlined chip
+  .post-tags .tag {
+    background: $white;
     border: $base-border;
+    color: $medium-gray;
 
     &:hover {
       color: $action-color;
       border-color: $action-color;
-      transform: translateY(-2px);
+    }
+  }
+
+  // Language switcher (ko/en translation link)
+  .language-switcher {
+    margin: 1.5em 0;
+    text-align: right;
+
+    a {
+      display: inline-block;
+      padding: 0.35em 0.9em;
+      font-size: 0.9em;
+      color: $action-color;
+      text-decoration: none;
+      border: $base-border;
+      border-radius: $base-border-radius;
+      transition: color $transition-normal, background-color $transition-normal, border-color $transition-normal;
+
+      &:hover {
+        color: $white;
+        background: $action-color;
+        border-color: $action-color;
+      }
     }
   }
 
@@ -112,7 +155,7 @@
       width: 1em;
       padding: 0 0.25em;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: $transition-color;
 
       &:hover {
         color: $blue;
@@ -140,7 +183,7 @@
       width: 50%;
       float: left;
       margin: 1em 0;
-      transition: transform 0.3s ease;
+      transition: $transition-transform;
 
       &:hover {
         transform: translateX(-3px);
@@ -153,7 +196,7 @@
       float: left;
       margin: 1em 0;
       text-align: right;
-      transition: transform 0.3s ease;
+      transition: $transition-transform;
 
       &:hover {
         transform: translateX(3px);
@@ -164,7 +207,7 @@
   .nav-link {
     color: $medium-gray;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: $transition-color;
 
     &:hover {
       color: $action-color;
@@ -174,11 +217,10 @@
   .social-link {
     margin: 0 0.5em;
     color: $medium-gray;
-    transition: all 0.3s ease;
+    transition: $transition-color;
 
     &:hover {
       color: $action-color;
-      transform: scale(1.1);
     }
   }
 }

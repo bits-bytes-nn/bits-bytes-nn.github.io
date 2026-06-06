@@ -9,6 +9,34 @@ html, body {
 	width: 100%;
 }
 
+/*
+*	Accessibility
+*/
+// Visible keyboard-focus indicator for all interactive elements. The theme
+// removed default outlines in several places; restore one for keyboard users
+// only (mouse clicks don't trigger :focus-visible).
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+	outline: 2px solid $action-color;
+	outline-offset: 2px;
+	border-radius: 1px;
+}
+
+// Respect users who prefer reduced motion: neutralize the hover transforms and
+// transitions used throughout the theme.
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
 ol.default {
 	@extend %default-ol;
 }
@@ -34,9 +62,27 @@ blockquote {
 	line-height: 1.6;
 }
 
-pre code.hljs {
+// Rouge code blocks (.highlight wraps <pre><code>); theme colors live in _syntax.scss
+.highlight pre,
+.highlighter-rouge .highlight {
 	font-size: modular-scale(-1);
 	border-radius: $base-border-radius;
+}
+
+.highlight pre.highlight {
+	padding: 1em;
+	overflow-x: auto;
+}
+
+// Reset the inline-`code` chip styling inside fenced blocks, so the gray inline
+// background/padding doesn't paint over Rouge's dark code-block theme.
+.highlight code,
+.highlighter-rouge pre code {
+	display: inline;
+	background: none;
+	padding: 0;
+	font-size: inherit;
+	border-radius: 0;
 }
 
 .page-divider {
@@ -101,7 +147,7 @@ pre code.hljs {
 
 	.scrim {
 		padding: 3em 1em;
-		transition: background-color 0.3s ease;
+		transition: background-color $transition-normal;
 
 		&.has-cover {
 			background-color: rgba(0,0,0,0.3);
@@ -133,7 +179,7 @@ pre code.hljs {
 	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 	z-index: 1000;
-	transition: all 0.3s ease;
+	transition: $transition-all;
 
 	&:hover {
 		box-shadow: 0 3px 6px rgba($dark-gray, 0.15);
@@ -154,7 +200,7 @@ pre code.hljs {
 		margin: 0;
 		font-size: 1.5em;
 		padding-top: 0.5em;
-		transition: transform 0.3s ease;
+		transition: $transition-transform;
 
 		&:hover {
 			transform: scale(1.1);
@@ -174,7 +220,7 @@ pre code.hljs {
 	.logo {
 		float: left;
 		height: 4em;
-		transition: opacity 0.3s ease;
+		transition: opacity $transition-normal;
 
 		&:hover {
 			opacity: 0.8;
@@ -188,7 +234,7 @@ pre code.hljs {
 			max-height: 2.5em;
 			margin-top: 0.75em;
 			padding-right: 1em;
-			transition: transform 0.3s ease;
+			transition: $transition-transform;
 
 			&:hover {
 				transform: scale(1.05);
@@ -236,7 +282,7 @@ pre code.hljs {
 		text-align: right;
 		width: 100%;
 		padding: 0.25em 0;
-		transition: transform 0.3s ease;
+		transition: $transition-transform;
 
 		&:hover {
 			transform: translateX(-3px);
@@ -257,7 +303,7 @@ pre code.hljs {
 	li.nav-link {
 		a {
 			display: inline-block;
-			transition: color 0.3s ease;
+			transition: $transition-color;
 			position: relative;
 
 			@include media ($tablet) {
@@ -347,7 +393,7 @@ pre code.hljs {
 
 		a.newer-posts {
 			text-decoration: none;
-			transition: color 0.3s ease;
+			transition: $transition-color;
 
 			&:hover {
 				color: $blue;
@@ -381,10 +427,14 @@ pre code.hljs {
 		margin: auto;
 		max-width: 100%;
 		height: auto;
-		@include hover-transform-shadow(1.05, $shadow-image-hover);
-	}
+		// Subtle shadow lift on hover — no scale, so body images don't jump
+		// around and obscure surrounding text while reading.
+		transition: box-shadow $transition-normal;
 
-	
+		&:hover {
+			box-shadow: $shadow-image-hover;
+		}
+	}
 
 	/*
 	*	Pages
@@ -401,7 +451,7 @@ pre code.hljs {
 			li {
 				padding: modular-scale(-4);
 				padding-left: 0;
-				transition: transform 0.3s ease;
+				transition: $transition-transform;
 
 				&:hover {
 					transform: translateX(3px);
@@ -422,11 +472,6 @@ pre code.hljs {
 			margin: auto;
 			padding-bottom: 0.5em;
 			border-radius: $base-border-radius;
-			transition: transform 0.3s ease;
-
-			&:hover {
-				transform: scale(1.02);
-			}
 		}
 	}
 }
@@ -442,7 +487,7 @@ pre code.hljs {
 
 	a {
 		color: $link-color;
-		transition: all 0.3s ease;
+		transition: $transition-all;
 		position: relative;
 
 		&::after {
@@ -454,7 +499,7 @@ pre code.hljs {
 			height: 1px;
 			background: $white;
 			transform: scaleX(0);
-			transition: transform 0.3s ease;
+			transition: $transition-transform;
 		}
 
 		&:hover {
@@ -519,11 +564,6 @@ pre code.hljs {
 		i {
 			width: 1.25em;
 			text-align: center;
-			transition: transform 0.3s ease;
-
-			&:hover {
-				transform: scale(1.2);
-			}
 		}
 
 		ul {

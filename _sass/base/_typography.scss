@@ -2,17 +2,19 @@ body {
   @include font-feature-settings("kern", "liga", "pnum");
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%; // prevent mobile auto-zoom from rescaling text
   color: $base-font-color;
   font-family: $base-font-family;
   font-size: $base-font-size;
-  line-height: $base-line-height;
+  // $base-line-height (1.85) drives vertical spacing; body copy reads a touch
+  // tight for mixed KO/EN at that value, so set the rendered line-height slightly lower.
+  line-height: 1.75;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $heading-font-family;
-  font-size: $base-font-size;
   line-height: $heading-line-height;
-  margin: 0 0 $base-font-size;
+  margin: 0 0 $small-spacing;
 }
 
 h1 {

@@ -1,0 +1,95 @@
+// Dark mode — opt-in via the OS/browser `prefers-color-scheme: dark`.
+//
+// The theme hardcodes light colors throughout, so rather than rewrite every
+// rule as a CSS custom property, this partial overrides the handful of surfaces
+// that actually carry background/text color. Loaded last so it wins the cascade.
+// Header/footer already use a deep blue ($highlight-color) that works on dark,
+// and code blocks are already dark (Rouge monokai), so both are left alone.
+
+@media (prefers-color-scheme: dark) {
+  $bg:        #0d1117; // page background (GitHub dark dim)
+  $surface:   #161b22; // raised panels (meta box, chips)
+  $fg:        #c9d1d9; // body text
+  $fg-muted:  #8b949e; // meta / secondary text
+  $border:    #30363d; // hairlines
+  $link:      #58a6ff; // accessible blue on dark
+
+  body {
+    background-color: $bg;
+    color: $fg;
+  }
+
+  a {
+    color: $link;
+
+    &:active, &:focus, &:hover { color: lighten($link, 8%); }
+  }
+
+  // Inline code: swap the light-gray chip for a dark surface
+  code {
+    background-color: $surface;
+    color: #e6edf3;
+  }
+
+  blockquote {
+    color: $fg-muted;
+    border-left-color: $border;
+  }
+
+  hr { border-bottom-color: $border; }
+
+  // Page divider dots
+  .page-divider { border-top-color: $border; }
+  .page-divider .one { background: $border; }
+  .page-divider .two { background: $bg; }
+
+  // Sticky nav bar
+  .navigation {
+    background: rgba($bg, 0.95);
+    box-shadow: 0 2px 4px rgba(#000, 0.4);
+
+    &.scrolled { background: rgba($bg, 0.92); }
+  }
+
+  // Post meta panel
+  .page-content .post .post-meta {
+    background: $surface;
+    box-shadow: 0 2px 4px rgba(#000, 0.3);
+  }
+
+  .post-date, .post-categories, .post-tags { color: $fg-muted; }
+
+  // Tag chip (outlined) on dark
+  .page-content .post .post-tags .tag {
+    background: $surface;
+    border-color: $border;
+    color: $fg-muted;
+
+    &:hover { color: $link; border-color: $link; }
+  }
+
+  // Category chip (filled accent) — nudge for dark contrast
+  .page-content .post .category {
+    background: rgba($link, 0.15);
+    border-color: rgba($link, 0.4);
+    color: $link;
+
+    &:hover { background: $link; color: $bg; }
+  }
+
+  // Post navigation / listing wrappers that used $light-gray backgrounds
+  .post-navigation { background: $surface; border-color: $border; }
+
+  // Search UI
+  #search-input {
+    background: $surface;
+    border-color: $border;
+    color: $fg;
+  }
+  .search-result { border-bottom-color: $border; }
+  .search-result h3 a { color: $fg; }
+  mark { background-color: #b8860b; color: #fff; }
+
+  // Home/listing post cards
+  .post-list hr, .posts-list li { border-color: $border; }
+}

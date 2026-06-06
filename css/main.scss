@@ -9,5 +9,8 @@
   "base/base",        // Base styles & variables
   "neat/neat",        // Neat grid framework
   "layout",           // Layout & structure
-  "post"              // Post-specific styles
+  "post",             // Post-specific styles
+  "tags",             // Tags listing page
+  "syntax",           // Rouge syntax-highlighting theme (server-side)
+  "dark"              // prefers-color-scheme: dark overrides (loaded last)
 ;
