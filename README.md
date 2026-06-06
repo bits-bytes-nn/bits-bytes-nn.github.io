@@ -1,84 +1,163 @@
 # Bits, Bytes and Neural Networks
 
-A tech blog exploring AI/ML research through in-depth paper reviews and analysis of emerging trends. Built with Jekyll (based on the [Centrarium theme](http://jekyllthemes.org/themes/centrarium/)) and deployed to GitHub Pages.
-
-Live at **[bits-bytes-nn.github.io](https://bits-bytes-nn.github.io/)**.
+> In-depth AI/ML paper reviews and notes on emerging research — a Jekyll blog,
+> deployed to GitHub Pages.
 
 ![Bits, Bytes and Neural Networks](assets/my_header_image_full.jpg)
 
+---
+
 ## Quick start
 
+If you've never run a Jekyll site before, here's the whole loop.
+
+**1. Install Ruby 3.3+ and Bundler.** Check what you have:
+
 ```bash
-bundle install                 # install gems (Jekyll 4.4, plugins, html-proofer)
-bundle exec jekyll serve       # dev server with live reload → http://localhost:4000
-bundle exec jekyll build       # one-off production build into _site/
+ruby --version     # need 3.3 or newer (see .ruby-version)
+bundle --version   # ships with Ruby; if missing: gem install bundler
 ```
 
-Requires **Ruby 3.3+** (matches `.ruby-version` and CI) and Bundler. Custom
-`_plugins/` are used, so the build runs plain `jekyll` (not the github-pages gem).
+On macOS the system Ruby is old — use [rbenv](https://github.com/rbenv/rbenv) or
+asdf to install 3.3+. (The repo pins the version in `.ruby-version`, so a version
+manager will pick it up automatically.)
 
-## Repository layout
+**2. Install the project's gems** (Jekyll, plugins, html-proofer):
 
-| Path | Purpose |
-|------|---------|
-| `_posts/YYYY-MM-DD-slug.md` | Blog posts (Markdown + YAML front matter). Korean is primary; English translations live at `<slug>-en.md`. |
-| `_layouts/` | Page templates: `default` → `post` / `page` / `archive`. |
-| `_includes/` | Reusable fragments: `head`, `header`, `footer`, `nav_links`, `page_divider`, `category-posts`, `language_switcher`. |
-| `_sass/` | Styles. Project partials are `_layout`, `_post`, `_tags`, `_syntax` (Rouge theme), `_dark` (dark mode), and `base/*`; `bourbon/` and `neat/` are vendored — don't edit. |
-| `_plugins/` | `reading_time.rb` (KO/EN-aware read time), `lazy_images.rb` (lazy-load `<img>`). |
-| `css/main.scss` | Sass entry point (imports `_sass` partials). `css/search.css` styles the search page only. |
-| `js/main.js` | Site behaviors (theme toggle, code-copy, TOC, menu, image zoom…). `js/search.js` drives search. |
-| `assets/images/<topic>.{jpg,png}` | Shared cover images, reused across posts by topic. |
-| `assets/<post-slug>/` | Per-post figures, one folder per post. |
-| `index.html`, `paper-reviews.md`, `paper-summaries.md`, `tech-guides.md`, `insights.md`, `categories.html`, `tags.html`, `search.md`, `about.md` | Top-level pages. |
-| `search.json` + `js/search.js` | Client-side full-text search (simple-jekyll-search). |
-| `.github/workflows/jekyll.yml` | CI: build → html-proofer link check → deploy to GitHub Pages on push to `main`. |
+```bash
+bundle install
+```
 
-For architecture and internals, see **[tech-doc.md](tech-doc.md)** (Korean).
+**3. Run the dev server.** It rebuilds on save and serves at
+`http://localhost:4000`:
+
+```bash
+bundle exec jekyll serve
+```
+
+Edit a file under `_posts/`, `_sass/`, or `_includes/`, save, and refresh — most
+changes appear immediately. (Changes to `_config.yml` need a server restart.)
+
+**4. Build for production** (what CI does) when you want the final output in
+`_site/`:
+
+```bash
+bundle exec jekyll build
+```
+
+> **Why plain `jekyll` and not `github-pages`?** This site uses custom Ruby
+> plugins in `_plugins/` (read time, lazy images), which the sandboxed
+> `github-pages` gem disallows. So both local builds and CI run Jekyll directly.
+
+---
+
+## Project structure
+
+```
+_posts/            Posts — YYYY-MM-DD-slug.md (Korean; English twin is -en.md)
+_layouts/          Page templates: default → post / page / archive
+_includes/         Reusable fragments: head, header, footer, nav_links,
+                   page_divider, category-posts, language_switcher
+_sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
+                   _dark (dark mode), base/*
+                   ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
+_plugins/          reading_time.rb (KO/EN-aware read time)
+                   lazy_images.rb  (adds loading="lazy" to <img>)
+css/               main.scss (Sass entry point) · search.css (search page only)
+js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
+                   search.js (drives the search box)
+assets/images/     Shared cover images, reused across posts by topic
+assets/<slug>/     Per-post figures, one folder per post
+search.json        Full-text search index (consumed by simple-jekyll-search)
+.github/workflows/ CI: build → html-proofer link check → deploy on push to main
+```
+
+**Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
+`paper-summaries.md`, `tech-guides.md`, `insights.md` (the four section tabs),
+`categories.html`, `tags.html`, `search.md`, and `about.md`.
+
+---
 
 ## Writing a post
 
-Use the `/write-post` skill for the full research-to-proofread workflow, or add
-a file manually as `_posts/YYYY-MM-DD-slug.md` with this front matter:
+The easiest path is the **`/write-post` skill**, which runs the whole
+research → draft → proofread workflow. To add one by hand, create
+`_posts/YYYY-MM-DD-slug.md` starting with this front matter:
 
 ```yaml
 ---
 layout: post
 title: "<Post Title>"
 date: YYYY-MM-DD HH:MM:SS
-author: "<Author>"                       # omit for non-paper posts (e.g. Insights)
-categories: ["<Category>", "<Subcategory>"]
+author: "<Author>"                 # the paper's org; omit for Insights/opinion posts
+categories: ["<Type>", "<Topic>"]
 tags: ["<Tag-1>", "<Tag-2>"]
 cover: /assets/images/<topic>.(jpg|png)
-use_math: true                           # set ONLY when the post has equations
-lang: ko                                 # optional; with translation_id, links ko/en
-translation_id: <shared-slug>            # optional; pairs a ko post with its -en twin
+use_math: true                     # ONLY if the post has equations (loads MathJax)
+lang: ko                           # optional — with translation_id below…
+translation_id: <shared-slug>      # …links a Korean post to its -en twin
 ---
 ```
 
-- **`categories[0]`** — one of `Paper Reviews`, `Paper Summaries`, `Tech Guides`,
-  `Insights`. Each drives a dedicated nav tab.
-- **`categories[1]`** — subcategory, e.g. `Language-Models`, `Multimodal-Learning`,
-  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`. The two levels
-  together form the output path: `_site/<category>/<subcategory>/YYYY/MM/DD/<slug>.html`.
-- **Math** — write **`$$...$$`** for both inline and display math, and set
-  `use_math: true` (MathJax loads only on those posts). Do **not** use single
-  `$...$`: kramdown applies Markdown emphasis (`_`, `*`) inside single-`$` spans
-  before MathJax runs, mangling formulas. See [tech-doc.md](tech-doc.md).
+### Categories drive the URL
 
-Validate locally with `bundle exec jekyll build` (or `bundle exec htmlproofer ./_site
---disable-external` to catch broken links) before pushing.
+Categories are **two levels**:
+
+- `categories[0]` — the **type**: `Paper Reviews`, `Paper Summaries`,
+  `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
+- `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
+  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, … (add new ones
+  freely).
+
+Jekyll combines them with the date to build the output path:
+
+```
+categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
+        ↓
+_site/paper reviews/language-models/2025/01/23/<slug>.html
+```
+
+### Math: always use `$$…$$`
+
+Write **`$$…$$`** for both inline and display math, and set `use_math: true`.
+
+**Never use single `$…$`.** kramdown doesn't treat single `$` as math, so its
+Markdown pass turns `_`/`*` inside the span into `<em>`/`<strong>` *before*
+MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. With
+`$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
+dollar signs like `$10M` are fine — they're not math.) See [tech-doc.md](tech-doc.md).
+
+### Validate before pushing
+
+```bash
+bundle exec jekyll build                              # does it build clean?
+bundle exec htmlproofer ./_site --disable-external    # any broken links/images?
+```
+
+CI runs the same html-proofer check, so catching it locally saves a failed
+deploy.
+
+---
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/jekyll.yml`, which builds with
-`JEKYLL_ENV=production`, runs html-proofer on the output, and deploys to GitHub
-Pages. No manual step required.
+Pushing to `main` triggers `.github/workflows/jekyll.yml`, which:
 
-The root-level `google*.html` and `naver*.html` files are Search Console / Naver
-ownership-verification tokens — they must ship to the site root, so they are **not**
-excluded in `_config.yml`.
+1. builds the site with `JEKYLL_ENV=production`,
+2. runs **html-proofer** over `_site/` (internal links, images, anchors), and
+3. deploys to GitHub Pages.
+
+If the workflow fails, it's almost always step 2 — open the Actions log to see
+exactly which link or image is broken. No manual deploy step is needed.
+
+> **⚠ Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**
+> They're Search Console / Naver ownership-verification tokens that must ship to
+> the site root. Excluding them silently breaks search indexing — the symptom is
+> "Google can't read the sitemap."
+
+---
 
 ## License
 
-MIT — see [LICENSE.md](LICENSE.md).
+MIT — see [LICENSE.md](LICENSE.md). Built on the
+[Centrarium](http://jekyllthemes.org/themes/centrarium/) Jekyll theme.
