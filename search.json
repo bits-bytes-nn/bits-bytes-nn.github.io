@@ -9,7 +9,8 @@ layout: null
       "date": "{{ post.date | date: '%Y-%m-%d' }}",
       "category": "{% if post.categories %}{{ post.categories | join: ', ' }}{% endif %}",
       "tags": "{% if post.tags %}{{ post.tags | join: ', ' | replace: '-', ' ' }}{% endif %}",
-      "snippet": {{ post.content | strip_html | strip_newlines | truncatewords: 40 | jsonify }}
+      "snippet": {{ post.content | strip_html | strip_newlines | truncatewords: 40 | jsonify }},
+      "content": {{ post.content | strip_html | strip_newlines | jsonify }}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}
 ]
