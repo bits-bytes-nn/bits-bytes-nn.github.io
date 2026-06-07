@@ -123,16 +123,24 @@
   // Theme toggle button
   .theme-toggle { color: inherit; }
 
-  // Search UI
+  // Tables: body text already flips with `body { color }` above, but the
+  // hairline borders are hardcoded light in base/_tables.scss and vanish on
+  // the dark background — repaint them.
+  th { border-bottom-color: lighten($border, 8%); }
+  td { border-bottom-color: $border; }
+
+  // Search UI. search.css hardcodes light colors and an old-brand-blue focus
+  // ring (#2980b9); override the surfaces it owns plus the focus state.
   #search-input {
     background: $surface;
     border-color: $border;
     color: $fg;
+    &:focus { border-color: $link; box-shadow: 0 0 0 3px rgba($link, 0.25); }
   }
   .search-result { border-bottom-color: $border; }
-  .search-result h3 a { color: $fg; }
-  .search-status { color: $fg-muted; }
-  .result-snippet { color: $fg; }
+  .search-result h3 a { color: $fg; &:hover { color: $link; } }
+  .search-status, .post-category { color: $fg-muted; }
+  .result-snippet, .search-result p { color: $fg; }
   mark { background-color: #b8860b; color: #fff; }
 
   .post-list hr, .posts-list li { border-color: $border; }

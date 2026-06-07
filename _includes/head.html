@@ -111,7 +111,7 @@
 	  "image": "{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.fb_image | prepend: site.baseurl | prepend: site.url }}{% endif %}",
 	  "author": { "@type": "{% if page.author %}Organization{% else %}Person{% endif %}", "name": {% if page.author %}{{ page.author | jsonify }}{% else %}{{ site.name | jsonify }}{% endif %} },
 	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
-	  "keywords": {{ page.tags | join: ', ' | jsonify }}
+	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
 	}
 	</script>
 	{% else %}
