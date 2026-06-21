@@ -3,12 +3,12 @@ layout: post
 title: "Amazon Bedrock AgentCore를 하네스로 읽다"
 date: 2026-04-12 12:00:00
 categories: ["Insights", "Agentic-AI"]
-tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "MCP", "Cedar-Policy"]
+tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "MCP", "Cedar-Policy", "Managed-RAG", "Agent-Registry"]
 cover: /assets/images/insights.png
 use_math: false
 ---
 
-# 에이전트의 '나머지 전부' — Amazon Bedrock AgentCore 10개 모듈을 뜯어봅니다
+# 에이전트의 '나머지 전부' — Amazon Bedrock AgentCore를 하네스의 렌즈로 뜯어봅니다
 
 > "하네스는 에이전트에서 모델을 뺀 나머지 전부입니다(A harness is everything about an agent except the model)." — Mitchell Hashimoto, HashiCorp 공동 설립자, [*My AI Adoption Journey*](https://mitchellh.com/writing/my-ai-adoption-journey), 2026.02
 
@@ -17,9 +17,9 @@ use_math: false
 ### TL;DR
 - [McKinsey 'State of AI 2025'](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai): **기업의 62퍼센트가 에이전트를 실험 중**이지만 그중 프로덕션 스케일에 도달한 곳은 **25퍼센트 미만**. 이른바 '파일럿의 늪'입니다
 - 발목을 잡는 것은 모델 성능이 아니라 **운영** — 보안, 격리, 거버넌스, 관찰가능성입니다
-- AWS의 답은 **Amazon Bedrock AgentCore**. 2025년 7월 프리뷰, 10월 GA, 그 뒤로 Policy·Evaluations·Registry가 차례로 붙으며 5개월 만에 SDK 다운로드 200만을 찍었습니다
-- 이 글은 공식 개발자 가이드와 AWS 블로그, 커뮤니티 딥다이브를 교차 참조해 10개 모듈을 하나씩 뜯어보고, Workload Identity 바인딩·Gateway Interceptor·Cedar의 forbid-overrides-permit·RFC 8707·Browser Live View·AgentCore를 MCP 서버로 노출하는 패턴까지 빠뜨리지 않고 짚습니다
-- 결론: AgentCore가 파는 것은 모델이 아니라 **"나머지 전부"** — 실행 환경, 인증, 가드레일, 관찰가능성 — 입니다. **인프라 절반은 플랫폼이 직접 떠안고, 플래닝·컨텍스트·자가 교정 같은 지능 절반은 프레임워크 몫으로 남기는 분업**이 핵심 설계입니다
+- AWS의 답은 **Amazon Bedrock AgentCore**. 2025년 7월 프리뷰, 10월 GA, 그 뒤로 거의 분기마다 모듈이 붙었고, 특히 2026년 6월에는 Managed Knowledge Base·Web Search·Agent Performance Loop가 한꺼번에 GA되며 **출시 1년 만에** 플랫폼의 표면적이 한 단계 더 넓어졌습니다
+- 이 글은 공식 개발자 가이드와 AWS 블로그, 커뮤니티 딥다이브를 교차 참조해 AgentCore를 **Build·Deploy·Assess 세 층**으로 하나씩 뜯어보고, Workload Identity 바인딩·Gateway Interceptor·Cedar의 forbid-overrides-permit·RFC 8707·Browser Live View·Managed Knowledge Base·Gateway elicitation까지 빠뜨리지 않고 짚습니다
+- 결론: AgentCore가 파는 것은 모델이 아니라 **"나머지 전부"** — 실행 환경, 인증, 가드레일, 관찰가능성 — 입니다. **인프라 절반은 플랫폼이 직접 떠안고, 지능 절반은 프레임워크 몫으로 남기는 분업**이 핵심 설계인데, 6월 들어 매니지드 RAG와 플랫폼 측 평가 루프가 등장하며 **그 경계선이 플랫폼 쪽으로 한 칸 밀렸습니다**. 단 플래닝과 런타임 자가 교정이라는 핵심 지능은 여전히 프레임워크에 남아 있습니다
 
 ---
 
@@ -27,11 +27,13 @@ use_math: false
 
 2025년이 끝날 무렵 한국 기업 CTO 모임에서 가장 자주 들린 말은 "POC는 쉬운데 프로덕션이 안 됩니다"였습니다. 노트북을 켜면 Claude가 코드를 짜고, Devin이 PR을 올리고, 데모 영상 속 에이전트가 Upwork에서 용돈을 벌어왔으니 외부에서 보기에 에이전트는 이미 완성된 기술처럼 보였습니다. 그런데 같은 에이전트를 자사의 프로덕션 환경에 집어넣으려는 순간, 질문의 성격이 송두리째 바뀝니다. 에이전트가 실수로 고객 데이터를 S3 퍼블릭 버킷에 올려버렸을 때 누가 책임을 지는지, 한 사용자의 세션 메모리가 다른 사용자에게 새어나가지 않는다는 것을 누가 어떻게 증명하는지, 금요일 밤 세 시에 에이전트가 무한 루프에 빠졌을 때 이를 어떻게 감지하고 멈추는지, 프롬프트 인젝션으로 에이전트에게 기록 삭제를 시키는 공격은 무엇으로 막는지, 매달 나오는 토큰 비용은 어떻게 예측하는지 같은 질문들이 한꺼번에 쏟아집니다.
 
-흔히 말하는 파일럿의 늪(Pilot Purgatory)입니다. [McKinsey의 'State of AI 2025' 조사](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai)에 따르면 기업의 62퍼센트가 에이전트를 실험 중이지만, 그중 프로덕션 스케일에 도달한 곳은 25퍼센트 미만입니다. 실험 기업의 4분의 3 이상이 POC 단계를 벗어나지 못한 채 클라우드 청구서만 쌓고 있다는 뜻이고, 늪의 깊이는 놀랍게도 모델의 능력과 별 상관이 없습니다. GPT-4.5든 Claude Opus 4.6이든 Gemini 3 Pro든 늪에 빠진 팀은 그대로 빠져 있습니다. 원인은 모델이 아니라 모델을 감싼 나머지 전부 — 보안, 격리, 거버넌스, 관찰가능성, 도구 접근 제어, 상태 관리, 실패 복구처럼 소프트웨어 엔지니어링이 지난 30년간 축적해 온 운영 역량이 에이전트라는 새 대상 앞에서 다시 필요해졌다는 사실입니다.
+흔히 말하는 파일럿의 늪(Pilot Purgatory)입니다. [McKinsey의 'State of AI 2025' 조사](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai)에 따르면 기업의 62퍼센트가 에이전트를 실험 중이지만, 그중 프로덕션 스케일에 도달한 곳은 25퍼센트 미만입니다. 실험 기업의 4분의 3 이상이 POC 단계를 벗어나지 못한 채 클라우드 청구서만 쌓고 있다는 뜻이고, 늪의 깊이는 놀랍게도 모델의 능력과 별 상관이 없습니다. 그해 가장 똑똑하다는 프런티어 모델 무엇을 가져다 꽂아도 늪에 빠진 팀은 그대로 빠져 있습니다. 원인은 모델이 아니라 모델을 감싼 나머지 전부 — 보안, 격리, 거버넌스, 관찰가능성, 도구 접근 제어, 상태 관리, 실패 복구처럼 소프트웨어 엔지니어링이 지난 30년간 축적해 온 운영 역량이 에이전트라는 새 대상 앞에서 다시 필요해졌다는 사실입니다.
 
 이 현상에 업계가 붙인 이름이 **하네스 엔지니어링(Harness Engineering)** 입니다. HashiCorp를 떠난 Hashimoto가 AI 코딩 도구를 직접 다루며 내놓은 앞의 한 줄 정의가 출발점이었고, OpenAI Codex 팀이 [100만 줄 코드를 인간이 한 줄도 쓰지 않고 만든 사내 실험](https://openai.com/index/harness-engineering/)(2026.02)으로 개념을 증명했으며, Martin Fowler와 Birgitta Böckeler가 [피드포워드·피드백 2×2 프레임워크로 정리한 글](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html)과 Anthropic의 ["Effective Harnesses for Long-Running Agents"](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)가 뒤를 이으며 용어가 업계 표준으로 자리 잡았습니다. 모델은 통제할 수 없지만 모델을 감싼 인프라·도구·피드백 루프는 통제할 수 있다는 것이 이 프레임의 핵심이고, 이 글의 목표는 그 하네스를 AWS가 어떻게 매니지드 서비스로 제품화했는지에 집중하는 것입니다.
 
-AWS의 답이 Amazon Bedrock AgentCore라는 플랫폼이고, 2025년 7월 프리뷰로 등장한 뒤 10개월 동안 거의 분기마다 새로운 모듈이 붙으며 공격적으로 확장해 왔습니다. 이 글은 그 10개월을 요약하는 대신 공식 [개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html)와 AWS 엔지니어링 블로그, 커뮤니티 딥다이브를 교차 참조해 **10개 모듈 각각을 하나씩 열어보고**, 하네스 엔지니어링의 체크리스트에 무엇을 채우고 어디를 비워 두었는지 정직하게 짚습니다.
+여기서 작은 사건 하나를 미리 적어 둘 필요가 있습니다. Hashimoto가 "하네스는 모델을 뺀 나머지 전부"라고 명명한 지 채 1년이 지나지 않은 2026년 6월, AWS는 에이전트 런타임 하나를 출시하며 그 이름을 **그대로 `harness`라고 붙였습니다**(`CreateHarness`·`InvokeHarness`, 4월 프리뷰 후 6월 GA). 업계가 은유로 쓰던 단어가 두 달 만에 콘솔에서 클릭하는 SKU가 된 셈입니다. 이 이름의 겹침은 우연한 작명이 아니라 이 글이 증명하려는 명제 — 진짜 제품은 모델이 아니라 그 나머지 전부라는 것 — 가 벤더의 제품 카탈로그에까지 새겨졌다는 신호이고, §3.1과 결론에서 다시 돌아옵니다.
+
+AWS의 답이 Amazon Bedrock AgentCore라는 플랫폼이고, 2025년 7월 프리뷰로 등장한 뒤 출시 1년 동안 거의 분기마다 새로운 모듈이 붙으며 공격적으로 확장해 왔습니다. 이 글은 그 1년을 요약하는 대신 공식 [개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html)와 AWS 엔지니어링 블로그, 커뮤니티 딥다이브를 교차 참조해 AgentCore를 **Build·Deploy·Assess 세 층으로 하나씩 열어보고**, 하네스 엔지니어링의 체크리스트에 무엇을 채우고 어디를 비워 두었는지 정직하게 짚습니다.
 
 ---
 
@@ -39,7 +41,7 @@ AWS의 답이 Amazon Bedrock AgentCore라는 플랫폼이고, 2025년 7월 프�
 
 AgentCore를 한 줄로 정의하면, 어떤 에이전트 프레임워크와 어떤 모델을 쓰든 프로덕션 운영에 필요한 공통 인프라를 제공하는 플랫폼이라고 할 수 있습니다. 여기서 "어떤"이라는 단어가 이 제품의 핵심 마케팅 포지션이자 설계 제약의 출발점입니다. AWS는 공식 문서 첫 페이지에서부터 CrewAI, LangGraph, LlamaIndex, Google ADK, OpenAI Agents SDK, Strands Agents, 그리고 여러분이 어젯밤에 직접 짠 파이썬 파일까지 모두 지원한다고 선언합니다. 모델 측면에서도 Amazon Bedrock 안의 Nova 계열, Anthropic의 Claude, Meta의 Llama, Mistral, Google Gemini, OpenAI API, 자체 호스팅한 오픈소스 모델까지 전부 받아들인다고 못을 박습니다.
 
-AWS [공식 개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html)가 10개 모듈을 한 장으로 정리한 컴포넌트 지도입니다. Build(개발 시 사용) · Deploy(배포·실행) · Assess(모니터링·평가) 세 층으로 분류되어 있고, 최상단에 "어떤 프레임워크·어떤 모델·모든 주요 프로토콜"이라는 이 제품의 약속이 명시되어 있습니다.
+AWS [공식 개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html)가 전체 모듈을 한 장으로 정리한 컴포넌트 지도입니다. Build(개발 시 사용) · Deploy(배포·실행) · Assess(모니터링·평가) 세 층으로 분류되어 있고, 최상단에 "어떤 프레임워크·어떤 모델·모든 주요 프로토콜"이라는 이 제품의 약속이 명시되어 있습니다. 이 글이 모듈을 "몇 개"로 세지 않고 이 **세 층**을 골격으로 삼는 이유가 여기 있습니다 — 분기마다 모듈이 붙는 속도라면 숫자 세기는 다음 분기에 곧장 틀리지만, Build·Deploy·Assess라는 분류는 그대로 살아남기 때문입니다. 실제로 아래 공식 지도조차 갱신 주기가 출시 속도를 따라가지 못해, Managed Knowledge Base·Payments처럼 가장 최근 합류한 모듈은 빠져 있을 수 있는데, 그 신규 모듈들도 결국 이 세 층 중 하나에 얹힙니다.
 
 <a href="https://docs.aws.amazon.com/images/bedrock-agentcore/latest/devguide/images/agentcore_all_components_final.png" class="glightbox" data-gallery="agentcore" data-glightbox="title: Amazon Bedrock AgentCore 공식 컴포넌트 지도 — Build · Deploy · Assess 세 층">
   <img src="https://docs.aws.amazon.com/images/bedrock-agentcore/latest/devguide/images/agentcore_all_components_final.png" alt="Amazon Bedrock AgentCore 공식 컴포넌트 지도. Build 층에 Browser, Code Interpreter, Gateway, Identity, Memory, Policy, Registry. Deploy 층에 Runtime. Assess 층에 Observability, Evaluations." />
@@ -49,24 +51,29 @@ AWS [공식 개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/l
 
 > 포지셔닝 변화가 분명합니다. 과거 Bedrock은 모델 호스팅 서비스였지만, AgentCore로 넘어오면서 에이전트의 **컨트롤 플레인**, 즉 운영·거버넌스·관찰가능성의 표준 레이어로 확장되고 있습니다. 모델은 갈수록 상품화되고 진짜 차별화는 하네스 품질에서 나온다는 2026년 업계 합의를 AWS가 정확히 반영한 설계입니다.
 
-과금은 쓴 만큼 내는 방식이고, 선불 약정이나 최소 사용료는 없습니다. 공식 문서에는 AWS가 사용자 콘텐츠를 학습에 활용하지 않고 서비스 성능 개선 용도로만 제한적으로 사용한다고 명시되어 있는데, 이 조항은 엔터프라이즈 데이터 거버넌스 팀이 가장 민감하게 검토하는 부분이므로 계약 단계에서 반드시 확인해야 합니다.
+과금은 쓴 만큼 내는 방식이고, 선불 약정이나 최소 사용료는 없습니다. 공식 문서에는 AWS가 사용자 콘텐츠를 학습에 활용하지 않고 서비스 성능 개선 용도로만 제한적으로 사용한다고 명시되어 있는데, 이 조항은 엔터프라이즈 데이터 거버넌스 팀이 가장 민감하게 검토하는 부분이므로 계약 단계에서 반드시 확인해야 합니다. 규제 산업이 그다음으로 확인하는 컴플라이언스 인증도 빠르게 채워졌습니다 — 2026년 2월 ISO·CSA STAR 인증, 5월 AWS GovCloud(US-West) 출시, 6월 [SOC 1·2·3](https://aws.amazon.com/compliance/services-in-scope/SOC/) 범위 편입까지 1년 안에 들어왔습니다.
 
-10개월의 속도 감각을 짧게만 짚자면, 2025년 7월 Runtime·Memory·Gateway·Identity·Code Interpreter·Observability의 여섯 모듈로 프리뷰가 시작되었고, 8월에 Browser가 프리뷰로 붙었으며, 10월 GA 시점에 VPC·PrivateLink·CloudFormation·A2A 프로토콜 지원이 한꺼번에 더해졌습니다. 12월 re:Invent에서 Policy·Evaluations가 프리뷰로 공개되고 Episodic Memory와 양방향 스트리밍이 등장했으며, 2026년 3월에 Policy와 Evaluations가 나란히 GA, 4월에는 Registry가 에이전트 난립 대응으로 프리뷰 합류했습니다.
+출시 1년의 속도 감각을 짚자면, 2025년 7월 Runtime·Memory·Gateway·Identity·Code Interpreter·Observability의 여섯 모듈로 프리뷰가 시작되었고, 8월에 Browser가 프리뷰로 붙었으며, 10월 GA 시점에 VPC·PrivateLink·CloudFormation·A2A 프로토콜 지원이 한꺼번에 더해졌습니다. 12월 re:Invent에서 Policy·Evaluations가 프리뷰로 공개되고 Episodic Memory와 양방향 스트리밍이 등장했으며, 2026년 1월에는 **서울 리전을 포함한** 다섯 개 리전이 추가되어 한국에서의 데이터 레지던시 제약 워크로드도 사정권에 들어왔습니다. 3월에 Policy와 Evaluations가 나란히 GA되고 CLI가 GA, 4월에는 AWS Agent Registry가 에이전트 난립 대응으로 프리뷰 합류하고 Gateway의 MCP용 3LO(3-legged OAuth)가 GA, Agent Performance Loop와 Payments가 프리뷰로 등장했으며, 5월에는 CDK L2 컨스트럭트가 정식(stable)으로 승격되었습니다. 그리고 6월, **Managed Knowledge Base와 Web Search가 GA되고, Agent Performance Loop가 GA, harness가 GA, Policy에 Bedrock Guardrails가 붙는** 한 달짜리 큰 물결이 한꺼번에 들이닥쳤습니다. 이 글은 그 6월의 물결까지 반영합니다.
 
-10개 모듈을 개발자 코드와 이어 주는 단일 접점이 오픈소스 파이썬 패키지 **[`bedrock-agentcore`](https://github.com/aws/bedrock-agentcore-sdk-python)** (Apache 2.0)이고, Strands·LangGraph·CrewAI·Autogen 같은 에이전트 프레임워크와 의존성 없이 조합되도록 설계되었습니다. 이 SDK의 **PyPI 누적 다운로드가 같은 기간 200만 건을 넘었다**는 사실이, AgentCore가 Bedrock 제품군의 전략적 중심축이라는 내부 판단을 뒷받침합니다. SDK의 구체적인 API(데코레이터, 메모리 클라이언트 등)는 §3에서 각 모듈을 열어볼 때 자연스럽게 짚고, 일단 10개 모듈이 하네스 8요소에 어떻게 매핑되는지 한 장짜리 지도부터 보겠습니다.
+전체 모듈을 개발자 코드와 이어 주는 단일 접점이 오픈소스 파이썬 패키지 **[`bedrock-agentcore`](https://github.com/aws/bedrock-agentcore-sdk-python)** (Apache 2.0)이고, Strands·LangGraph·CrewAI·Autogen 같은 에이전트 프레임워크와 의존성 없이 조합되도록 설계되었습니다. 이 SDK의 **PyPI 누적 다운로드가 출시 반년여 만에 200만 건을 넘었다**는 사실이, AgentCore가 Bedrock 제품군의 전략적 중심축이라는 내부 판단을 뒷받침합니다. SDK의 구체적인 API(데코레이터, 메모리 클라이언트 등)는 §3에서 각 모듈을 열어볼 때 자연스럽게 짚고, 일단 주요 모듈이 하네스의 요소들에 어떻게 매핑되는지 한 장짜리 지도부터 보겠습니다.
 
-| 모듈 | 한 줄 역할 | 하네스 대응 |
-|------|-----------|-------------|
-| **Runtime** | microVM 기반 서버리스 실행, 세션 격리, 최대 8시간 | 실행 환경 |
-| **Memory** | 단기·장기 메모리 (Semantic / Summary / User Preference / Episodic) + 브랜칭 | 상태 관리 |
-| **Gateway** | API·Lambda·MCP를 MCP 도구로 zero-code 변환, 시맨틱 도구 선택, Interceptor | 도구 오케스트레이션 |
-| **Policy** | Cedar 기반 결정론적 정책 제어 *(2026.03 GA)* | 가드레일 |
-| **Identity** | OAuth 2LO/3LO, IdP 위임, Token Vault, RFC 8707 | 보안/인증 |
-| **Code Interpreter** | 격리 샌드박스에서 Python·JS·TS 실행 | 도구 — 코드 실행 |
-| **Browser** | Playwright 호환 클라우드 브라우저 + Live View + 녹화 | 도구 — 웹 상호작용 |
-| **Observability** | OTEL 트레이스 + CloudWatch + 외부 익스포트 | 관찰가능성 |
-| **Evaluations** | 13개 내장 평가자 + LLM-judge + 코드 기반 *(2026.03 GA)* | 품질 검증 |
-| **Registry** *(Preview)* | 에이전트·도구·스킬 중앙 카탈로그, MCP 서버 노출 | 에이전트 난립 방지 |
+| 층 | 모듈 | 한 줄 역할 | 하네스 대응 |
+|----|------|-----------|-------------|
+| Deploy | **Runtime** | microVM 기반 서버리스 실행, 세션 격리, 최대 8시간 | 실행 환경 |
+| Deploy | **harness** | 선언형 config로 에이전트 루프를 통째로 매니지 *(2026.06 GA)* | 실행 환경 — 매니지드 |
+| Build | **Memory** | 단기·장기 메모리 (Semantic / Summary / User Preference / Episodic) + 브랜칭 | 상태 관리 |
+| Build | **Gateway** | API·Lambda·MCP를 MCP 도구로 zero-code 변환, 시맨틱 도구 선택, Interceptor, elicitation | 도구 오케스트레이션 |
+| Build | **Managed Knowledge Base** | Gateway 네이티브 타겟으로 매니지드 RAG (청킹·임베딩·검색·리랭킹) *(2026.06 GA)* | 컨텍스트 — RAG |
+| Build | **Web Search** | Gateway 빌트인 커넥터, zero data egress 웹 검색 *(2026.06 GA)* | 도구 — 웹 지식 |
+| Build | **Policy** | Cedar 기반 결정론적 정책 제어 + Bedrock Guardrails *(2026.03 GA, Guardrails 06 GA)* | 가드레일 |
+| Build | **Identity** | OAuth 2LO/3LO, IdP 위임, Token Vault, RFC 8707 | 보안/인증 |
+| Build | **Code Interpreter** | 격리 샌드박스에서 Python·JS·TS·Node.js 실행 | 도구 — 코드 실행 |
+| Build | **Browser** | Playwright 호환 클라우드 브라우저 + Live View + 녹화 | 도구 — 웹 상호작용 |
+| Build | **Payments** | 에이전트 자율 결제 (Coinbase·Stripe, x402) *(Preview)* | 도구 — 상거래 |
+| Assess | **Observability** | OTEL 트레이스 + CloudWatch + 외부 익스포트 + Failure Insights *(Insights Preview)* | 관찰가능성 |
+| Assess | **Evaluations** | 13개 내장 평가자 + LLM-judge + 코드 기반 *(2026.03 GA)* | 품질 검증 |
+| Assess | **Performance Loop** | Recommendations + Batch Eval + A/B 테스트 *(2026.06 GA)* | 자가 교정 — 플랫폼 |
+| Build | **AWS Agent Registry** *(Preview)* | 에이전트·도구·스킬 중앙 카탈로그, MCP 서버 노출 | 에이전트 난립 방지 |
 
 <a href="/assets/images/agentcore-harness-mapping.png" class="glightbox" data-gallery="agentcore" data-glightbox="title: AgentCore 서비스와 하네스 엔지니어링 구성요소의 매핑">
   <img src="/assets/images/agentcore-harness-mapping.png" alt="AgentCore 서비스와 하네스 엔지니어링 구성요소의 매핑" />
@@ -74,7 +81,7 @@ AWS [공식 개발자 가이드](https://docs.aws.amazon.com/bedrock-agentcore/l
 
 ---
 
-## 3. AgentCore 해부 — 10개 모듈을 뜯어보다
+## 3. AgentCore 해부 — Build·Deploy·Assess 세 층을 뜯어보다
 
 ### 3.1 Runtime — 비결정론적 프로세스를 결정론적 경계로 감싸기
 
@@ -164,7 +171,13 @@ Runtime은 이 문제를 **이중 인증 구조**로 풀어냅니다. 모든 Run
 
 실무 도입 시 꼭 기억해야 할 주의사항은 세 가지입니다. 첫째, **ARM64 전용**이라 x86 머신의 평범한 `docker build`가 만든 amd64 이미지는 Runtime이 거부합니다. `docker buildx --platform linux/arm64`나 CodeBuild의 크로스 플랫폼 빌드가 정석이고, 네이티브 C/C++ 의존 라이브러리는 ARM64 바이너리 존재 여부를 사전에 확인해야 합니다. 둘째, **Cold start**는 첫 세션 기준 수 초가 걸릴 수 있고 이후 동일 세션 내 호출은 빠르게 처리됩니다. 소비자 대면 저지연 시나리오에서는 미리 세션을 열어두는 warm-up 전략이 사실상 필수입니다. 셋째, **응답 포맷 선택**은 워크로드 성격을 따라갑니다. JSON은 단일 질문·답변이나 결정론적 계산에 맞고 SSE는 실시간 대화와 점진적 생성에 맞는데, Runtime은 두 모드 혼용을 허용하므로 한 에이전트 안에서 요청 유형에 따라 다르게 쓸 수 있습니다.
 
-마지막으로 프리뷰 단계인 **지속 파일시스템(Persistent Filesystem)** 을 별도로 짚어 둘 필요가 있습니다. 앞서 본 대로 Runtime의 세션 상태는 휘발성이라 8시간 한도가 다하거나 Idle로 종료되면 파일시스템에 쓴 데이터까지 사라지는데, Persistent Filesystem을 켜 두면 세션이 중단되었다 재개될 때 파일 상태가 그대로 유지됩니다. 며칠에 걸쳐 큰 코드베이스를 리팩토링하는 에이전트, 수십 단계로 이루어진 데이터 파이프라인을 돌리며 중간 산출물을 디스크에 누적하는 에이전트, 또는 학습 체크포인트를 단계적으로 저장해야 하는 에이전트처럼 세션 경계를 넘어 작업 상태가 살아 있어야 하는 워크로드에 결정적인 옵션입니다. 현재는 프리뷰지만 GA로 전환되면 Runtime이 감당할 수 있는 워크로드 범위가 한 단계 더 넓어집니다.
+마지막으로 프리뷰 단계인 **지속 파일시스템(Persistent Filesystem)** 을 별도로 짚어 둘 필요가 있습니다. 앞서 본 대로 Runtime의 세션 상태는 휘발성이라 8시간 한도가 다하거나 Idle로 종료되면 파일시스템에 쓴 데이터까지 사라지는데, Persistent Filesystem을 켜 두면 세션이 중단되었다 재개될 때 파일 상태가 그대로 유지됩니다. 며칠에 걸쳐 큰 코드베이스를 리팩토링하는 에이전트, 수십 단계로 이루어진 데이터 파이프라인을 돌리며 중간 산출물을 디스크에 누적하는 에이전트, 또는 학습 체크포인트를 단계적으로 저장해야 하는 에이전트처럼 세션 경계를 넘어 작업 상태가 살아 있어야 하는 워크로드에 결정적인 옵션입니다.
+
+#### harness — Runtime 위에 얹힌 "코드 없는 에이전트"
+
+지금까지 본 Runtime은 **여러분의 에이전트 코드를 컨테이너로 받아** microVM에서 돌리는 플랫폼입니다. 그런데 2026년 6월 GA된 **harness**는 한 칸 더 위로 올라갑니다. 도입부에서 예고한 그 이름입니다. AWS의 공식 정의를 그대로 옮기면 ["하네스는 에이전트가 프로덕션에서 돌기 위해 필요한 나머지 전부를, 두 번의 API 호출 뒤에 감춘 것"](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-harness-is-now-generally-available-go-from-idea-to-production-grade-agent-in-minutes/)입니다 — 에이전트 루프를 직접 코딩하는 대신, 모델·시스템 프롬프트·도구·메모리·한도를 **선언형 설정으로 기술**하면 `CreateHarness`로 정의하고 `InvokeHarness`로 실행하는 게 끝입니다. 컨테이너 빌드도, 오케스트레이션 코드도 없습니다.
+
+모델 선택은 `bedrock`·`openAi`·`gemini`·`liteLlm` 네 갈래로, Bedrock 안의 Claude·Nova·Llama부터 LiteLLM을 경유한 서드파티 모델까지 설정 한 줄로 바꿔 끼웁니다. 흥미로운 탈출구는 **export**입니다. harness로 빠르게 만든 에이전트를 단일 CLI 명령으로 **Strands 기반 코드로 내보낼 수 있어서**(Claude Agent SDK 대상은 예고됨), 매니지드 추상화로 출발했다가 세밀한 제어가 필요해지면 코드로 내려가는 경로가 열려 있습니다. harness는 Runtime의 대체재가 아니라 그 위의 **빠른 출발선**이고, 커스텀 코드가 필요 없는 표준적 에이전트라면 harness로 분 단위에 프로덕션까지 가고, 복잡한 제어가 필요하면 Runtime에 직접 배포하거나 harness에서 export해 내려가는 2단 구조로 읽으면 정확합니다.
 
 ### 3.2 Memory — Actor, Session, Event, 그리고 네 가지 전략
 
@@ -215,13 +228,25 @@ def on_message_added(self, event: MessageAddedEvent):
 
 **세 가지 타겟 유형**이 지원됩니다. AWS Lambda 함수를 직접 타겟으로 지정하거나, OpenAPI 스펙을 올리거나, Smithy 서비스 정의를 연결하면 됩니다. 어느 방법이든 Gateway가 엔드포인트를 파싱하고 스키마를 MCP 도구 형식으로 매핑하며, 파라미터 변환과 인증 핸들링을 자동으로 처리합니다. Lambda 타겟은 기존에 깔린 사내 Lambda가 많은 팀에게 전환 비용이 거의 0이고, OpenAPI 기반은 외부 SaaS나 사내 REST API를 그대로 노출할 때 유용하며, Smithy는 AWS 서비스를 도구로 포장할 때 깔끔하게 맞아떨어집니다. Salesforce, Zoom, JIRA, Slack 같은 주요 SaaS에 대한 사전 통합 커넥터도 제공됩니다.
 
-실무적으로 놓치기 쉬운 제약이 하나 있습니다. **MCP 사양이 OAuth만 인가 방식으로 지원하기 때문에, Gateway에는 반드시 OAuth authorizer가 연결되어야 합니다.** 기존 OAuth 서버가 없으면 Amazon Cognito로 즉석에서 생성할 수 있다는 옵션이 문서에 명시되어 있습니다. 자체 인증 시스템을 쓰고 있더라도 MCP 경로에는 OAuth 레이어를 앞에 두는 구조가 필요하다는 뜻입니다.
+실무적으로 놓치기 쉬운 제약이 하나 있습니다. **MCP 사양이 OAuth만 인가 방식으로 지원하기 때문에, Gateway에는 반드시 OAuth authorizer가 연결되어야 합니다.** 기존 OAuth 서버가 없으면 Amazon Cognito로 즉석에서 생성할 수 있다는 옵션이 문서에 명시되어 있습니다. 자체 인증 시스템을 쓰고 있더라도 MCP 경로에는 OAuth 레이어를 앞에 두는 구조가 필요하다는 뜻입니다. 2026년 4월에는 MCP 타겟에 대한 3LO(사용자 동의 기반 3-legged OAuth)가 GA되어, Gateway가 사용자별 위임 토큰으로 다운스트림 MCP 서버에 접근하는 흐름이 정식 지원됩니다.
 
 **시맨틱 도구 선택(Semantic Tool Selection)** 이 Gateway의 숨은 보석입니다. 도구 수가 수백, 수천으로 늘어나면 모델의 컨텍스트 윈도우가 도구 설명만으로도 포화되고, 토큰 예산의 상당 부분이 쓰지도 않을 도구 스키마에 소모됩니다. Gateway는 도구 설명을 벡터로 인덱싱해 두고 사용자 쿼리와 유사한 top-k만 동적으로 주입합니다. AWS 자체 측정에 따르면 관련 도구만 노출했을 때 레이턴시가 최대 3배 개선되고 정확도도 올라가는데, Vercel이 자사 블로그에서 공개한 "도구 80퍼센트를 제거했더니 성능이 올랐다"는 교훈을 인프라 레벨에서 자동화한 셈입니다.
 
 이중 인증 모델은 **Inbound**(사용자→Gateway, IAM/OAuth)와 **Outbound**(Gateway→타겟, IAM 역할/API 키/OAuth 2LO)로 분리됩니다. 이 분리가 중요한 이유는 에이전트가 사용자를 사칭하지 않고 자신의 신원으로 다운스트림에 접근하는 위임 패턴을 기본값으로 만들기 때문입니다. 감사 로그에서 누가 무엇을 했는지가 선명해지고, 사용자 비밀번호나 장기 토큰을 에이전트가 보유할 필요가 없어집니다.
 
 Gateway의 또 하나 중요한 기능이 **Interceptor**입니다. AWS 블로그와 Starter Toolkit 문서에서 소개된 이 기능은 모든 도구 호출 파이프라인에 커스텀 Lambda 로직을 주입할 수 있게 해 줍니다. PII(개인식별정보) 자동 마스킹, 요청 속도 제한, 감사 로깅 같은 횡단 관심사를 도구 코드를 수정하지 않고 파이프라인 레벨에서 처리합니다. 2025년 9월의 Postmark MCP 공급망 공격(악성 npm 패키지가 모든 발신 이메일에 공격자 주소를 BCC로 삽입)을 떠올려 봅시다. Interceptor가 모든 발신 이메일의 수신자 목록을 감사 로그에 기록했다면 첫 이메일에서 바로 발각되었을 겁니다. 이것이 Gateway를 단순한 도구 게이트웨이가 아니라 보안 레이어로 만드는 장치입니다.
+
+2026년에 추가된 **elicitation**은 Gateway를 사람-개입(human-in-the-loop) 경로로 확장합니다. 도구가 실행 도중 사용자 확인이나 추가 입력이 필요할 때, MCP 서버는 클라이언트로 [elicitation 요청을 되돌려 보낼 수 있습니다](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-mcp-elicitation.html) — "이 민감한 작업을 수행하기 전에 승인을 요청"하는 식으로 실행을 일시 정지하는 것입니다. Gateway는 다운스트림 서버의 요청 ID를 자체 ID로 치환해 클라이언트에 전달하고 응답을 올바른 서버로 다시 라우팅합니다. 폼(form) 모드로 구조화된 확인을 받을 수도 있어서, 그동안 Browser Live View 정도로만 가능하던 명시적 승인 게이트가 **도구 호출 경로 자체에** 내장됩니다. 뒤의 §4.2 갭 분석에서 다시 보겠지만, 이 한 기능이 "HITL 게이트"라는 빈칸을 상당 부분 메웁니다.
+
+#### Managed Knowledge Base — RAG가 Gateway 타겟이 되다
+
+2026년 6월 GA된 **[Amazon Bedrock Managed Knowledge Base](https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-managed-knowledge-base-for-faster-more-accurate-enterprise-ai-applications/)** 는 Gateway 이야기에서 가장 무게가 큰 추가입니다. 그동안 검색 증강 생성(RAG)은 — 문서를 청크로 쪼개고, 임베딩을 만들고, 벡터 DB에 넣고, 질의 시 유사도 검색을 돌리고, 결과를 리랭킹하는 — 전적으로 개발자나 프레임워크가 손으로 짜야 하는 영역이었습니다. Managed Knowledge Base는 이 파이프라인 전체, 즉 "스토리지·검색·임베딩·리랭킹·파운데이션 모델 선택"을 하나의 매니지드 프리미티브로 흡수하고, 결정적으로 **Gateway의 네이티브 타겟 유형으로 통합**됩니다. 에이전트 입장에서는 사내 지식을 또 하나의 MCP 도구처럼 호출할 뿐이고, 인덱싱·동기화·벡터 스토리지는 보이지 않는 곳에서 돌아갑니다. 데이터 소스 커넥터로 **Amazon S3, SharePoint, Confluence, Web Crawler, Google Drive, OneDrive** 여섯 종을 기본 제공해, 사내 위키나 드라이브를 며칠이 아니라 몇 번의 설정으로 에이전트의 지식 베이스로 붙일 수 있습니다.
+
+이 모듈이 중요한 이유는 §4.2에서 따로 짚겠지만, AWS가 줄곧 "프레임워크의 영역"이라며 손대지 않던 컨텍스트 공급의 한 축을 플랫폼 안으로 끌어들였다는 점입니다. 다만 경계는 분명합니다. Managed KB가 매니지하는 것은 *무엇을 검색해 가져올지*(retrieval)이지, 가져온 것을 *컨텍스트 윈도우에 어떻게 배치하고 압축할지*(context window management, compaction)가 아닙니다. 후자는 여전히 프레임워크와 에이전트 로직의 몫입니다.
+
+#### Web Search — zero egress 웹 지식
+
+같은 6월에 GA된 **[Web Search](https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/)** 도 Gateway의 빌트인 커넥터로 들어옵니다. 별도의 서드파티 검색 API를 발급받아 키를 관리할 필요 없이, Amazon 자체 웹 인덱스와 지식 그래프 위에서 도는 매니지드 웹 검색을 도구로 바로 쓸 수 있고, 결과로 스니펫·출처 URL·제목·발행일이 랭킹되어 돌아옵니다. 핵심 셀링 포인트는 **zero data egress** — 검색 질의와 결과가 고객의 보안 AWS 환경 밖으로 빠져나가지 않는다는 점입니다. 앞서 본 Browser가 특정 웹페이지를 *항해*하는 도구라면, Web Search는 열린 웹에서 *지식을 길어 오는* 도구로 역할이 갈립니다. 한 가지 실무 주의점은 GA 시점에 [우선 US East(버지니아) 리전에서 먼저 열렸다](https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/)는 것으로, 다른 리전으로의 확장 시점은 도입 전에 확인해야 합니다.
 
 마지막으로 Gateway는 CloudWatch와 CloudTrail에 사용량·호출 수·에러율·레이턴시 메트릭을 자동으로 흘려 주므로, 별도 계측 코드 없이 운영 가시성을 확보할 수 있습니다.
 
@@ -261,6 +286,8 @@ Policy의 또 하나 중요한 구조적 특성은 **정책 엔진(Policy Engine
 
 운영 측면에서는 자연어 정책 작성과 Audit/Dry-run 모드, 자동 추론 세 가지를 같이 기억해 두면 유용합니다. Cedar 문법을 익히고 싶지 않은 컴플라이언스 팀원은 "프로덕션 환경의 고객 데이터는 삭제할 수 없습니다"를 한국어나 영어로 입력해 Cedar 템플릿으로 자동 변환할 수 있는데, 이것이 엔터프라이즈 도입 시 법무·보안·컴플라이언스 팀의 심리적 허들을 낮추는 장치입니다. 새 정책은 Audit/Dry-run 모드로 먼저 배포해 "이 정책이 실제로 강제되었다면 어떤 요청이 차단되었을 것인가"를 프로덕션 트래픽 위에서 관찰한 뒤 강제로 전환하는 것이 정석이고, 이는 IAM 정책 운영에서 굳어진 베스트 프랙티스와 동일한 절차입니다. **자동 추론(Automated Reasoning)** 까지 켜면 "이 정책 세 개가 같이 있을 때 어떤 요청도 통과하지 못하는 모순이 있는가" 같은 질문을 기계적으로 검증할 수 있어 정책 조합의 숨은 충돌을 코드로 잡아낼 수 있습니다.
 
+Cedar가 "누가 무엇을 할 수 있는가"라는 **인가**를 결정론적으로 다룬다면, 2026년 6월 Policy 안으로 들어온 **[Bedrock Guardrails](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-policy-guardrails-generally-available/)** 는 "오가는 *내용*이 안전한가"라는 **콘텐츠 검사**를 같은 레이어에서 맡습니다. 이제 Policy 안에 Guardrail을 정의해, 인가된 에이전트 액션의 출력과 Gateway 타겟으로 들어가는 입력을 프롬프트 인젝션 시도·유해 콘텐츠·민감 정보 노출 관점에서 검사할 수 있습니다. 검사는 Cedar 정책과 마찬가지로 **Gateway 레이어, 즉 에이전트 코드 바깥**에서 돌아가므로 에이전트가 우회할 수 없고, Gateway를 거치는 모든 도구·컨텍스트가 자동으로 그 검사를 받습니다. 결정론적 *권한* 게이트(Cedar)와 확률적 *내용* 게이트(Guardrails)가 한 정책 안에 나란히 서는 셈입니다.
+
 ### 3.5 Identity — 위임, 토큰 볼트, RFC 8707
 
 에이전트가 여러분의 Google Calendar에 회의를 잡고 Slack에 메시지를 보내고 GitHub에 PR을 올립니다. 이때 가장 안 좋은 설계는 사용자 비밀번호를 에이전트가 저장하고 대신 로그인하는 방식이고, 두 번째로 안 좋은 설계는 사용자 토큰을 플레인텍스트로 환경변수에 넣어두는 방식입니다. AgentCore Identity는 **위임(delegation)** 모델을 기본값으로 삼아 이 문제를 구조적으로 풀어냅니다.
@@ -287,29 +314,37 @@ Code Interpreter와 Browser는 엄밀히 말해 도구 카테고리에 속하지
 
 여기에 **세션 녹화** 기능이 더해집니다. 커스텀 브라우저 설정에서 DOM 변경, 사용자 액션, 콘솔 로그, 네트워크 이벤트를 S3에 저장하고 재생할 수 있어서, 에이전트가 어제 무엇을 했는지 마우스 움직임까지 복기할 수 있습니다. 감사와 디버깅의 강력한 도구입니다. Browser와 Code Interpreter 둘 다 Runtime의 microVM 안에서 실행되므로, 악성 사이트에 접속하더라도 잘못된 코드를 실행하더라도 격리 경계 바깥으로 영향이 퍼지지 않습니다.
 
-### 3.7 Observability와 Evaluations — 피드백 루프의 두 모드
+### 3.7 Observability·Evaluations·Performance Loop — 닫히는 피드백 루프
 
 에이전트를 프로덕션에 올렸는데 어느 날 갑자기 이상한 행동을 한다고 가정해 봅시다. 로그가 없으면 디버깅은 불가능에 가깝습니다. 관찰가능성이 하네스의 핵심 구성 요소로 자리 잡은 이유가 여기 있습니다. AgentCore Observability는 **[OpenTelemetry](https://opentelemetry.io/) 표준을 전면 채택**했고, CloudWatch와 기본 통합되며 외부 관찰가능성 도구(Langfuse, Datadog, Splunk, LangSmith 등)와도 연동됩니다.
 
 구조는 세 계층입니다. **개발 중 트레이스 디버깅**은 로컬에서 에이전트의 추론 단계와 도구 호출 체인을 트레이스 트리로 시각화하게 해 주고, **프로덕션 CloudWatch 대시보드와 알람**은 호출률, 레이턴시 백분위, 에러율, 리소스 사용량을 표준 메트릭으로 제공하며, **외부 OTEL 익스포트**는 조직이 이미 구축한 Datadog이나 Grafana 스택으로 트레이스를 내보낼 수 있게 합니다. 세 계층이 하나의 공통 포맷(OTEL)으로 통일되어 있어서 벤더 종속이 줄어듭니다. 브라질 유통 기업 Grupo Elfa가 Observability 도입으로 에이전트 결정의 100퍼센트 추적 가능성을 확보하고 문제 해결 시간을 50퍼센트 단축한 사례는 관찰가능성의 가치가 장애 복구 시간이라는 구체적 비즈니스 지표로 환원된다는 점을 보여 줍니다.
 
+원시 트레이스를 사람이 일일이 읽는 단계에서 한 발 나아간 것이 2026년 6월 프리뷰로 들어온 **Failure Insights**입니다. 수백 개의 에이전트 세션을 가로질러 **반복되는 실패 패턴을 자동으로 찾아내고**, 에러로 드러나지 않는 조용한 행동 실패(silent failure)까지 짚어 근본 원인을 설명하고 빈도순으로 정렬해 줍니다. 트레이스 한 건을 들여다보는 게 아니라 "지난 한 주 가장 자주 무너진 지점이 어디였나"를 집계로 답하는 도구이고, 일·주 단위 정기 리포트나 배포 직후 표적 조사 양쪽에 쓸 수 있습니다. 정확히는 실패·의도(intent)·궤적(trajectory) 세 가지 인사이트가 함께 제공되며, 프리뷰 기간 동안은 무료입니다.
+
 **Evaluations는 품질 피드백의 두 모드를 제공합니다.** 먼저 **13개의 내장 평가자**가 있고, 이들은 **네 계열로 분류**됩니다. **출력 품질**(정확성, 유용성, 충실성, 완전성), **도구 사용**(올바른 도구 선택, 파라미터 정확성, 결과 해석), **안전성**(유해 콘텐츠, 편향, 규제 준수), **프로세스**(효율성, 일관성, 지시 따르기). 에이전트 용도에 따라 관련 계열의 평가자를 선택해 조합하는 구조입니다. 비즈니스 특화 기준이 필요하면 **커스텀 평가자**를 두 방식으로 만들 수 있는데, **LLM-as-Judge**로 평가 기준을 프롬프트로 정의하거나, **코드 기반**으로 Lambda에서 결정론적 검증(정규식 매칭, 외부 API 호출, 비즈니스 규칙)을 수행할 수 있습니다.
 
 평가 모드는 두 가지로 나뉩니다. **On-demand 모드**는 배포 전에 배치로 실행되어 CI/CD의 품질 게이트 역할을 하고, **Online 모드**는 프로덕션 트래픽을 실시간으로 샘플링해서 채점하며 품질이 임계값 아래로 떨어지면 즉시 알림을 보냅니다. 이 구분이 왜 중요한가 하면, 배포 전 테스트만으로는 프로덕션의 다양한 입력을 커버할 수 없고, 프로덕션 모니터링만으로는 알려진 실패 패턴을 사전에 차단할 수 없기 때문입니다. 둘 다 필요합니다.
 
-re:Invent 세션에서 특별히 강조된 실무 팁이 **에이전트 간 핸드오프(handoff) 모니터링**입니다. 대부분의 실패는 여기서 발생합니다. 에이전트 A가 B에게 "고객이 환불을 원한다"는 맥락을 넘기지만, "이미 두 번 거절당해 화가 나 있다"는 뉘앙스는 전달되지 않습니다. 개별 에이전트가 완벽해도 이음새에서 무너집니다. Evaluations의 핸드오프 추적은 어떤 컨텍스트가 전달되었고 무엇이 유실되었는지를 트레이스로 잡아냅니다. 평가는 세션·트레이스·스팬 세 레벨에서 스코프 지정이 가능합니다. Evaluations는 2026년 3월 GA되어 9개 리전에서 사용 가능해졌고, Policy와 함께 프로덕션 에이전트 운영의 쌍축을 이루게 되었습니다.
+re:Invent 세션에서 특별히 강조된 실무 팁이 **에이전트 간 핸드오프(handoff) 모니터링**입니다. 대부분의 실패는 여기서 발생합니다. 에이전트 A가 B에게 "고객이 환불을 원한다"는 맥락을 넘기지만, "이미 두 번 거절당해 화가 나 있다"는 뉘앙스는 전달되지 않습니다. 개별 에이전트가 완벽해도 이음새에서 무너집니다. Evaluations의 핸드오프 추적은 어떤 컨텍스트가 전달되었고 무엇이 유실되었는지를 트레이스로 잡아냅니다. 평가는 세션·트레이스·스팬 세 레벨에서 스코프 지정이 가능합니다. Evaluations는 2026년 3월 GA되어, Policy와 함께 프로덕션 에이전트 운영의 쌍축을 이루게 되었습니다.
 
-### 3.8 Registry — 에이전트 함대의 카탈로그
+여기까지가 "관찰하고(Observability) 채점하는(Evaluations)" 두 단계라면, 2026년 6월 GA된 **[Agent Performance Loop](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-new-optimization-capabilities/)** 가 그 뒤에 "고치고 검증하는" 단계를 붙여 루프를 닫습니다. 세 조각으로 이루어집니다. **Recommendations**는 프로덕션 트레이스와 평가자 출력을 분석해 시스템 프롬프트와 도구 설명을 어떻게 고치면 좋을지 구체적 변경안을 제안하고, **Batch Evaluation**은 선별된 과거 세션을 테스트 데이터셋 삼아 변경 전후를 일괄 재생해 회귀를 잡아내며, **A/B 테스트**는 실제 프로덕션 트래픽을 분기시켜 변경이 진짜 나아졌는지를 살아 있는 조건에서 검증합니다. 14개 리전에서 GA되었고, AgentCore Runtime뿐 아니라 Lambda·EKS·AWS 외부 런타임에서 도는 에이전트에도 적용됩니다. 주목할 지점은 이것이 *플랫폼 레벨의 자가 교정 루프*라는 사실입니다 — 그동안 "에이전트가 스스로 더 나아지게 만드는" 일은 전적으로 개발자가 손으로 돌리던 영역이었는데, 관찰→평가→교정→검증의 한 바퀴가 매니지드 서비스로 묶였습니다. §4.2에서 이 함의를 다시 짚습니다.
 
-2026년 4월 프리뷰로 공개된 Registry는 AgentCore의 가장 최근 모듈이자 가장 전략적인 움직임입니다. 문제는 단순합니다. 조직이 에이전트를 10개 만들면 관리할 수 있지만 100개가 되면 누가 무엇을 했는지 모르게 되고, 1000개가 되면 혼돈입니다. 부서마다 비슷한 에이전트를 중복 개발하고, 보안 팀은 무엇이 돌고 있는지 파악하지 못하며, 운영 비용이 예측 불가능해집니다. 이것이 **에이전트 난립(agent sprawl)** 이라고 불리는 현상입니다. 전통 소프트웨어에서는 이 규모에 도달하는 데 수년이 걸렸지만, 에이전트는 만들기 쉬운 만큼 훨씬 빠르게 증식합니다.
+### 3.8 Payments — 에이전트가 직접 결제하는 시대
 
-Registry의 제안은 조직 내 모든 에이전트·도구·스킬·MCP 서버·커스텀 리소스를 중앙 카탈로그로 인덱싱하자는 것입니다. 각 레코드는 누가 발행했는지, 어떤 프로토콜을 구현하는지, 어떤 인터페이스를 노출하는지, 어떻게 호출하는지를 구조화된 메타데이터로 저장합니다. **검색은 키워드와 시맨틱의 하이브리드**로 제공되어, "환불을 처리하는 에이전트가 있는지"를 자연어로 물으면 유사 역할의 에이전트와 도구가 관련도 순으로 반환됩니다. 여기에 승인 워크플로와 IAM/OAuth 기반 접근 제어가 결합되어 거버넌스가 자동으로 걸립니다.
+2026년 봄 프리뷰로 등장한 **[Payments](https://aws.amazon.com/blogs/machine-learning/agents-that-transact-introducing-amazon-bedrock-agentcore-payments-built-with-coinbase-and-stripe/)** 는 지금까지의 모듈들과 결이 다릅니다. 앞의 것들이 에이전트를 *안전하게 돌리는* 인프라였다면, Payments는 에이전트가 **돈을 쓰게** 합니다 — API·MCP 서버·웹 콘텐츠, 심지어 다른 에이전트에 대해 자율적으로 비용을 지불하는 매니지드 결제 능력입니다. **Coinbase·Stripe와 공동 개발**되었고, 열린 [x402 프로토콜](https://aws.amazon.com/blogs/machine-learning/agents-that-transact-introducing-amazon-bedrock-agentcore-payments-built-with-coinbase-and-stripe/) 위에서 지갑 인증 → 거래 실행 → 지출 거버넌스·관찰의 전 생애주기를 다루며, Coinbase 경유 USDC 스테이블코인 마이크로페이먼트와 Stripe 결제 연결을 지원합니다. 에이전트 경제(agent economy)라는 말이 결제 레일을 만나 구체화되는 첫 지점이지만, 아직 **프리뷰**이고 가용 리전도 네 곳(버지니아·오레곤·프랑크푸르트·시드니)으로 제한적이라, 서울 리전 기반 워크로드라면 당장은 옵션이 아니라는 점을 기억해야 합니다. 자율 결제는 매력적인 만큼 사고의 폭발 반경도 큰 영역이므로, 뒤의 §4와 보안 논의에서 다시 신중하게 다룹니다.
 
-접근 방법은 세 가지입니다. AgentCore 콘솔 UI, AWS CLI·SDK를 통한 API, 그리고 **Registry 자체를 MCP 서버로 노출**하는 방식. 마지막이 특히 흥미로운데, Kiro(AWS의 에이전틱 IDE)나 Claude Code 같은 MCP 클라이언트에서 Registry를 MCP 서버로 추가하면 IDE 안에서 "우리 회사에 이 기능을 하는 에이전트가 있는지"를 직접 쿼리하고 호출할 수 있습니다. **에이전트 간 A2A 통신에서도 상대 에이전트의 능력(agent card)을 Registry에서 검색해 동적으로 협업 대상을 결정**할 수 있어서, 하드코딩된 에이전트 목록 없이 조직의 에이전트 함대가 스스로를 발견하고 조합하는 패턴이 가능해집니다.
+### 3.9 AWS Agent Registry — 에이전트 함대의 카탈로그
 
-Registry는 플랫폼 중립(platform-agnostic)이라는 점도 중요합니다. AWS 바깥 클라우드나 온프레미스에서 돌고 있는 에이전트도 메타데이터를 등록해 인덱싱할 수 있고, AgentCore·Kiro·Amazon Quick Suite에서 빌드된 에이전트는 자동 등록됩니다. Zuora 사례가 대표적인데, Sales·Finance·Product·Developer 네 팀에 걸친 50개 에이전트를 Registry로 관리하며, Finance 팀 분석가가 환불 처리 에이전트를 검색하면 Product 팀이 만든 도구가 뜨고 승인 워크플로를 거쳐 재사용하는 흐름이 자연스럽게 구현됩니다. 현재 5개 리전(US East 버지니아, US West 오레곤, Asia Pacific 시드니·도쿄, Europe 아일랜드)에서 프리뷰 중이고, Microsoft(Entra Agent ID, Agent 365)와 Google(Vertex AI Agent Builder + Apigee Registry)이 같은 공간을 노리고 있어서 "에이전트 레지스트리"가 향후 몇 년간 클라우드 대전의 새 전장이 될 것이라는 관측이 지배적입니다.
+2026년 4월 프리뷰로 공개된 **AWS Agent Registry**(제품 정식 명칭이 "AgentCore Registry"가 아니라 "AWS Agent Registry"이며, AgentCore를 통해 제공됩니다)는 AgentCore의 가장 전략적인 움직임 중 하나입니다. 문제는 단순합니다. 조직이 에이전트를 10개 만들면 관리할 수 있지만 100개가 되면 누가 무엇을 했는지 모르게 되고, 1000개가 되면 혼돈입니다. 부서마다 비슷한 에이전트를 중복 개발하고, 보안 팀은 무엇이 돌고 있는지 파악하지 못하며, 운영 비용이 예측 불가능해집니다. 이것이 **에이전트 난립(agent sprawl)** 이라고 불리는 현상입니다. 전통 소프트웨어에서는 이 규모에 도달하는 데 수년이 걸렸지만, 에이전트는 만들기 쉬운 만큼 훨씬 빠르게 증식합니다.
 
-### 3.9 AgentCore MCP Server — 인프라 자체를 도구로
+이 레지스트리의 제안은 조직 내 모든 에이전트·도구·스킬·MCP 서버·커스텀 리소스를 중앙 카탈로그로 인덱싱하자는 것입니다. 각 레코드는 누가 발행했는지, 어떤 프로토콜을 구현하는지, 어떤 인터페이스를 노출하는지, 어떻게 호출하는지를 구조화된 메타데이터로 저장합니다. **검색은 키워드와 시맨틱의 하이브리드**로 제공되어, "환불을 처리하는 에이전트가 있는지"를 자연어로 물으면 유사 역할의 에이전트와 도구가 관련도 순으로 반환됩니다. 여기에 승인 워크플로와 IAM/OAuth 기반 접근 제어가 결합되어 거버넌스가 자동으로 걸립니다.
+
+접근 방법은 세 가지입니다. AgentCore 콘솔 UI, AWS CLI·SDK를 통한 API, 그리고 **레지스트리 자체를 MCP 서버로 노출**하는 방식. 마지막이 특히 흥미로운데, Kiro(AWS의 에이전틱 IDE)나 Claude Code 같은 MCP 클라이언트에서 레지스트리를 MCP 서버로 추가하면 IDE 안에서 "우리 회사에 이 기능을 하는 에이전트가 있는지"를 직접 쿼리하고 호출할 수 있습니다. **에이전트 간 A2A 통신에서도 상대 에이전트의 능력(agent card)을 레지스트리에서 검색해 동적으로 협업 대상을 결정**할 수 있어서, 하드코딩된 에이전트 목록 없이 조직의 에이전트 함대가 스스로를 발견하고 조합하는 패턴이 가능해집니다.
+
+이 레지스트리는 플랫폼 중립(platform-agnostic)이라는 점도 중요합니다. AWS 바깥 클라우드나 온프레미스에서 돌고 있는 에이전트도 메타데이터를 등록해 인덱싱할 수 있고, AgentCore·Kiro·Amazon Quick Suite에서 빌드된 에이전트는 자동 등록됩니다. Zuora 사례가 대표적인데, Sales·Finance·Product·Developer 네 팀에 걸친 50개 에이전트를 한 카탈로그로 관리하며, Finance 팀 분석가가 환불 처리 에이전트를 검색하면 Product 팀이 만든 도구가 뜨고 승인 워크플로를 거쳐 재사용하는 흐름이 자연스럽게 구현됩니다. 2026년 6월 기준으로도 여전히 **프리뷰**이고 가용 리전은 다섯 곳(US East 버지니아, US West 오레곤, Asia Pacific 싱가포르·도쿄, Europe 아일랜드)으로, 서울은 아직 포함되지 않았습니다. Microsoft(Entra Agent ID, Agent 365)와 Google(Vertex AI Agent Builder + Apigee Registry)이 같은 공간을 노리고 있어서 "에이전트 레지스트리"가 향후 몇 년간 클라우드 대전의 새 전장이 될 것이라는 관측이 지배적입니다.
+
+### 3.10 AgentCore MCP Server — 인프라 자체를 도구로
 
 한 가지 더 짚어야 할 것이 있습니다. **AgentCore 자체가 MCP 서버로 노출됩니다.** 개발자가 Claude Code, Cursor, Cline 같은 MCP 클라이언트에서 이 서버를 추가하면 AgentCore의 리소스를 IDE 안에서 직접 조회하고 관리할 수 있습니다. 에이전트 배포 상태 확인, Gateway 도구 목록 조회, 메모리 네임스페이스 탐색, Policy 엔진에 등록된 규칙 검토 같은 작업을 자연어로 처리할 수 있다는 뜻입니다. AWS 콘솔과 CLI 사이에 제3의 인터페이스가 생긴 셈입니다.
 
@@ -319,41 +354,45 @@ Registry는 플랫폼 중립(platform-agnostic)이라는 점도 중요합니다.
 
 ## 4. 하네스의 렌즈 — 매핑과 갭
 
-여기까지 10개 모듈을 하나씩 열어 봤습니다. 한 발 물러서서 이것들이 현대적 하네스 엔지니어링이 요구하는 컴포넌트들 — 실행 환경 격리, 도구 오케스트레이션, 보안·인증, 결정론적 가드레일, 상태 관리, 관찰가능성, 품질 검증, 에이전트 난립 방지 — 에 어떻게 매핑되고 어디를 비워 두는지 두 개의 표로 압축해 봅니다.
+여기까지 Build·Deploy·Assess 세 층을 하나씩 열어 봤습니다. 한 발 물러서서 이것들이 현대적 하네스 엔지니어링이 요구하는 컴포넌트들 — 실행 환경 격리, 도구 오케스트레이션, 보안·인증, 결정론적 가드레일, 상태 관리, 관찰가능성, 품질 검증, 에이전트 난립 방지 — 에 어떻게 매핑되고 어디를 비워 두는지 두 개의 표로 압축해 봅니다. 이 절이 이 글의 무게 중심입니다. 그리고 흥미로운 건, AgentCore가 채워 둔 칸과 비워 둔 칸의 경계선이 고정된 게 아니라 분기마다 움직이고 있다는 사실입니다 — 특히 2026년 봄, 한때 "프레임워크 영역"이라 단정했던 칸 몇 개가 플랫폼 쪽으로 넘어왔습니다.
 
 ### 4.1 커버되는 영역
 
 | 하네스 요소 | 담당 모듈 | 핵심 장치 |
 |-----------|----------|----------|
-| 실행 환경 격리 | Runtime | microVM(Firecracker), 세션 격리, Workload Identity |
-| 도구 오케스트레이션 | Gateway | MCP zero-code 변환, 시맨틱 도구 선택, Interceptor |
+| 실행 환경 격리 | Runtime · harness | microVM(Firecracker), 세션 격리, Workload Identity, 선언형 매니지드 런타임 |
+| 도구 오케스트레이션 | Gateway | MCP zero-code 변환, 시맨틱 도구 선택, Interceptor, elicitation |
 | 보안·인증 | Identity | OAuth 2LO/3LO, Token Vault + KMS, RFC 8707 |
-| 결정론적 가드레일 | Policy | Cedar, forbid-overrides-permit, Gateway 통합 |
+| 결정론적 가드레일 | Policy | Cedar, forbid-overrides-permit, Bedrock Guardrails, Gateway 통합 |
 | 상태 관리 | Memory | 단기 + 4전략 + Branching |
-| 관찰가능성 | Observability | OTEL, CloudWatch, 외부 익스포트 |
-| 품질 검증 | Evaluations | 13개 4계열 + 커스텀, On-demand/Online |
+| 관찰가능성 | Observability | OTEL, CloudWatch, 외부 익스포트, Failure Insights *(Preview)* |
+| 품질 검증·교정 | Evaluations · Performance Loop | 13개 4계열 + 커스텀, Recommendations + Batch Eval + A/B |
+| 컨텍스트 — 검색 | Managed Knowledge Base | 매니지드 RAG(청킹·임베딩·검색·리랭킹), Gateway 타겟, 6 커넥터 |
 | 코드 실행 도구 | Code Interpreter | 격리 샌드박스 |
-| 웹 상호작용 도구 | Browser | Live View, 세션 녹화 |
-| 에이전트 난립 방지 | Registry *(Preview)* | 하이브리드 검색, MCP 서버 노출 |
+| 웹 상호작용·지식 | Browser · Web Search | Live View, 세션 녹화, zero-egress 웹 검색 |
+| 에이전트 난립 방지 | AWS Agent Registry *(Preview)* | 하이브리드 검색, MCP 서버 노출 |
 
-이 정도 범위의 하네스 체크리스트를 일관된 제품군으로 출시한 플랫폼은 2026년 4월 기준 AgentCore가 유일합니다. Microsoft는 Azure AI Foundry와 Entra Agent ID, Google은 Vertex AI Agent Builder와 Apigee로 비슷한 묶음을 만들어 가고 있지만 통합도와 성숙도에서 격차가 있습니다.
+이 정도 범위의 하네스 체크리스트를 일관된 제품군으로 출시한 플랫폼은 2026년 6월 기준 AgentCore가 유일합니다. Microsoft는 Azure AI Foundry와 Entra Agent ID, Google은 Vertex AI Agent Builder와 Apigee로 비슷한 묶음을 만들어 가고 있지만 통합도와 성숙도에서 격차가 있습니다.
 
-### 4.2 비어 있는 영역
+### 4.2 비어 있던 영역 — 그리고 봄 사이에 움직인 경계선
 
-| 하네스 요소 | 현 상태 | 왜 갭인가 |
-|-----------|--------|----------|
-| **컨텍스트 엔지니어링** | 직접 제공 안 함 | 윈도우 관리, 컴팩션, 동적 RAG는 프레임워크 영역. "프레임워크 아래의 인프라"라는 지향에 따른 의도적 경계 |
-| **플래닝·분해** | 직접 제공 안 함 | 복잡 작업의 하위 분해 로직은 에이전트 프레임워크 책임 |
-| **자가 교정 루프** | 부분적 | Code Interpreter로 코드→테스트→수정은 가능하지만 범용 "에러 시 재시도·수정" 메커니즘은 개발자 구현 |
-| **Human-in-the-Loop 게이트** | 간접적 | Browser Live View 외에 명시적 HITL 승인 게이트는 Policy로 우회 구현 |
-| **지식 구조화** | 미지원 | 암묵지→명시지 변환은 매니지드로 제공될 성격이 아님 |
-| **엔트로피 관리** | 미지원 | 에이전트가 만드는 기술 부채의 자동 청소 |
-| **비용 최적화** | 없음 | 토큰 예산, 비용 상한 알림 같은 에이전트 레벨 제어 부재 |
-| **AWS Lock-in** | 구조적 위험 | CloudWatch·IAM·ECR·Cedar·Bedrock 밀착 통합 — 개발 가속에 유리하나 이전 시 전면 재설계 |
+불과 두 달 전인 2026년 봄까지만 해도 이 표의 여덟 칸은 모두 "비어 있음"이었습니다. 그 사이 셋이 부분적으로 채워졌습니다. 경계선의 이동이 이 플랫폼을 읽는 가장 중요한 단서이므로, *봄(4월) 상태 → 현재(6월) 상태 → 무엇이 바뀌고 무엇이 남았나*의 세 칸으로 그려 봅니다.
 
-[Kai Waehner의 경고](https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/)를 기억해 두는 편이 좋습니다. "모델 API 선택이 아니라 런타임·거버넌스·관찰가능성 스택에 에이전트 아키텍처를 심는 것이므로 시간이 갈수록 되돌리기 어려워진다."
+| 하네스 요소 | 4월 상태 | 6월 상태 | 무엇이 바뀌고 무엇이 남았나 |
+|-----------|---------|---------|----------------------------|
+| **컨텍스트 — 검색(RAG)** | 미제공 | **부분 충족** | Managed KB(6월 GA)가 인덱싱·청킹·검색·리랭킹을 매니지드로 흡수. 단 윈도우 배치·컴팩션은 여전히 프레임워크 |
+| **자가 교정 루프** | 부분적 | **부분 충족(확대)** | Performance Loop(6월 GA)의 Recommendations·Batch Eval·A/B가 플랫폼 레벨 교정 루프를 제공. 단 런타임 중 "에러→재시도→수정" 자율 루프는 여전히 프레임워크 |
+| **Human-in-the-Loop 게이트** | 간접적 | **부분 충족** | Gateway elicitation으로 도구 호출 경로에 명시적 승인·입력 게이트가 내장 — Browser Live View 외 두 번째 경로 |
+| **에이전트 상거래·결제** | (요소 자체 부재) | **신규 충족(Preview)** | Payments(프리뷰)가 자율 결제를 매니지드로. 직전까지 카테고리조차 없던 영역 |
+| **플래닝·분해** | 미제공 | 여전히 갭 | 복잡 작업의 하위 분해 로직은 에이전트 프레임워크 책임 |
+| **지식 구조화** | 미지원 | 여전히 갭 | Managed KB는 RAG일 뿐 암묵지→명시지 변환은 아님 — 둘은 다른 문제 |
+| **엔트로피 관리** | 미지원 | 여전히 갭 | 에이전트가 만드는 기술 부채의 자동 청소 |
+| **비용 최적화** | 없음 | 거의 그대로 | Performance Loop의 비용·지연 권고가 일부 닿지만, 토큰 예산·비용 상한 같은 에이전트 레벨 제어는 여전히 부재 |
+| **AWS Lock-in** | 구조적 위험 | **심화** | Managed KB·Payments·harness까지 밀착도가 더 커져 이전 비용이 오히려 상승 |
 
-**한 줄 평가.** AgentCore는 하네스의 **인프라 절반**(실행·보안·관찰가능성·가드레일)을 매우 강하게 커버하고, **지능 절반**(플래닝·컨텍스트·자가 교정)은 의도적으로 프레임워크에 위임합니다. 이것은 AWS의 "프레임워크 중립" 전략과 일관된 결정입니다. 플래닝 로직까지 AgentCore에 넣어 버리면 CrewAI 지원이나 LangGraph 지원이라는 문구를 쓸 수 없게 되므로 그 절반은 손대지 않는 것입니다. 개발자 입장에서는 프레임워크 선택의 자유를 얻는 대신 두 레이어를 직접 조합해야 하는 복잡성을 떠안게 됩니다. 하네스 인프라는 매니지드로 받되, 그 위에 얹는 지능 로직은 본인의 몫으로 남는다는 뜻입니다.
+[Kai Waehner의 경고](https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/)는 이 흐름 속에서 오히려 더 무거워집니다. "모델 API 선택이 아니라 런타임·거버넌스·관찰가능성 스택에 에이전트 아키텍처를 심는 것이므로 시간이 갈수록 되돌리기 어려워진다." 플랫폼이 매니지드로 흡수하는 영역이 넓어질수록, 편의와 고착(lock-in)은 같은 동전의 양면으로 함께 커집니다.
+
+**한 줄 평가.** AgentCore는 하네스의 **인프라 절반**(실행·보안·관찰가능성·가드레일)을 여전히 가장 강하게 커버합니다. 4월과 달라진 점은 **지능 절반의 경계선이 플랫폼 쪽으로 한 칸 밀렸다**는 것입니다 — 매니지드 RAG(Managed KB)와 플랫폼 측 교정 루프(Performance Loop), 도구 경로의 HITL 게이트(elicitation)가 등장하며, 4월엔 "프레임워크 영역"이라 단정했던 칸들이 회색지대로 바뀌었습니다. 그럼에도 **핵심 지능 — 플래닝·작업 분해, 그리고 런타임 도중의 자율 자가 교정 — 은 여전히 프레임워크 몫**입니다. 플래닝 로직까지 AgentCore에 넣어 버리면 CrewAI 지원이나 LangGraph 지원이라는 문구를 쓸 수 없게 되므로, 그 마지막 절반은 "프레임워크 중립" 전략과 정면으로 충돌하는 자리이고 AWS가 가장 늦게까지 남겨 둘 영역입니다. 개발자 입장에서 함의는 4월과 같되 무게가 달라졌습니다 — 매니지드로 받을 수 있는 범위가 넓어진 만큼, 직접 조합해야 할 부분은 줄었지만 그만큼 플랫폼에 깊이 매이게 됩니다.
 
 ### 4.3 실무 도입 시 유의점
 
@@ -361,7 +400,9 @@ Registry는 플랫폼 중립(platform-agnostic)이라는 점도 중요합니다.
 
 보안 측면에서는 메모리 중독과 프롬프트 인젝션이 장기 메모리에 악의적 입력을 잔존시킬 위험을 만들고, 입출력 필터링과 버전 관리, 정기 감사가 같이 따라가야 합니다. ARM64 전용이라는 점은 x86 네이티브 의존성 프로젝트에서 사전 호환성 확인이 필수라는 뜻이며, 비결정론적 오류는 에이전트의 본질적 속성이므로 Evaluations와 풍부한 로깅으로 추적하고 결정론이 필요한 부분은 Code Interpreter나 Lambda로 대체해야 합니다.
 
-운영·비용 측면에서 에이전트 난립은 Registry 도입만으로 자동 해결되지 않으며 주기적 감사·미사용 폐기·명확한 오너십 같은 조직 프로세스가 같이 따라가야 합니다. 비용 예측도 만만치 않은데, 토큰 소비와 microVM 시간과 Memory 저장이 여러 축으로 쌓이므로 예산 알람을 사전에 설정하지 않으면 월말에 놀라게 됩니다. 마지막으로 **Policy는 Gateway를 거치지 않는 호출에 적용되지 않는다는 제약**을 반드시 기억해야 합니다. 모든 도구 호출을 Gateway에 집중시키는 아키텍처 결정이 Policy의 효과 범위를 결정하기 때문에, 이 구조를 흐트러뜨리면 가드레일 자체가 무력해집니다.
+새로 들어온 매니지드 모듈에도 그림자가 따라옵니다. Managed Knowledge Base는 RAG 파이프라인을 통째로 가져가는 대신 청킹 전략·검색 파라미터·리랭킹을 손으로 튜닝할 여지를 줄이므로, 검색 품질이 도메인에 민감한 워크로드라면 매니지드 기본값이 충분한지를 도입 전에 검증해야 하고 저장·질의 비용이라는 축도 새로 더해집니다. Web Search는 GA 시점에 리전이 제한적이라 가용성과 쿼터를 먼저 확인해야 하며, Payments는 자율 결제라는 속성상 폭발 반경이 가장 큰 모듈이므로 — Lethal Trifecta의 "상태 변경"이 곧 "돈의 이동"이 됩니다 — 프리뷰 단계에서 지출 상한과 승인 게이트를 Policy로 단단히 두르지 않은 채 프로덕션에 올리는 건 위험합니다.
+
+운영·비용 측면에서 에이전트 난립은 레지스트리 도입만으로 자동 해결되지 않으며 주기적 감사·미사용 폐기·명확한 오너십 같은 조직 프로세스가 같이 따라가야 합니다. 비용 예측도 만만치 않은데, 토큰 소비와 microVM 시간과 Memory 저장에 더해 이제 Managed KB 저장·질의와 Performance Loop의 평가 실행까지 여러 축으로 쌓이므로, 예산 알람을 사전에 설정하지 않으면 월말에 놀라게 됩니다. 마지막으로 **Policy는 Gateway를 거치지 않는 호출에 적용되지 않는다는 제약**을 반드시 기억해야 합니다. 모든 도구 호출을 Gateway에 집중시키는 아키텍처 결정이 Policy의 효과 범위를 결정하기 때문에, 이 구조를 흐트러뜨리면 가드레일 자체가 무력해집니다 — Managed KB·Web Search가 Gateway 타겟으로 들어온 지금은 오히려 이 "모든 것을 Gateway로" 원칙이 더 자연스럽게 지켜진다는 점은 다행입니다.
 
 ---
 
@@ -373,7 +414,7 @@ Registry는 플랫폼 중립(platform-agnostic)이라는 점도 중요합니다.
 
 [Mission Cloud의 공개 사례](https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot)는 프레임워크 선택이라는 현실적 결정을 드러냅니다. 데이터 마이그레이션은 복잡한 작업입니다. 소스 시스템에서 타겟 시스템으로 데이터를 옮기면서 스키마 변환, 정합성 검증, 오류 처리를 동시에 해야 합니다. 이 과정에서 나오는 자연어 질문 — "이 테이블은 아직 마이그레이션 안 됐나?", "지난주 레코드 중 불일치가 있었나?", "소스와 타겟의 레코드 수가 맞나?" — 에 즉시 답하는 챗봇을 **13주** 안에 완성해야 했습니다.
 
-아키텍처는 **슈퍼 에이전트(Super Agent)** 가 최상위에서 사용자의 의도를 분석한 뒤 세 개의 전문 서브 에이전트로 라우팅하는 계층 구조입니다. **Discovery Agent**는 RAG(검색 증강 생성) 기반으로 벡터 DB에 인덱싱된 수천 페이지의 마이그레이션 문서에서 답을 찾고, **Text-to-SQL Agent**는 자연어를 PostgreSQL 쿼리로 변환한 뒤 Code Interpreter로 집계와 시각화까지 처리하며, **Validation Agent**는 소스와 타겟의 레코드 수를 비교해 불일치를 발견하면 어떤 레코드가 누락되었는지까지 추적합니다. "지난 주 일별 마이그레이션 레코드 수를 보여줘"라는 한 문장이 `SELECT date, COUNT(*) FROM migration_log WHERE migrated_at >= NOW() - INTERVAL '7 days' GROUP BY date`로 변환·실행되고 차트로 렌더링되기까지의 전 과정이 하나의 에이전트 파이프라인으로 엮이는 구조입니다.
+아키텍처는 **슈퍼 에이전트(Super Agent)** 가 최상위에서 사용자의 의도를 분석한 뒤 세 개의 전문 서브 에이전트로 라우팅하는 계층 구조입니다. **Discovery Agent**는 RAG(검색 증강 생성) 기반으로 벡터 DB에 인덱싱된 수천 페이지의 마이그레이션 문서에서 답을 찾고, **Text-to-SQL Agent**는 자연어를 PostgreSQL 쿼리로 변환한 뒤 Code Interpreter로 집계와 시각화까지 처리하며, **Validation Agent**는 소스와 타겟의 레코드 수를 비교해 불일치를 발견하면 어떤 레코드가 누락되었는지까지 추적합니다. "지난 주 일별 마이그레이션 레코드 수를 보여줘"라는 한 문장이 `SELECT date, COUNT(*) FROM migration_log WHERE migrated_at >= NOW() - INTERVAL '7 days' GROUP BY date`로 변환·실행되고 차트로 렌더링되기까지의 전 과정이 하나의 에이전트 파이프라인으로 엮이는 구조입니다. 덧붙이자면, Discovery Agent가 직접 짠 벡터 DB 인덱싱 부분은 §3.3에서 본 Managed Knowledge Base가 GA된 지금이라면 손수 구축하지 않고 Gateway 타겟으로 대체할 수 있는 자리입니다 — 앞서 말한 "경계선이 플랫폼 쪽으로 밀렸다"는 변화가 실제 아키텍처에서 어디를 덜어 주는지 보여주는 구체적 예입니다.
 
 흥미로운 지점은 프레임워크 선택 과정입니다. Mission Cloud는 처음에 LangGraph를 검토했다가 최종적으로 AWS의 Strands Agents로 전환했습니다. **Strands의 콜드 스타트는 약 800ms · 메모리 약 150MB**, LangGraph는 **약 1,200ms · 약 250MB**로 측정되었는데, 이 수치 차이보다 더 결정적이었던 것은 설계 철학의 차이였습니다. LangGraph는 **개발자 주도(developer-driven)** 접근입니다. 개발자가 상태 그래프를 정의하고 노드 간 전이를 명시적으로 프로그래밍하기 때문에 에이전트 동작을 세밀하게 통제할 수 있지만 코드가 많아집니다. Strands는 **모델 주도(model-driven)** 접근입니다. 개발자는 도구와 목표만 정의하고 모델이 실행 순서를 결정합니다. 코드가 적고 AWS 네이티브 설계라서 Bedrock 모델 호출, AgentCore Runtime 배포, IAM 인증이 추가 통합 없이 작동합니다. 13주라는 타임라인에서 LangGraph의 추상화 레이어가 AWS 네이티브 서비스와 통합될 때 요구하는 어댑터 코드와 호환성 패치가 부담이었고, Strands가 그 오버헤드를 제거했습니다. 다만 복잡한 상태 머신이 필요하거나 다양한 LLM 제공자를 혼합해야 하거나 AWS 외부 환경에서 운영해야 한다면 LangGraph가 여전히 더 적합합니다. 프레임워크 선택은 특수한 제약 조건 아래에서의 최적해라는 점을 놓치면 안 됩니다.
 
@@ -421,21 +462,21 @@ AWS가 2026년 2월 [모범사례 블로그](https://aws.amazon.com/blogs/machin
 | 4 | 멀티 에이전트 아키텍처 | — | 프로토콜(MCP·A2A)과 패턴(계층·순차·P2P) 혼동 금지 |
 | 5 | 사용자별 메모리·ID로 안전 확장 | 보안 | Memory 네임스페이스 격리 + Identity 암호학적 바인딩 |
 | 6 | 계산에는 결정론적 코드 | 연산적 피드백 | Code Interpreter — LLM에 산수 시키지 말 것 |
-| 7 | Evaluations로 지속 테스팅 | 추론적 피드백 | 13개 내장 + 도메인 특화 커스텀 평가자 |
-| 8 | IaC로 배포 자동화 | 기계적 강제 | CDK·Terraform·CloudFormation + CI/CD |
-| 9 | 조직 전체로 확장 | 엔트로피 관리 | 팀별 Gateway + Registry 거버넌스 |
+| 7 | Evaluations로 지속 테스팅·교정 | 추론적 피드백 | 13개 내장 + 커스텀 평가자, Performance Loop의 A/B·배치 평가로 루프 닫기 |
+| 8 | IaC로 배포 자동화 | 기계적 강제 | CDK L2(stable)·Terraform·CloudFormation + CI/CD |
+| 9 | 조직 전체로 확장 | 엔트로피 관리 | 팀별 Gateway + AWS Agent Registry 거버넌스 |
 
 **"비즈니스 문제에서 역으로 시작"은 기술 선택이 아니라 사고방식의 문제입니다.** Clearwater Analytics가 800개 에이전트에 도달한 것은 "에이전트를 많이 만들자"고 결정해서가 아닙니다. 투자 분석가의 일상 업무를 관찰하고, "오전 2시간을 차지하는 데이터 정합성 검증"을 자동화한 것이 첫 에이전트였습니다. 거기서 두 번째, 세 번째가 자연스럽게 파생되었습니다. 에이전트 프로젝트가 취소되거나 중단되는 비율이 높은 현실에서 Clearwater가 800개까지 간 건 해결할 문제에서 출발했기 때문입니다. 대부분의 실패한 프로젝트는 "우리도 에이전트를 만들어야 한다"에서 출발하고, 만들고 나서야 "이걸 누가 쓰지?"를 묻습니다. 순서가 뒤바뀌면 결과도 뒤바뀝니다.
 
-**"Day 1부터 관찰가능성"을 강조하는 이유는 나중에 추가하면 이미 놓친 데이터가 많기 때문**입니다. 에이전트는 전통 소프트웨어와 달리 실행 경로가 비결정론적입니다. 같은 입력에 다른 도구를 선택하고 다른 순서로 실행할 수 있습니다. "어제는 됐는데 오늘은 안 된다"는 리포트가 들어왔을 때 Day 1부터 트레이스가 있으면 "어제는 A→B→C 순서로 실행했는데 오늘은 A→C를 먼저 호출해 빈 결과가 B로 흘러갔다"는 진단이 가능합니다. Day 100부터 관찰가능성을 붙이면 앞 99일의 정상 경로 데이터가 없어 비교 기준 자체가 사라집니다. 12초 지연이 모델 추론 때문인지 DB 쿼리 때문인지 외부 API 타임아웃 때문인지 구분하는 것은 트레이스 없이는 추측일 뿐이고, 추측으로는 프로덕션 장애를 해결할 수 없습니다.
+**"Day 1부터 관찰가능성"을 강조하는 이유는 나중에 추가하면 이미 놓친 데이터가 많기 때문**입니다. 에이전트는 전통 소프트웨어와 달리 실행 경로가 비결정론적입니다. 같은 입력에 다른 도구를 선택하고 다른 순서로 실행할 수 있습니다. "어제는 됐는데 오늘은 안 된다"는 리포트가 들어왔을 때 Day 1부터 트레이스가 있으면 "어제는 A→B→C 순서로 실행했는데 오늘은 A→C를 먼저 호출해 빈 결과가 B로 흘러갔다"는 진단이 가능합니다. Day 100부터 관찰가능성을 붙이면 앞 99일의 정상 경로 데이터가 없어 비교 기준 자체가 사라집니다. 12초 지연이 모델 추론 때문인지 DB 쿼리 때문인지 외부 API 타임아웃 때문인지 구분하는 것은 트레이스 없이는 추측일 뿐이고, 추측으로는 프로덕션 장애를 해결할 수 없습니다. §3.7에서 본 Failure Insights는 이 원칙의 자연스러운 연장입니다 — 트레이스를 Day 1부터 쌓아 두면, 수백 세션에 걸친 실패 패턴을 사람이 일일이 뒤지는 대신 집계로 받아 볼 수 있습니다.
 
 **"사용자별 메모리·ID로 안전 확장"은 규모 의존적 원칙입니다.** 10명 규모에서는 네임스페이스 격리를 대충 해도 문제가 안 보이지만 1,000명이 되면 교차 오염 확률이 통계적으로 의미 있는 수준이 됩니다. 수많은 조직이 에이전트 보안 사고를 경험한다는 통계는 대부분이 이 확장 단계에서 무너졌음을 시사합니다. Memory의 네임스페이스 격리와 Identity의 암호학적 바인딩은 사용자 수에 관계없이 일정한 격리 보장을 제공합니다. 2025년에 있었던 Asana의 MCP 컨텍스트·캐시 분리 논리 결함으로 1,000개 조직에 34일간 교차 데이터 오염이 발생한 사건이 이 원칙의 현실적 배경이기도 합니다.
 
 **"계산에는 결정론적 코드"는 구조적 분업 원칙입니다.** LLM에게 "1,247 × 893"을 시키면 틀릴 수 있습니다. 비결정론적 시스템에게 결정론적 답이 필요한 작업을 맡기는 것은 구조적 오류입니다. 10조 달러 규모의 Clearwater 환경에서 소수점 셋째 자리 오차는 수십억 달러가 됩니다. `numpy`가 정확한 답을 내놓아야 합니다. 이 원칙을 AgentCore 내부에서 구현하면 **"모델은 추론하고 시스템은 실행한다"** 는 문장으로 요약되고, 구체적으로는 Code Interpreter가 수치 계산을, Policy가 규칙 준수를 결정론적으로 처리하는 분업이 됩니다. 모델 호출을 최소화하면 비용도 줄고 신뢰도도 올라가는 이중 효과가 있습니다.
 
-**"IaC로 배포 자동화"는 에이전트 시대에 더 중요해졌습니다.** 전통적 웹 서비스에서 IaC는 "편의"였습니다. 콘솔에서 수동 배포해도 작동합니다. 에이전트 시스템에서 IaC는 **"안전"** 입니다. 에이전트의 Policy·Identity·Memory 설정이 코드로 정의되지 않으면 누가 언제 어떤 권한을 변경했는지 추적할 수 없습니다. Git 히스토리에서 "누가, 언제, 어떤 권한을 추가했는가"가 명확한 감사 추적으로 남아야 인시던트 발생 시 원인 규명이 가능합니다. AWS는 [CloudFormation 배포 가이드](https://aws.amazon.com/blogs/machine-learning/build-ai-agents-with-amazon-bedrock-agentcore-using-aws-cloudformation/)와 CDK Construct를 제공하므로 Day 1부터 코드로 인프라를 관리하는 편이 장기적으로 안전합니다.
+**"IaC로 배포 자동화"는 에이전트 시대에 더 중요해졌습니다.** 전통적 웹 서비스에서 IaC는 "편의"였습니다. 콘솔에서 수동 배포해도 작동합니다. 에이전트 시스템에서 IaC는 **"안전"** 입니다. 에이전트의 Policy·Identity·Memory 설정이 코드로 정의되지 않으면 누가 언제 어떤 권한을 변경했는지 추적할 수 없습니다. Git 히스토리에서 "누가, 언제, 어떤 권한을 추가했는가"가 명확한 감사 추적으로 남아야 인시던트 발생 시 원인 규명이 가능합니다. AWS는 [CloudFormation 배포 가이드](https://aws.amazon.com/blogs/machine-learning/build-ai-agents-with-amazon-bedrock-agentcore-using-aws-cloudformation/)를 제공하고, 2026년 5월에는 [CDK L2 컨스트럭트가 정식(stable)으로 승격](https://github.com/aws/aws-cdk/releases/tag/v2.255.0)되어 별도 알파 패키지 없이 `aws-cdk-lib`에서 AgentCore 리소스를 선언할 수 있습니다(다만 Policy 서브모듈은 아직 alpha라 이 부분만 L1 이스케이프 해치를 씁니다). CLI도 3월에 GA되었으므로, Day 1부터 코드로 인프라를 관리하는 편이 장기적으로 안전합니다.
 
-나머지 네 원칙도 가볍게 짚고 넘어갑니다. **도구 설명**(#3)은 에이전트가 시맨틱 검색으로 도구를 찾는 세계에서 "이 도구가 무엇을 하는지"를 한 문장으로 정확히 표현하는 것이 정확도와 비용을 동시에 결정하므로, 보안 검토를 거친 중앙 도구 카탈로그 — Gateway와 Registry의 조합 — 가 개인 Lambda 배열보다 구조적으로 유리합니다. **멀티 에이전트 아키텍처**(#4)에서 가장 흔한 실수가 프로토콜과 패턴을 헷갈리는 것인데, 이 글의 §5 말미에서 짚은 대로 MCP·A2A는 통신 방식이고 계층·순차·P2P는 협업 구조여서 둘은 독립적으로 선택해야 합니다. **Evaluations로 지속 테스팅**(#7)은 배포 후 품질 드리프트를 조기에 잡아내는 장치로, CI/CD에 On-demand 평가를 붙이고 프로덕션 트래픽에 Online 평가를 샘플링하는 2중 구조가 기본입니다. **조직 전체로 확장**(#9)은 팀별 Gateway 인스턴스를 분리해 blast radius를 쪼개고 Registry로 중앙 거버넌스를 유지하는 조합이 정석입니다.
+나머지 네 원칙도 가볍게 짚고 넘어갑니다. **도구 설명**(#3)은 에이전트가 시맨틱 검색으로 도구를 찾는 세계에서 "이 도구가 무엇을 하는지"를 한 문장으로 정확히 표현하는 것이 정확도와 비용을 동시에 결정하므로, 보안 검토를 거친 중앙 도구 카탈로그 — Gateway와 Registry의 조합 — 가 개인 Lambda 배열보다 구조적으로 유리합니다. **멀티 에이전트 아키텍처**(#4)에서 가장 흔한 실수가 프로토콜과 패턴을 헷갈리는 것인데, 이 글의 §5 말미에서 짚은 대로 MCP·A2A는 통신 방식이고 계층·순차·P2P는 협업 구조여서 둘은 독립적으로 선택해야 합니다. **Evaluations로 지속 테스팅**(#7)은 배포 후 품질 드리프트를 조기에 잡아내는 장치로, CI/CD에 On-demand 평가를 붙이고 프로덕션 트래픽에 Online 평가를 샘플링하는 2중 구조가 기본인데, 여기에 Performance Loop의 A/B 테스트와 배치 평가를 얹으면 "드리프트를 감지"하는 데서 "고쳐서 검증"하는 데까지 한 바퀴가 닫힙니다. **조직 전체로 확장**(#9)은 팀별 Gateway 인스턴스를 분리해 blast radius를 쪼개고 AWS Agent Registry로 중앙 거버넌스를 유지하는 조합이 정석입니다.
 
 아홉 원칙 전체를 관통하는 공통점은 하나입니다. **전부 "나중에 추가하면 된다"고 착각하기 쉬운 항목들**입니다. 관찰가능성도, IaC도, 도구 설명도, 평가 파이프라인도 모두 Day 1에 시작하지 않으면 Day 100에는 이미 기술 부채가 감당 불가능한 규모로 불어난 뒤입니다. Clearwater가 800개까지 도달할 수 있었던 것은 Day 1에 이 아홉 가지를 의식적으로 세팅해 두었기 때문이고, 그 역은 대부분 Day 100의 "다시 만들겠다"는 결정으로 귀결됩니다.
 
@@ -447,9 +488,9 @@ AWS가 2026년 2월 [모범사례 블로그](https://aws.amazon.com/blogs/machin
 
 AgentCore의 개별 서비스 중 그 자체로 새로운 것은 많지 않습니다. [Firecracker](https://firecracker-microvm.github.io/)는 Lambda에서 이미 돌고 있었고, [Cedar](https://www.cedarpolicy.com/)는 이미 오픈소스였으며, 벡터 DB와 세션 스토어는 기존 구성 요소의 조합입니다. 힘은 이것들을 **통합하고 제품화**한 데 있습니다. Werner Vogels의 표현을 빌리면 이것은 "차별화되지 않는 무거운 작업(undifferentiated heavy lifting)"의 에이전트 시대 버전이고, SageMaker가 ML 운영에, Elastic Beanstalk이 웹 호스팅에 했던 것을 AgentCore가 에이전트 운영에 하고 있습니다.
 
-개발자와 아키텍트를 위한 함의는 이렇습니다. AgentCore는 하네스의 인프라 절반이므로 실행·보안·관찰가능성은 맡기되 플래닝·컨텍스트·자가 교정은 프레임워크 선택과 커스텀 구현이 필요합니다. "프레임워크 중립"이 주는 자유와 복잡성은 동전의 양면이고, 선택의 자유가 큰 만큼 통합의 책임도 개발자에게 옵니다. Policy와 Gateway의 조합이 숨은 결정적 무기이며, LLM 추론 루프 바깥의 결정론적 제어는 엔터프라이즈 도입의 가장 민감한 지점을 해결합니다. Registry의 등장은 에이전트 운영 성숙도의 지표이고, 단일 에이전트 구축에서 조직 전체의 에이전트 함대 관리로 관심이 이동했다는 뜻입니다. 그리고 하네스를 의식하지 않고 에이전트를 짜는 시대는 끝났습니다. 이것은 AWS에만 해당하는 이야기가 아니라, 어떤 플랫폼을 쓰든 여러분이 짜고 있는 나머지 전부가 프로덕션 신뢰도의 대부분을 결정한다는 뜻입니다.
+개발자와 아키텍트를 위한 함의는 이렇습니다. AgentCore는 하네스의 인프라 절반을 매니지드로 맡아 주고, 2026년 봄을 지나며 그 절반이 지능 쪽으로 한 칸 더 넓어졌습니다 — 매니지드 RAG와 플랫폼 측 교정 루프, 도구 경로의 승인 게이트가 들어오면서, 4월까지 "프레임워크가 알아서 하라"던 칸들이 회색지대가 되었습니다. 그래도 플래닝과 런타임 자가 교정이라는 핵심 지능은 여전히 여러분 몫이고, "프레임워크 중립"이 주는 자유와 복잡성은 동전의 양면이라 선택의 자유가 큰 만큼 통합의 책임도 개발자에게 옵니다. Policy와 Gateway의 조합이 숨은 결정적 무기이며, LLM 추론 루프 바깥의 결정론적 제어 — 이제 Cedar 인가에 Bedrock Guardrails 콘텐츠 검사까지 더해진 — 는 엔터프라이즈 도입의 가장 민감한 지점을 해결합니다. AWS Agent Registry의 등장은 에이전트 운영 성숙도의 지표이고, 단일 에이전트 구축에서 조직 전체의 에이전트 함대 관리로 관심이 이동했다는 뜻입니다. 그리고 하네스를 의식하지 않고 에이전트를 짜는 시대는 끝났습니다. 이것은 AWS에만 해당하는 이야기가 아니라, 어떤 플랫폼을 쓰든 여러분이 짜고 있는 나머지 전부가 프로덕션 신뢰도의 대부분을 결정한다는 뜻입니다.
 
-2025년 우리는 모델의 능력에 홀렸습니다. 2026년 우리는 그 모델을 어떻게 울타리 치고, 지켜보면서, 되돌릴 수 있게 만드는지를 배우고 있습니다. AgentCore는 그 울타리의 한 버전이며 완벽하지 않고 모든 것을 커버하지도 않지만, 2026년 4월 현재 한 벤더가 일관된 제품군으로 하네스 엔지니어링의 인프라 항목을 이만큼 덮어내는 사례는 없습니다. Hashimoto의 정의를 다시 한 번 빌리면, 결국 에이전트를 프로덕션으로 보내는 결정적 역량은 모델이 아니라 그 모델을 감싼 **나머지 전부**에서 나옵니다. 그 나머지에 이름이 붙고 제품이 붙기 시작했다는 것이, 이 10개월의 진짜 변화입니다.
+2025년 우리는 모델의 능력에 홀렸습니다. 2026년 우리는 그 모델을 어떻게 울타리 치고, 지켜보면서, 되돌릴 수 있게 만드는지를 배우고 있습니다. AgentCore는 그 울타리의 한 버전이며 완벽하지 않고 모든 것을 커버하지도 않지만, 2026년 6월 현재 한 벤더가 일관된 제품군으로 하네스 엔지니어링의 인프라 항목을 이만큼 덮어내는 사례는 없습니다. Hashimoto의 정의를 다시 한 번 빌리면, 결국 에이전트를 프로덕션으로 보내는 결정적 역량은 모델이 아니라 그 모델을 감싼 **나머지 전부**에서 나옵니다. 그리고 이 글을 열며 적어 둔 그 작은 사건 — AWS가 매니지드 런타임에 `harness`라는 이름을 그대로 붙인 일 — 이 여기서 의미를 드러냅니다. 업계가 은유로 쓰던 "나머지 전부"가 콘솔에서 클릭하는 제품 이름이 되었다는 것은, 이 명제가 옳았다는 입증인 동시에 그것이 상품으로 굳어 가고 있다는 신호입니다. 모델이 아니라 하네스라는 말에 이제 이름과 가격표가 붙기 시작했다는 것이, 이 1년의 진짜 변화입니다.
 
 ---
 
@@ -457,56 +498,69 @@ AgentCore의 개별 서비스 중 그 자체로 새로운 것은 많지 않습�
 
 ### AWS 공식 문서·SDK
 
-1. [What is Amazon Bedrock AgentCore?](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) — 개발자 가이드 전반, 10개 서비스의 공식 정의·아키텍처·API 레퍼런스
-2. [Understanding Cedar policies](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-understanding-cedar.html) — Policy 모듈의 Cedar 사용 가이드
-3. [Runtime protocols](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-protocols.html) — MCP, A2A, AGUI 프로토콜 지원 상세
-4. [Example Cedar policies](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/example-policies.html) — permit/forbid 실전 예제
-5. [bedrock-agentcore (Python SDK)](https://github.com/aws/bedrock-agentcore-sdk-python) — 공식 오픈소스 SDK, Apache 2.0. `BedrockAgentCoreApp`·`@entrypoint` 데코레이터와 Memory/Gateway/Identity/Browser/Code Interpreter 클라이언트 제공
-6. [AgentCore SDK for Memory](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-sdk-memory.html) — `MemoryClient`·`create_event`·`retrieve_memories` 사용 가이드
+1. [What is Amazon Bedrock AgentCore?](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) — 개발자 가이드 전반, 전체 서비스의 공식 정의·아키텍처·API 레퍼런스
+2. [Release notes for Amazon Bedrock AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/release-notes.html) — 월별 공식 변경 이력(GA 전환·신규 기능의 1차 출처)
+3. [AgentCore regions](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html) — 컴포넌트별 리전 가용성 표(서울 포함)
+4. [Understanding Cedar policies](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-understanding-cedar.html) — Policy 모듈의 Cedar 사용 가이드
+5. [Use elicitation with your AgentCore gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-mcp-elicitation.html) — Gateway elicitation(HITL) 동작 상세
+6. [AgentCore harness](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html) · [harness vs Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness-vs-runtime.html) — harness 기능 정의와 Runtime과의 관계
+7. [Runtime protocols](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-protocols.html) — MCP, A2A, AGUI 프로토콜 지원 상세
+8. [Example Cedar policies](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/example-policies.html) — permit/forbid 실전 예제
+9. [bedrock-agentcore (Python SDK)](https://github.com/aws/bedrock-agentcore-sdk-python) — 공식 오픈소스 SDK, Apache 2.0. `BedrockAgentCoreApp`·`@entrypoint` 데코레이터와 Memory/Gateway/Identity/Browser/Code Interpreter 클라이언트 제공
+10. [AgentCore SDK for Memory](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-sdk-memory.html) — `MemoryClient`·`create_event`·`retrieve_memories` 사용 가이드
+11. [aws-cdk-lib AgentCore L2 constructs](https://github.com/aws/aws-cdk/releases/tag/v2.255.0) — CDK L2 컨스트럭트 stable 승격(v2.255.0, 2026.05)
+12. [AWS Services in Scope — SOC](https://aws.amazon.com/compliance/services-in-scope/SOC/) — AgentCore SOC 1·2·3 편입(2026.06)
 
-### AWS 블로그
+### AWS 블로그·What's New
 
-5. Danilo Poccia, [Introducing Amazon Bedrock AgentCore (Preview)](https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-agentcore-securely-deploy-and-operate-ai-agents-at-any-scale/), AWS News Blog, 2025.07
-6. Danilo Poccia, [Amazon Bedrock AgentCore adds quality evaluations and policy controls](https://aws.amazon.com/blogs/aws/amazon-bedrock-agentcore-adds-quality-evaluations-and-policy-controls-for-deploying-trusted-ai-agents/), AWS News Blog, 2025.12
-7. [Amazon Bedrock AgentCore is now generally available](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-is-now-generally-available/), AWS ML Blog, 2025.10
-8. [Introducing AgentCore Gateway](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-gateway-transforming-enterprise-ai-agent-tool-development/), AWS ML Blog, 2025.08
-9. [Introducing AgentCore Identity](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-identity-securing-agentic-ai-at-scale/), AWS ML Blog, 2025.08
-10. [Introducing AgentCore Browser Tool](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-browser-tool/), AWS ML Blog, 2025.08
-11. [Build reliable AI agents with AgentCore Evaluations](https://aws.amazon.com/blogs/machine-learning/build-reliable-ai-agents-with-amazon-bedrock-agentcore-evaluations/), AWS ML Blog, 2026.03
-12. [AI agents in enterprises: Best practices with AgentCore](https://aws.amazon.com/blogs/machine-learning/ai-agents-in-enterprises-best-practices-with-amazon-bedrock-agentcore/), AWS ML Blog, 2026.02 — 9가지 모범사례의 1차 출처
-13. [Build AI agents with AgentCore using CloudFormation](https://aws.amazon.com/blogs/machine-learning/build-ai-agents-with-amazon-bedrock-agentcore-using-aws-cloudformation/), AWS ML Blog, 2026.01
-14. [AWS Agent Registry now in preview](https://aws.amazon.com/blogs/machine-learning/the-future-of-managing-agents-at-scale-aws-agent-registry-now-in-preview/), AWS ML Blog, 2026.04
-15. [Accelerating sports content creation using agentic AI: PGA TOUR](https://aws.amazon.com/blogs/media/accelerating-sports-content-creation-usingagentic-ai-pga-tour/), AWS Media Blog, 2026.03
-16. [Reduce time-to-market for AI agents using SQL Server 2025 and AgentCore](https://aws.amazon.com/blogs/modernizing-with-aws/reduce-time-to-market-for-ai-agents-using-sql-server-2025-and-amazon-bedrock-agentcore/), AWS Modernizing Blog, 2026.04
+13. Danilo Poccia, [Introducing Amazon Bedrock AgentCore (Preview)](https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-agentcore-securely-deploy-and-operate-ai-agents-at-any-scale/), AWS News Blog, 2025.07
+14. Danilo Poccia, [Amazon Bedrock AgentCore adds quality evaluations and policy controls](https://aws.amazon.com/blogs/aws/amazon-bedrock-agentcore-adds-quality-evaluations-and-policy-controls-for-deploying-trusted-ai-agents/), AWS News Blog, 2025.12
+15. [Amazon Bedrock AgentCore is now generally available](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-is-now-generally-available/), AWS ML Blog, 2025.10
+16. [Introducing AgentCore Gateway](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-gateway-transforming-enterprise-ai-agent-tool-development/), AWS ML Blog, 2025.08
+17. [Introducing AgentCore Identity](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-identity-securing-agentic-ai-at-scale/), AWS ML Blog, 2025.08
+18. [Introducing AgentCore Browser Tool](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-bedrock-agentcore-browser-tool/), AWS ML Blog, 2025.08
+19. [Build reliable AI agents with AgentCore Evaluations](https://aws.amazon.com/blogs/machine-learning/build-reliable-ai-agents-with-amazon-bedrock-agentcore-evaluations/), AWS ML Blog, 2026.03
+20. [AI agents in enterprises: Best practices with AgentCore](https://aws.amazon.com/blogs/machine-learning/ai-agents-in-enterprises-best-practices-with-amazon-bedrock-agentcore/), AWS ML Blog, 2026.02 — 9가지 모범사례의 1차 출처
+21. [Build AI agents with AgentCore using CloudFormation](https://aws.amazon.com/blogs/machine-learning/build-ai-agents-with-amazon-bedrock-agentcore-using-aws-cloudformation/), AWS ML Blog, 2026.01
+22. [AWS Agent Registry now in preview](https://aws.amazon.com/blogs/machine-learning/the-future-of-managing-agents-at-scale-aws-agent-registry-now-in-preview/), AWS ML Blog, 2026.04 — AWS Agent Registry(프리뷰)의 1차 출처
+23. [Amazon Bedrock AgentCore harness is now generally available](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-harness-is-now-generally-available-go-from-idea-to-production-grade-agent-in-minutes/), AWS ML Blog, 2026.06 — "harness = 모델 외 나머지 전부를 두 API 호출 뒤에" 정의, Strands export·LiteLLM의 1차 출처
+24. [Introducing Amazon Bedrock Managed Knowledge Base](https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-managed-knowledge-base-for-faster-more-accurate-enterprise-ai-applications/), AWS News Blog, 2026.06 — 매니지드 RAG, Gateway 네이티브 타겟, 6 커넥터의 1차 출처
+25. [Announcing Web Search on Amazon Bedrock AgentCore](https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/), AWS News Blog, 2026.06 — zero-egress 웹 검색, 초기 버지니아 한정 GA
+26. [Agents that transact: Introducing AgentCore Payments (built with Coinbase and Stripe)](https://aws.amazon.com/blogs/machine-learning/agents-that-transact-introducing-amazon-bedrock-agentcore-payments-built-with-coinbase-and-stripe/), AWS ML Blog, 2026.05 — Payments(프리뷰), x402의 1차 출처
+27. [Introducing the Agent Performance Loop: AgentCore optimization](https://aws.amazon.com/blogs/machine-learning/introducing-the-agent-performance-loop-agentcore-optimization-now-in-preview/), AWS ML Blog, 2026.04(프리뷰); [New optimization capabilities now GA](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-new-optimization-capabilities/), What's New, 2026.06 — Recommendations·Batch Eval·A/B·Failure Insights
+28. [AgentCore Policy + Bedrock Guardrails generally available](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-policy-guardrails-generally-available/), What's New, 2026.06
+29. [Amazon Bedrock AgentCore now available in AWS GovCloud (US)](https://aws.amazon.com/about-aws/whats-new/2026/05/bedrock-agentcore-launch-aws-govcloud-us/), What's New, 2026.05
+30. [Accelerating sports content creation using agentic AI: PGA TOUR](https://aws.amazon.com/blogs/media/accelerating-sports-content-creation-usingagentic-ai-pga-tour/), AWS Media Blog, 2026.03
+31. [Reduce time-to-market for AI agents using SQL Server 2025 and AgentCore](https://aws.amazon.com/blogs/modernizing-with-aws/reduce-time-to-market-for-ai-agents-using-sql-server-2025-and-amazon-bedrock-agentcore/), AWS Modernizing Blog, 2026.04
 
 ### 실전 사례 자료
 
-17. Mission Cloud, [Building Enterprise AI Agents with AgentCore: Lessons from a Data Migration Chatbot](https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot), 2025.11
-18. re:Invent 2025 세션 AIM395, [Concept to Campaign: Marketing Agents on AgentCore (Epsilon)](https://dev.to/kazuya_dev/aws-reinvent-2025-concept-to-campaign-marketing-agents-on-amazon-bedrock-agentcore-aim395-55cl)
-19. re:Invent 2025 세션 AIM3310, [Agents in the Enterprise: Best Practices with AgentCore (Clearwater Analytics)](https://dev.to/kazuya_dev/aws-reinvent-2025-agents-in-the-enterprise-best-practices-with-amazon-bedrock-agentcore-aim3310-2m8a)
+32. Mission Cloud, [Building Enterprise AI Agents with AgentCore: Lessons from a Data Migration Chatbot](https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot), 2025.11
+33. re:Invent 2025 세션 AIM395, [Concept to Campaign: Marketing Agents on AgentCore (Epsilon)](https://dev.to/kazuya_dev/aws-reinvent-2025-concept-to-campaign-marketing-agents-on-amazon-bedrock-agentcore-aim395-55cl)
+34. re:Invent 2025 세션 AIM3310, [Agents in the Enterprise: Best Practices with AgentCore (Clearwater Analytics)](https://dev.to/kazuya_dev/aws-reinvent-2025-agents-in-the-enterprise-best-practices-with-amazon-bedrock-agentcore-aim3310-2m8a)
 
 ### 커뮤니티 분석
 
-20. Joud W. Awad, [AWS Bedrock AgentCore Deep Dive](https://joudwawad.medium.com/aws-bedrock-agentcore-deep-dive-6822e4071774), Medium, 2025.10 — 코드 레벨 패턴(MemoryHookProvider, `fork_conversation`)의 1차 참고
-21. Refactored.pro, [AWS re:Invent 2025: Bedrock AgentCore — The Trust Layer for Enterprise AI](https://www.refactored.pro/blog/2025/12/4/aws-reinvent-2025-bedrock-agentcorethe-deterministic-guardrails-that-make-autonomous-ai-safe-for-the-enterprise), 2025.12
-22. Kai Waehner, [Enterprise Agentic AI Landscape 2026](https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/), 2026.04 — 벤더 Lock-in 관점
-23. InfoWorld, [AWS targets AI agent sprawl with new Bedrock Agent Registry](https://www.infoworld.com/article/4157183/aws-targets-ai-agent-sprawl-with-new-bedrock-agent-registry.html), 2026.04
-24. Caylent, [Redefining Agent Infrastructure as Undifferentiated Heavy Lifting](https://caylent.com/blog/amazon-bedrock-agent-core-redefining-agent-infrastructure-as-undifferentiated-heavy-lifting)
+35. Joud W. Awad, [AWS Bedrock AgentCore Deep Dive](https://joudwawad.medium.com/aws-bedrock-agentcore-deep-dive-6822e4071774), Medium, 2025.10 — 코드 레벨 패턴(MemoryHookProvider, `fork_conversation`)의 1차 참고
+36. Refactored.pro, [AWS re:Invent 2025: Bedrock AgentCore — The Trust Layer for Enterprise AI](https://www.refactored.pro/blog/2025/12/4/aws-reinvent-2025-bedrock-agentcorethe-deterministic-guardrails-that-make-autonomous-ai-safe-for-the-enterprise), 2025.12
+37. Kai Waehner, [Enterprise Agentic AI Landscape 2026](https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/), 2026.04 — 벤더 Lock-in 관점
+38. InfoWorld, [AWS targets AI agent sprawl with new Bedrock Agent Registry](https://www.infoworld.com/article/4157183/aws-targets-ai-agent-sprawl-with-new-bedrock-agent-registry.html), 2026.04
+39. Caylent, [Redefining Agent Infrastructure as Undifferentiated Heavy Lifting](https://caylent.com/blog/amazon-bedrock-agent-core-redefining-agent-infrastructure-as-undifferentiated-heavy-lifting)
 
 ### 하네스 엔지니어링
 
-25. Mitchell Hashimoto, [*My AI Adoption Journey*](https://mitchellh.com/writing/my-ai-adoption-journey), 2026.02 — "하네스는 에이전트에서 모델을 뺀 나머지 전부" 정의의 출처
-26. OpenAI Engineering, [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/), 2026.02
-27. Martin Fowler & Birgitta Böckeler, [Harness Engineering for Coding Agent Users](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html), 2026.02
-28. Anthropic Engineering, [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), 2025.11
-29. Philipp Schmid, [The Importance of Agent Harness in 2026](https://www.philschmid.de/agent-harness-2026), 2026.01
+40. Mitchell Hashimoto, [*My AI Adoption Journey*](https://mitchellh.com/writing/my-ai-adoption-journey), 2026.02 — "하네스는 에이전트에서 모델을 뺀 나머지 전부" 정의의 출처
+41. OpenAI Engineering, [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/), 2026.02
+42. Martin Fowler & Birgitta Böckeler, [Harness Engineering for Coding Agent Users](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html), 2026.02
+43. Anthropic Engineering, [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), 2025.11
+44. Philipp Schmid, [The Importance of Agent Harness in 2026](https://www.philschmid.de/agent-harness-2026), 2026.01
 
 ### 보안·리스크
 
-30. Simon Willison, [The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/), 2025.06 — Epsilon 사례 분석의 이론적 프레임
-31. AuthZed, [A Timeline of MCP Security Breaches](https://authzed.com/blog/timeline-mcp-breaches), 2025
-32. Snyk, [Malicious MCP Server on npm: postmark-mcp](https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/), 2025.09 — Gateway Interceptor의 필요성을 드러낸 실제 공급망 공격 사례
+45. Simon Willison, [The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/), 2025.06 — Epsilon 사례 분석의 이론적 프레임
+46. AuthZed, [A Timeline of MCP Security Breaches](https://authzed.com/blog/timeline-mcp-breaches), 2025
+47. Snyk, [Malicious MCP Server on npm: postmark-mcp](https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/), 2025.09 — Gateway Interceptor의 필요성을 드러낸 실제 공급망 공격 사례
 
 ### 업계 조사
 
-33. McKinsey, [*The State of AI in 2025*](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai), 2025.11 — 62퍼센트 실험·25퍼센트 프로덕션 수치의 출처
+48. McKinsey, [*The State of AI in 2025*](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai), 2025.11 — 62퍼센트 실험·25퍼센트 프로덕션 수치의 출처
