@@ -72,11 +72,11 @@ lang: ko
 
 맥락을 붙이는 방식은 데이터가 어떤 모양인지에 따라 갈립니다. 셋을 먼저 한 표에 세워 두겠습니다 — 뒤에 나오는 절들이 각각 이 지도의 어느 칸을 파는지 미리 보일 겁니다.
 
-| 원천 데이터 | 형태의 예 | 맥락층 (어떻게 의미를 붙이나) | 이 글의 절 |
+| 무엇에 맥락을 붙이나 | 형태의 예 | 맥락층 (어떻게 의미를 붙이나) | 이 글의 절 |
 |-------------|-----------|------------------------------|-----------|
-| **정형** | 웨어하우스 테이블, 지표 | 시맨틱 레이어 — 지표·차원·조인을 인증된 정의로 | §5 |
-| **비정형** | 문서, 계약서, 로그 | 지식 그래프 / GraphRAG — 엔티티·관계로 | §4 |
-| **메타데이터** | 테이블·파일 목록, 소유자, 접근 권한, 계보(lineage) | 카탈로그 — 발견·거버넌스 | §6 |
+| **정형 데이터** | 웨어하우스 테이블, 지표 | 시맨틱 레이어 — 지표·차원·조인을 인증된 정의로 | §5 |
+| **비정형 데이터** | 문서, 계약서, 로그 | 지식 그래프 / GraphRAG — 엔티티·관계로 | §4 |
+| **그 둘에 관한 메타데이터** | 테이블·파일 목록, 소유자, 접근 권한, 계보(lineage) | 카탈로그 — 앞의 두 층을 찾게 하는 배관 | §6 |
 
 왼쪽 열은 이미 회사 안에 있는 것이고, 가운데 열이 그 위에 새로 얹어야 하는 것 — 이 글의 본체입니다. 갈래마다 얹는 게 다른 건 모자란 것이 다르기 때문입니다. 정형 데이터에는 이미 스키마가 있으니 없는 건 구조가 아니라 **계산의 약속**입니다. 무엇을 어떻게 세는가, 그걸 코드로 못 박는 게 시맨틱 레이어입니다. 반대로 비정형 데이터에는 애초에 구조가 없으니 문서에서 엔티티와 관계를 새로 뽑아내는 일부터 해야 하고, 그 산출물이 지식 그래프입니다.
 
@@ -91,8 +91,6 @@ lang: ko
 이 지도에서 지난 20년과 달라진 칸은 하나뿐입니다 — 맨 위, 맥락을 받아 쓰는 자리입니다. 셋 다 새 이름이 아닙니다 — 시맨틱 웹 구상이 2001년, knowledge graph라는 말이 산업에 퍼진 게 2012년(§1.2), 카탈로그는 데이터 웨어하우스와 함께 자란 개념입니다. 바뀐 건 그것들이 무엇에게 말을 거는가입니다.
 
 ### 2.2 왜 지금인가 — 종착점이 사람에서 에이전트로
-
-종착점이 바뀐 게 왜 손익분기선을 움직이나. §1.2에서 약속한 두 입력값 중 **가치** 쪽이 여기서 오릅니다(**비용** 쪽은 §4.4에서 숫자로 봅니다).
 
 판을 바꾼 건 **에이전트 전환**입니다. 챗봇 시대에는 사람이 LLM의 답을 받아 보고 이상하면 걸렀습니다. 에이전트 시대에는 LLM이 스스로 데이터를 조회하고, 그 결과로 다음 행동을 정하고, 또 조회하는 자율 루프를 돕니다. 중간에 사람이 없습니다. [2025년 초 발표된 "Agentic RAG" 서베이](https://arxiv.org/abs/2501.09136)는 이 전환을 정적 검색에서 에이전트 주도 검색으로의 이동으로 정리하며, reflection·planning·tool use·multi-agent collaboration 네 패턴으로 검색을 동적으로 관리한다고 분석합니다. 이게 맥락의 가치를 끌어올리는 지점입니다 — 만약 에이전트가 `revenue`를 총매출로 오해해 SQL을 짜면, 그 틀린 숫자가 검수 없이 다음 단계(예: 예산 재배정 실행)로 흘러갑니다. 맥락이 데이터에 붙어 있지 않으면 오해가 복리로 증폭됩니다.
 
@@ -213,13 +211,11 @@ _:r :출처 :인사시스템 .                          # 그 표지에 출처�
 
 `_:r`은 이름을 안 붙인 임시 노드이고, `rdf:reifies`가 "이 노드는 저 사실을 가리킨다"는 뜻의 서술어입니다. 그러니 주어 자리에 앉은 것은 사실 자체가 아니라 **그 사실을 가리키는 표지**이고, 명세는 이 표지를 **reifier**라 부릅니다. 다만 고전 방식과 달리 사실을 세 조각으로 분해하지 않고 `<<( )>>` 안에 문장 그대로 담아 둡니다 — 새로 만드는 건 표지 하나뿐입니다.
 
-**영수증 번호**로 생각하면 편합니다. 물건에 메모를 직접 붙이는 게 아니라 번호표를 발급하고 메모는 번호에 적는 방식입니다. 왜 한 단계를 두나 — "김 대리는 결제팀 소속"이 참인지와 "인사 시스템이 그렇게 말한다"가 참인지는 별개이기 때문입니다. 번호를 거치면 후자만 기록하면서 전자에 대한 판단은 유보할 수 있고, 실제로 명세는 triple term이 가리키는 사실이 그래프에서 주장된(asserted) 것일 수도 아닐 수도 있다고 못 박습니다. triple term이 사실상 `rdf:reifies`의 목적어로만 쓰이는 관행(*"generally restricted to be used only as the object of a triple using the rdf:reifies predicate"* — 문법적으로는 어느 트리플의 목적어 자리에도 놓일 수 있지만, 그렇게 쓰는 게 일반적이라는 뜻입니다)도 이 설계에서 따라옵니다.
+왜 표지를 한 단계 두는가 — "김 대리는 결제팀 소속"이 참인지와 "인사 시스템이 그렇게 말한다"가 참인지는 별개이기 때문입니다. 표지를 거치면 후자만 기록하면서 전자에 대한 판단은 유보할 수 있고, 실제로 명세는 triple term이 가리키는 사실이 그래프에서 주장된(asserted) 것일 수도 아닐 수도 있다고 못 박습니다.
 
 참고로 용어 하나는 걸러 둬야 합니다. 위에서 본 옛 방식(`rdf:Statement`·`rdf:subject` 네 어휘)도 이름이 **reification**이고, 지금 설명한 RDF 1.2의 방식도 같은 이름을 씁니다. 그런데 둘은 다른 것입니다 — Turtle 1.2 명세도 주석(Note)으로 *"Reification in RDF 1.2 is a concept distinct from the Reification vocabulary originally defined in RDF Semantics"*라고 짚어 둡니다. 검색하면 지난 20년치 자료가 먼저 나오고 거기서 "RDF reification"은 대개 옛 어휘를 뜻하니, "reification은 트리플이 부풀고 쿼리가 지저분해진다"는 오래된 불평을 새 문법에 그대로 옮겨 읽으면 정확히 거꾸로 이해하게 됩니다. 새 쪽은 그 불평을 없애려고 나온 것입니다.
 
-번호표에 직접 이름을 붙이려면 `~` 뒤에 적으면 됩니다 — `<< :김대리 :소속 :결제팀 ~ :주장1 >>`. 생략하면 매번 새 익명 노드가 발급되는데, 여기서 실무 함정이 하나 나옵니다. 같은 사실을 인사 시스템과 전화번호부가 각각 인용하면 번호표가 둘로 갈려, 한 사실에 대한 두 증언이 아니라 서로 무관한 두 주장으로 남습니다. 여러 출처를 한 사실에 모으려면 번호표에 이름을 붙여 공유해야 합니다.
-
-실무 적용에는 단서가 붙습니다. 성숙도가 문서마다 다릅니다 — 개념을 정의한 RDF 1.2 Concepts는 Candidate Recommendation(2026년 4월 7일)이지만, 위 코드가 따르는 [Turtle 1.2](https://www.w3.org/TR/rdf12-turtle/)는 아직 Working Draft(2026년 7월 23일)로 스스로 "작업 중인 문서로 인용하는 것은 부적절하다"고 적어 둡니다. CR도 최종 권고가 아니니, 지금 이 문법을 쓰려면 제품별 지원 범위를 먼저 확인해야 합니다. 그래도 방향은 분명합니다 — 어떤 사실이 어디서 왔는지를 그래프가 스스로, 그리고 깔끔하게 말할 수 있게 되는 것. LLM에게 근거를 요구하는 시대에 이건 장식이 아니라 필수 기능입니다.
+실무 적용에는 단서가 붙습니다. 성숙도가 문서마다 다릅니다 — 개념을 정의한 RDF 1.2 Concepts는 Candidate Recommendation(2026년 4월 7일)이지만, 위 코드가 따르는 [Turtle 1.2](https://www.w3.org/TR/rdf12-turtle/)는 아직 Working Draft(2026년 7월 23일)로 스스로 "작업 중인 문서로 인용하는 것은 부적절하다"고 적어 둡니다. CR도 최종 권고가 아니니, 지금 이 문법을 쓰려면 제품별 지원 범위를 먼저 확인해야 합니다 — 표지에 이름을 붙이는 문법(`~`)까지 지원하는지도 함께 봐야 합니다. 이름을 안 붙이면 익명 표지가 매번 새로 생겨서, 같은 사실을 두 출처가 인용할 때 서로 무관한 두 주장으로 남습니다. 그래도 방향은 분명합니다 — 어떤 사실이 어디서 왔는지를 그래프가 스스로, 그리고 깔끔하게 말할 수 있게 되는 것. LLM에게 근거를 요구하는 시대에 이건 장식이 아니라 필수 기능입니다.
 
 ### 3.4 왜 이렇게까지 하나 — FAIR와 온톨로지 공학
 
@@ -249,24 +245,36 @@ _:r :출처 :인사시스템 .                          # 그 표지에 출처�
   <img src="/assets/images/vector-vs-graphrag.png" alt="벡터 RAG와 GraphRAG의 대조. 왼쪽 벡터 RAG는 '베를린 출시 지연을 유발한 공급사는?'이라는 두 홉 질문에서 다섯 조각 중 유사도가 높은 둘(공급사 메모, 출시 회고)만 회수하고, 정작 두 조각을 잇는 'part spec 88 rev.C' 조각은 순위가 밀려 회수되지 않는다(NOT hit). 오른쪽 GraphRAG는 벡터 검색으로 Acme Corp 노드에 진입한 뒤 SUPPLIES, USED_IN 두 관계를 순회해 part 88을 거쳐 Berlin launch에 도달하고, 그 경로 자체가 근거가 된다." />
 </a>
 
-그런데 Microsoft 자신이 붙인 단서를 짚어야 합니다 — [Microsoft는](https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/) GraphRAG가 **포괄성(comprehensiveness)·근거 제시(human enfranchisement)·다양성(diversity) 세 지표에서 baseline RAG를 "일관되게 앞선다(consistently outperforms)"**면서도, SelfCheckGPT로 절대 측정한 **충실성(faithfulness)에서는 "baseline RAG와 비슷한 수준(a similar level of faithfulness)"**이라고 적었습니다. 앞의 세 지표는 LLM 채점자가 두 답변을 짝지어 비교한 결과라는 점도 같은 글에 밝혀져 있습니다. 이 대조가 핵심입니다 — 짝비교는 "둘 중 어느 답이 나은가"만 재고, 절대 측정은 답 하나를 놓고 근거와 어긋나는 진술이 몇 개인지 셉니다(SelfCheckGPT가 후자 계열 도구입니다). 그래서 앞선 세 지표의 승률은 상대 우위일 뿐이고, 절대치로 잰 충실성은 제자리였습니다. 읽어야 할 대목은 강점의 위치입니다 — 앞선 세 지표는 "이 방대한 코퍼스가 무슨 얘길 하는가"류의 전역 질문에서 재는 것이고, 국소 사실 하나를 정확히 집어 오는 능력은 그 셋에 들어 있지 않습니다. 어느 쪽이 어떤 질의에서 이기는지는 §7.5에서 독립 평가 숫자로 따지겠습니다. 여기서는 이 정도만 확정해 두면 됩니다 — 그래프는 벡터를 대체하는 물건이 아니라, 관계가 답의 일부일 때 얹는 보강재입니다.
+그런데 Microsoft 자신이 붙인 단서를 짚어야 합니다 — [Microsoft는](https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/) GraphRAG가 **포괄성(comprehensiveness)·근거 제시(human enfranchisement)·다양성(diversity) 세 지표에서 baseline RAG를 "일관되게 앞선다(consistently outperforms)"**면서도, SelfCheckGPT로 절대 측정한 **충실성(faithfulness)에서는 "baseline RAG와 비슷한 수준(a similar level of faithfulness)"**이라고 적었습니다. 앞의 세 지표는 LLM 채점자가 두 답변을 짝지어 비교한 결과라는 점도 같은 글에 밝혀져 있습니다.
+
+이 대조가 핵심입니다 — 짝비교는 "둘 중 어느 답이 나은가"만 재고, 절대 측정은 답 하나를 놓고 근거와 어긋나는 진술이 몇 개인지 셉니다(SelfCheckGPT가 후자 계열 도구입니다). 그래서 앞선 세 지표의 승률은 상대 우위일 뿐이고, 절대치로 잰 충실성은 제자리였습니다. 읽어야 할 대목은 강점의 위치입니다 — 앞선 세 지표는 "이 방대한 코퍼스가 무슨 얘길 하는가"류의 전역 질문에서 재는 것이고, 국소 사실 하나를 정확히 집어 오는 능력은 그 셋에 들어 있지 않습니다. 어느 쪽이 어떤 질의에서 이기는지는 §7.5에서 독립 평가 숫자로 따지겠습니다. 여기서는 이 정도만 확정해 두면 됩니다 — 그래프는 벡터를 대체하는 물건이 아니라, 관계가 답의 일부일 때 얹는 보강재입니다.
 
 ### 4.2 공통 파이프라인과 관리형 극단
 
 그 전에 결정적인 구분을 하나 해 두겠습니다 — **고전적 지식 그래프와 요즘 GraphRAG는 그래프를 만드는 주체가 다릅니다.** §3에서 다룬 온톨로지 기반 지식 그래프는 사람(지식 엔지니어)이 먼저 스키마를 설계합니다. "고객이라는 개념은 이런 속성과 관계를 갖는다"를 손으로 정의하고, 데이터를 그 틀에 채웁니다. 반면 요즘 GraphRAG는 그 설계 단계를 건너뜁니다 — 사전 온톨로지 없이 LLM이 문서를 읽으며 엔티티와 관계를 **기계적으로 뽑아내** 그래프를 즉석에서 만듭니다. 이게 GraphRAG를 값싸고 빠르게 만든 핵심(§4.4)인 동시에, §7.4에서 볼 불안정성의 근원이기도 합니다. 사람이 설계한 온톨로지는 일관되지만 비싸고, LLM이 뽑은 그래프는 값싸지만 들쭉날쭉합니다. 아래 다섯 단계는 이 LLM 자동 구축 방식을 기준으로 한 것입니다.
 
-어느 방법을 쓰든 비정형→그래프 파이프라인의 뼈대는 같은 다섯 단계입니다. 단계마다 고유한 함정이 있으니 하나씩 짚어 두겠습니다 — 뒤(§7)의 실패 모드가 어디서 터지는지 예고됩니다.
+어느 방법을 쓰든 비정형→그래프 파이프라인의 뼈대는 같은 다섯 단계입니다.
 
-먼저 **청킹(chunking)** — 문서를 적당한 크기 조각으로 나눕니다. 너무 잘게 나누면 한 문장의 주어와 술어가 다른 조각으로 흩어지고, 너무 크게 나누면 조각 하나에 잡음이 섞입니다. 다음이 **추출(extraction)** — LLM으로 각 조각에서 엔티티와 관계를 뽑습니다. 여기가 가장 취약한 지점으로, 같은 문서를 줘도 모델마다 다른 그래프가 나옵니다 — §7.4에서 그 편차를 연결성 지표로 재 봅니다. 세 번째가 **엔티티 해소(entity resolution)** — "Apple", "애플", "Apple Inc."가 같은 실체임을 판정해 하나의 노드로 합치는 작업입니다. 이걸 못 하면 같은 회사가 세 노드로 쪼개져 관계가 흩어집니다. 네 번째가 **커뮤니티 탐지(community detection)** — 그래프에서 서로 촘촘히 연결된 노드 무리를 자동으로 찾아내는 알고리즘입니다. Microsoft GraphRAG는 [계층적 Leiden 알고리즘](https://microsoft.github.io/graphrag/index/default_dataflow/)을 씁니다("we generate a hierarchy of entity communities using the Hierarchical Leiden Algorithm"). [Leiden](https://www.nature.com/articles/s41598-019-41695-z)은 Louvain의 개선판으로, 엣지 밀도를 재는 modularity를 최대화하며 노드를 무리로 묶은 뒤, 그 무리를 다시 상위 무리로 접어 넣어 여러 층위를 만듭니다. 찾아낸 무리마다 요약을 미리 생성해 두는 게 §4.1의 GraphRAG가 전역 질문에 답하는 재료입니다. 마지막이 **검색(retrieval)** — 질의 시점에 벡터 검색으로 진입점을 찾고 그 이웃 그래프를 순회합니다. 이 다섯 단계가 파이프라인의 공통 뼈대이고, 관리형·오픈소스·자체 구축은 이 뼈대의 **어디까지를 대신 해 주느냐**로 갈립니다.
+- **청킹(chunking)** — 문서를 적당한 크기 조각으로 나눕니다. 너무 잘게 나누면 한 문장의 주어와 술어가 다른 조각으로 흩어지고, 너무 크게 나누면 조각 하나에 잡음이 섞입니다.
+- **추출(extraction)** — LLM으로 각 조각에서 엔티티와 관계를 뽑습니다. 여기가 가장 취약한 지점으로, 같은 문서를 줘도 모델마다 다른 그래프가 나옵니다(§7.4에서 그 편차를 연결성 지표로 재 봅니다).
+- **엔티티 해소(entity resolution)** — "Apple", "애플", "Apple Inc."가 같은 실체임을 판정해 하나의 노드로 합칩니다. 이걸 못 하면 같은 회사가 세 노드로 쪼개져 관계가 흩어집니다.
+- **커뮤니티 탐지(community detection)** — 서로 촘촘히 연결된 노드 무리를 자동으로 찾아냅니다. 찾아낸 무리마다 요약을 미리 생성해 두는 게 §4.1의 GraphRAG가 전역 질문에 답하는 재료입니다.
+- **검색(retrieval)** — 질의 시점에 벡터 검색으로 진입점을 찾고 그 이웃 그래프를 순회합니다.
 
-같은 뼈대를 학계 쪽 어휘로 그린 지도가 Peng et al. 서베이의 그림입니다. 인덱싱(G-Indexing) → 검색(G-Retrieval) → 생성(G-Generation)의 흐름 사이에, 검색 결과를 노드·트리플·경로·부분그래프 중 무엇으로 뽑고 그걸 어떤 형식으로 LLM에 넣을지가 별도 축으로 놓여 있습니다 — §4.4에서 볼 LightRAG·PathRAG의 차이가 정확히 이 축에서 갈립니다.
+이 다섯이 파이프라인의 공통 뼈대이고, 관리형·오픈소스·자체 구축은 이 뼈대의 **어디까지를 대신 해 주느냐**로 갈립니다.
+
+네 번째 단계만 알고리즘 이름을 하나 짚어 두겠습니다. Microsoft GraphRAG는 [계층적 Leiden](https://microsoft.github.io/graphrag/index/default_dataflow/)을 씁니다("we generate a hierarchy of entity communities using the Hierarchical Leiden Algorithm"). [Leiden](https://www.nature.com/articles/s41598-019-41695-z)은 무리를 가르는 기준으로 **모듈도(modularity)**를 씁니다 — 무리 안의 엣지가 무리 밖보다 얼마나 촘촘한지를 재는 값이고, 이 값이 커지는 방향으로 노드를 묶습니다. 그렇게 만든 무리를 다시 상위 무리로 접어 넣어 여러 층위를 만드는 게 "계층적"의 뜻입니다.
+
+같은 뼈대를 학계 쪽 어휘로 그린 지도가 Peng et al. 서베이의 그림입니다. 인덱싱·검색·생성 사이에 축이 하나 더 놓여 있다는 게 요점입니다 — 검색 결과를 노드·트리플·경로·부분그래프 중 무엇으로 뽑을 것인가. §4.4에서 볼 LightRAG·PathRAG의 차이가 정확히 이 축에서 갈립니다.
 
 <a href="https://arxiv.org/abs/2408.08921" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: GraphRAG 파이프라인의 학계 지도 — G-Indexing에서 G-Retrieval, 그리고 그래프 표현 형식을 거쳐 G-Generation으로 (출처: Peng et al., Graph Retrieval-Augmented Generation: A Survey, 2024, Figure 2)">
   <img src="https://arxiv.org/html/2408.08921v2/x2.png" alt="GraphRAG 파이프라인 도식. 왼쪽 아래 Graph Database와 G-Indexing에서 시작해 위쪽 G-Retrieval(질의 확장·분해, 검색기, 병합·가지치기)로 올라가고, 가운데 Retrieval Results 열에 노드·트리플·경로·부분그래프·혼합이 나열되며, Graph Format 열은 인접 테이블·자연어·코드 형태·구문 트리·노드 시퀀스·그래프 임베딩 중 하나로 변환한 뒤 오른쪽 G-Generation의 생성 전·중·후 보강 단계로 이어져 최종 응답을 만든다." />
 </a>
 
 
-가장 손이 덜 가는 극단이 관리형입니다. [Amazon Bedrock Knowledge Bases의 GraphRAG](https://aws.amazon.com/blogs/machine-learning/announcing-general-availability-of-amazon-bedrock-knowledge-bases-graphrag-with-amazon-neptune-analytics/)는 2025년 3월 정식 출시됐고 Amazon Neptune Analytics 위에서 돕니다. 문서를 넣으면 그래프 모델링 전문성 없이 임베딩과 엔티티/관계 그래프를 자동 생성합니다. 내부 동작은 [AWS ML 블로그의 구축 가이드](https://aws.amazon.com/blogs/machine-learning/build-graphrag-applications-using-amazon-bedrock-knowledge-bases/)가 풀어 설명합니다 — `ExtractChunkEntity` 단계가 LLM으로 각 조각의 엔티티를 뽑아 chunk·document·entity **세 가지 노드 타입**("The system creates three types of nodes: chunk, document, and entity")으로 저장하고, 질의 시점에 벡터 검색으로 top-k 조각을 찾은 뒤 그 이웃 그래프를 순회합니다. 임베딩 모델은 Titan Text Embeddings v2를 골랐다고 밝힙니다. 구체적인 구성 수치는 [정식 출시 공지](https://aws.amazon.com/blogs/machine-learning/announcing-general-availability-of-amazon-bedrock-knowledge-bases-graphrag-with-amazon-neptune-analytics/)(2025년 3월 7일)에 있는데, 따라 하기 전제조건으로 Claude 3 Haiku(`anthropic.claude-3-haiku-20240307-v1:0`)와 임베딩 모델의 접근 권한을 켜라고 안내하고(블로그는 이 모델의 용도를 특정하지 않습니다), 예시 구성의 Neptune Analytics 비용을 "시간당 약 $0.48"로 적어 둡니다. 다만 AWS가 내세우는 문구 — "그래프 모델링 전문성 없이 생성형 AI 애플리케이션의 정확도를 높인다(boost the accuracy of generative AI applications without any graph modeling expertise)" — 는 **AWS 자신의 서술이지 독립 벤치마크가 아닙니다.**
+가장 손이 덜 가는 극단이 관리형입니다. [Amazon Bedrock Knowledge Bases의 GraphRAG](https://aws.amazon.com/blogs/machine-learning/announcing-general-availability-of-amazon-bedrock-knowledge-bases-graphrag-with-amazon-neptune-analytics/)는 2025년 3월 정식 출시됐고 Amazon Neptune Analytics 위에서 돕니다. 문서를 넣으면 그래프 모델링 전문성 없이 임베딩과 엔티티/관계 그래프를 자동 생성합니다. 내부 동작은 [AWS ML 블로그의 구축 가이드](https://aws.amazon.com/blogs/machine-learning/build-graphrag-applications-using-amazon-bedrock-knowledge-bases/)가 풀어 설명합니다 — `ExtractChunkEntity` 단계가 LLM으로 각 조각의 엔티티를 뽑아 chunk·document·entity **세 가지 노드 타입**("The system creates three types of nodes: chunk, document, and entity")으로 저장하고, 질의 시점에 벡터 검색으로 top-k 조각을 찾은 뒤 그 이웃 그래프를 순회합니다. 임베딩 모델은 Titan Text Embeddings v2를 골랐다고 밝힙니다.
+
+[정식 출시 공지](https://aws.amazon.com/blogs/machine-learning/announcing-general-availability-of-amazon-bedrock-knowledge-bases-graphrag-with-amazon-neptune-analytics/)(2025년 3월 7일)는 예시 구성의 Neptune Analytics 비용을 "시간당 약 $0.48"로 적어 둡니다. 다만 AWS가 내세우는 문구는 **AWS 자신의 서술이지 독립 벤치마크가 아닙니다** — "그래프 모델링 전문성 없이 생성형 AI 애플리케이션의 정확도를 높인다(boost the accuracy of generative AI applications without any graph modeling expertise)".
 
 AWS 블로그에 실린 구성도가 이 관리형의 경계를 그대로 보여 줍니다 — 점선 상자로 묶인 "Graph Knowledge Base (managed by Amazon Bedrock)" 안쪽, 즉 청킹·임베딩·엔티티 추출과 그래프 저장이 전부 서비스 몫입니다. 사용자가 만지는 건 상자 밖의 S3 적재와 질의뿐입니다.
 
@@ -279,15 +287,19 @@ AWS 블로그에 실린 구성도가 이 관리형의 경계를 그대로 보여
 
 관리형의 대가는 제어권입니다. 청킹은 그래도 열려 있습니다 — 같은 AWS 블로그가 "고정 크기부터 LLM 기반까지 고를 수 있는(you can choose between basic fixed-size chunking to more complex LLM-based chunking mechanisms)" 방식이라고 적습니다. 반면 그 뒤 단계를 사용자가 조정하는 수단은 문서에 나오지 않습니다 — 엔티티를 뽑는 `ExtractChunkEntity`의 추출 모델도, chunk·document·entity 3종으로 고정된 그래프 스키마도 바꾸는 방법이 안내되지 않습니다. 도메인 온톨로지를 강제하거나 추출을 도메인 사전으로 통제하려면 오픈소스로 내려와야 합니다.
 
-중간지대에 오픈소스 툴킷이 있습니다. [AWS Labs의 GraphRAG Toolkit](https://aws.amazon.com/blogs/database/introducing-the-graphrag-toolkit/)(2025년 1월)은 비정형 텍스트에서 `LexicalGraphIndex`로 그래프와 벡터 인덱스를 한 번에 만들고, `TraversalBasedRetriever`(그래프 순회)와 `SemanticGuidedRetriever`(의미 검색 + 순회 혼합) 두 검색 전략을 골라 쓰게 하며, Neptune(그래프)·OpenSearch Serverless(벡터)·Bedrock(LLM) 위에 graph-enhanced RAG를 조립합니다. [현재 레포](https://github.com/awslabs/graphrag-toolkit)는 여기에 BYOKG-RAG(Bring Your Own Knowledge Graph) — 이미 가진 지식 그래프에 질의응답을 얹는 컴포넌트 — 가 더해져 둘로 나뉘어 있습니다. 제어권을 되찾는 대가가 무엇인지는 이 툴킷의 데이터 모델을 보면 실감이 납니다 — 관리형의 chunk·document·entity 세 종류 대신, Source·Chunk·Topic·Statement·Fact·Entity 여섯 종류와 `EXTRACTED_FROM`·`BELONGS_TO`·`SUPPORTS`·`SUBJECT`/`OBJECT` 같은 관계까지 사용자가 이해하고 관리해야 합니다. 문장 단위 Statement와 그것을 떠받치는 Fact를 분리해 둔 덕에 답의 근거를 원문 조각까지 되짚을 수 있는데, 그 추적성이 곧 스키마 복잡도입니다.
+중간지대에 오픈소스 툴킷이 있습니다. [AWS Labs의 GraphRAG Toolkit](https://aws.amazon.com/blogs/database/introducing-the-graphrag-toolkit/)(2025년 1월)은 비정형 텍스트에서 `LexicalGraphIndex`로 그래프와 벡터 인덱스를 한 번에 만들고, `TraversalBasedRetriever`(그래프 순회)와 `SemanticGuidedRetriever`(의미 검색 + 순회 혼합) 두 검색 전략을 골라 쓰게 하며, Neptune(그래프)·OpenSearch Serverless(벡터)·Bedrock(LLM) 위에 graph-enhanced RAG를 조립합니다. [현재 레포](https://github.com/awslabs/graphrag-toolkit)는 여기에 이미 가진 지식 그래프에 질의응답을 얹는 BYOKG-RAG(Bring Your Own Knowledge Graph)가 더해져 둘로 나뉘어 있습니다.
+
+이름을 이렇게 늘어놓은 이유가 있습니다. 제어권을 되찾는 대가가 무엇인지는 이 툴킷의 데이터 모델을 보면 실감이 납니다 — 관리형의 chunk·document·entity 세 종류 대신, Source·Chunk·Topic·Statement·Fact·Entity 여섯 종류와 `EXTRACTED_FROM`·`BELONGS_TO`·`SUPPORTS`·`SUBJECT`/`OBJECT` 같은 관계까지 사용자가 이해하고 관리해야 합니다. 문장 단위 Statement와 그것을 떠받치는 Fact를 분리해 둔 덕에 답의 근거를 원문 조각까지 되짚을 수 있는데, 그 추적성이 곧 스키마 복잡도입니다.
 
 <a href="https://aws.amazon.com/blogs/database/introducing-the-graphrag-toolkit/" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 제어권의 가격표 — 관리형의 노드 3종 대신 Source·Chunk·Topic·Statement·Fact·Entity 6종과 그 사이 관계를 직접 다뤄야 한다 (출처: AWS Database Blog, Introducing the GraphRAG Toolkit, 2025 — AWS 자체 자료)">
   <img src="https://d2908q01vomqb2.cloudfront.net/887309d048beef83ad3eabf2a79a64a389ab1c9f/2025/01/14/DBBLOG-4573-datamodel.png" alt="graphrag-toolkit의 렉시컬 그래프 데이터 모델. 맨 위 Source에 여러 Chunk가 EXTRACTED_FROM으로 매달리고 Chunk끼리 NEXT·PREVIOUS로 이어진다. 가운데 Topic이 MENTIONED_IN으로 Chunk를 가리키고, 아래 Statement들이 BELONGS_TO로 Topic에 붙는다. 맨 아래 Entity들이 SUBJECT·OBJECT·RELATION으로 Fact를 이루고, Fact가 SUPPORTS로 Statement를 떠받친다." />
 </a>
 
-여기서 잠깐 필자의 것을 홍보하자면 — 필자가 만든 [Unified Knowledge Graph RAG on AWS](https://github.com/awslabs/unified-kg-rag-on-aws)도 이 계열입니다. Microsoft GraphRAG와 LightRAG를 단일 AWS 스택(Bedrock·Neptune·OpenSearch·S3)에서 통합해 벡터·BM25·그래프 3중 하이브리드 검색과 증분 인덱싱을 제공하는데, 두 방법론을 같은 인프라 위에서 직접 비교하고 질의 특성에 따라 골라 쓰라는 발상입니다.
+여기서 잠깐 필자의 것을 홍보하자면 — 필자가 만든 [Unified Knowledge Graph RAG on AWS](https://github.com/awslabs/unified-kg-rag-on-aws)도 이 계열입니다. Microsoft GraphRAG와 LightRAG를 단일 AWS 스택(Bedrock·Neptune·OpenSearch·S3)에서 통합해 벡터·BM25(단어 빈도 기반 고전 검색 점수)·그래프 3중 하이브리드 검색과 증분 인덱싱을 제공하는데, 두 방법론을 같은 인프라 위에서 직접 비교하고 질의 특성에 따라 골라 쓰라는 발상입니다.
 
-자체 구축 극단에서는 그래프 저장소를 직접 운영합니다. [Amazon Neptune](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/neptune-analytics-vs-neptune-database.html)만 해도 성격이 다른 셋이 있어 혼동하기 쉽습니다 — **Neptune Database**는 운영·트랜잭션용(초당 최대 10만 쿼리, 소셜·사기탐지·Customer 360), **Neptune Analytics**는 분석용 인메모리 엔진(수백억 관계, GraphRAG가 얹히는 곳), **[Neptune ML](https://docs.aws.amazon.com/neptune/latest/userguide/machine-learning.html)**은 GNN(graph neural network, 그래프 신경망 — 노드의 이웃 정보를 학습해 아직 없는 엣지를 확률로 채우는 모델)으로 링크를 예측합니다(약물-질병 그래프에서 'Aspirin' + 'treats' → 'heart disease' 예측). 최근 Neptune Analytics는 [그래프와 벡터를 한 openCypher 쿼리로](https://aws.amazon.com/blogs/database/improving-generative-ai-accuracy-with-vector-and-graph-search-hybrid-queries/) 다루도록 벡터 저장을 엔진 안으로 들였습니다("you can run both graph traversals and vector similarity searches in the same query"). AWS 문서가 말하는 것은 여기까지이고, 이게 실무에서 무엇을 덜어 주는지는 필자의 해석입니다 — 벡터 DB와 그래프 DB를 따로 두면 둘을 항상 같은 상태로 맞추는 동기화 코드가 따라붙는데, 한쪽에만 저장하면 그 코드가 사라집니다.
+자체 구축 극단에서는 그래프 저장소를 직접 운영합니다. [Amazon Neptune](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/neptune-analytics-vs-neptune-database.html)만 해도 성격이 다른 셋이 있어 혼동하기 쉽습니다 — **Neptune Database**는 운영·트랜잭션용(초당 최대 10만 쿼리, 소셜·사기탐지·Customer 360), **Neptune Analytics**는 분석용 인메모리 엔진(수백억 관계, GraphRAG가 얹히는 곳), **[Neptune ML](https://docs.aws.amazon.com/neptune/latest/userguide/machine-learning.html)**은 GNN(graph neural network, 그래프 신경망 — 노드의 이웃 정보를 학습해 아직 없는 엣지를 확률로 채우는 모델)으로 링크를 예측합니다(약물-질병 그래프에서 'Aspirin' + 'treats' → 'heart disease' 예측).
+
+최근 Neptune Analytics는 [그래프와 벡터를 한 openCypher 쿼리로](https://aws.amazon.com/blogs/database/improving-generative-ai-accuracy-with-vector-and-graph-search-hybrid-queries/) 다루도록 벡터 저장을 엔진 안으로 들였습니다("you can run both graph traversals and vector similarity searches in the same query"). AWS 문서가 말하는 것은 여기까지이고, 이게 실무에서 무엇을 덜어 주는지는 필자의 해석입니다 — 벡터 DB와 그래프 DB를 따로 두면 둘을 항상 같은 상태로 맞추는 동기화 코드가 따라붙는데, 한쪽에만 저장하면 그 코드가 사라집니다.
 
 이 스펙트럼에서 어디를 고를지는 결국 세 질문으로 압축됩니다 — 도메인 온톨로지를 강제해야 하는가(그렇다면 관리형 탈락), 그래프를 운영할 전담 역량이 있는가(없다면 자체 구축 탈락), 그리고 얼마나 빨리 가치를 증명해야 하는가(급하면 관리형). 대부분의 팀에게 합리적인 출발점은 관리형이나 오픈소스 툴킷으로 빠르게 프로토타입을 세워 "그래프가 우리 문제에 실제로 값을 하는가"부터 확인하는 것입니다 — §7에서 볼 실패 모드들이 대부분 이 검증 없이 자체 구축으로 직행한 프로젝트에서 터지기 때문입니다.
 
@@ -317,7 +329,9 @@ AWS 블로그에 실린 구성도가 이 관리형의 경계를 그대로 보여
 
 LazyGraphRAG의 발상을 조금 더 풀어 보면 왜 이게 통하는지 보입니다. 풀 GraphRAG는 "혹시 물어볼지 모르는 모든 것"에 대비해 인덱싱 시점에 코퍼스 전체를 LLM으로 정제해 둡니다 — 손님이 무엇을 주문할지 모르니 아침에 모든 메뉴의 재료를 다 손질해 두는 주방과 같습니다. 대부분은 그날 팔리지 않습니다. LazyGraphRAG는 이 선불 투자를 거부하고, 값싼 NLP로 목차만 잡아 둔 뒤 질문이 실제로 들어왔을 때에야 그 질문에 필요한 부분만 LLM으로 정제합니다. 게으름(lazy)이 곧 절약인 셈입니다 — 이름값을 합니다. 대가는 질문마다 LLM 호출이 붙는다는 것입니다 — 첫 질문만이 아닙니다. 다만 안 물어볼 것에 미리 돈을 쓰지 않으니, 질의가 드문 코퍼스에서는 총비용이 급락합니다.
 
-그런데 여기서 인용을 멈추면 오해를 남깁니다 — **이 수치를 재현할 수 있는 공개 구현이 지금도 없습니다.** 2024년 12월 [GraphRAG 1.0 발표](https://www.microsoft.com/en-us/research/blog/moving-to-graphrag-1-0-streamlining-ergonomics-for-developers-and-users/)는 이 방식을 "머지않아 코어 코드베이스에 사용자 선택 옵션으로 추가될 것(will be added to the core GraphRAG codebase in the near future as a new option for users)"이라 예고했지만, 1년 반이 지난 시점에도 [저장소](https://github.com/microsoft/graphrag)에 관련 코드가 없고 [공식 문서](https://microsoft.github.io/graphrag/query/overview/)의 검색 방식은 Local·Global·DRIFT·Basic 넷뿐입니다. 요구가 몰렸던 이슈는 **"계획 없음(not planned)"으로 닫혔습니다**(2025년 11월, [#1512](https://github.com/microsoft/graphrag/issues/1512)). 아주 못 쓰게 된 건 아닙니다 — 같은 블로그에 붙은 2025년 6월 6일 편집자 주는 이 기술이 Microsoft Discovery와 Azure Local에 탑재됐다고(후자는 퍼블릭 프리뷰로) 알립니다. 다만 그건 제품 안에 들어갔다는 뜻이고, 위 수치를 남이 돌려 볼 코드가 공개돼 있다는 뜻은 아닙니다. 그러니 표는 "이렇게 하면 이만큼 싸진다"는 **연구 결과**로 읽어야 하고, 오늘 `pip install`로 얻는 것과는 다릅니다.
+그런데 여기서 인용을 멈추면 오해를 남깁니다 — **이 수치를 재현할 수 있는 공개 구현이 지금도 없습니다.** 2024년 12월 [GraphRAG 1.0 발표](https://www.microsoft.com/en-us/research/blog/moving-to-graphrag-1-0-streamlining-ergonomics-for-developers-and-users/)는 이 방식을 "머지않아 코어 코드베이스에 사용자 선택 옵션으로 추가될 것(will be added to the core GraphRAG codebase in the near future as a new option for users)"이라 예고했지만, 1년 반이 지난 시점에도 [저장소](https://github.com/microsoft/graphrag)에 관련 코드가 없고 [공식 문서](https://microsoft.github.io/graphrag/query/overview/)의 검색 방식은 Local·Global·DRIFT·Basic 넷뿐입니다. 요구가 몰렸던 이슈는 **"계획 없음(not planned)"으로 닫혔습니다**(2025년 11월, [#1512](https://github.com/microsoft/graphrag/issues/1512)).
+
+아주 못 쓰게 된 건 아닙니다 — 같은 블로그에 붙은 2025년 6월 6일 편집자 주는 이 기술이 Microsoft Discovery와 Azure Local에 탑재됐다고(후자는 퍼블릭 프리뷰로) 알립니다. 다만 그건 제품 안에 들어갔다는 뜻이고, 위 수치를 남이 돌려 볼 코드가 공개돼 있다는 뜻은 아닙니다. 그러니 표는 "이렇게 하면 이만큼 싸진다"는 **연구 결과**로 읽어야 하고, 오늘 `pip install`로 얻는 것과는 다릅니다.
 
 셋째 처방은 학계 후속 연구에서 나옵니다. 앞의 둘이 인덱싱 비용을 건드렸다면, 이쪽은 질의 시점에 무엇을 얼마나 꺼내 올지를 손봅니다. [**LightRAG**](https://arxiv.org/abs/2410.05779)는 검색을 두 층위로 나눕니다 — low-level은 "이 부품의 정확한 사양은?" 같은 구체 엔티티·관계를, high-level은 "이 산업의 공급망 위험은?" 같은 넓은 주제를 겨냥합니다. 질문의 결이 다르면 검색 경로도 갈라 태워 낭비를 줄입니다.
 
@@ -337,7 +351,7 @@ LazyGraphRAG의 발상을 조금 더 풀어 보면 왜 이게 통하는지 보�
 
 ### 5.1 시맨틱 레이어란 무엇인가 — 지표를 코드로 못 박는 층
 
-**시맨틱 레이어**는 웨어하우스 테이블 위에 얹혀, 지표와 차원의 계산 규칙을 코드로 못 박아 두는 층입니다. §1에서 `revenue` 컬럼이 총매출인지 순매출인지 말해 주지 않는다고 했는데, 그 대답을 적어 두는 자리가 여기입니다. 질의가 들어오면 이 정의에 따라 SQL이 생성되니, LLM이 컬럼명을 보고 추측할 여지가 사라집니다.
+**시맨틱 레이어**는 웨어하우스 테이블 위에 얹혀, 지표와 차원의 계산 규칙을 코드로 못 박아 두는 층입니다. §1에서 `revenue` 컬럼이 총매출인지 순매출인지 말해 주지 않는다고 했는데, 그 대답을 적어 두는 자리가 여기입니다. 질의가 들어오면 이 정의에 따라 SQL이 생성되니, LLM이 컬럼명을 보고 추측할 여지가 사라집니다. 역할이 갈리는 지점이 여기입니다 — LLM이 하는 일은 자연어를 "지표 하나 + 차원 몇 개 + 필터"로 옮기는 것까지이고, 그 조합에서 SQL을 만드는 건 엔진입니다. 그래서 엔진이 만들 수 없는 조합을 요구받으면 틀린 SQL이 아니라 아무 답도 나오지 않습니다(§5.3에서 그 경계를 숫자로 봅니다).
 
 무엇이 들어가는지는 네 조각으로 정리됩니다. **지표(measure)**는 무엇을 어떻게 세는가(`net_revenue = SUM(order_amount) - SUM(refund_amount)`), **차원(dimension)**은 어떤 축으로 쪼개는가(지역·분기·상품군), **조인 경로**는 그 값들이 어느 테이블 어느 컬럼에서 와서 어떻게 이어지는가, **필터**는 어디까지를 셈에 넣는가(취소 주문 제외 등)입니다. 네 조각이 합쳐져 **인증된 정의(certified definition)**가 되고, 이게 조직 안의 유일한 정답이 됩니다.
 
@@ -365,42 +379,27 @@ LazyGraphRAG의 발상을 조금 더 풀어 보면 왜 이게 통하는지 보�
 
 dbt는 그 SQL들을 **git 저장소의 파일로 옮겨 놓습니다.** `.sql` 파일 하나가 웨어하우스의 결과 객체 하나에 대응하고(이걸 dbt가 **모델**이라 부릅니다 — 기본값은 뷰이고 설정에 따라 테이블·증분 테이블 등으로 바뀝니다), 파일에서 `ref()`로 다른 파일을 참조하면 dbt가 그 의존 관계로 방향 비순환 그래프를 만들어 실행 순서를 정합니다. 코드니까 리뷰·테스트·CI가 붙고, 누가 언제 정의를 바꿨는지도 남습니다. 그 파일 옆에 "이 테이블에서 순매출은 이렇게 센다"는 지표 정의를 함께 두는 기능이 dbt Semantic Layer입니다.
 
-그 dbt를 만든 dbt Labs의 Jason Ganz와 Benoit Perigaud가 2026년 4월 [Sequeda의 ACME Insurance 벤치마크를 다시 돌렸습니다](https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026) — 테이블 15개, 질문 11개, 각 20회 반복. **자기 제품을 대상으로 한 자체 벤치마크**라는 점을 먼저 달고 읽어야 합니다.
+dbt Labs가 2026년 4월 [Sequeda의 ACME Insurance 벤치마크를 다시 돌렸습니다](https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026) — 테이블 15개, 질문 11개, 각 20회 반복. **자기 제품을 대상으로 한 자체 벤치마크**라는 점을 달고 읽어야 합니다. 널리 인용되는 건 전체 평균(text-to-SQL 64.5% 대 시맨틱 레이어 72.7%)이지만, 같은 블로그가 11문항을 **MetricFlow의 홉 한계를 넘는가**로 갈라 놓은 표가 훨씬 많은 것을 말합니다.
 
-| 비교 범위 | Text-to-SQL | 시맨틱 레이어 |
-|-----------|-------------|---------------|
-| 원본(고도 정규화) 테이블, 전체 11문항 · 2023(GPT-4) | 32.7% | 60.5% |
-| 원본(고도 정규화) 테이블, 전체 11문항 · 2026(Sonnet 4.6 / GPT-5.3 Codex) | **64.5%** | **72.7%** |
-| dbt 모델 3개를 덧붙인 뒤 · claude-sonnet-4-6 | 90.0% | **98.2%** |
-| 같은 조건 · gpt-5.3-codex | 84.1% | **100.0%** |
-
-네 줄은 조건이 서로 다르니 갈라 읽어야 합니다. 위 두 줄의 시맨틱 레이어는 dbt 블로그 표기로 *Minimal Semantic Layer*, 즉 원본 테이블 위에 얇게 올린 dbt 프로젝트입니다. 흔히 "100% vs 84%"로 잘려 인용되는 게 아래 두 줄인데, 이건 **LLM에게 dbt 모델 3개를 더 만들게 한 뒤**의 숫자입니다. 거창한 작업이 아닙니다 — 원문 표현으로 "몇 테이블을 함께 조인한(joining a few tables together)" 모델 파일 세 개이고, 사람이 코드를 쓰지 않고 LLM이 만들었습니다.
-
-그러면 왜 모델 세 개를 덧붙이는 것만으로 72.7%가 98.2%로 뛰었을까요. 같은 블로그가 11문항을 **MetricFlow의 홉 한계를 넘는가**로 갈라 다시 집계한 표에 답이 있습니다.
-
-| 홉 한계 초과? | Text-to-SQL 2023 | Text-to-SQL 2026 (Sonnet 4.6 / GPT-5.3) | 시맨틱 레이어 2023 | 시맨틱 레이어 2026 |
+| 홉 한계 초과? | Text-to-SQL 2023 | Text-to-SQL 2026 | 시맨틱 레이어 2023 | 시맨틱 레이어 2026 |
 |---|---|---|---|---|
 | 아니오 (8문항) | 26.9% | 62.5% / 51.2% | 83.1% | **100.0%** |
 | 예 (3문항) | 48.3% | 70.0% / **100.0%** | 0.0% | **0.0%** |
-| 전체 (11문항) | 32.7% | 64.5% / 64.5% | 60.5% | 72.7% |
+| 전체 (11문항) | 32.7% | 64.5% | 60.5% | 72.7% |
 
-이 표가 앞의 72.7%보다 훨씬 많은 것을 말합니다. 사정권 **안**에서 시맨틱 레이어는 2026년 모델로 100%입니다 — 모델을 더 만들 필요도 없습니다. 그런데 사정권 **밖**에서는 2023년이든 2026년이든 0%이고, 하필 그 3문항이 표 전체에서 text-to-SQL이 유일하게 완승하는 칸입니다(GPT-5.3 Codex 100%). 즉 시맨틱 레이어의 실패는 계산 오류가 아니라 **커버리지 경계**이고, 앞서 본 전체 72.7%는 그 경계 안팎을 섞어 평균 낸 숫자입니다.
+사정권 **안**에서 시맨틱 레이어는 2026년 모델로 100%입니다. **밖**에서는 2023년이든 2026년이든 0%이고, 하필 그 3문항이 표 전체에서 text-to-SQL이 유일하게 완승하는 칸입니다. 즉 시맨틱 레이어의 실패는 계산 오류가 아니라 **커버리지 경계**이고, 평균 72.7%는 그 경계 안팎을 섞은 숫자입니다.
 
-경계가 어디인지는 벤더 문서에 하드 리밋으로 적혀 있습니다. [MetricFlow는 최대 세 테이블, 홉 두 번까지만](https://docs.getdbt.com/docs/build/join-logic) 자동으로 이어 줍니다("MetricFlow can join up to three tables, supporting multi-hop joins with a limit of two hops") — 주문에서 고객, 고객에서 국가까지는 되지만 국가에서 지역으로 한 번 더 가는 `customer__country__region_name`은 문서가 직접 안 된다고 예시로 듭니다. fan-out과 chasm 조인도 금지입니다. 그러니 최소 구성이 72.7%에 멈춘 이유는 계산이 틀렸기 때문이 아니라 **애초에 답을 만들 수 없는 질문이 있었기** 때문입니다.
+경계는 벤더 문서에 하드 리밋으로 적혀 있습니다. [MetricFlow는 최대 세 테이블, 홉 두 번까지만](https://docs.getdbt.com/docs/build/join-logic) 자동으로 이어 줍니다 — 주문에서 고객, 고객에서 국가까지는 되지만 국가에서 지역으로 한 번 더 가는 `customer__country__region_name`은 문서가 직접 안 된다고 예시로 듭니다. 이 벤치마크의 스키마가 제3정규형으로 극도로 쪼개져 있어(중복을 없애려 테이블을 잘게 나누면 그만큼 조인이 늘어납니다) 그 한계에 걸렸습니다. 답을 얻기까지 거쳐야 하는 조인의 단계 수가 **엔티티 홉**이고, 청구에서 계약, 계약에서 고객, 고객에서 지역으로 세 번 건너가야 하는 질문이 3홉입니다.
 
-왜 이 스키마가 그 한계에 걸렸나 — 제3정규형으로 극도로 쪼개져 있었기 때문입니다. 제3정규형은 중복을 없애려고 데이터를 잘게 나눠 저장하는 관계형 설계 원칙인데, 잘게 나눌수록 하나의 답을 얻으려 거쳐야 하는 조인이 늘어납니다. 그 조인의 단계 수가 **엔티티 홉**이고, 청구에서 계약, 계약에서 고객, 고객에서 지역으로 세 번 건너가야 하는 질문이 3홉입니다. 원문 표현으로 이 스키마는 "MetricFlow에 너무 많은 엔티티 홉을 요구했다(required too many entity hops for MetricFlow)"는 것입니다.
+그래서 블로그는 LLM에게 dbt 모델 세 개를 더 만들게 했습니다 — 원문 표현으로 "몇 테이블을 함께 조인한(joining a few tables together)" 파일 셋이고, 사람이 코드를 쓰지 않았습니다. 그 세 개가 홉을 미리 접어 주자 열한 문항 모두 사정권에 들어왔고, 시맨틱 레이어는 98.2%(Sonnet 4.6)와 100%(GPT-5.3 Codex), text-to-SQL은 90.0%와 84.1%가 됐습니다. 흔히 "100% vs 84%"로 잘려 인용되는 게 이 숫자인데, 보여 주는 건 시맨틱 레이어의 정확도가 아니라 **모델링을 얼마나 해 뒀는가**입니다.
 
-모델 세 개가 한 일이 바로 그 홉을 미리 접어 둔 것입니다. 그러자 열한 문항 모두 사정권에 들어왔습니다. 그러니 98.2%와 100%가 보여 주는 건 시맨틱 레이어의 정확도가 아니라 **모델링을 얼마나 해 뒀는가**입니다 — 정확도는 이미 사정권 안에서 100%였습니다.
-
-왼쪽 열에도 단서가 붙습니다. 그것도 특정 행이 아니라 표 전체에 걸립니다. text-to-SQL을 작동시키려고 전체 스키마를 컨텍스트로 밀어 넣었는데 그게 "더 큰 데이터셋에서는 현실적이지 않다(which isn't practical for larger datasets)"며, "이 점을 유념하고 숫자를 읽으라(Keep that in mind as you read the numbers)"고 덧붙였습니다. 모델링 실험에서도 새 테이블과 관계를 DDL 컨텍스트에 반영했다고 밝히니, 네 줄의 text-to-SQL 쪽 숫자가 모두 실무에서 재현하기 어려운 최상 조건에서 나온 것입니다.
-
-이 단서가 어느 쪽에 유리한지 따져 보면 방향이 하나입니다 — 실무에서는 스키마 전체를 넣기 어려우니 text-to-SQL의 실제 점수는 표보다 낮아질 것이고, 그러면 두 방식의 격차는 표에 찍힌 것보다 벌어집니다. 그러니 이 표에서 가져갈 것은 절댓값도 격차의 크기도 아닙니다. 방향 하나와 실패의 성격 하나입니다 — 모델링을 미리 해 둔 쪽이 이기고, 못 할 때는 침묵합니다.
+왼쪽 열에도 단서가 붙고, 이건 표 전체에 걸립니다. text-to-SQL을 작동시키려고 전체 스키마를 컨텍스트로 밀어 넣었는데 저자들이 그게 "더 큰 데이터셋에서는 현실적이지 않다(which isn't practical for larger datasets)"고 적었습니다. 실무에서는 그렇게 못 하니 text-to-SQL의 실제 점수는 표보다 낮아지고, 격차는 표에 찍힌 것보다 벌어집니다. 그러니 이 표에서 가져갈 것은 절댓값이 아니라 실패의 성격입니다 — 모델링을 미리 해 둔 쪽이 이기고, 못 할 때는 침묵합니다.
 
 절댓값을 믿지 말라는 말이 공허하지 않도록, 같은 문제를 실제 사내 웨어하우스에서 재 본 독립 벤치마크를 옆에 놓겠습니다. MIT 중심 연구진(Michael Stonebraker 공저)이 만든 [**BEAVER**](https://arxiv.org/abs/2409.02038)는 "비공개 데이터 웨어하우스에서 끌어낸 첫 text-to-SQL 벤치마크"로, 실제 질의 로그에서 뽑은 9,128개 질문-SQL 짝과 19개 도메인의 812개 테이블로 이뤄집니다. 결과는 이렇습니다 — 최신 모델(GPT-5.2)을 쓴 최고 수준 에이전트 프레임워크가 **10.8%**입니다. 위 표의 90%·100%와 같은 작업인데 한 자릿수 대 세 자릿수로 갈립니다. 공개 벤치마크가 "잘 정돈된 스키마와 단순한 질문-SQL 짝"으로 만들어진 반면 사내 웨어하우스는 "복잡한 스키마, 도메인 지식, 정교한 구조와 함수를 요구하는 분석 질의"로 되어 있기 때문입니다.
 
-이 논문에서 이 글의 논지에 가장 중요한 숫자는 10.8%가 아니라 그다음입니다. 사람이 손으로 달아 둔 다섯 하위 과제의 정답을 **모두 정답지로 넣어 줘도 30.1%**입니다(논문 표현으로 oracle hints — 모델이 스스로 풀어야 할 중간 단계를 미리 알려 주는 것). 맥락을 사람이 채워 주면 세 배가 되지만(§1의 16.7%→54.2%와 같은 방향입니다) 거기서 멈춘다는 뜻입니다. 맥락 명문화가 값을 하되 그것만으로 끝나지 않는다는 이 글의 두 명제가, 정형 쪽에서 독립적으로 같은 모양으로 측정된 셈입니다.
+이 논문에서 더 중요한 숫자는 10.8%가 아니라 그다음입니다. 사람이 손으로 달아 둔 다섯 하위 과제의 정답을 **모두 정답지로 넣어 줘도 30.1%**입니다(논문 표현으로 oracle hints — 모델이 스스로 풀어야 할 중간 단계를 미리 알려 주는 것). 맥락을 사람이 채워 주면 세 배가 되지만(§1의 16.7%→54.2%와 같은 방향입니다) 거기서 멈춘다는 뜻입니다. 맥락 명문화가 값을 하되 그것만으로 끝나지 않는다는 이 글의 두 명제가, 정형 쪽에서 독립적으로 같은 모양으로 측정된 셈입니다.
 
-표를 세로로 읽으면 다른 것도 보입니다. 2년 사이(2023년 11월 GPT-4 대 2026년 2~3월 Sonnet 4.6·GPT-5.3 Codex) text-to-SQL 쪽이 32.7%에서 64.5%로 두 배 가까이 올랐습니다. 격차는 좁혀지지 사라지지 않았습니다 — 그리고 남은 격차의 정체는 정확도보다 **실패의 성격**입니다. 저자들의 표현대로 시맨틱 레이어는 답할 수 없을 때 답할 수 없다고 말하는데("the Semantic Layer tells you it can't answer"), text-to-SQL은 "기꺼이 틀린 숫자를 내놓습니다(will cheerfully give you a wrong number)". 사람이 검수하는 대시보드라면 후자도 견딜 만합니다. 에이전트가 그 숫자를 받아 다음 행동을 정하는 §2.2의 세계에서는 견디기 어렵습니다.
+침묵한다는 그 성질을 저자들의 표현으로 옮기면 이렇습니다. 시맨틱 레이어는 답할 수 없을 때 답할 수 없다고 말하는데("the Semantic Layer tells you it can't answer"), text-to-SQL은 "기꺼이 틀린 숫자를 내놓습니다(will cheerfully give you a wrong number)". 사람이 검수하는 대시보드라면 후자도 견딜 만합니다. 에이전트가 그 숫자를 받아 다음 행동을 정하는 §2.2의 세계에서는 견디기 어렵습니다.
 
 다만 이 성질에는 조건이 하나 붙습니다. "답할 수 없다고 말한다"는 건 에이전트가 **시맨틱 레이어를 거쳤을 때**의 이야기입니다. dbt가 자사 MCP 서버를 소개하며 [스스로 밝힌 관측](https://docs.getdbt.com/blog/introducing-dbt-mcp-server)이 이 지점을 찌릅니다 — "현재로서는 툴 선택 준수도가 완전하지 않습니다. 테스트에서 모델이 불필요한 툴 호출을 여러 번 돌거나 잘못된 순서로 부르는 경우가 있었습니다(As of right now we don't have perfect adherence for tool selection. In our testing, the model will sometimes cycle through several unnecessary tool calls or call them in the wrong order)." 게다가 같은 서버가 인증된 지표 조회(`query_metrics`)와 자유 SQL 실행을 **함께** 노출하고, dbt는 자유 SQL이 "시맨틱 안전장치를 우회한다(bypasses dbt's semantic safeguards)"며 샌드박스에만 두라고 권합니다.
 
@@ -408,13 +407,15 @@ dbt는 그 SQL들을 **git 저장소의 파일로 옮겨 놓습니다.** `.sql` 
 
 마지막으로 이 절의 숫자 전부에 걸리는 단서를 하나 달아 둡니다. text-to-SQL 벤치마크 자체의 정답이 못 믿을 만하다는 연구가 있습니다. UIUC 연구진이 [CIDR 2026에 낸 분석](https://www.vldb.org/cidrdb/papers/2026/p5-jin.pdf)은 널리 쓰이는 두 벤치마크의 주석 오류율을 각각 **52.8%(BIRD Mini-Dev)**와 **66.1%(Spider 2.0-Snow)**로 보고합니다. 정답 SQL이 실제 데이터·스키마와 어긋나거나 질문 자체가 모호한 경우입니다. 정정한 뒤 상위 에이전트 다섯을 다시 돌리면 성능이 상대 기준 −3%에서 31%까지 변하고 순위가 최대 세 계단 뒤집힙니다 — 4위였던 CHESS가 62%에서 81%로 올라 1위가 됩니다. 저자들의 결론은 "현재 text-to-SQL 벤치마크의 신뢰할 수 없음(the unreliability of current text-to-SQL benchmarks)"입니다. §1의 16.7%→54.2%도, 위 표의 100%도 이 잣대 아래 있습니다. 벤더 편향만 걸러 내면 되는 게 아니라, 정답 라벨 자체를 의심해야 하는 단계라는 뜻입니다.
 
+그렇다고 이 글의 출발점이 무의미해지는 건 아닙니다. 라벨 오류는 비교되는 두 조건에 똑같이 걸리므로 절댓값은 흔들리지만 방향은 남습니다. BEAVER와 이 논문을 끌어와 확인한 것도 절댓값이 아니라 그 방향입니다 — 맥락을 명시하면 답이 나아지고, 명시하지 않으면 그럴듯한 오답이 나온다는 것.
+
 ### 5.4 semantics-as-code — 정의를 문서가 아니라 코드로
 
 §1에서 기억해 두라고 한 **"맥락을 코드로 명문화한다"**가 여기서 제품 기능이 됩니다. 두 갈래를 관통하는 그 원칙의 이름이 **semantics-as-code**입니다 — 온톨로지와 지표 정의를 소프트웨어 코드처럼 다루는 것입니다. 구체적으로는 셋입니다. 정의를 git으로 **버전 관리**하고, CI/CD로 **배포**하며, §5.2의 CQ를 **회귀 테스트**로 돌립니다. 마지막이 핵심인데, 지표를 고친 뒤 "이 지표가 여전히 기대값으로 계산되는가"를 기계가 물어봐 주는 장치가 있어야 정의가 조용히 썩지 않습니다. 온톨로지를 문서로 두면 죽고, 코드로 두면 삽니다.
 
 이 방식이 왜 LLM에게 특히 중요한지는 벤더 제품에서 드러납니다. Databricks는 [Unity Catalog Business Semantics를 소개하며](https://www.databricks.com/blog/redefining-semantics-data-layer-future-bi-and-ai) 지표를 SQL로 중앙에 정의해 카탈로그가 관리하게 하면 "질의 시점에 엔진이 그 SQL을 결정론적으로 컴파일해 실행한다(the engine compiles and executes the underlying SQL deterministically at query time)"고 적습니다. 그 결과로 내세우는 문장이 *"Genie is no longer hallucinating metrics; it's resolving them from a single source of truth"* — 자사 자연어 질의 도구인 Genie가 지표를 지어내지 않고 단일 진실 공급원에서 해소한다는 것입니다.
 
-벤더 자신의 제품 서술이니 그만큼 감안해서 읽어야 합니다. 다만 메커니즘 자체는 따져 볼 수 있는 주장입니다 — 지표 계산이 정의 파일에 못 박혀 있으면 모델이 SQL을 새로 상상할 여지가 그만큼 줄어듭니다. 뒤집어 말하면 정의가 없는 지표에 대해서는 이 보호막이 작동하지 않습니다.
+다만 메커니즘 자체는 따져 볼 수 있는 주장입니다 — 지표 계산이 정의 파일에 못 박혀 있으면 모델이 SQL을 새로 상상할 여지가 그만큼 줄어듭니다. 뒤집어 말하면 정의가 없는 지표에 대해서는 이 보호막이 작동하지 않습니다.
 
 Databricks가 함께 실은 스택 그림이 이 배치를 한눈에 보여 줍니다 — 지표·차원·관계 모델링을 담은 Metric views가 카탈로그 안에 한 층으로 놓이고, 대시보드·Genie·SQL/노트북 세 소비 경로가 **모두 그 한 층을 거쳐** 숫자를 받습니다. 경로마다 지표를 다시 정의하지 않는다는 게 요점입니다 — 그리고 지표 정의가 카탈로그 안에 사는 이 배치가, 다음 장에서 다룰 발견과 권한 문제로 그대로 이어집니다.
 
@@ -445,7 +446,9 @@ OBDA는 복제를 아예 하지 않습니다. 대신 세 조각만 적어 둡니
 
 온톨로지 쪽에는 조건이 하나 붙습니다. §3.2에서 본 OWL의 표현력을 다 쓸 수는 없고, [OWL 2 QL](https://www.w3.org/TR/owl2-profiles/)이라는 축소판 프로파일을 써야 합니다. 이유가 이 방식의 성립 조건 자체입니다. SPARQL 질의를 SQL로 한 번 바꿔 원본 DB에 던지는 게 전부여야 합니다. 그런데 "이 관계는 전이적이다"(A→B, B→C이면 A→C)처럼 규칙을 반복 적용해야 답이 나오는 것이 온톨로지에 있으면 한 번의 번역으로 끝나지 않습니다 — 몇 번 적용해야 하는지가 데이터에 따라 달라지니 SQL 한 문장으로 못 적습니다.
 
-그래서 QL은 그런 구문을 아예 문법에서 뺐습니다 — 전이성, 개수를 세는 카디널리티 구문, 논리합("A이거나 B"), 속성 연쇄, 개체 동일성 선언이 금지 목록에 있습니다. 다만 이건 구문이 금지된 것이고 뜻이 다 막힌 건 아닙니다 — 예컨대 "고객은 계약을 적어도 하나 가진다"는 카디널리티 구문 없이도 표현할 수 있어서 QL에서 여전히 합법입니다. 명세가 개체 동일성을 뺀 이유를 밝히는데, 그걸 넣으면 "질의 응답의 데이터 복잡도가 올라가(would increase the data complexity of query answering)" 더 이상 재작성이 불가능해진다는 것입니다. 남는 게 빈약해 보이지만, 명세 표현으로 "UML 클래스 다이어그램이나 ER 다이어그램 같은 개념 모델의 주요 기능 대부분(most of the main features of conceptual models such as UML class diagrams and ER diagrams)"은 그대로 표현됩니다. 클래스와 그 상하 관계, 속성, 관계의 정의역·치역 — 실무에서 개념 모델을 그릴 때 쓰는 것들입니다.
+그래서 QL은 그런 구문을 아예 문법에서 뺐습니다 — 전이성, 개수를 세는 카디널리티 구문, 논리합("A이거나 B"), 속성 연쇄, 개체 동일성 선언이 금지 목록에 있습니다. 다만 이건 구문이 금지된 것이고 뜻이 다 막힌 건 아닙니다 — 예컨대 "고객은 계약을 적어도 하나 가진다"는 카디널리티 구문 없이도 표현할 수 있어서 QL에서 여전히 합법입니다. 명세가 개체 동일성을 뺀 이유를 밝히는데, 그걸 넣으면 "질의 응답의 데이터 복잡도가 올라가(would increase the data complexity of query answering)" 더 이상 재작성이 불가능해진다는 것입니다.
+
+남는 게 빈약해 보이지만, 명세 표현으로 "UML 클래스 다이어그램이나 ER 다이어그램 같은 개념 모델의 주요 기능 대부분(most of the main features of conceptual models such as UML class diagrams and ER diagrams)"은 그대로 표현됩니다. 클래스와 그 상하 관계, 속성, 관계의 정의역·치역 — 실무에서 개념 모델을 그릴 때 쓰는 것들입니다.
 
 이 절제의 대가로 얻는 게 이름 그대로입니다. QL은 질의 응답을 "표준 관계형 질의 언어로 재작성해 구현할 수 있다(can be implemented by rewriting queries into a standard relational Query Language)"에서 온 약자이고, 그 재작성은 "데이터에 아무 변경도 없이(without any changes to the data)" 이뤄집니다. 즉 온톨로지를 얹으려고 기존 DB를 건드릴 필요가 없다는 뜻이고, 그게 복제 없이 통합한다는 발상을 성립시킵니다.
 
@@ -473,11 +476,17 @@ OBDA는 복제를 아예 하지 않습니다. 대신 세 조각만 적어 둡니
   <img src="/assets/images/confused-deputy-defense.png" alt="같은 질문 '옆 팀 김 과장 연봉이 얼마야?'가 두 경로를 지나는 대조도. 왼쪽 빨간 경로는 에이전트가 넓은 권한의 서비스 계정 토큰을 들고, 시맨틱 레이어에서만 권한을 검사한 뒤 웨어하우스가 인사 급여 행을 그대로 반환한다 — 에이전트 아래 어느 계층도 질문한 사람이 누구인지 모르고, 원시 SQL로 레이어를 건너뛰면 그 검사마저 사라진다. 오른쪽 초록 경로는 에이전트가 RFC 8693 위임으로 호출자 신원을 유지하고, MCP 계층이 RFC 8707로 토큰 수신자를 고정하며 토큰 passthrough를 금지하고, 마지막으로 웨어하우스의 행 필터가 결과를 0행으로 잘라 낸다 — 원시 SQL도 같은 필터를 지나므로 우회 경로가 없다. 아래 문장: 프롬프트 강화는 두 경로 중 어느 것도 바꾸지 못하고, 엔진에 도달하는 신원이 누구인지가 결말을 가른다." />
 </a>
 
-그리고 결정적으로, **행·열 수준 보안은 시맨틱 레이어 아래(웨어하우스)에서 강제**해야 에이전트가 우회하지 못합니다. 왜 아래여야 하는지가 핵심입니다 — 만약 권한 검사를 시맨틱 레이어나 에이전트 앱에서만 하면, 에이전트가 그 층을 건너뛰고 웨어하우스에 직접 SQL을 날리는 순간 통제가 무력해집니다. 통제를 데이터에 가장 가까운 곳에 두어야 어떤 경로로도 못 뚫습니다. [Databricks Unity Catalog의 ABAC](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac)는 거버넌스 태그가 붙은 대상에 row filter와 column mask를 정책으로 걸고, 그 정책을 테이블은 물론 구체화 뷰(materialized view)와 스트리밍 테이블에도 그대로 겁니다. Snowflake는 [Semantic View 개발 모범사례 문서](https://docs.snowflake.com/en/user-guide/views-semantic/best-practices-dev)에서 기반 테이블의 행 접근 정책이 "시맨틱 뷰로 전파되어 강제된다(they propagate to semantic views and are enforced)"고 명시합니다. 즉 에이전트가 아무리 창의적으로 SQL을 짜도, 그리고 프롬프트 인젝션에 조종당하더라도, 사용자가 볼 수 없는 행은 애초에 결과 집합에 나타나지 않습니다 — §6.2 첫머리의 "김 과장 연봉"이 데이터베이스 엔진 차원에서 걸러지는 것입니다.
+그리고 결정적으로, **행·열 수준 보안은 시맨틱 레이어 아래(웨어하우스)에서 강제**해야 에이전트가 우회하지 못합니다. 왜 아래여야 하는지가 핵심입니다 — 만약 권한 검사를 시맨틱 레이어나 에이전트 앱에서만 하면, 에이전트가 그 층을 건너뛰고 웨어하우스에 직접 SQL을 날리는 순간 통제가 무력해집니다. 통제를 데이터에 가장 가까운 곳에 두어야 어떤 경로로도 못 뚫습니다.
 
-이 배관을 깔아 본 팀이 뒤늦게 마주치는 함정이 하나 있습니다 — **행 필터는 통과하는데 감사 로그에서 책임 주체가 사라지는 상태**입니다. RFC 8693은 위임이 여러 단으로 이어질 때 `act` 클레임을 겹쳐 넣어 이력을 남기게 하지만, 곧바로 이렇게 못 박습니다 — *"For the purpose of applying access control policy, the consumer of a token MUST only consider the token's top-level claims and the party identified as the current actor by the 'act' claim. Prior actors identified by any nested 'act' claims are informational only and are not to be considered in access control decisions."* 앞선 행위자들은 참고용이고 인가 판정에 쓰지 말라는 뜻입니다. 그러니 중간 게이트웨이가 토큰을 다시 교환하며 그 중첩 이력을 접어 버려도 접근 통제는 아무 이상 없이 돌아갑니다 — 사고가 난 뒤 "이 조회를 최초에 시킨 사람이 누구인가"를 물을 때야 비어 있음이 드러납니다. 토큰 교환을 도입할 때 시험해야 하는 건 "막히는가"만이 아니라 **누가 시켰는지가 마지막 리소스 서버까지 그대로 남는가**입니다.
+[Databricks Unity Catalog의 ABAC](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac)는 거버넌스 태그가 붙은 대상에 row filter와 column mask를 정책으로 걸고, 그 정책을 테이블은 물론 구체화 뷰(materialized view)와 스트리밍 테이블에도 그대로 겁니다. Snowflake는 [Semantic View 개발 모범사례 문서](https://docs.snowflake.com/en/user-guide/views-semantic/best-practices-dev)에서 기반 테이블의 행 접근 정책이 "시맨틱 뷰로 전파되어 강제된다(they propagate to semantic views and are enforced)"고 명시합니다. 즉 에이전트가 아무리 창의적으로 SQL을 짜도, 그리고 프롬프트 인젝션에 조종당하더라도, 사용자가 볼 수 없는 행은 애초에 결과 집합에 나타나지 않습니다 — §6.2 첫머리의 "김 과장 연봉"이 데이터베이스 엔진 차원에서 걸러지는 것입니다.
 
-정리하면 에이전트 거버넌스의 원칙은 하나입니다 — **툴 발견부터 쿼리 실행, 응답 종합까지 모든 계층이 각자 권한을 강제해야 하고, 어느 한 지점이 뚫려도 데이터가 새 나가지 않아야 합니다.** 데이터 프로덕트를 도메인이 소유하되 거버넌스를 중앙화하는 [데이터 메시](https://martinfowler.com/articles/data-monolith-to-mesh.html)(Zhamak Dehghani — 당시 Thoughtworks의 기술 컨설턴트로, 이 2019년 글에서 "data mesh"라는 용어를 제시했습니다) 사상이 여기서 에이전틱 AI의 요구와 만납니다.
+이 배관을 깔아 본 팀이 뒤늦게 마주치는 함정이 하나 있습니다 — **행 필터는 통과하는데 감사 로그에서 책임 주체가 사라지는 상태**입니다. RFC 8693은 위임이 여러 단으로 이어질 때 `act` 클레임을 겹쳐 넣어 이력을 남기게 하지만, 곧바로 이렇게 못 박습니다 — *"For the purpose of applying access control policy, the consumer of a token MUST only consider the token's top-level claims and the party identified as the current actor by the 'act' claim. Prior actors identified by any nested 'act' claims are informational only and are not to be considered in access control decisions."* 앞선 행위자들은 참고용이고 인가 판정에 쓰지 말라는 뜻입니다.
+
+그러니 중간 게이트웨이가 토큰을 다시 교환하며 그 중첩 이력을 접어 버려도 접근 통제는 아무 이상 없이 돌아갑니다 — 사고가 난 뒤 "이 조회를 최초에 시킨 사람이 누구인가"를 물을 때야 비어 있음이 드러납니다. 토큰 교환을 도입할 때 시험해야 하는 건 "막히는가"만이 아니라 **누가 시켰는지가 마지막 리소스 서버까지 그대로 남는가**입니다.
+
+여기까지가 정형 쪽 이야기입니다. 절 머리에서 이 문제가 그래프에도 똑같이 걸린다고 했으니 그쪽 사정도 밝혀야 합니다 — **그래프 쪽에는 행 필터에 해당하는 표준 장치가 없습니다.** 웨어하우스에는 행·열 보안이 엔진 기능으로 있지만, 노드와 엣지 단위 권한을 그래프 DB가 어디까지 지원하는지는 제품마다 다릅니다. 지원하지 않으면 사실상 남는 우회는 하나입니다 — 인덱싱 시점에 권한 등급별로 그래프를 갈라 두는 것. 그리고 §4.1의 커뮤니티 요약이 여기서 문제를 하나 더 만듭니다. 권한 등급이 다른 문서 열 개가 요약 하나에 녹아 들어가면, 그 요약을 읽을 수 있는 사람은 원문 열 개를 다 읽은 셈이 됩니다.
+
+정리하면 에이전트 거버넌스의 원칙은 하나입니다 — **툴 발견부터 쿼리 실행, 응답 종합까지 모든 계층이 각자 권한을 강제해야 하고, 어느 한 지점이 뚫려도 데이터가 새 나가지 않아야 합니다.** 도메인이 데이터를 소유하되 거버넌스는 중앙 규격을 따르는 [데이터 메시](https://martinfowler.com/articles/data-monolith-to-mesh.html)(Zhamak Dehghani, 2019) 사상이 에이전트에게 필요한 성질과 같습니다 — 정의는 도메인마다 달라도 인가 규칙은 어느 경로로 들어와도 동일해야 하니까요.
 
 ### 6.3 메타데이터 카탈로그 — 찾게 하는 층, 그리고 그 층도 AI-ready해야 한다
 
@@ -499,15 +508,17 @@ OBDA는 복제를 아예 하지 않습니다. 대신 세 조각만 적어 둡니
 
 ### 6.4 수렴 — MCP라는 하나의 규격
 
-§2.1의 지형도에서 세 갈래가 하나의 규격으로 에이전트에 모인다고 했습니다. 그 규격이 **[MCP(Model Context Protocol)](https://www.anthropic.com/news/model-context-protocol)**입니다. 2024년 11월 Anthropic이 발표한 이 개방 표준의 의의는 JDBC에 빗대면 분명합니다. JDBC 이전에는 애플리케이션이 데이터베이스마다 다른 드라이버·API로 붙어야 했습니다 — Oracle용 코드, MySQL용 코드를 따로 짰습니다. JDBC가 "자바 애플리케이션이 어떤 DB든 같은 인터페이스로 말한다"는 규격을 세우자, DB를 갈아 끼워도 애플리케이션은 그대로였습니다. MCP는 그 자리에 LLM을 놓습니다 — 에이전트가 지식 그래프든 시맨틱 레이어든 카탈로그든 **같은 프로토콜로** 맥락을 요청하게 만든 것입니다. Anthropic이 밝힌 문제도 같습니다 — 새 데이터 소스마다 "자체 구현이 필요하다(Every new data source requires its own custom implementation)"는 것. 필자의 셈으로 옮기면 에이전트 N개와 소스 M개의 곱만큼 붙이던 연동이 합으로 줄어드는 구조입니다. 세 갈래가 하나의 규격으로 모이는 건 우연이 아니라, 에이전트라는 공통 소비자가 강제하는 수렴입니다.
+§2.1의 지형도에서 세 갈래가 하나의 규격으로 에이전트에 모인다고 했습니다. 그 규격이 **[MCP(Model Context Protocol)](https://www.anthropic.com/news/model-context-protocol)**입니다. 2024년 11월 Anthropic이 발표한 이 개방 표준의 의의는 JDBC에 빗대면 분명합니다. JDBC 이전에는 애플리케이션이 데이터베이스마다 다른 드라이버·API로 붙어야 했습니다 — Oracle용 코드, MySQL용 코드를 따로 짰습니다. JDBC가 "자바 애플리케이션이 어떤 DB든 같은 인터페이스로 말한다"는 규격을 세우자, DB를 갈아 끼워도 애플리케이션은 그대로였습니다. MCP는 그 자리에 LLM을 놓습니다 — 에이전트가 지식 그래프든 시맨틱 레이어든 카탈로그든 **같은 프로토콜로** 맥락을 요청하게 만든 것입니다.
 
-시맨틱 레이어 진영도 표준으로 뭉치기 시작했습니다. 2025년 9월 [Open Semantic Interchange(OSI)](https://www.snowflake.com/en/news/press-releases/snowflake-salesforce-dbt-labs-and-more-revolutionize-data-readiness-for-ai-with-open-semantic-interchange-initiative/)가 Snowflake 주도로 Salesforce·dbt Labs·RelationalAI·BlackRock 등이 참여해 출범했습니다. 2025년 9월 23일 보도자료는 "성장하는 파트너 연합(a growing coalition of partners)"으로 Alation·Atlan·BlackRock·Blue Yonder·Cube·dbt Labs·Elementum AI·Hex·Honeydew·Mistral AI·Omni·RelationalAI·Salesforce·Select Star·Sigma·Snowflake·ThoughtSpot 17개사를 열거하고, Tableau CPO의 "공동 주도(co-leading)" 발언도 함께 싣습니다 — 벤더마다 다른 지표 정의 형식을 벤더 중립 오픈소스 스펙으로 통일하려는 움직임입니다. 에이전틱 AI가 여러 벤더 데이터를 가로질러야 하는 이상, 표준화 압력은 벤더의 선의가 아니라 에이전트의 요구에서 나옵니다.
+구조는 이렇습니다. 데이터 소스 쪽에 **MCP 서버**를 세우고, 에이전트가 클라이언트로 그 서버에 붙습니다. 서버가 내놓는 건 호출 가능한 **툴 목록**입니다 — §5.3에서 본 `query_metrics`(인증된 지표를 이름으로 조회)가 그 하나이고, 그래프 쪽이라면 순회 툴, 카탈로그라면 검색 툴이 같은 자리에 놓입니다. 소스마다 서버를 한 번 만들어 두면 어느 에이전트든 그 서버를 쓸 수 있으니, 곱만큼 붙이던 연동이 합으로 줄어드는 것입니다. Anthropic이 밝힌 문제도 같습니다 — 새 데이터 소스마다 "자체 구현이 필요하다(Every new data source requires its own custom implementation)"는 것. 필자의 셈으로 옮기면 에이전트 N개와 소스 M개의 곱만큼 붙이던 연동이 합으로 줄어드는 구조입니다. 세 갈래가 하나의 규격으로 모이는 건 우연이 아니라, 에이전트라는 공통 소비자가 강제하는 수렴입니다.
+
+시맨틱 레이어 진영도 표준으로 뭉치기 시작했습니다. 2025년 9월 [Open Semantic Interchange(OSI)](https://www.snowflake.com/en/news/press-releases/snowflake-salesforce-dbt-labs-and-more-revolutionize-data-readiness-for-ai-with-open-semantic-interchange-initiative/)가 Snowflake 주도로 출범했습니다. 벤더마다 다른 지표 정의 형식을 벤더 중립 오픈소스 스펙으로 통일하자는 것이고, 출범 당시 참여가 17개사였습니다 — 웨어하우스(Snowflake)와 변환 도구(dbt Labs)와 BI(ThoughtSpot·Sigma)와 카탈로그(Alation·Atlan)가 한자리에 앉았다는 게 요점입니다. 서로 고객을 빼앗는 사이인데도 지표 정의 형식만은 공유하겠다고 나선 것입니다. 에이전틱 AI가 여러 벤더 데이터를 가로질러야 하는 이상, 표준화 압력은 벤더의 선의가 아니라 에이전트의 요구에서 나옵니다.
 
 그 뒤 10개월 사이 이 움직임은 재단으로 들어갔습니다. 2026년 7월 OSI는 이름을 바꿔 [**Apache Ossie**](https://ossie.apache.org/updates/ossie-enters-apache-incubator/)로 Apache 인큐베이터에 들어갔고, 참여가 출범 당시 17개사에서 "50개 조직 이상(more than 50 organizations)"으로 늘었습니다. 스펙의 성격을 스스로 규정한 문구가 이 글에 중요합니다 — "시맨틱 레이어와 온톨로지 **양쪽**을 위한 열린 명세(an open specification for both semantic layer and ontology)"이고, 워킹그룹이 Metric Language·Catalog·**Ontology** 셋입니다. §5.3에서 메트릭 주도와 온톨로지 주도로 갈라 놓은 두 갈래가, 그리고 이 글이 세 갈래로 나눈 지도가 한 스펙 안에서 합쳐지려 하는 셈입니다.
 
 다만 재단에 들어간 것과 제품이 지원하는 것은 다릅니다. 인큐베이션 상태는 그 자체로 "코드의 완성도나 안정성을 반영하지 않는다(incubation status is not necessarily a reflection of the completeness or stability of the code)"고 프로젝트가 명시하며, 스펙 버전도 아직 0.2 개발판입니다. §4.4의 LazyGraphRAG에 붙인 잣대를 여기에도 붙이면 — 발표된 것과 오늘 쓸 수 있는 것은 구분해야 합니다.
 
-마지막으로 이 배관이 무너지면 앞의 두 장이 어떻게 함께 무너지는지를 짚어 둬야 합니다. §5의 시맨틱 레이어가 자랑하는 성질은 "답할 수 없을 때 답할 수 없다고 말한다"는 것인데, 권한이 검색 계층 아래로 새면 그 성질은 값을 잃습니다 — 인증된 정의로 계산한 정확한 숫자를, 봐서는 안 될 사람이 받아 보는 것이니 정확도가 오히려 피해를 키웁니다. §4의 GraphRAG 쪽은 사정이 더 미묘합니다. 커뮤니티 요약은 수천 개 문서의 신호를 하나의 문단으로 압축한 산출물인데, 그 압축 과정에서 원문 단위 접근 권한은 이미 뭉개져 있습니다. 요약 하나에 권한 등급이 다른 문서 열 개가 녹아 있으면, 그 요약을 읽을 수 있는 사람은 열 개 중 가장 민감한 문서를 간접적으로 읽은 셈입니다. 그래프를 지을 때 정한 커뮤니티 경계가 곧 권한 경계가 되는 것 — 인덱싱 시점의 설계 결정이 실행 시점의 보안 사고로 되돌아오는 경로입니다.
+마지막으로 이 배관이 무너지면 앞의 두 장이 어떻게 함께 무너지는지를 짚어 둬야 합니다. §5의 시맨틱 레이어가 자랑하는 성질은 "답할 수 없을 때 답할 수 없다고 말한다"는 것인데, 권한이 검색 계층 아래로 새면 그 성질은 값을 잃습니다 — 인증된 정의로 계산한 정확한 숫자를, 봐서는 안 될 사람이 받아 보는 것이니 정확도가 오히려 피해를 키웁니다. §4의 GraphRAG 쪽은 §6.2에서 본 커뮤니티 요약 문제가 그대로 걸립니다 — 그래프를 지을 때 정한 커뮤니티 경계가 곧 권한 경계가 되니, 인덱싱 시점의 설계 결정이 실행 시점의 보안 사고로 되돌아옵니다.
 
 ## 7. 실전 사례와 한계 — 세 결말, 그리고 무엇이 무너지는가
 
@@ -519,15 +530,27 @@ OBDA는 복제를 아예 하지 않습니다. 대신 세 조각만 적어 둡니
 
 문제의 본질을 조금 더 파 보면 왜 이게 어려운지 보입니다. 한 시스템은 "신용 위험"을, 다른 시스템은 "여신 리스크"를, 또 다른 시스템은 "차주 부도 가능성"을 적어 두는데, 이 셋이 같은 것을 가리키는지는 사람이 문맥을 읽어야만 압니다. 리스크 총계를 내려면 이 자유 텍스트 수만 건을 일일이 대조해 "이건 같은 범주"라고 묶어야 하는데, 시스템이 스무 개면 조합이 폭발합니다. 이게 자유 텍스트로 쌓인 데이터의 저주입니다 — 사람은 읽고 알지만 기계는 못 묶습니다.
 
-해법은 온톨로지와 시맨틱 레이어였습니다. 핵심은 **2만 개가 넘는 자유 텍스트 리스크 서술을 1,100개의 표준 택소노미로 정규화**한 것입니다 — 흩어진 표현들을 표준 개념에 매핑해, "신용 위험"이든 "여신 리스크"든 같은 택소노미 노드를 가리키게 만든 것. §3.1의 온톨로지가 하는 일 그대로이고, §5의 "CQ에서 인증된 정의로 내려가기"의 실물입니다. 결과로 7개 프로그램을 연결하며 통합 기간이 **1년에서 2개월로** 줄었고, 데이터 제공자 13곳과 40개 넘는 시스템을 연결하며 앱 6개를 폐기해 수백만 달러의 운영·라이선스 비용을 줄였습니다. 여덟 개의 핵심 택소노미는 지금도 여러 전사 애플리케이션에서 함께 쓰입니다. 다만 이 수치는 구축을 수행한 컨설팅사의 자기 보고이고, "1년→2개월"이 순수하게 시맨틱 레이어 덕인지 함께 진행된 조직·프로세스 개선의 몫인지는 사례만으로 분리되지 않습니다 — 벤더 성공담은 늘 이 교란 변수를 안습니다. 그럼에도 값을 한 이유를 진단하면, 문제의 형태가 정확히 **정형 스키마 안에 갇힌 자유 텍스트의 어휘 통일**이었기 때문입니다 — 테이블 구조는 이미 있었고, 정작 맞지 않은 건 칸 안에 사람이 적어 넣은 말이었습니다. 2만 개를 1,100개로 묶는 일은 벡터 검색이 할 수 없고(유사도로 "비슷한" 서술을 찾을 순 있어도 "같은 범주"로 확정하지 못합니다), 온톨로지가 정확히 잘하는 일입니다.
+해법은 온톨로지와 시맨틱 레이어였습니다. 핵심은 **2만 개가 넘는 자유 텍스트 리스크 서술을 1,100개의 표준 택소노미로 정규화**한 것입니다 — 흩어진 표현들을 표준 개념에 매핑해, "신용 위험"이든 "여신 리스크"든 같은 택소노미 노드를 가리키게 만든 것. §3.1의 온톨로지가 하는 일 그대로이고, §5의 "CQ에서 인증된 정의로 내려가기"의 실물입니다. 결과로 7개 프로그램을 연결하며 통합 기간이 **1년에서 2개월로** 줄었고, 데이터 제공자 13곳과 40개 넘는 시스템을 연결하며 앱 6개를 폐기해 수백만 달러의 운영·라이선스 비용을 줄였습니다. 여덟 개의 핵심 택소노미는 지금도 여러 전사 애플리케이션에서 함께 쓰입니다.
+
+다만 이 수치는 구축을 수행한 컨설팅사의 자기 보고이고, "1년→2개월"이 순수하게 시맨틱 레이어 덕인지 함께 진행된 조직·프로세스 개선의 몫인지는 사례만으로 분리되지 않습니다 — 벤더 성공담은 늘 이 교란 변수를 안습니다.
+
+그럼에도 값을 한 이유를 진단하면, 문제의 형태가 정확히 **정형 스키마 안에 갇힌 자유 텍스트의 어휘 통일**이었기 때문입니다 — 테이블 구조는 이미 있었고, 정작 맞지 않은 건 칸 안에 사람이 적어 넣은 말이었습니다. 2만 개를 1,100개로 묶는 일은 벡터 검색이 할 수 없고(유사도로 "비슷한" 서술을 찾을 순 있어도 "같은 범주"로 확정하지 못합니다), 온톨로지가 정확히 잘하는 일입니다.
 
 ### 7.2 BenevolentAI + AstraZeneca — 비정형 지식의 연결 (지식 그래프)
 
 두 번째는 제약입니다. [BenevolentAI](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-achieves-further-milestones-ai-enabled-target-identification-collaboration-astrazeneca/)는 바이오메디컬 지식 그래프를 신약 타깃 발굴에 씁니다. 이 그래프는 과학 문헌·특허·유전 정보·화학·임상시험 같은 이질적 소스를 하나의 어휘로 정규화하고 서로 잇습니다 — §6.1의 이기종 통합이 생명과학에 적용된 형태입니다.
 
-AstraZeneca와의 협업(2019년 시작, 2022년 확장)에서 이 플랫폼은 포트폴리오에 **5개의 신규 약물 타깃**을 올렸습니다 — 만성 신장병(CKD) 2개, 특발성 폐섬유증(IPF) 3개. 작동 원리는 §4.1의 관계 순회를 문헌 규모로 밀어붙인 것이고, 아직 관찰되지 않은 관계를 채우는 대목이 §4.3에서 스쳐 본 링크 예측입니다. 신약 타깃 발굴이 왜 그래프 문제인지 풀어 보겠습니다 — 어떤 유전자가 특정 질병의 치료 표적이 되는지는, 한 논문에 통째로 적혀 있지 않습니다. A 논문이 "유전자 X가 단백질 Y를 조절한다"고 하고, B 논문이 "단백질 Y가 경로 Z에 관여한다"고 하고, C 논문이 "경로 Z가 이 질병에서 교란된다"고 따로 말합니다. 이 세 조각을 이으면 "유전자 X가 이 질병의 표적일 수 있다"는, **어느 논문에도 직접 쓰여 있지 않은** 가설이 나옵니다. 지식 그래프는 이 조각들을 노드와 엣지로 연결해 그 숨은 경로를 드러내고, §4.3의 링크 예측(GNN)은 아직 관찰되지 않은 엣지("X-질병")를 확률로 채웁니다. 게다가 질병 프로그램에서 나온 새 지식이 다시 플랫폼으로 피드백되는 폐순환입니다 — §2.2에서 아직 연구 단계라 한 셋째 갈래(Synergized)에 실무가 가장 가까이 간 형태이고, 다만 순환을 도운 쪽은 LLM이 아니라 사람과 실험이었습니다. 신약 타깃 발굴은 본질적으로 "수백만 편 논문에 흩어진 관계를 연결해 새 관계를 추론하는" 문제이고, 이는 벡터 유사도가 원리적으로 닿을 수 없는 종류의 문제입니다.
+AstraZeneca와의 협업(2019년 시작, 2022년 확장)에서 이 플랫폼은 포트폴리오에 **5개의 신규 약물 타깃**을 올렸습니다 — 만성 신장병(CKD) 2개, 특발성 폐섬유증(IPF) 3개.
 
-덧붙여야 할 후속이 있습니다. **기술이 값을 했다는 것과 회사가 살아남았다는 것은 다른 이야기입니다.** BenevolentAI는 2023년 5월 주력 후보물질 BEN-2293의 임상 2a상 결과를 받고 "추가 투자를 하지 않겠다(will not invest further in BEN-2293 following its Phase 2a trial results)"고 밝힌 뒤 [전략 재편을 발표하며](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-unveils-strategic-plan-position-company-new-era-ai/) "최대 약 180명 감원(reduction of up to approximately 180 employees)"과 **£45M 순 비용 절감**(시설·운영비 £13M + 신약 프로그램·인건비 £32M)을 내놨고, 2024년 4월에는 [사업 우선순위를 다시 조정하며](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-provides-an-update-on-its-business-priorities/) 인력을 약 30% 더 줄이고("reduction in headcount by c.30%") 미국 사업장을 닫았습니다. 이때 접은 제품이 하필 **Knowledge Exploration Tools** — 그래프에 쌓은 지식을 외부 고객이 직접 탐색하게 만들려던 소프트웨어였습니다. 회사의 설명은 "이 SaaS 제품을 완전히 상업화하는 데 필요한 투자를 감안하면(given the investment needed to fully commercialise this SaaS product)" 작업을 중단한다는 것이었습니다. 그리고 2025년 3월 12일 Osaka Holdings와의 합병이 발효되고 이튿날인 3월 13일 Euronext Amsterdam에서 [상장 폐지](https://www.benevolent.com/news-and-media/press-releases-and-in-media/egm-results-announcement/)되어 비상장으로 돌아갔습니다. 이사회를 대표해 [상장 폐지를 제안한 공시](https://www.benevolent.com/news-and-media/press-releases-and-in-media/proposed-delisting-merger-benevolentai-osaka-holdings-s-rl-and-publication-notice-extraordinary-general-meeting/)(2025년 2월 6일)에서 당시 이사회 의장(Executive Chairman)이던 Kenneth Mulvany가 든 이유는 간명합니다 — *"After careful review and, in particular, consideration of the costs attributable to the Company maintaining its listing on Euronext…"*
+신약 타깃 발굴이 왜 그래프 문제인지 풀어 보겠습니다. 어떤 유전자가 특정 질병의 치료 표적이 되는지는 한 논문에 통째로 적혀 있지 않습니다. A 논문이 "유전자 X가 단백질 Y를 조절한다"고 하고, B 논문이 "단백질 Y가 경로 Z에 관여한다"고 하고, C 논문이 "경로 Z가 이 질병에서 교란된다"고 따로 말합니다. 이 세 조각을 이으면 "유전자 X가 이 질병의 표적일 수 있다"는, **어느 논문에도 직접 쓰여 있지 않은** 가설이 나옵니다. 벡터 유사도가 원리적으로 닿을 수 없는 종류의 문제입니다.
+
+지식 그래프는 이 조각들을 노드와 엣지로 이어 숨은 경로를 드러냅니다. §4.1의 관계 순회를 문헌 규모로 밀어붙인 것이고, 아직 관찰되지 않은 엣지("X-질병")를 확률로 채우는 대목이 §4.3에서 스쳐 본 링크 예측(GNN)입니다. 게다가 질병 프로그램에서 나온 새 지식이 다시 플랫폼으로 돌아오는 폐순환입니다 — §2.2에서 아직 연구 단계라 한 셋째 갈래(Synergized)에 실무가 가장 가까이 간 형태이고, 다만 순환을 도운 쪽은 LLM이 아니라 사람과 실험이었습니다.
+
+덧붙여야 할 후속이 있습니다. **기술이 값을 했다는 것과 회사가 살아남았다는 것은 다른 이야기입니다.** BenevolentAI는 2023년 5월 주력 후보물질 BEN-2293의 임상 2a상 결과를 받고 "추가 투자를 하지 않겠다(will not invest further in BEN-2293 following its Phase 2a trial results)"고 밝힌 뒤 [전략 재편을 발표하며](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-unveils-strategic-plan-position-company-new-era-ai/) "최대 약 180명 감원(reduction of up to approximately 180 employees)"과 **£45M 순 비용 절감**(시설·운영비 £13M + 신약 프로그램·인건비 £32M)을 내놨고, 2024년 4월에는 [사업 우선순위를 다시 조정하며](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-provides-an-update-on-its-business-priorities/) 인력을 약 30% 더 줄이고("reduction in headcount by c.30%") 미국 사업장을 닫았습니다.
+
+이때 접은 제품이 하필 **Knowledge Exploration Tools** — 그래프에 쌓은 지식을 외부 고객이 직접 탐색하게 만들려던 소프트웨어였습니다. 회사의 설명은 "이 SaaS 제품을 완전히 상업화하는 데 필요한 투자를 감안하면(given the investment needed to fully commercialise this SaaS product)" 작업을 중단한다는 것이었습니다.
+
+그리고 2025년 3월 12일 Osaka Holdings와의 합병이 발효되고 이튿날인 3월 13일 Euronext Amsterdam에서 [상장 폐지](https://www.benevolent.com/news-and-media/press-releases-and-in-media/egm-results-announcement/)되어 비상장으로 돌아갔습니다. 이사회를 대표해 [상장 폐지를 제안한 공시](https://www.benevolent.com/news-and-media/press-releases-and-in-media/proposed-delisting-merger-benevolentai-osaka-holdings-s-rl-and-publication-notice-extraordinary-general-meeting/)(2025년 2월 6일)에서 당시 이사회 의장(Executive Chairman)이던 Kenneth Mulvany가 든 이유는 간명합니다 — *"After careful review and, in particular, consideration of the costs attributable to the Company maintaining its listing on Euronext…"*
 
 이 결말에서 무엇을 배울지가 중요합니다. 그래프가 틀렸다는 결론은 과합니다 — 타깃 5개는 실제로 포트폴리오에 올랐고, 그 판정은 임상이 내립니다. 배울 것은 오히려 **자산의 수익화 경로**입니다. 지식 그래프는 가설 생성 장치이고, 가설의 값은 그것을 검증할 자본과 시간이 있을 때만 회수됩니다. 문헌 관계를 잇는 데 성공한 회사가 그 관계를 파는 데(Knowledge Exploration Tools) 실패하고 스스로 검증할 활주로(runway)도 잃으면, 그래프의 정확도와 무관하게 사업은 접힙니다. 이 사례에서 검증된 건 "그래프가 문헌에 흩어진 가설을 만들어 낸다"까지이고, "그래프가 신약을 만든다"는 아직 아닙니다 — 벤더 사례를 읽을 때 이 두 문장을 섞지 않는 게 중요합니다.
 
@@ -537,17 +560,21 @@ AstraZeneca와의 협업(2019년 시작, 2022년 확장)에서 이 플랫폼은 
 
 먼저 이 절의 출처를 밝혀 두겠습니다. 이하 수치는 전부 [Cerebras 엔지니어링 블로그](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base) 하나에서 나온 회사 자체 보고이고, 외부 검증도 제3자 재현도 없습니다. 게재일 표기가 없으며, 이 글을 쓰는 시점에 원문 URL은 HTTP 500을 반환해 아래 인용은 모두 [2026년 7월 20일 아카이브 스냅샷](http://web.archive.org/web/20260720010722/https://www.cerebras.ai/blog/how-we-built-our-knowledge-base)에 보존된 본문에서 대조했습니다. 즉 절대 수치보다 **아키텍처 선택과 그 이유**를 읽을 자료입니다.
 
-그 단서를 달고 보면, 이 지식 베이스는 **출시 3개월 만에** 사내에서 가장 널리 쓰이는 도구 중 하나가 되어 하루 15,000건 넘는 질의를 받습니다. 놀라운 건 저장 계층의 소박함입니다 — 온톨로지도, 지식 그래프도, 시맨틱 레이어도 없습니다. **핵심은 임베딩·요약·메타데이터를 함께 담은 단일 Postgres 테이블**이고("At the core is a single Postgres table that holds embeddings, raw summaries, and metadata from many sources"), Slack 스레드든 코드든 위키든 모든 소스가 같은 스키마·같은 3,072차원 임베딩으로 들어갑니다 — 소스별 특수 처리를 저장 단계에서 하지 않겠다는 선언입니다. 검색은 그래프 순회가 아니라 **여러 신호를 겹쳐 쓰는 하이브리드**입니다. 블로그가 Slack 스레드 적재를 예로 들며 꼽은 네 가지가 전문 검색(full-text search), 임베딩 검색, 역문서빈도(inverse document frequency), 시효 감쇠(age decay)입니다. IDF는 흔한 단어의 가중치를 낮추고 드문 단어를 높이는 고전 검색 지표로, 블로그의 표현을 빌리면 *"sounds good, thanks!"* 같은 문장은 임베딩 공간에서 많은 질의와 가까이 있지만 단어 희소성을 반영하면 점수가 0에 가까워집니다. 시효 감쇠는 최근 문서에 가점을 주는 장치입니다 — 같은 질문에 답하는 스레드가 둘이면 반년 전 것은 이미 없어진 인프라를 설명하고 있을 수 있습니다. 네 신호를 역순위 융합(RRF, Reciprocal Rank Fusion)으로 합치는데, 공식은 이렇습니다.
+그 단서를 달고 보면, 이 지식 베이스는 **출시 3개월 만에** 사내에서 가장 널리 쓰이는 도구 중 하나가 되어 하루 15,000건 넘는 질의를 받습니다. 놀라운 건 저장 계층의 소박함입니다 — 온톨로지도, 지식 그래프도, 시맨틱 레이어도 없습니다. **핵심은 임베딩·요약·메타데이터를 함께 담은 단일 Postgres 테이블**이고("At the core is a single Postgres table that holds embeddings, raw summaries, and metadata from many sources"), Slack 스레드든 코드든 위키든 모든 소스가 같은 스키마·같은 3,072차원 임베딩으로 들어갑니다 — 소스별 특수 처리를 저장 단계에서 하지 않겠다는 선언입니다.
+
+검색도 그래프 순회가 아니라 **여러 신호를 겹쳐 쓰는 하이브리드**입니다. 블로그가 Slack 스레드 적재를 예로 들며 꼽은 네 가지가 전문 검색(full-text search), 임베딩 검색, 역문서빈도(inverse document frequency), 시효 감쇠(age decay)입니다. IDF는 흔한 단어의 가중치를 낮추고 드문 단어를 높이는 고전 검색 지표로, 블로그의 표현을 빌리면 *"sounds good, thanks!"* 같은 문장은 임베딩 공간에서 많은 질의와 가까이 있지만 단어 희소성을 반영하면 점수가 0에 가까워집니다. 시효 감쇠는 최근 문서에 가점을 주는 장치입니다 — 같은 질문에 답하는 스레드가 둘이면 반년 전 것은 이미 없어진 인프라를 설명하고 있을 수 있습니다.
+
+네 신호를 역순위 융합(RRF, Reciprocal Rank Fusion)으로 합치는데, 공식은 이렇습니다.
 
 $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
-각 리스트 $$r$$에서의 순위 $$\mathrm{rank}_r(d)$$의 역수에 그 리스트의 가중치 $$w_r$$를 곱해 더하는 게 전부입니다(Cerebras는 리스트별 기본 가중치를 1.0, 완충 상수를 60으로 적습니다). 점수가 아니라 **순위**를 쓰는 게 요령입니다 — 임베딩 유사도(0~1)와 BM25 점수는 척도가 달라 직접 더할 수 없지만, "몇 등"은 어느 신호에서든 같은 단위입니다. 분모의 상수 60은 1등과 2등의 점수 차가 지나치게 벌어지는 것을 눌러 주는 완충값입니다. Cerebras는 [RRF 원 논문](https://dl.acm.org/doi/10.1145/1571941.1572114)(Cormack, Clarke, Büttcher, SIGIR 2009)을 참고문헌으로 달고 "기본 가중치 1.0, 완충 상수 60"을 그대로 쓴다고 적습니다 — 업계에서 굳어 쓰이는 값입니다. 지식 그래프와는 아무 상관이 없는 고전 정보검색 기법입니다.
+각 리스트 $$r$$에서의 순위 $$\mathrm{rank}_r(d)$$의 역수에 그 리스트의 가중치 $$w_r$$를 곱해 더하는 게 전부입니다(Cerebras는 리스트별 기본 가중치를 1.0, 완충 상수를 60으로 적습니다). 점수가 아니라 **순위**를 쓰는 게 요령입니다 — 임베딩 유사도(0~1)와 BM25 점수는 척도가 달라 직접 더할 수 없지만, "몇 등"은 어느 신호에서든 같은 단위입니다. 분모의 상수 60은 1등과 2등의 점수 차가 지나치게 벌어지는 것을 눌러 주는 완충값으로, [RRF 원 논문](https://dl.acm.org/doi/10.1145/1571941.1572114)(SIGIR 2009) 이후 업계에서 굳어 쓰이는 값입니다. 지식 그래프와는 아무 상관이 없는 고전 정보검색 기법입니다.
 
 물론 파이프라인 전체가 임베딩 테이블 하나로 끝나는 건 아닙니다. 같은 글은 질의를 계획기(planner)→실행기(executor)→종합기(synthesizer)로 나누고, 검색 결과를 LLM 재순위기가 0~10점으로 채점해 상위 열 건만 남기며, 임베딩 전에 문서를 LLM으로 증류하고, "프로젝트" 단위로 검색 범위를 좁히는 장치들을 함께 설명합니다. 요점은 손을 덜 썼다는 게 아니라, **그 손을 온톨로지가 아닌 다른 곳에 썼다**는 것입니다.
 
 소박하다고 대충 만든 건 아닙니다. 오히려 그래프를 안 쓴 대신 **소스별 청킹 전략**에 공을 들였습니다 — Slack은 스레드 단위로 저장해(답글이 달릴 때마다 부모·형제 메시지를 통째로 다시 임베딩해) 맥락 파편화를 막고, 코드는 클래스→메서드로 언어 인식 분할을 합니다. 즉 Cerebras는 "맥락"을 포기한 게 아니라, 맥락을 온톨로지가 아니라 **청킹과 검색 융합에 담은** 것입니다. §4.2의 다섯 단계 중 추출·해소·커뮤니티라는 비싼 세 단계를 건너뛰고, 청킹과 검색만 정교하게 다듬은 셈입니다.
 
-왜 통했을까요. Cerebras의 문제는 "이 코드가 왜 이렇게 짜였지?", "이 기능 담당이 누구지?" 같은 **국소 검색**이 대부분이지, 40개 시스템을 가로지르는 관계 순회가 아니었습니다. §4.1에서 본 GraphRAG의 강점(코퍼스 전체를 두고 묻는 전역 질문)이 필요 없는 워크로드라, 지식 그래프의 인덱싱 비용과 유지보수 부담(§7.4의 함정들)을 질 이유가 없었습니다. 이 글에서 가장 뜻밖의 교훈이 나오는 대목입니다 — **AI-ready 데이터를 만든다는 게 반드시 지식 그래프를 세운다는 뜻은 아닙니다.** Cerebras도 맥락을 새겨 넣었습니다. 다만 그 층위를 온톨로지가 아니라 검색 파이프라인으로 낮췄을 뿐입니다. 문제의 형태가 그걸 허락했으니까요. 반대로 이 워크로드에 §7.6의 Cyc처럼 어휘 전체를 먼저 그리려 들었다면, 출시 3개월이 아니라 몇 년째 아무도 안 쓰는 시스템을 다듬고 있었을 것입니다. §7.1의 은행이 온톨로지로 이긴 건 문제의 형태가 달랐기 때문입니다 — 스무 개 시스템의 어휘를 맞추는 일에는 표준 개념 집합이 반드시 필요했습니다.
+왜 통했을까요. Cerebras의 문제는 "이 코드가 왜 이렇게 짜였지?", "이 기능 담당이 누구지?" 같은 **국소 검색**이 대부분이지, 40개 시스템을 가로지르는 관계 순회가 아니었습니다. §4.1에서 본 GraphRAG의 강점(코퍼스 전체를 두고 묻는 전역 질문)이 필요 없는 워크로드라, 지식 그래프의 인덱싱 비용과 유지보수 부담(§7.4의 함정들)을 질 이유가 없었습니다. 여기서 나오는 교훈은 이렇습니다 — **AI-ready 데이터를 만든다는 게 반드시 지식 그래프를 세운다는 뜻은 아닙니다.** Cerebras도 맥락을 새겨 넣었습니다. 다만 그 층위를 온톨로지가 아니라 검색 파이프라인으로 낮췄을 뿐입니다. 문제의 형태가 그걸 허락했으니까요. 반대로 이 워크로드에 §7.6의 Cyc처럼 어휘 전체를 먼저 그리려 들었다면, 출시 3개월이 아니라 몇 년째 아무도 안 쓰는 시스템을 다듬고 있었을 것입니다. §7.1의 은행이 온톨로지로 이긴 건 문제의 형태가 달랐기 때문입니다 — 스무 개 시스템의 어휘를 맞추는 일에는 표준 개념 집합이 반드시 필요했습니다.
 
 세 사례를 나란히 놓으면 논지가 완성됩니다. 도구가 결과를 정하는 게 아니라, **데이터 형태와 문제의 형태**가 도구를 정합니다.
 
@@ -557,11 +584,13 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 | BenevolentAI | 비정형(문헌·특허 관계) | 바이오메디컬 지식 그래프 | 신약 타깃 5개 |
 | Cerebras | 비정형(사내 국소 Q&A) | 없음(Postgres 벡터 하이브리드) | 출시 3개월 만에 일 1.5만 질의 |
 
-세 사례가 "언제 값을 하는가"를 보였다면, 이제 "무엇이 무너지는가"로 넘어갑니다. 지식 그래프·GraphRAG는 만능이 아닙니다 — 2025~2026년의 독립 평가가 어디서 어떻게 무너지는지를 숫자로 짚어 놨습니다. LLM 추출은 구조적으로 불안정하고 답 엔티티를 아예 빠뜨리며(§7.4), 그래프가 늘 이기는 것도 아니고(§7.5), 역사에는 반면교사가 있습니다(§7.6). 이건 도입을 말리는 게 아니라, 손익분기선(§2)의 비용 쪽에 무엇이 들어가는지를 채우는 것입니다.
+세 사례가 "언제 값을 하는가"를 보였다면, 이제 "무엇이 무너지는가"로 넘어갑니다. 지식 그래프·GraphRAG는 만능이 아닙니다 — 2025~2026년의 독립 평가가 어디서 어떻게 무너지는지를 숫자로 짚어 놨습니다. LLM 추출은 구조적으로 불안정하고 답 엔티티를 아예 빠뜨리며(§7.4), 그래프가 늘 이기는 것도 아니고(§7.5), 역사에는 반면교사가 있습니다(§7.6).
 
 ### 7.4 LLM이 뽑은 그래프는 왜 조각나는가
 
-§4.4에서 LLM 자동 추출이 GraphRAG를 값싸게 만든다고 했지만, 그 산출물의 품질에는 측정된 함정이 있습니다. *Are Large Language Models Effective Knowledge Graph Constructors?*라는 제목의 [2025년 10월 연구](https://arxiv.org/abs/2510.11297)(Ruirui Chen et al. — 앞의 PathRAG 저자와는 다른 연구팀입니다)는 같은 코퍼스를 여섯 개 모델에 똑같이 주고 나온 그래프의 **모양**을 재 봤습니다. 지표는 거대 연결 요소 비율($$F_{GC}$$) — 전체 노드 중 가장 큰 연결 덩어리에 속한 비율입니다. GPT-4o의 초기 추출 결과는 **0.249**였습니다. 노드의 24.9%만 본체에 속하고 나머지는 논문의 표현대로 *"isolated subgraphs(\"islands\")"* — 작은 조각들로 흩어졌다는 뜻입니다. 이 숫자는 정확히 읽어야 합니다. 나머지 75%가 낱개로 떠 있다는 뜻은 아닙니다. 그것들끼리는 이어져 있을 수 있고, 다만 그 무리들이 본체와 끊겨 있습니다. §3.1의 세 단계로 판정하면 이 그래프는 가장 느슨한 첫 단계, 이름표만 붙은 상태에 머물러 있습니다 — 조직 원리가 없으니 무엇까지를 같은 엔티티로 볼지도 정해져 있지 않고, 아래 숫자들이 그 공백의 대가입니다.
+§4.4에서 LLM 자동 추출이 GraphRAG를 값싸게 만든다고 했지만, 그 산출물의 품질에는 측정된 함정이 있습니다. *Are Large Language Models Effective Knowledge Graph Constructors?*라는 제목의 [2025년 10월 연구](https://arxiv.org/abs/2510.11297)(Ruirui Chen et al. — 앞의 PathRAG 저자와는 다른 연구팀입니다)는 같은 코퍼스를 여섯 개 모델에 똑같이 주고 나온 그래프의 **모양**을 재 봤습니다. 지표는 거대 연결 요소 비율($$F_{GC}$$) — 전체 노드 중 가장 큰 연결 덩어리에 속한 비율입니다. GPT-4o의 초기 추출 결과는 **0.249**였습니다. 노드의 24.9%만 본체에 속하고 나머지는 논문의 표현대로 *"isolated subgraphs(\"islands\")"* — 작은 조각들로 흩어졌다는 뜻입니다.
+
+이 숫자는 정확히 읽어야 합니다. 나머지 75%가 낱개로 떠 있다는 뜻은 아닙니다. 그것들끼리는 이어져 있을 수 있고, 다만 그 무리들이 본체와 끊겨 있습니다. §3.1의 세 단계로 판정하면 이 그래프는 가장 느슨한 첫 단계, 이름표만 붙은 상태에 머물러 있습니다 — 조직 원리가 없으니 무엇까지를 같은 엔티티로 볼지도 정해져 있지 않고, 아래 숫자들이 그 공백의 대가입니다.
 
 이게 왜 치명적인지 생각해 보십시오. GraphRAG의 존재 이유는 §4.1에서 본 "관계를 넘나드는 순회"인데, 노드의 4분의 3이 본체 밖의 다른 섬에 있다면, 본체에서 출발한 순회는 그 섬에 닿지 못합니다. 같은 문단에 나온 두 사실이 그래프에서는 서로 남남이 되는 것 — 그래프의 모양만 갖췄지 그래프의 값어치는 못 하는 상태입니다.
 
@@ -581,7 +610,9 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 ### 7.5 GraphRAG는 만능 업그레이드가 아니다
 
-가장 흔한 오해가 "GraphRAG가 벡터 RAG의 상위 호환"이라는 것입니다. Michigan State·Oregon·UT Arlington·Meta·IBM Research 등 공동 연구진의 [체계적 평가](https://arxiv.org/abs/2502.11371)(Han et al., arXiv:2502.11371 — 전처리·검색·생성 설정을 통일한 공통 프로토콜로 벡터 RAG와 여러 GraphRAG 변종을 같은 조건에서 비교한 연구. 아래 표의 수치는 2025년 2월 초판부터 있고, 통합 결과(66.28)와 후처리별 수치(50.50·83.72), Table 4의 시간·용량, 인용문은 2026년 3월 v3 개정에서 추가된 것입니다)가 내놓은 첫 번째 결론은 정반대입니다 — *"First, RAG and GraphRAG exhibit complementary behaviors rather than a consistent winner."* 한쪽이 늘 이기는 게 아니라 서로 보완한다는 뜻입니다. 네 QA 벤치마크에 일곱 구성(벡터 RAG, RaptorRAG, KG-GraphRAG 두 변종, Community-GraphRAG의 Local·Global, HippoRAG2)을 교차한 이 평가의 숫자를 보면 방향이 갈리는 지점이 분명합니다. 다만 읽는 범위를 좁혀 두겠습니다 — 아래 수치는 이 논문이 고른 QA 데이터셋 넷(NQ·HotpotQA·MultiHop-RAG·NovelQA)에서 같은 코퍼스·같은 설정으로 잰 값이고, 도메인이나 인덱싱 구성이 달라지면 우열의 폭도 달라집니다. 가져갈 것은 절댓값이 아니라 **어떤 질의 유형에서 방향이 뒤집히는가**입니다.
+가장 흔한 오해가 "GraphRAG가 벡터 RAG의 상위 호환"이라는 것입니다. 미국·유럽 여러 대학과 Meta·IBM Research 공동 연구진이 [벡터 RAG와 GraphRAG 변종들을 같은 조건에서 비교했습니다](https://arxiv.org/abs/2502.11371)(Han et al., v3 기준) — 전처리·검색·생성 설정을 통일한 공통 프로토콜로 네 QA 벤치마크에 일곱 구성을 교차한 평가입니다. 첫 번째 결론이 통념과 정반대입니다 — *"First, RAG and GraphRAG exhibit complementary behaviors rather than a consistent winner."* 한쪽이 늘 이기는 게 아니라 서로 보완한다는 뜻입니다.
+
+수치를 읽는 범위를 먼저 좁혀 두겠습니다. 아래는 이 논문이 고른 QA 데이터셋 넷에서 같은 코퍼스·같은 설정으로 잰 값이라, 도메인이나 인덱싱 구성이 달라지면 우열의 폭도 달라집니다. 가져갈 것은 절댓값이 아니라 **어떤 질의 유형에서 방향이 뒤집히는가**입니다.
 
 | 벤치마크 · 질의 유형 | 벡터 RAG | GraphRAG (Local) | GraphRAG (Global) |
 |---|---|---|---|
@@ -592,9 +623,11 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 읽는 법이 중요합니다. 단일 홉 사실 질의(NQ)에서는 벡터가 앞섭니다. 사건의 전후 관계를 묻는 MultiHop-RAG의 Temporal 질의에서는 벡터가 30.70인데 그래프가 Local 50.60(**+19.9%포인트**)·Global 53.34(**+22.6%포인트**)로 앞섭니다 — 흩어진 사건을 모아 순서를 세우는 일이 그래프의 정중앙입니다. 그런데 같은 표에서 Global 검색은 NQ F1에서 10.3점, NovelQA times에서 13.4점을 벡터에 내줍니다(지표 척도가 서로 달라 절대 점수 차로 읽어야 합니다). 논문의 설명이 명확합니다 — *"Global search retrieves high-level community summaries, which can lose fine-grained evidence and hurt detail-centric QA, as reflected on detail-oriented subsets in NovelQA."* 커뮤니티 요약은 전역 감각을 주는 대신 세부 증거를 뭉개 버리고, 그 손실이 NovelQA의 세부 질의 부분집합에서 드러난다는 것입니다.
 
-그래서 현장의 답은 대개 "둘 다"입니다 — [HybridRAG 논문](https://arxiv.org/abs/2408.04948)(2024)이 금융 어닝콜 전사를 대상으로 벡터 DB와 지식 그래프 **양쪽에서** 검색한 결과가 각 단독을 능가함을 실증했습니다. 그러니 실무 교훈은 "GraphRAG를 쓸까"가 아니라 **"어느 검색 모드를 쓸까"**입니다. 같은 GraphRAG 안에서도 Local과 Global의 성적이 질의 유형에 따라 수십 포인트까지 갈리니, 하나로 고정해 두면 절반의 질의에서 손해를 봅니다. 위 표의 NovelQA "times" 행만 보면 격차가 15.24%포인트지만, 같은 논문 Table 2의 MultiHop-RAG NULL 질의에서는 Local 80.07 대 Global 19.27로 **60.8%포인트**까지 벌어지고, 반대로 Temporal 질의에서는 Global이 53.34로 Local 50.60을 앞섭니다 — 어느 쪽이 이기는지가 질의 유형마다 뒤집힙니다. 논문이 권하는 것도 이겁니다 — 질의 유형으로 라우팅하거나(Strategy 1), 둘의 결과를 통합하거나(Strategy 2). 실제로 통합했을 때 NQ F1이 RAG 64.78·GraphRAG 63.01에서 **66.28**로 둘 다를 넘었습니다(v3 Table 20, Llama3.1-8B).
+그래서 실무 교훈은 "GraphRAG를 쓸까"가 아니라 **"어느 검색 모드를 쓸까"**가 됩니다. 같은 GraphRAG 안에서도 Local과 Global이 질의 유형에 따라 갈리는 폭이 큽니다 — 같은 논문 Table 2의 MultiHop-RAG NULL 질의(답할 근거가 없는 질문)에서는 Local 80.07 대 Global 19.27로 **60.8%포인트**까지 벌어집니다. 하나로 고정해 두면 절반의 질의에서 손해를 보는 셈입니다.
 
-그리고 이 승패는 검색 후처리를 얹어도 대체로 뒤집히지 않습니다. 같은 평가가 재순위화(reranking)와 반복 검색(IRCoT)까지 교차해 봤는데, 질의 유형별 우위 관계는 그대로였습니다.
+논문이 권하는 처방은 둘입니다 — 질의 유형을 보고 갈라 태우거나, 두 결과를 통합하거나. 실제로 통합했을 때 NQ F1이 벡터 64.78·그래프 63.01에서 **66.28**로 둘 다를 넘었습니다(v3 Table 20). 현장에서 "둘 다"를 쓰는 것이 이 계산의 답이고, [HybridRAG 논문](https://arxiv.org/abs/2408.04948)(2024)도 금융 어닝콜 전사에서 벡터 DB와 지식 그래프 **양쪽** 검색이 각 단독을 능가함을 실증했습니다.
+
+그리고 이 승패는 검색 후처리를 얹어도 대체로 뒤집히지 않습니다. 같은 평가가 검색 결과를 손보는 두 후처리까지 교차해 봤습니다 — **재순위화(reranking)**는 회수한 조각을 다시 점수 매겨 순서를 바꾸는 것이고, **IRCoT**는 한 번에 답하지 않고 "지금까지 모은 근거로 다음에 무엇을 더 찾아야 하나"를 되물으며 검색과 추론을 번갈아 돌리는 방식입니다. 둘 다 얹어 봤지만 질의 유형별 우위 관계는 그대로였습니다.
 
 <a href="https://arxiv.org/html/2502.11371v3/#S4.F1" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 추론 전략(Rerank · Vanilla · IRCoT)별 QA 성능 — 단일 홉(NQ)에서는 벡터 RAG가, 멀티홉(MultiHop-RAG)에서는 그래프 기반 HippoRAG2가 전략과 무관하게 앞선다 (출처: Han et al., RAG vs. GraphRAG: A Systematic Evaluation and Key Insights, 2025, Figure 1)">
   <img src="https://arxiv.org/html/2502.11371v3/x1.png" alt="추론 전략별 QA 성능을 비교한 두 개의 꺾은선 그래프. 왼쪽 NQ(단일 홉)에서는 Rerank·Vanilla·IRCoT 세 전략 모두에서 벡터 RAG가 가장 높은 F1을 유지하고, 오른쪽 MultiHop-RAG(멀티홉)에서는 그래프 기반 HippoRAG2가 세 전략 모두에서 가장 높다. 전략을 바꿔도 방법 사이의 순서는 유지되지만, MultiHop-RAG의 Community-GraphRAG(Local)만 IRCoT에서 Vanilla보다 낮게 떨어진다." />
@@ -602,7 +635,9 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 두 패널의 색깔 순서가 서로 뒤집혀 있다는 게 이 그림의 전부입니다. 단일 홉(NQ)에서는 벡터 RAG가 세 전략 내내 맨 위에 있고, 멀티홉(MultiHop-RAG)에서는 그래프를 쓰는 HippoRAG2가 세 전략 내내 맨 위에 있습니다. 후처리는 방법의 순서를 바꾸지 못하고 각자의 점수를 함께 밀어 올리는 데 그칩니다 — 즉 방법 선택을 대신해 주지 않습니다.
 
-그런데 이 그림에는 반례가 하나 박혀 있고, 그게 오히려 교훈입니다. MultiHop-RAG 패널의 Community-GraphRAG(Local)은 IRCoT를 붙이자 vanilla보다 **내려갑니다**. 논문이 원인을 특정합니다 — "정보가 부족하니 답할 수 없다"고 답해야 하는 NULL 질의의 정확도가 80.07에서 **50.50**으로 무너졌기 때문입니다(v3 Table 18, Llama3.1-8B). 다른 유형은 다 올랐는데 이 하나가 전체를 끌어내렸습니다. 논문의 해석은 반복 검색이 **과잉 생성(over-generation)**을 부추긴다는 것입니다 — 근거가 없으면 침묵해야 할 자리에서 모델이 자꾸 답을 만들어 내는 쪽으로 기운다는 뜻입니다. 실무에서 이건 정확도 몇 점보다 비싼 실패입니다. "모르겠습니다"를 할 줄 아는 능력은 후처리를 얹을 때 조용히 깎여 나갈 수 있고, 종합 점수만 보면 그 손실이 보이지 않습니다. 파이프라인에 단계를 하나 더 얹을 때마다 **거절률(abstention)을 따로 측정해야 하는 이유**입니다. 반복 검색만의 문제도 아닙니다 — 같은 표에서 재순위화를 붙인 벡터 RAG도 NULL 질의 정확도가 96.01에서 83.72로 내려갑니다. 종합 점수는 67.02에서 69.91로 올라간 채로 말입니다. 후처리는 대체로 평균을 올리면서 "모르겠습니다"를 깎습니다.
+그런데 이 그림에는 반례가 하나 박혀 있고, 그게 오히려 교훈입니다. MultiHop-RAG 패널의 Community-GraphRAG(Local)은 IRCoT를 붙이자 vanilla보다 **내려갑니다**. 논문이 원인을 특정합니다 — "정보가 부족하니 답할 수 없다"고 답해야 하는 NULL 질의의 정확도가 80.07에서 **50.50**으로 무너졌기 때문입니다(v3 Table 18, Llama3.1-8B). 다른 유형은 다 올랐는데 이 하나가 전체를 끌어내렸습니다. 논문의 해석은 반복 검색이 **과잉 생성(over-generation)**을 부추긴다는 것입니다 — 근거가 없으면 침묵해야 할 자리에서 모델이 자꾸 답을 만들어 내는 쪽으로 기운다는 뜻입니다.
+
+실무에서 이건 정확도 몇 점보다 비싼 실패입니다. "모르겠습니다"를 할 줄 아는 능력은 후처리를 얹을 때 조용히 깎여 나갈 수 있고, 종합 점수만 보면 그 손실이 보이지 않습니다. 파이프라인에 단계를 하나 더 얹을 때마다 **거절률(abstention)을 따로 측정해야 하는 이유**입니다. 반복 검색만의 문제도 아닙니다 — 같은 표에서 재순위화를 붙인 벡터 RAG도 NULL 질의 정확도가 96.01에서 83.72로 내려갑니다. 종합 점수는 67.02에서 69.91로 올라간 채로 말입니다. 후처리는 대체로 평균을 올리면서 "모르겠습니다"를 깎습니다.
 
 비용도 재확인해야 합니다. 같은 평가의 Table 4(MultiHop-RAG 기준)가 세 방식의 시간·용량을 나란히 재 놓았습니다.
 
@@ -614,15 +649,19 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 두 가지를 짚어야 합니다. 첫째, 비싼 건 디스크가 아닙니다 — 저장 용량은 세 방식이 117~165MB로 사실상 같고, 벌어지는 건 LLM 호출이 만드는 시간입니다. 둘째, **검색 지연에서는 Community-GraphRAG가 벡터 RAG보다 오히려 빨랐습니다**(1,249초 vs 1,724초). 논문의 설명은 커뮤니티 단위 직접 매칭이라 순회가 짧다는 것이고, 반대로 KG-GraphRAG가 14,434초로 최악인 건 LLM 기반 엔티티 확장과 다단 순회를 매 질의마다 돌기 때문입니다. 그래프가 느리다는 통념은 절반만 맞습니다 — 느린 건 구축이고, 질의 시점 지연은 어떤 그래프를 어떻게 순회하느냐에 달렸습니다.
 
-여기서 LazyGraphRAG(§4.4)의 자리도 다시 잡아야 합니다. 그건 LLM 비용을 없앤 게 아니라 인덱싱에서 **쿼리 시점으로 옮긴** 것입니다. 구조적으로 이건 성격이 다른 두 비용의 교환입니다 — 인덱싱은 코퍼스 크기에 비례하는 **한 번의 지출**이고, 질의 시점 LLM 호출은 질의 수에 비례해 **매번 다시 청구되는** 지출입니다. 그러니 손익 계산에 넣어야 할 값은 코퍼스 크기 하나가 아니라 **코퍼스 크기 대 질의 빈도의 비율**입니다. 그렇다고 이 교환이 손해로 뒤집힌다는 뜻은 아닙니다 — §4.4의 벤더 수치대로면 옮겨 간 쪽의 질의 비용도 벡터 RAG와 맞먹는 수준이니, "질의가 잦으면 LazyGraphRAG가 불리해진다"는 결론은 그 숫자에서 곧바로 나오지 않습니다. 질문 하나에 관련성 판정(relevance test)을 넉넉히 돌리고 비싼 모델을 붙여 질의당 비용이 벤더 보고치를 크게 웃돌 때만 성립합니다. 그러니 실무에서 챙길 건 숫자가 아니라 **어느 축에 청구서가 붙는지**입니다 — 질의가 드문 아카이브라면 선불을 없앤 쪽이 명백히 유리하고, 질의가 하루 수만 건 쏟아지는 서비스라면 그 관련성 판정 예산이 곧 월 청구서가 되니 비용 한도로 관리해야 합니다.
+여기서 LazyGraphRAG(§4.4)의 자리도 다시 잡아야 합니다. 그건 LLM 비용을 없앤 게 아니라 인덱싱에서 **쿼리 시점으로 옮긴** 것입니다. 구조적으로 이건 성격이 다른 두 비용의 교환입니다 — 인덱싱은 코퍼스 크기에 비례하는 **한 번의 지출**이고, 질의 시점 LLM 호출은 질의 수에 비례해 **매번 다시 청구되는** 지출입니다.
 
-균형을 위해 덧붙이면, 이건 GraphRAG를 쓰지 말라는 뜻이 아닙니다. 독립 실무 평가인 [Thoughtworks Technology Radar](https://www.thoughtworks.com/radar/techniques/graphrag)(2025년 4월 2일 게재, 현재 판에서는 내려감)는 GraphRAG를 경계 대상('Hold')이 아니라 **'Trial'**(시도할 가치 있음)에 놓고 *"In many cases this approach enhances LLM-generated responses"* — 많은 경우 이 접근이 LLM 응답을 개선한다 — 고 평가했습니다. Technology Radar의 'Trial'은 "위험을 감당할 수 있는 프로젝트에서 실제로 시도해 역량을 쌓을 가치가 있다"는 뜻이지 "검증된 안전한 기본값"은 아닙니다. 이 온도차가 정확합니다 — §2의 손익분기선이 움직이고 있으니 지금 배워 둘 가치는 충분하지만, §7.4·§7.5의 함정이 그대로 남아 있으니 "일단 다 그래프로"는 위험합니다. 요점은 만능이 아니라는 것이고, 판단 기준을 표로 정리한 게 다음 절입니다.
+그러니 손익 계산에 넣어야 할 값은 코퍼스 크기 하나가 아니라 **코퍼스 크기 대 질의 빈도의 비율**입니다. 그렇다고 이 교환이 손해로 뒤집힌다는 뜻은 아닙니다 — §4.4의 벤더 수치대로면 옮겨 간 쪽의 질의 비용도 벡터 RAG와 맞먹는 수준이니, "질의가 잦으면 LazyGraphRAG가 불리해진다"는 결론은 그 숫자에서 곧바로 나오지 않습니다. 질문 하나에 관련성 판정(relevance test)을 넉넉히 돌리고 비싼 모델을 붙여 질의당 비용이 벤더 보고치를 크게 웃돌 때만 성립합니다. 그러니 실무에서 챙길 건 숫자가 아니라 **어느 축에 청구서가 붙는지**입니다 — 질의가 드문 아카이브라면 선불을 없앤 쪽이 명백히 유리하고, 질의가 하루 수만 건 쏟아지는 서비스라면 그 관련성 판정 예산이 곧 월 청구서가 되니 비용 한도로 관리해야 합니다.
+
+균형을 위해 덧붙이면, 이건 GraphRAG를 쓰지 말라는 뜻이 아닙니다. 독립 실무 평가인 [Thoughtworks Technology Radar](https://www.thoughtworks.com/radar/techniques/graphrag)(2025년 4월 2일 게재, 현재 판에서는 내려감)는 GraphRAG를 경계 대상('Hold')이 아니라 **'Trial'**(시도할 가치 있음)에 놓고 *"In many cases this approach enhances LLM-generated responses"* — 많은 경우 이 접근이 LLM 응답을 개선한다 — 고 평가했습니다. Technology Radar의 'Trial'은 "위험을 감당할 수 있는 프로젝트에서 실제로 시도해 역량을 쌓을 가치가 있다"는 뜻이지 "검증된 안전한 기본값"은 아닙니다. 이 온도차가 정확합니다 — §2의 손익분기선이 움직이고 있으니 지금 배워 둘 가치는 충분하지만, §7.4·§7.5의 함정이 그대로 남아 있으니 "일단 다 그래프로"는 위험합니다. 판단 기준을 표로 정리한 게 다음 절입니다.
 
 ### 7.6 반면교사 셋 — Cyc, Freebase, IBM Watson
 
 역사에는 맥락을 새겨 넣는 일이 실패한 사료가 있습니다. 세 갈래의 실패입니다.
 
-**Cyc** — 맥락을 **과도하게** 박으려다 짓눌린 사례입니다. Douglas Lenat — Carnegie Mellon과 Stanford에서 컴퓨터과학을 가르쳤고, 수학적 발견을 탐색으로 다룬 기계 학습 프로그램 AM으로 [IJCAI Computers and Thought Award](https://en.wikipedia.org/wiki/IJCAI_Computers_and_Thought_Award)를 받은 [AAAI 초대 펠로](https://en.wikipedia.org/wiki/Douglas_Lenat) — 이 1984년 7월 MCC에서 시작한 상식(common-sense) 지식 베이스입니다. "인간이 당연히 아는 것 — 물은 젖어 있고, 부모는 자식보다 나이가 많고 — 을 전부 손으로 규칙화하면 진짜 지능이 나온다"는 야심이었습니다. 결과는 [문헌에 기록된 것만 세도](https://en.wikipedia.org/wiki/Cyc) 2002년까지 **$60M와 600 person-years**, 2017년 시점 약 2,450만 개의 공리(axiom)를 손으로 인코딩한 것이었고, Lenat은 2023년 세상을 떠날 때까지 "일반 지능"에 닿지 못했습니다. *The Master Algorithm*의 저자 [Pedro Domingos](https://en.wikipedia.org/wiki/Pedro_Domingos)(워싱턴대 컴퓨터과학·공학 명예교수)는 Cyc를 "catastrophic failure"라 불렀습니다. 원인은 명확합니다 — 세상의 모든 맥락을 미리 새겨 넣으려는 야심 자체가 밑 빠진 독이었습니다. 이게 "ontology bloat"의 원조이고, 필자가 보기에 오늘의 LLM은 정확히 반대 길(규칙을 손으로 짜지 않고 데이터에서 통계적으로 학습)로 Cyc가 40년간 붙들었던 것에 부분적으로 닿았습니다. 그 방어선은 §5의 Competency Question입니다 — "세상 전부"가 아니라 "답해야 할 질문에만 답하는" 온톨로지로 범위를 묶는 규율입니다.
+**Cyc** — 맥락을 **과도하게** 박으려다 짓눌린 사례입니다. AI 연구자 [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat)이 1984년 7월 MCC에서 시작한 상식(common-sense) 지식 베이스입니다. "인간이 당연히 아는 것 — 물은 젖어 있고, 부모는 자식보다 나이가 많고 — 을 전부 손으로 규칙화하면 진짜 지능이 나온다"는 야심이었습니다. 결과는 [문헌에 기록된 것만 세도](https://en.wikipedia.org/wiki/Cyc) 2002년까지 **$60M와 600 person-years**, 2017년 시점 약 2,450만 개의 공리(axiom)를 손으로 인코딩한 것이었고, Lenat은 2023년 세상을 떠날 때까지 "일반 지능"에 닿지 못했습니다. *The Master Algorithm*의 저자 [Pedro Domingos](https://en.wikipedia.org/wiki/Pedro_Domingos)(워싱턴대 컴퓨터과학·공학 명예교수)는 Cyc를 "catastrophic failure"라 불렀습니다.
+
+원인은 명확합니다 — 세상의 모든 맥락을 미리 새겨 넣으려는 야심 자체가 밑 빠진 독이었습니다. 이게 "ontology bloat"의 원조이고, 필자가 보기에 오늘의 LLM은 정확히 반대 길(규칙을 손으로 짜지 않고 데이터에서 통계적으로 학습)로 Cyc가 40년간 붙들었던 것에 부분적으로 닿았습니다. 그 방어선은 §5의 Competency Question입니다 — "세상 전부"가 아니라 "답해야 할 질문에만 답하는" 온톨로지로 범위를 묶는 규율입니다.
 
 **Freebase** — 대규모 지식 그래프도 죽는다는 사료입니다. Metaweb이 2007년 3월 공개해 [2014년 1월 기준 4,400만 토픽·24억 팩트](https://en.wikipedia.org/wiki/Freebase_%28database%29)를 담았고 Google이 2010년 7월 인수했지만, 2014년 12월 종료를 예고하고 2016년 5월 2일 문을 닫으며 데이터를 Wikidata로 넘겼습니다. Google 지식 그래프의 일부 동력이 이 데이터였는데도 그랬습니다 — 유지 비용과 커뮤니티 동력이 사업성과 안 맞으면 최대 규모의 그래프도 접힙니다. 내려받은 덤프가 남아 있다는 것과 살아 있는 그래프라는 건 다른 이야기입니다.
 
