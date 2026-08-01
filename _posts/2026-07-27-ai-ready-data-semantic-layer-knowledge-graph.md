@@ -583,7 +583,7 @@ AstraZeneca와의 협업(2019년 시작, 2022년 확장)에서 이 플랫폼은 
 
 세 번째 사례가 앞의 둘을 뒤집습니다. 앞의 둘이 "맥락을 새겨 넣는 일이 값을 했다"는 이야기라면, Cerebras는 "무거운 사전 작업 **없이도** 이겼다"는 이야기이기 때문입니다.
 
-먼저 이 절의 출처를 밝혀 두겠습니다. 이하 수치는 전부 [Cerebras 엔지니어링 블로그](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base) 하나에서 나온 회사 자체 보고이고, 외부 검증도 제3자 재현도 없습니다. 게재일 표기가 없으며, 이 글을 쓰는 시점에 원문 URL은 HTTP 500을 반환합니다. 아래 인용은 [2026년 7월 20일 아카이브 스냅샷](http://web.archive.org/web/20260720010722/https://www.cerebras.ai/blog/how-we-built-our-knowledge-base)에서 대조했는데, 그 스냅샷도 서버 오류를 함께 캡처한 상태입니다 — 다만 페이지 데이터 페이로드에 본문이 온전히 남아 있어 그것으로 확인했습니다. 즉 절대 수치보다 **아키텍처 선택과 그 이유**를 읽을 자료입니다.
+먼저 이 절의 출처를 밝혀 두겠습니다. 이하 수치는 전부 [Cerebras 엔지니어링 블로그](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base) 하나에서 나온 회사 자체 보고이고, 외부 검증도 제3자 재현도 없습니다. 게재일도 표기돼 있지 않습니다. 즉 절대 수치보다 **아키텍처 선택과 그 이유**를 읽을 자료입니다.
 
 그 단서를 달고 보면, 이 지식 베이스는 **출시 3개월 만에** 사내에서 가장 널리 쓰이는 도구 중 하나가 되어 하루 15,000건 넘는 질의를 받습니다. 놀라운 건 저장 계층의 소박함입니다 — 온톨로지도, 지식 그래프도, 시맨틱 레이어도 없습니다. **핵심은 임베딩·요약·메타데이터를 함께 담은 단일 Postgres 테이블**이고("At the core is a single Postgres table that holds embeddings, raw summaries, and metadata from many sources"), Slack 스레드든 코드든 위키든 모든 소스가 같은 스키마·같은 3,072차원 임베딩으로 들어갑니다 — 소스별 특수 처리를 저장 단계에서 하지 않겠다는 선언입니다.
 
@@ -791,7 +791,7 @@ Cerebras는 오른쪽이었고 오른쪽 도구를 썼습니다. 은행(정형)�
 65. BenevolentAI, "[BenevolentAI provides an update on its business priorities](https://www.benevolent.com/news-and-media/press-releases-and-in-media/benevolentai-provides-an-update-on-its-business-priorities/)", 2024.04
 66. BenevolentAI, "[EGM Results announcement](https://www.benevolent.com/news-and-media/press-releases-and-in-media/egm-results-announcement/)", 2025.03 (Euronext Amsterdam 상장 폐지)
 67. BenevolentAI, "[Proposed Delisting via Merger of BenevolentAI into Osaka Holdings S.à r.l. and Publication of Notice of Extraordinary General Meeting](https://www.benevolent.com/news-and-media/press-releases-and-in-media/proposed-delisting-merger-benevolentai-osaka-holdings-s-rl-and-publication-notice-extraordinary-general-meeting/)", 2025.02 (Kenneth Mulvany 발언)
-68. Cerebras, "[How Cerebras Built Its Enterprise Knowledge Base](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base)" (게재일 미표기, 2026-07-26 확인 시 원문 HTTP 500)
+68. Cerebras, "[How Cerebras Built Its Enterprise Knowledge Base](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base)" (게재일 미표기, 2026-07-26 열람)
 69. Gordon Cormack, Charles Clarke, Stefan Büttcher, "[Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods](https://dl.acm.org/doi/10.1145/1571941.1572114)" (SIGIR), 2009
 70. IEEE Spectrum, "[How IBM Watson Overpromised and Underdelivered on AI Health Care](https://spectrum.ieee.org/how-ibm-watson-overpromised-and-underdelivered-on-ai-health-care)", 2019
 71. Wikipedia, "[Cyc](https://en.wikipedia.org/wiki/Cyc)", 2026-07-26 열람
