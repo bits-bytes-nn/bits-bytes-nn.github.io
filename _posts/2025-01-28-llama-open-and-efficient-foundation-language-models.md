@@ -4,9 +4,7 @@ title: "LLaMA: Open and Efficient Foundation Language Models"
 date: 2023-02-27 17:11:15
 author: "Meta AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: [
-    "Open-and-Efficient-Foundation-Language-Models", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Scaling-Laws-for-Large-Language-Models", "Economical-Training", "Computation-Communication-Overlap", "Public-Dataset-Only Training", "RMSNorm-Pre-Normalization", "Memory-Efficient-Attention", "CommonCrawl-Quality-Filtering"
-]
+tags: ["Open-and-Efficient-Foundation-Language-Models", "Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Scaling-Laws-for-Large-Language-Models", "Economical-Training", "Computation-Communication-Overlap", "Public-Dataset-Only Training", "RMSNorm-Pre-Normalization", "Memory-Efficient-Attention", "CommonCrawl-Quality-Filtering", "Llama"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

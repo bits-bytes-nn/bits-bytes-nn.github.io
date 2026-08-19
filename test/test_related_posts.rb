@@ -145,46 +145,132 @@ class TestRank < Minitest::Test
   end
 end
 
+class TestAdjacent < Minitest::Test
+  def ordered(*posts)
+    posts.sort_by { |p| [p[:date].to_time.to_i, p[:id]] }
+  end
+
+  def test_returns_the_neighbours_in_date_order
+    old = post("/old", date: "2024-01-01")
+    mid = post("/mid", date: "2025-01-01")
+    new = post("/new", date: "2026-01-01")
+    older, newer = RelatedPosts.adjacent(mid, ordered(old, mid, new))
+    assert_equal "/old", older[:id]
+    assert_equal "/new", newer[:id]
+  end
+
+  def test_nil_at_each_end_of_the_archive
+    old = post("/old", date: "2024-01-01")
+    new = post("/new", date: "2026-01-01")
+    list = ordered(old, new)
+    assert_nil RelatedPosts.adjacent(old, list)[0]
+    assert_nil RelatedPosts.adjacent(new, list)[1]
+  end
+
+  # The live defect: all three translation pairs share a date exactly, so
+  # Jekyll's page.previous pointed the newest Korean post at its own English
+  # version.
+  def test_skips_the_translation_twin_even_on_an_identical_date
+    ko = post("/ko", lang: "ko", translation_id: "t1", date: "2026-07-27")
+    en = post("/en", lang: "en", translation_id: "t1", date: "2026-07-27")
+    before = post("/before", lang: "ko", date: "2026-04-12")
+    older, newer = RelatedPosts.adjacent(ko, ordered(before, en, ko))
+    assert_equal "/before", older[:id]
+    assert_nil newer
+  end
+
+  # Skipping past an ineligible neighbour, rather than dropping the link: the
+  # reader still gets a previous post, just not the untranslated one.
+  def test_steps_over_an_other_language_neighbour
+    target = post("/target", lang: "ko", date: "2026-03-01")
+    english = post("/english", lang: "en", date: "2026-02-01")
+    korean = post("/korean", lang: "ko", date: "2026-01-01")
+    older, = RelatedPosts.adjacent(target, ordered(korean, english, target))
+    assert_equal "/korean", older[:id]
+  end
+
+  def test_an_english_post_navigates_english_posts
+    en_a = post("/en-a", lang: "en", date: "2026-01-01")
+    ko = post("/ko", lang: "ko", date: "2026-02-01")
+    en_b = post("/en-b", lang: "en", date: "2026-03-01")
+    older, newer = RelatedPosts.adjacent(en_b, ordered(en_a, ko, en_b))
+    assert_equal "/en-a", older[:id]
+    assert_nil newer
+  end
+
+  # Most paper posts declare no lang; they must not be treated as a third
+  # language and cut off from each other.
+  def test_posts_without_an_explicit_lang_are_neighbours
+    a = post("/a", date: "2024-01-01")
+    b = post("/b", date: "2025-01-01", lang: "ko")
+    older, = RelatedPosts.adjacent(b, ordered(a, b))
+    assert_equal "/a", older[:id]
+  end
+
+  def test_returns_nothing_when_the_target_is_not_in_the_list
+    assert_equal [nil, nil], RelatedPosts.adjacent(post("/x"), [post("/y")])
+  end
+
+  def test_a_lone_post_has_no_neighbours
+    only = post("/only")
+    assert_equal [nil, nil], RelatedPosts.adjacent(only, [only])
+  end
+end
+
 class TestTheActualHarnessCluster < Minitest::Test
-  # The real front matter of the five posts this feature was built for. The
-  # Claude Code posts share no tags with the harness chronicle — they are related
-  # only by category, which is deliberately not enough.
+  # The real front matter of the five Insights/Agentic-AI posts.
+  #
+  # These five used to share nothing at all: the Claude Code teardown said
+  # "Agentic-Architecture", the harness chronicle said "Agentic-Patterns", and
+  # AgentCore said "Agentic-Infrastructure" — three names for one topic, so the
+  # shared-tag requirement found no pair. The explicit "Agentic-AI" topic tag is
+  # what connects them, and it is a tag, not a category, that does it.
   def setup
     @evolution_ko = post("/evolution-ko", lang: "ko", translation_id: "evo", date: "2026-04-05",
                          tags: %w[Prompt-Engineering Context-Engineering Harness-Engineering
-                                  Agentic-Patterns LLM-Architecture Vibe-Coding],
+                                  Agentic-Patterns LLM-Architecture Vibe-Coding Agentic-AI],
                          categories: ["Insights", "Agentic-AI"])
     @evolution_en = post("/evolution-en", lang: "en", translation_id: "evo", date: "2026-04-05",
                          tags: @evolution_ko[:tags], categories: ["Insights", "Agentic-AI"])
     @agentcore = post("/agentcore", date: "2026-04-12",
                       tags: %w[AgentCore AWS-Bedrock Harness-Engineering Agentic-Infrastructure
-                               MCP Cedar-Policy Managed-RAG Agent-Registry],
+                               Model-Context-Protocol Cedar-Policy Managed-RAG Agent-Registry
+                               Agentic-AI],
                       categories: ["Insights", "Agentic-AI"])
     @claude_ko = post("/claude-ko", lang: "ko", translation_id: "cc", date: "2026-03-31",
                       tags: %w[Claude-Code Agentic-Architecture Context-Compaction
-                               Multi-Agent-Orchestration Security-Architecture],
+                               Multi-Agent-Orchestration Security-Architecture Agentic-AI],
                       categories: ["Insights", "Agentic-AI"])
     @claude_en = post("/claude-en", lang: "en", translation_id: "cc", date: "2026-03-31",
                       tags: @claude_ko[:tags], categories: ["Insights", "Agentic-AI"])
     @all = [@evolution_ko, @evolution_en, @agentcore, @claude_ko, @claude_en]
   end
 
-  # Harness-Engineering is the one tag they share, and it is the query cluster
-  # this feature exists to consolidate.
-  def test_agentcore_and_the_harness_chronicle_relate_to_each_other
-    assert_equal ["/evolution-ko"], RelatedPosts.rank(@agentcore, @all)
-    assert_equal ["/agentcore"], RelatedPosts.rank(@evolution_ko, @all)
+  # Two shared tags (Harness-Engineering and Agentic-AI) put these two ahead of
+  # the teardown, which shares only the topic tag. Depth of overlap still orders
+  # the list.
+  def test_agentcore_and_the_harness_chronicle_rank_first_for_each_other
+    assert_equal ["/evolution-ko", "/claude-ko"], RelatedPosts.rank(@agentcore, @all)
+    assert_equal ["/agentcore", "/claude-ko"], RelatedPosts.rank(@evolution_ko, @all)
   end
 
-  # Both are Insights/Agentic-AI, but they share no topic tag. "Also about agents"
-  # is not a reason to send a reader from one to the other.
-  def test_the_claude_code_teardown_is_not_linked_on_category_alone
-    assert_equal [], RelatedPosts.rank(@claude_ko, @all)
+  # The taxonomy fix, pinned: this post had no related block on the live site.
+  def test_the_claude_code_teardown_now_connects_through_the_topic_tag
+    assert_equal ["/agentcore", "/evolution-ko"], RelatedPosts.rank(@claude_ko, @all)
   end
 
+  # Still true, and still the rule: strip the shared topic tag and shared
+  # categories alone must not resurrect the link.
+  def test_the_shared_category_alone_would_not_have_connected_them
+    bare_claude = @claude_ko.merge(tags: @claude_ko[:tags] - ["Agentic-AI"])
+    bare_all = @all.map { |p| p[:id] == bare_claude[:id] ? bare_claude : p }
+    assert_equal [], RelatedPosts.rank(bare_claude, bare_all)
+  end
+
+  # Only three English posts exist and each is a translation, so an English
+  # reader's candidate pool is tiny — the topic tag is what keeps it non-empty.
   def test_an_english_post_only_sees_english_relatives
-    # /claude-en shares no tag with /evolution-en, and /agentcore is Korean.
-    assert_equal [], RelatedPosts.rank(@evolution_en, @all)
+    assert_equal ["/claude-en"], RelatedPosts.rank(@evolution_en, @all)
   end
 
   def test_no_post_is_offered_its_own_translation

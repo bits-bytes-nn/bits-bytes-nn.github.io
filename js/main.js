@@ -7,21 +7,26 @@ document.addEventListener('DOMContentLoaded', function () {
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     var icon = themeToggle.querySelector('i');
+    var themeColor = document.querySelector('meta[name="theme-color"]');
     function isDark() {
       return document.documentElement.getAttribute('data-theme') === 'dark';
     }
-    function syncIcon() {
+    function syncTheme() {
       if (icon) icon.className = isDark() ? 'fa-solid fa-sun' : 'fa-regular fa-moon';
       // aria-label is static, so without this a screen-reader user cannot tell
       // whether dark mode is currently on.
       themeToggle.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+      // Repaints the mobile browser's own chrome. The inline bootstrap in
+      // head.html does this on load; without it here the address bar stayed
+      // white until the next navigation. Keep in step with $bg in _dark.scss.
+      if (themeColor) themeColor.setAttribute('content', isDark() ? '#0d1117' : '#ffffff');
     }
-    syncIcon();
+    syncTheme();
     themeToggle.addEventListener('click', function () {
       var next = isDark() ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
-      syncIcon();
+      syncTheme();
     });
   }
 

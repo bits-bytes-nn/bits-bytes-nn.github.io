@@ -44,20 +44,27 @@
 {%- endif -%}
 <head>
 	<meta charset="utf-8" />
-	<!-- Apply saved theme before paint to avoid a flash of the wrong colors -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- Light is the default; dark is opt-in via the toggle, not the OS setting.
+	     The matching `color-scheme` lives in _sass/_dark.scss, keyed off
+	     data-theme, because a meta tag cannot vary by theme. -->
+	<meta name="theme-color" content="#ffffff" />
+	<!-- Applies the saved theme before first paint, so a dark-mode visitor gets no
+	     flash of the light palette. Placed after the meta above, not before it:
+	     this also has to repaint the browser UI (the mobile address bar), and the
+	     tag has to exist to be found. #0d1117 is $bg in _sass/_dark.scss. -->
 	<script>
 		(function () {
 			try {
 				var t = localStorage.getItem('theme');
-				if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+				if (t !== 'dark' && t !== 'light') return;
+				document.documentElement.setAttribute('data-theme', t);
+				var m = document.querySelector('meta[name="theme-color"]');
+				if (m) m.setAttribute('content', t === 'dark' ? '#0d1117' : '#ffffff');
 			} catch (e) {}
 		})();
 	</script>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<!-- Light is the default; dark is opt-in via the toggle, not the OS setting. -->
-	<meta name="color-scheme" content="light" />
-	<meta name="theme-color" content="#ffffff" />
 
 	<title>{{ page_title }}</title>
 	<meta name="description" content="{{ page_description | escape }}" />
@@ -98,7 +105,6 @@
 	<link rel="manifest" href="{{ '/assets/icons/manifest.json' | prepend: site.baseurl }}">
 	<meta name="msapplication-TileColor" content="#ffffff" />
 	<meta name="msapplication-TileImage" content="{{ '/assets/icons/ms-icon-144x144.png' | prepend: site.baseurl }}">
-	<!-- theme-color declared at top of <head> with prefers-color-scheme media queries -->
 
 	<!-- Facebook OGP cards -->
 	{% if site.protocols.fb_image %}

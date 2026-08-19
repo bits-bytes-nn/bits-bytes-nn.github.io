@@ -7,7 +7,7 @@ description: >-
   컨텍스트에서 하네스로 패러다임이 세 번 바뀐 2022-2026년을 각 시대가 왜 실패했는지로 추적합니다.
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
-tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]
+tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding", "Agentic-AI"]
 cover: /assets/images/insights.jpg
 use_math: false
 lang: ko

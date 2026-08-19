@@ -5,7 +5,7 @@ subtitle: "Gemini: 고도로 능력 있는 멀티모달 모델 패밀리"
 date: 2023-12-19 02:39:27
 author: "Google DeepMind"
 categories: ["Paper Reviews", "Multimodal-Learning"]
-tags: ["Natively-Multimodal-Transformer-Architecture", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Long-Context-Attention-Mechanism", "Multimodal-Safety-Evaluation-Framework", "Responsible-Multimodal-Model-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model"]
+tags: ["Natively-Multimodal-Transformer-Architecture", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Long-Context-Attention-Mechanism", "Multimodal-Safety-Evaluation-Framework", "Responsible-Multimodal-Model-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model", "Multimodal-Models"]
 cover: /assets/images/multimodal-learning.jpg
 use_math: true
 ---

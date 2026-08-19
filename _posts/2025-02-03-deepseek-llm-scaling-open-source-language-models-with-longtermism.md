@@ -4,7 +4,7 @@ title: "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"
 date: 2024-01-05 18:59:13
 author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Scaling-Open-Source-Language-Models-with-Longtermism", "Compute-Optimal-Scaling", "Non-Embedding-FLOPs-per-Token", "Multi-Step-Learning-Rate-Scheduler", "Optimal-Model-Data-Scaling-Allocation", "Direct-Preference-Optimization", "Grouped-Query-Attention", "Language-Model-Scaling-Laws", "Efficient-Model-Training", "Depth-Over-Width-Scaling"]
+tags: ["Scaling-Open-Source-Language-Models-with-Longtermism", "Compute-Optimal-Scaling", "Non-Embedding-FLOPs-per-Token", "Multi-Step-Learning-Rate-Scheduler", "Optimal-Model-Data-Scaling-Allocation", "Direct-Preference-Optimization", "Grouped-Query-Attention", "Language-Model-Scaling-Laws", "Efficient-Model-Training", "Depth-Over-Width-Scaling", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

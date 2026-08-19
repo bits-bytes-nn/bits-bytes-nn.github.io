@@ -7,7 +7,7 @@ description: >-
   shifts from prompts to context to harnesses, traced by why each era failed.
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
-tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]
+tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding", "Agentic-AI"]
 cover: /assets/images/insights.jpg
 use_math: false
 lang: en

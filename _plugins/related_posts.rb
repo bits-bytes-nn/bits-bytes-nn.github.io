@@ -1,13 +1,29 @@
 # frozen_string_literal: true
 #
-# Picks topically related posts for each post and exposes them as `page.related`.
+# Decides which other posts a post links to, and exposes them to the layout:
+#
+#   page.related          — topically related, ranked (see `rank`)
+#   page.adjacent_older   — the "← Previous" link in _layouts/post.html
+#   page.adjacent_newer   — the "Next →" link
+#
+# Both answers obey the same two eligibility rules (`eligible?`), which is why
+# they live together: never point a reader at this post's own translation, and
+# never cross languages. Jekyll's built-in `page.previous`/`page.next` know
+# neither rule, and all three translation pairs on this site share a date — so
+# the newest Korean post's "← Previous" was its own English version.
 #
 # A shared topic tag is required. Sharing only a category is not a reading
 # recommendation: "Paper Reviews / Language-Models" holds 17 posts, so category
 # overlap alone would put LLaMA and Llama 2 under DeepSeek-V3 with nothing
 # actually in common. Categories only break ties between posts that already share
-# a tag. An empty block is better than a wrong suggestion, so the 13 posts whose
-# tags are unique to them simply don't get one.
+# a tag, and an empty block is better than a wrong suggestion.
+#
+# That strictness only pays off if the tags can actually meet. They could not at
+# first: 220 of 264 tags were per-paper contribution phrases used by exactly one
+# post, and three near-synonyms (Agentic-Architecture / Agentic-Patterns /
+# Agentic-Infrastructure) split the one cluster the feature was built for — so 11
+# posts got nothing. The fix was a controlled topic layer in the posts' front
+# matter, not a looser rule here. All 35 posts now get suggestions.
 #
 # Jekyll's built-in site.related_posts is either "the 10 most recent posts" or
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper
@@ -28,10 +44,7 @@ module RelatedPosts
   def self.rank(target, candidates, limit: LIMIT)
     scored = candidates.filter_map do |c|
       next if c[:id] == target[:id]
-      # A translation is the same article; the language switcher already links it.
-      next if translation_of?(target, c)
-      # Never suggest a Korean post to an English reader or the reverse.
-      next unless lang(c) == lang(target)
+      next unless eligible?(target, c)
 
       shared = shared_tags(target, c)
       next if shared.empty?
@@ -43,6 +56,28 @@ module RelatedPosts
       .sort_by { |c, s| [-s, -sort_time(c), c[:id].to_s] }
       .first(limit)
       .map { |c, _| c[:id] }
+  end
+
+  # Nearest usable post in each direction, as [older, newer]. `ordered` must be
+  # sorted oldest-first. Unlike `rank` this never returns nothing for want of a
+  # shared tag — date order always has a neighbour — but it does skip past
+  # ineligible ones rather than dropping the link, so a post whose immediate
+  # neighbour is its own translation still gets the one beyond it.
+  def self.adjacent(target, ordered)
+    i = ordered.index { |c| c[:id] == target[:id] }
+    return [nil, nil] unless i
+
+    older = ordered[0...i].reverse.find { |c| eligible?(target, c) }
+    newer = ordered[(i + 1)..].to_a.find { |c| eligible?(target, c) }
+    [older, newer]
+  end
+
+  # A translation is the same article, and the language switcher already links
+  # it; a post in the other language is unreadable to whoever is here.
+  def self.eligible?(target, candidate)
+    return false if translation_of?(target, candidate)
+
+    lang(candidate) == lang(target)
   end
 
   def self.shared_tags(a, b)
@@ -99,10 +134,17 @@ if defined?(Jekyll::Hooks)
       }
     end
     by_url = docs.to_h { |d| [d.url, d] }
+    # Sorted here rather than trusting the collection's order, and by id as well
+    # as date because the three translation pairs share a date exactly.
+    ordered = meta.sort_by { |m| [RelatedPosts.sort_time(m), m[:id].to_s] }
 
     meta.each_with_index do |target, i|
       ids = RelatedPosts.rank(target, meta)
       docs[i].data["related"] = ids.map { |id| by_url[id] }
+
+      older, newer = RelatedPosts.adjacent(target, ordered)
+      docs[i].data["adjacent_older"] = older && by_url[older[:id]]
+      docs[i].data["adjacent_newer"] = newer && by_url[newer[:id]]
     end
   end
 end

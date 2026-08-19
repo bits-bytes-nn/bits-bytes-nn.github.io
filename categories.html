@@ -7,19 +7,18 @@ description: >-
   Tech Guides, and Insights.
 ---
 
+{%- comment -%}
+  Category names are already written in display case in front matter
+  ("Agentic-AI", "Retrieval-Augmented-Generation"), so replacing the separators
+  is the whole job — which is what index.html and _layouts/post.html do.
+
+  This used to title-case each word through `capitalize`, which uppercases the
+  first letter and *lowercases the rest*: "Agentic-AI" shipped as "Agentic Ai"
+  on the live page while every other listing rendered it correctly.
+{%- endcomment -%}
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}
-  {% assign cat_temp = cat | replace: "-", " " | replace: "_", " " %}
-  {% assign words = cat_temp | split: " " %}
-  {% assign cat_display = "" %}
-  {% for word in words %}
-    {% capture capitalized_word %}{{ word | capitalize }}{% endcapture %}
-    {% if forloop.first %}
-      {% assign cat_display = capitalized_word %}
-    {% else %}
-      {% assign cat_display = cat_display | append: " " | append: capitalized_word %}
-    {% endif %}
-  {% endfor %}
+  {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
   <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">
   {% for post in site.categories[cat] %}

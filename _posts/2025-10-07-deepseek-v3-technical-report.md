@@ -5,7 +5,7 @@ subtitle: "DeepSeek-V3 기술 보고서"
 date: 2024-12-27 04:03:16
 author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE-Architecture", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding"]
+tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE-Architecture", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding", "Mixture-of-Experts", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

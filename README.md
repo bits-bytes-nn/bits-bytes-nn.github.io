@@ -89,11 +89,11 @@ search.json        Full-text search index (consumed by simple-jekyll-search)
 test/              minitest unit tests for the _plugins/ logic
 script/            validate-site.sh (post-build discoverability checks)
 sitemap-index.xml  Sitemap index — the URL to submit to Search Console
-.github/workflows/ CI: build → html-proofer → validate-site → deploy on push to main
+.github/workflows/ CI: tests → build → html-proofer → validate-site; deploys on push to main
 ```
 
 **Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
-`paper-summaries.md`, `tech-guides.md`, `insights.md` (the four section tabs),
+`paper-summaries.md`, `tech-guides.md`, `insights.md` (the four section pages),
 `categories.html`, `tags.html`, `search.md`, and `about.md`.
 
 ---
@@ -142,10 +142,37 @@ share one.
 Categories are **two levels**:
 
 - `categories[0]` — the **type**: `Paper Reviews`, `Paper Summaries`,
-  `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
+  `Tech Guides`, or `Insights`. This decides which section page the post appears
+  on. Only `Paper Reviews` and `Insights` have posts today, so only those two are
+  in the nav — `paper-summaries.md` and `tech-guides.md` sit at `sitemap: false`
+  with no `main_nav`, and their front matter says which two keys to restore when
+  the first post lands in either.
 - `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, … (add new ones
   freely).
+
+### Tags: one topic tag on top of the specific ones
+
+Tags are free-form and hyphenated, and most describe one paper's contribution
+(`Fine-Grained-Expert-Segmentation`). Those are a good index but they connect
+nothing: 220 of 264 tags were used by exactly one post, and since
+`_plugins/related_posts.rb` requires a **shared** tag, 11 posts got no related
+reading at all — including four graph-RAG papers that share no tag with each
+other.
+
+So also give each post at least one tag from the controlled topic layer:
+
+```
+Agentic-AI  Alignment  DeepSeek  Knowledge-Graph  Llama
+Mixture-of-Experts  Multimodal-Models  Reasoning-Models
+Retrieval-Augmented-Generation
+```
+
+Keep the specific tags — they say something the topic tag does not, and dropping
+them would move live `/tags/` anchors. Before inventing a topic tag, check
+whether one of the above (or an existing tag used by 2+ posts) already covers it:
+`Agentic-Architecture`, `Agentic-Patterns` and `Agentic-Infrastructure` were three
+names for one thing, which is why that cluster had no links.
 
 Jekyll combines them with the date to build the output path:
 
@@ -198,7 +225,9 @@ changes every page on the site**, so add a case there before changing behaviour.
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/jekyll.yml`, which:
+`.github/workflows/jekyll.yml` runs on **pull requests to `main` as well as
+pushes to it**, so the four gates below block a bad merge instead of only
+reporting one. Steps 1–4 run on both; step 5 is skipped for pull requests. It:
 
 1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
 2. builds the site with `JEKYLL_ENV=production`,

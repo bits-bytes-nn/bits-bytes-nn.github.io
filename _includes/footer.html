@@ -61,13 +61,11 @@
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
 
-{% if page.custom_js %}
-<!-- Custom page specific js files -->
-  {% for js_file in page.custom_js %}
-    <script src="{{ '/js/' | prepend: site.baseurl }}{{ js_file }}.js"></script>
-  {% endfor %}
-{% endif %}
+<!-- Removed from here: a `page.custom_js` loop that no page ever set (pages
+     needing an extra asset use `head_extra`, as search.md does), and a
+     conditional on site.ga_tracking_id whose entire body was a comment saying
+     the tracking lives in head.html. Both were inherited theme scaffolding.
 
-{% if site.ga_tracking_id %}
-<!-- Google Analytics 4 tracking is implemented in head.html -->
-{% endif %}
+     Note for whoever edits this comment: do not write Liquid tag delimiters in
+     here. Liquid tokenizes tags inside comments too — HTML and Liquid alike —
+     so a tag named in prose is opened for real and the build fails. -->

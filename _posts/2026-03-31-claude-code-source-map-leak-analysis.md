@@ -7,7 +7,7 @@ description: >-
   8계층 보안과 4단 메시지 압축, 에이전틱 루프를 아키텍처로 읽습니다.
 date: 2026-03-31 12:00:00
 categories: ["Insights", "Agentic-AI"]
-tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
+tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture", "Agentic-AI"]
 cover: /assets/images/insights.jpg
 use_math: false
 lang: ko

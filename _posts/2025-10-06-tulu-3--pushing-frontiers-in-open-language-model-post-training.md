@@ -5,7 +5,7 @@ subtitle: "Tülu 3: 오픈 언어 모델 사후 훈련의 새로운 지평"
 date: 2024-11-22 18:44:04
 author: "Allen Institute for AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Reinforcement-Learning-with-Verifiable-Rewards", "Multi-Stage-Post-Training-Recipe", "Direct-Preference-Optimization", "Persona-Driven-Data-Synthesis", "Skill-Specific-Synthetic-Data-Generation", "Prompt-Decontamination", "Open-Language-Model-Evaluation-System", "Length-Normalized-Preference-Optimization", "Asynchronous-Reinforcement-Learning-Infrastructure", "Skill-Targeted-Model-Training"]
+tags: ["Reinforcement-Learning-with-Verifiable-Rewards", "Multi-Stage-Post-Training-Recipe", "Direct-Preference-Optimization", "Persona-Driven-Data-Synthesis", "Skill-Specific-Synthetic-Data-Generation", "Prompt-Decontamination", "Open-Language-Model-Evaluation-System", "Length-Normalized-Preference-Optimization", "Asynchronous-Reinforcement-Learning-Infrastructure", "Skill-Targeted-Model-Training", "Alignment"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
