@@ -18,6 +18,17 @@ failures=0
 fail() { printf '  FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
 pass() { printf '  ok    %s\n' "$1"; }
 
+# XML well-formedness through Ruby's bundled REXML rather than xmllint, so this
+# script needs no toolchain beyond the Ruby the build already requires — CI used
+# to apt-install libxml2-utils purely for this.
+#
+# RUBYOPT/BUNDLE_GEMFILE are cleared because bundler injects bundler/setup, which
+# restricts $LOAD_PATH to the Gemfile's gems; rexml is not one of them.
+xml_wellformed() {
+  env -u RUBYOPT -u BUNDLE_GEMFILE -u BUNDLE_BIN_PATH \
+    ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV[0]))' "$1" 2>/dev/null
+}
+
 if [ ! -d "$SITE" ]; then
   echo "no such directory: $SITE" >&2
   exit 1
@@ -38,7 +49,7 @@ for rel in sitemap.xml sitemap-index.xml feed.xml; do
     fail "$rel does not start with '<?xml' (BOM or leading whitespace?)"
     continue
   fi
-  if ! xmllint --noout "$f" 2>/dev/null; then
+  if ! xml_wellformed "$f"; then
     fail "$rel is not well-formed XML"
     continue
   fi
