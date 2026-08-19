@@ -3,6 +3,12 @@ name: Build and deploy Jekyll site to GitHub Pages
 on:
   push:
     branches: [ "main" ]
+  # Runs the same four gates on the PR, so a change that breaks the build, the
+  # plugin tests, an internal link, or the sitemap/metadata checks is caught
+  # before it lands. Without this the gates only ran after a merge: a bad PR
+  # reached main and merely failed to deploy, leaving main red.
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -69,9 +75,12 @@ jobs:
         # this site actually shipped.
         run: script/validate-site.sh ./_site
       - name: Upload artifact
+        # Nothing to publish from a PR run; the gates above are the whole point.
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
 
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
