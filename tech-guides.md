@@ -5,10 +5,9 @@ permalink: /tech-guides/
 description: >-
   Hands-on technical guides and tutorials for the libraries, frameworks, tools,
   and platforms I work with.
-# See paper-summaries.md: hidden from the nav and the sitemap while empty.
-# Restore `main_nav: true` and `nav_order: 4` with the first post in this
-# category.
-sitemap: false
+# Stays in the nav even with no posts yet — see paper-summaries.md.
+main_nav: true
+nav_order: 4
 ---
 
 {%- comment -%} No heading here — see insights.md. {%- endcomment -%}

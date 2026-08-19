@@ -58,9 +58,8 @@ bundle exec jekyll build
 ```
 
 > **Why plain `jekyll` and not `github-pages`?** This site uses custom Ruby
-> plugins in `_plugins/` (read time, lazy images, post descriptions), which the
-> sandboxed `github-pages` gem disallows. So both local builds and CI run Jekyll
-> directly.
+> plugins in `_plugins/`, which the sandboxed `github-pages` gem disallows. So
+> both local builds and CI run Jekyll directly.
 
 ---
 
@@ -68,7 +67,7 @@ bundle exec jekyll build
 
 ```
 _posts/            Posts — YYYY-MM-DD-slug.md (Korean; English twin is -en.md)
-_layouts/          Page templates: default → post / page / archive
+_layouts/          Page templates: default → post / page
 _includes/         Reusable fragments: head, header, footer, nav_links,
                    page_divider, category-posts, language_switcher,
                    related_posts
@@ -78,7 +77,7 @@ _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
 _plugins/          reading_time.rb      (KO/EN-aware read time)
                    lazy_images.rb       (adds loading="lazy" to <img>)
                    post_description.rb  (fills page.description for posts)
-                   related_posts.rb     (fills page.related for posts)
+                   related_posts.rb     (page.related, and the prev/next links)
                    scrollable_tables.rb (wraps wide tables so they scroll)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
@@ -142,23 +141,31 @@ share one.
 Categories are **two levels**:
 
 - `categories[0]` — the **type**: `Paper Reviews`, `Paper Summaries`,
-  `Tech Guides`, or `Insights`. This decides which section page the post appears
-  on. Only `Paper Reviews` and `Insights` have posts today, so only those two are
-  in the nav — `paper-summaries.md` and `tech-guides.md` sit at `sitemap: false`
-  with no `main_nav`, and their front matter says which two keys to restore when
-  the first post lands in either.
+  `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
+  A type with no posts yet keeps its tab and renders an empty-state line: a
+  missing tab reads as a section that was removed, not one still filling up.
 - `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, … (add new ones
   freely).
 
+Jekyll combines the two with the date to build the output path:
+
+```
+categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
+        ↓
+_site/paper reviews/language-models/2025/01/23/<slug>.html
+```
+
+So **changing the categories or date of a published post changes its URL**, which
+breaks inbound links and search results. Set them once and leave them.
+
 ### Tags: one topic tag on top of the specific ones
 
-Tags are free-form and hyphenated, and most describe one paper's contribution
-(`Fine-Grained-Expert-Segmentation`). Those are a good index but they connect
-nothing: 220 of 264 tags were used by exactly one post, and since
-`_plugins/related_posts.rb` requires a **shared** tag, 11 posts got no related
-reading at all — including four graph-RAG papers that share no tag with each
-other.
+Tags are free-form and hyphenated, and a tag phrased as one paper's contribution
+(`Fine-Grained-Expert-Segmentation`) can only ever apply to that paper. Those
+make a precise index and connect nothing, and `_plugins/related_posts.rb`
+requires a **shared** tag — so a post tagged only that way ships with no
+"Related reading" block at all.
 
 So also give each post at least one tag from the controlled topic layer:
 
@@ -169,18 +176,12 @@ Retrieval-Augmented-Generation
 ```
 
 Keep the specific tags — they say something the topic tag does not, and dropping
-them would move live `/tags/` anchors. Before inventing a topic tag, check
-whether one of the above (or an existing tag used by 2+ posts) already covers it:
-`Agentic-Architecture`, `Agentic-Patterns` and `Agentic-Infrastructure` were three
-names for one thing, which is why that cluster had no links.
+them would move live `/tags/` anchors. **Add the topic tag, don't swap for it.**
 
-Jekyll combines them with the date to build the output path:
-
-```
-categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
-        ↓
-_site/paper reviews/language-models/2025/01/23/<slug>.html
-```
+Before coining a new topic tag, check that nothing above already covers it. Three
+names for one idea (`Agentic-Architecture`, `Agentic-Patterns`,
+`Agentic-Infrastructure`) leave every post holding a tag no other post shares,
+which is the same as having no topic tag at all.
 
 ### Math: always use `$$…$$`
 
@@ -194,40 +195,42 @@ dollar signs like `$10M` are fine — they're not math.)
 
 ### Validate before pushing
 
+These are the four gates CI runs, in the same order. Build to a throwaway
+directory rather than `_site/`, for the reason in the note below:
+
 ```bash
-ruby test/run_all.rb                                  # plugin logic still correct?
-bundle exec jekyll build                              # does it build clean?
-bundle exec htmlproofer ./_site --disable-external    # any broken links/images?
-script/validate-site.sh                               # sitemap, feed, metadata, headings
+ruby test/run_all.rb                                        # plugin logic still correct?
+bundle exec jekyll build --strict-front-matter \
+  --destination /tmp/site-verify                            # does it build clean?
+bundle exec htmlproofer /tmp/site-verify --disable-external \
+  --allow-hash-href --no-enforce-https                      # broken links, images, anchors?
+script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings
 ```
 
-CI runs the same three checks, so catching it locally saves a failed deploy.
-
-`test/` covers `_plugins/` — the description derivation, the read-time estimate,
-and the lazy-image rewrite. Plain `ruby`, not `bundle exec`: the plugins guard
-their Jekyll/Liquid registration behind `defined?` so their logic loads
-standalone, and minitest ships with Ruby. **Anything you change in `_plugins/`
-changes every page on the site**, so add a case there before changing behaviour.
-
-> **If the checks report something impossible, look for a running `jekyll serve`
+> **If a check reports something impossible, look for a running `jekyll serve`
 > first.** It watches the tree and rewrites `_site/` behind you, it overrides
 > `site.url` with `http://localhost:4000` (so every sitemap URL looks wrong), and
-> it keeps the `_config.yml` it started with — so `exclude` entries added since
-> then don't apply. Either stop it, or build somewhere else:
+> it holds the `_config.yml` it started with — so `exclude` entries added since
+> then don't apply. Building elsewhere sidesteps all three:
 >
 > ```bash
 > ps aux | grep '[j]ekyll serve'
-> bundle exec jekyll build --destination /tmp/site-verify
-> script/validate-site.sh /tmp/site-verify
 > ```
+
+`test/` unit-tests the pure logic in `_plugins/` — one file per plugin. Plain
+`ruby`, not `bundle exec`: each plugin guards its Jekyll/Liquid registration
+behind `defined?` so the logic loads standalone, and minitest ships with Ruby.
+**Anything you change in `_plugins/` changes every page on the site**, so add a
+case before changing behaviour.
 
 ---
 
 ## Deployment
 
 `.github/workflows/jekyll.yml` runs on **pull requests to `main` as well as
-pushes to it**, so the four gates below block a bad merge instead of only
-reporting one. Steps 1–4 run on both; step 5 is skipped for pull requests. It:
+pushes to it**, so the gates below block a bad merge rather than merely reporting
+one after the fact. Steps 1–4 run on both events; step 5 is skipped for pull
+requests. In order, it:
 
 1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
 2. builds the site with `JEKYLL_ENV=production`,
@@ -240,8 +243,8 @@ reporting one. Steps 1–4 run on both; step 5 is skipped for pull requests. It:
    no authoring sources published — and
 5. deploys to GitHub Pages.
 
-If the workflow fails, it's almost always step 3 or 4 — open the Actions log,
-which names the exact link, image, or page. No manual deploy step is needed.
+A failure is almost always step 3 or 4; the Actions log names the exact link,
+image, or page. There is no manual deploy step.
 
 > **⚠ Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**
 > They're Search Console / Naver ownership-verification tokens that must ship to

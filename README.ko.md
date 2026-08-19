@@ -56,9 +56,8 @@ bundle exec jekyll build   # 결과물은 _site/ 에 생성
 ```
 
 > **왜 `github-pages` gem이 아니라 순수 `jekyll`인가요?**
-> 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인(읽기 시간, 이미지 lazy-load, 글 설명문 생성)을 씁니다.
-> `github-pages` gem은 보안 샌드박스 때문에 커스텀 플러그인을 막으므로,
-> 로컬과 CI 모두 Jekyll을 직접 실행합니다.
+> 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인을 씁니다. `github-pages` gem은 보안
+> 샌드박스 때문에 커스텀 플러그인을 막으므로, 로컬과 CI 모두 Jekyll을 직접 실행합니다.
 
 ---
 
@@ -66,7 +65,7 @@ bundle exec jekyll build   # 결과물은 _site/ 에 생성
 
 ```
 _posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역본은 -en.md)
-_layouts/          페이지 템플릿: default → post / page / archive
+_layouts/          페이지 템플릿: default → post / page
 _includes/         재사용 조각: head, header, footer, nav_links,
                    page_divider, category-posts, language_switcher,
                    related_posts
@@ -76,7 +75,7 @@ _sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마
 _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    lazy_images.rb       (<img>에 loading="lazy" 추가)
                    post_description.rb  (글의 page.description 채우기)
-                   related_posts.rb     (글의 page.related 채우기)
+                   related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
                    scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
@@ -138,20 +137,29 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 카테고리는 **두 단계**입니다.
 
 - `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Tech Guides`,
-  `Insights` 중 하나. 글이 어느 섹션 페이지에 들어갈지를 정합니다. 현재 글이 있는 유형은
-  `Paper Reviews`와 `Insights`뿐이라 내비에도 이 둘만 있습니다 — `paper-summaries.md`와
-  `tech-guides.md`는 `main_nav` 없이 `sitemap: false` 상태이고, 첫 글이 들어오면 어떤 두
-  값을 되살리면 되는지가 각 파일 프런트매터에 적혀 있습니다.
+  `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. 아직 글이 없는 유형도
+  **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
+  없어진 섹션으로 읽히기 때문입니다.
 - `categories[1]` — **주제**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 필요하면 자유롭게 추가합니다.
 
+Jekyll은 이 둘과 날짜를 합쳐 출력 경로를 만듭니다.
+
+```
+categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
+        ↓
+_site/paper reviews/language-models/2025/01/23/<slug>.html
+```
+
+그래서 **이미 게시된 글의 카테고리나 날짜를 바꾸면 URL이 바뀝니다.** 외부에서 걸린 링크와
+검색 결과가 깨지므로, 한 번 정하면 그대로 둡니다.
+
 ### 태그: 세부 태그 위에 주제 태그를 하나
 
-태그는 자유 형식·하이픈 연결이고, 대부분 논문 하나의 기여를 서술합니다
-(`Fine-Grained-Expert-Segmentation`). 색인으로는 좋지만 글을 **잇지는** 못합니다 — 태그
-264개 중 220개가 단 한 편에만 붙어 있었고, `_plugins/related_posts.rb`는 **공유** 태그를
-요구하므로 11편이 관련 글을 하나도 얻지 못했습니다. 서로 남남이던 그래프 RAG 논문 네 편이
-거기 있었습니다.
+태그는 자유 형식·하이픈 연결입니다. 논문 하나의 기여를 그대로 옮긴 태그
+(`Fine-Grained-Expert-Segmentation`)는 그 논문에만 붙을 수 있습니다. 색인으로는 정확하지만
+글을 **잇지는** 못하고, `_plugins/related_posts.rb`가 **공유** 태그를 요구하므로 그렇게만
+달린 글은 "Related reading"이 아예 붙지 않은 채 배포됩니다.
 
 그래서 글마다 아래 통제된 주제 태그를 최소 하나 답니다.
 
@@ -162,17 +170,11 @@ Retrieval-Augmented-Generation
 ```
 
 기존 세부 태그는 **그대로 남깁니다.** 주제 태그가 담지 못하는 내용을 담고 있고, 지우면 이미
-살아 있는 `/tags/` 앵커가 움직입니다. 새 주제 태그를 만들기 전에 위 목록이나 이미 두 편
-이상이 쓰는 태그로 덮이는지 먼저 확인하세요. `Agentic-Architecture`·`Agentic-Patterns`·
-`Agentic-Infrastructure`가 한 주제의 세 이름이었던 것이 그 묶음에 링크가 없던 이유입니다.
+살아 있는 `/tags/` 앵커가 움직입니다. **주제 태그는 얹는 것이지 바꿔 다는 게 아닙니다.**
 
-Jekyll은 이 둘과 날짜를 합쳐 출력 경로를 만듭니다.
-
-```
-categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
-        ↓
-_site/paper reviews/language-models/2025/01/23/<slug>.html
-```
+새 주제 태그를 만들기 전에 위 목록에 이미 덮이는 게 없는지 확인하세요. 한 개념을 세 이름으로
+부르면(`Agentic-Architecture`·`Agentic-Patterns`·`Agentic-Infrastructure`) 글마다 아무도
+공유하지 않는 태그를 하나씩 들고 있게 되고, 그건 주제 태그가 없는 것과 같습니다.
 
 ### 수식은 반드시 `$$…$$`로
 
@@ -186,39 +188,39 @@ kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합
 
 ### 푸시 전에 확인하세요
 
+CI가 돌리는 네 게이트를 같은 순서로 미리 돌립니다. `_site/`가 아니라 임시 경로로 빌드하는
+이유는 아래 주의에 있습니다.
+
 ```bash
-ruby test/run_all.rb                                  # 플러그인 로직이 여전히 맞나?
-bundle exec jekyll build                              # 빌드가 깨끗한가?
-bundle exec htmlproofer ./_site --disable-external    # 깨진 링크·이미지는 없나?
-script/validate-site.sh                               # 사이트맵·피드·메타데이터·헤딩
+ruby test/run_all.rb                                        # 플러그인 로직이 여전히 맞나?
+bundle exec jekyll build --strict-front-matter \
+  --destination /tmp/site-verify                            # 빌드가 깨끗한가?
+bundle exec htmlproofer /tmp/site-verify --disable-external \
+  --allow-hash-href --no-enforce-https                      # 깨진 링크·이미지·앵커는 없나?
+script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
 ```
-
-CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 실패를 막을 수 있습니다.
-
-`test/`는 `_plugins/`를 검사합니다 — 설명문 추출, 읽기 시간 계산, 이미지 lazy-load
-치환. `bundle exec`가 아니라 plain `ruby`인 이유는, 플러그인이 Jekyll·Liquid 등록을
-`defined?`로 감싸 로직만 단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기
-때문입니다. **`_plugins/`를 건드리면 사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기
-전에 테스트 케이스를 먼저 추가하세요.
 
 > **검사 결과가 말이 안 되면 먼저 떠 있는 `jekyll serve`를 찾으세요.** 파일을 감시하며
 > `_site/`를 계속 덮어쓰고, `site.url`을 `http://localhost:4000`으로 바꾸며(사이트맵 URL이
 > 전부 틀리게 보입니다), 시작할 때 읽은 `_config.yml`을 계속 들고 있어 그 뒤에 추가한
-> `exclude`가 적용되지 않습니다. 종료하거나, 다른 경로로 빌드해서 검사하세요.
+> `exclude`가 적용되지 않습니다. 다른 경로로 빌드하면 세 문제를 한꺼번에 비켜 갑니다.
 >
 > ```bash
 > ps aux | grep '[j]ekyll serve'
-> bundle exec jekyll build --destination /tmp/site-verify
-> script/validate-site.sh /tmp/site-verify
 > ```
+
+`test/`는 `_plugins/`의 순수 로직을 플러그인당 한 파일씩 단위 테스트합니다. `bundle exec`가
+아니라 plain `ruby`인 이유는, 각 플러그인이 Jekyll·Liquid 등록을 `defined?`로 감싸 로직만
+단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기 때문입니다. **`_plugins/`를 건드리면
+사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기 전에 테스트 케이스를 먼저 추가하세요.
 
 ---
 
 ## 배포
 
 `.github/workflows/jekyll.yml`은 `main` 푸시뿐 아니라 **`main`으로 향하는 PR에서도**
-돕니다. 그래서 아래 네 게이트가 잘못된 머지를 보고만 하지 않고 막습니다. 1~4단계는 양쪽
-모두에서, 5단계는 PR에서 건너뜁니다.
+돕니다. 그래서 아래 게이트가 잘못된 머지를 사후에 보고하는 데 그치지 않고 막습니다.
+1~4단계는 두 경우 모두, 5단계는 PR에서 건너뜁니다. 순서대로:
 
 1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
 2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
@@ -230,8 +232,8 @@ CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 �
    중복되지 않는지, 저작 원본이 배포되지 않았는지를 검사한 뒤
 5. GitHub Pages에 배포합니다.
 
-워크플로우가 실패한다면 대개 3·4단계입니다. Actions 로그에 어떤 링크·이미지·페이지가
-문제인지 그대로 나옵니다. 수동 배포 단계는 없습니다.
+실패하면 대개 3·4단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로
+나옵니다. 수동 배포 단계는 없습니다.
 
 > **⚠ `google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**
 > Search Console·네이버 소유권 인증 토큰이라 사이트 루트에 그대로 올라가야 합니다.
