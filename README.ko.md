@@ -56,7 +56,7 @@ bundle exec jekyll build   # 결과물은 _site/ 에 생성
 ```
 
 > **왜 `github-pages` gem이 아니라 순수 `jekyll`인가요?**
-> 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인(읽기 시간, 이미지 lazy-load)을 씁니다.
+> 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인(읽기 시간, 이미지 lazy-load, 글 설명문 생성)을 씁니다.
 > `github-pages` gem은 보안 샌드박스 때문에 커스텀 플러그인을 막으므로,
 > 로컬과 CI 모두 Jekyll을 직접 실행합니다.
 
@@ -72,15 +72,18 @@ _includes/         재사용 조각: head, header, footer, nav_links,
 _sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
                    _dark(다크모드), base/*
                    ⚠ bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
-_plugins/          reading_time.rb (한·영 읽기 시간 계산)
-                   lazy_images.rb  (<img>에 loading="lazy" 추가)
+_plugins/          reading_time.rb      (한·영 읽기 시간 계산)
+                   lazy_images.rb       (<img>에 loading="lazy" 추가)
+                   post_description.rb  (글의 page.description 채우기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
 assets/images/     토픽별로 재사용하는 공용 커버 이미지
 assets/<slug>/     글마다 하나씩 두는 그림 폴더
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
-.github/workflows/ CI: 빌드 → html-proofer 링크 검사 → main 푸시 시 배포
+script/            validate-site.sh (빌드 후 검색 노출 검사)
+sitemap-index.xml  사이트맵 인덱스 — Search Console에 제출할 URL
+.github/workflows/ CI: 빌드 → html-proofer → validate-site → main 푸시 시 배포
 ```
 
 **최상위 페이지:** `index.html`(홈), 네 개의 섹션 탭인 `paper-reviews.md`·
@@ -98,8 +101,11 @@ search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 ---
 layout: post
 title: "<글 제목>"
+subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
 date: YYYY-MM-DD HH:MM:SS
 author: "<저자>"                   # 논문 저자(기관). Insights·의견 글이면 생략
+description: >-                    # 선택 — 아래 설명 참고
+  <검색 결과에 노출될 문장, 150자 안팎>
 categories: ["<유형>", "<주제>"]
 tags: ["<태그-1>", "<태그-2>"]
 cover: /assets/images/<topic>.(jpg|png)
@@ -108,6 +114,20 @@ lang: ko                           # 선택 — 아래 translation_id와 함께 
 translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다
 ---
 ```
+
+**본문 첫 줄에 제목을 H1으로 다시 쓰지 마세요.** 레이아웃이 이미 제목을 렌더링하므로
+`# 제목`을 넣으면 `<h1>`이 두 개가 되고, 검색 결과 설명문에도 그 제목이 새어 나갑니다.
+부제를 붙이고 싶으면 `subtitle:`을 쓰세요.
+
+### `description:` — 검색 결과에 뜨는 문장
+
+`description:`은 구글이 링크 아래에 보여 주는 문장이고, 소셜 카드가 인용하는 문장이며,
+RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_description.rb`가 본문의
+첫 산문 단락에서 뽑아 주는데, 대개 그걸로 충분합니다. 다만 첫 단락이 인용문이나 공개
+고지로 시작하는 글 — 즉 대부분의 Insights 글 — 은 직접 쓰는 편이 낫습니다.
+
+설명문은 **사이트 전체에서 중복되면 안 됩니다.** 두 페이지가 같은 설명문을 쓰면 CI가
+빌드를 실패시킵니다.
 
 ### 카테고리가 URL을 결정합니다
 
@@ -141,9 +161,21 @@ kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합
 ```bash
 bundle exec jekyll build                              # 빌드가 깨끗한가?
 bundle exec htmlproofer ./_site --disable-external    # 깨진 링크·이미지는 없나?
+script/validate-site.sh                               # 사이트맵·피드·메타데이터
 ```
 
-CI도 같은 html-proofer 검사를 돌립니다. 로컬에서 미리 잡으면 배포 실패를 막을 수 있습니다.
+CI도 같은 두 검사를 돌립니다. 로컬에서 미리 잡으면 배포 실패를 막을 수 있습니다.
+
+> **검사 결과가 말이 안 되면 먼저 떠 있는 `jekyll serve`를 찾으세요.** 파일을 감시하며
+> `_site/`를 계속 덮어쓰고, `site.url`을 `http://localhost:4000`으로 바꾸며(사이트맵 URL이
+> 전부 틀리게 보입니다), 시작할 때 읽은 `_config.yml`을 계속 들고 있어 그 뒤에 추가한
+> `exclude`가 적용되지 않습니다. 종료하거나, 다른 경로로 빌드해서 검사하세요.
+>
+> ```bash
+> ps aux | grep '[j]ekyll serve'
+> bundle exec jekyll build --destination /tmp/site-verify
+> script/validate-site.sh /tmp/site-verify
+> ```
 
 ---
 
@@ -152,15 +184,32 @@ CI도 같은 html-proofer 검사를 돌립니다. 로컬에서 미리 잡으면 
 `main`에 푸시하면 `.github/workflows/jekyll.yml`이 다음을 수행합니다.
 
 1. `JEKYLL_ENV=production`으로 사이트를 빌드하고
-2. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사한 뒤
-3. GitHub Pages에 배포합니다.
+2. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
+3. **`script/validate-site.sh`**로 사이트맵·피드 파싱, 페이지별 설명문·canonical,
+   설명문·제목 중복을 검사한 뒤
+4. GitHub Pages에 배포합니다.
 
-워크플로우가 실패한다면 대개 2단계입니다. Actions 로그를 열면 어떤 링크·이미지가
-깨졌는지 정확히 나옵니다. 수동 배포 단계는 없습니다.
+워크플로우가 실패한다면 대개 2·3단계입니다. Actions 로그에 어떤 링크·이미지·페이지가
+문제인지 그대로 나옵니다. 수동 배포 단계는 없습니다.
 
 > **⚠ `google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**
 > Search Console·네이버 소유권 인증 토큰이라 사이트 루트에 그대로 올라가야 합니다.
-> 제외하면 검색 색인이 조용히 망가집니다 — 증상은 "구글이 사이트맵을 못 읽음"입니다.
+> 제외하면 소유권 인증이 조용히 망가집니다.
+
+### Search Console이 사이트맵을 "가져올 수 없음"이라고 할 때
+
+먼저 파일을 확인하세요. 대개 파일은 정상입니다.
+
+```bash
+curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # 200, application/xml 기대
+curl -sS  https://bits-bytes-nn.github.io/sitemap.xml | xmllint --noout -
+curl -sS  https://bits-bytes-nn.github.io/robots.txt
+```
+
+세 개가 다 통과하면 원인은 사이트가 아니라 Search Console에 캐시된 판정입니다.
+Search Console은 사이트맵을 URL로 식별하고 처음 기록한 결과를 유지하므로, 같은 경로를
+다시 제출해도 굳은 항목을 재사용합니다. 그 항목을 삭제하고 **`sitemap-index.xml`** —
+한 번도 본 적 없는 URL — 을 제출한 뒤, URL 검사 → 색인 생성 요청으로 크롤링을 재촉하세요.
 
 ---
 

@@ -1,20 +1,19 @@
 ---
 layout: post
 title: "Claude Code 내부 아키텍처 분석"
+subtitle: "Claude Code의 속살이 드러났습니다. npm Source Map 유출로 본 에이전틱 AI의 해부학."
 date: 2026-03-31 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: false
 lang: ko
 translation_id: claude-code-architecture-analysis
 ---
 
-# Claude Code의 속살이 드러났습니다. npm Source Map 유출로 본 에이전틱 AI의 해부학.
-
 > Anthropic이 "오픈소스"라고 부르는 것과 실제로 오픈된 것 사이에는 4,600개 파일만큼의 간극이 있었습니다.
 
-### TL;DR
+## TL;DR
 - npm source map 실수로 Claude Code의 비공개 코어 엔진(4,600+ 파일) 전체가 노출되었습니다
 - 공식 "오픈소스"는 플러그인 껍데기(279개)뿐 — 핵심 엔진은 상용 비공개였습니다
 - 내부에는 8겹 보안 레이어, 4단계 메시지 압축, 비용 인식 에러 복구 등 정교한 프로덕션 아키텍처가 있습니다

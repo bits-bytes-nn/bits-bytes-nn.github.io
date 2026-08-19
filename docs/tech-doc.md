@@ -52,11 +52,11 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
-| 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox, 툴팁은 Tippy.js. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
+| 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
 | 검색 | `search.json`(전체 본문 색인) 위에 `simple-jekyll-search` | 서버 없이 브라우저에서 도는 검색. 미리 만들어 둔 색인 파일을 받아 클라이언트가 직접 찾는다 |
 | 다크모드 | 라이트가 기본, 토글로 opt-in(`_sass/_dark.scss`, `[data-theme="dark"]`) | OS의 다크모드 설정은 **따르지 않고**, 사용자가 버튼을 눌러 켜야 한다 |
 | 호스팅/CI | GitHub Actions로 GitHub Pages 배포(`.github/workflows/jekyll.yml`) | `main`에 푸시하면 자동으로 빌드·검사·배포 |
@@ -68,7 +68,7 @@ Pages가 그대로 서빙.**
 > **실행을 거부**하게 만든다. 그래서 외부에서 불러오는 것은 버전을 고정하고 SRI를 붙인다.
 
 > **왜 GitHub Pages 기본 빌드가 아니라 Jekyll을 직접 돌리나?** GitHub Pages의 내장
-> 빌드는 보안 샌드박스라 우리가 `_plugins/`에 만든 커스텀 플러그인(읽기시간·lazy-load)을
+> 빌드는 보안 샌드박스라 우리가 `_plugins/`에 만든 커스텀 플러그인(읽기시간·lazy-load·설명문)을
 > 막는다. 그래서 로컬과 CI 모두 순수 `jekyll`을 직접 실행한다.
 
 ## 2. 빌드 파이프라인 — 마크다운 한 편이 HTML이 되기까지
@@ -269,6 +269,11 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 - **사이트맵/피드** — `jekyll-sitemap`이 `/sitemap.xml`(검색엔진이 페이지 목록을 파악하는
   지도)을, `jekyll-feed`가 `/feed.xml`(RSS 구독용)을 자동 생성한다. `robots.txt`가 크롤러를
   사이트맵으로 안내하고, `head.html`이 `<link rel="alternate">`로 피드 위치를 알린다.
+  루트의 `sitemap-index.xml`은 `sitemap.xml`을 가리키는 사이트맵 인덱스로, Search Console에
+  제출하는 URL이다(굳은 제출 항목을 우회하는 용도 — README 참고).
+- **검색 노출 검사** — `script/validate-site.sh`가 빌드 후 `_site/`를 훑어 사이트맵·피드가
+  파싱되는지, 모든 페이지에 설명문과 canonical이 있는지, 설명문·제목이 중복되지 않는지
+  확인한다. htmlproofer가 보지 않는 영역이고, 실제로 한 번 깨졌던 부분이라 CI 게이트로 둔다.
 - **소유권 인증 토큰 파일** — 루트의 `google*.html`, `naver*.html`은 Google Search
   Console / 네이버가 "이 사이트가 정말 네 것이냐"를 확인하는 인증 파일이다. 사이트 루트에서
   **그대로 서빙돼야** 인증이 유지되고 사이트맵 크롤링이 된다. 그래서 `_config.yml`의

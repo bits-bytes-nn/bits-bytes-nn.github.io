@@ -1,3 +1,47 @@
+{%- comment -%}
+  Single source of truth for the description / social image / locale used by the
+  meta, OpenGraph, Twitter and JSON-LD blocks below. Each of those four used to
+  inline its own `page.excerpt` expression, so they drifted and all four
+  inherited the same defect.
+
+  `page.description` is authoritative: posts that don't declare one get it filled
+  in by _plugins/post_description.rb, which also makes jekyll-feed emit the same
+  text. Listing pages declare theirs in front matter, because a description
+  derived from a page of links would be noise.
+{%- endcomment -%}
+{%- assign page_description = page.description | default: site.description | shorten: 160 -%}
+
+{%- comment -%}
+  A page `cover` is a wide banner of unknown size, so its dimensions are not
+  declared — crawlers measure it themselves. Only the configured default image
+  ships width/height, because those values are verified against the file.
+{%- endcomment -%}
+{%- if page.cover -%}
+	{%- assign social_image = page.cover | prepend: site.baseurl | prepend: site.url -%}
+{%- else -%}
+	{%- assign social_image = site.protocols.fb_image | prepend: site.baseurl | prepend: site.url -%}
+{%- endif -%}
+
+{%- assign page_lang = page.lang | default: 'ko' -%}
+{%- if page_lang == 'en' -%}
+	{%- assign og_locale = 'en_US' -%}
+{%- else -%}
+	{%- assign og_locale = 'ko_KR' -%}
+{%- endif -%}
+{%- comment -%}
+  Paginated listings all render index.html, so without a page-number suffix
+  /page/2..7 ship byte-identical titles and descriptions.
+{%- endcomment -%}
+{%- assign page_title = page.title | default: site.title -%}
+{%- if paginator and paginator.page > 1 -%}
+	{%- assign page_title = page_title | append: ' — Page ' | append: paginator.page -%}
+	{%- assign page_description = page_description | append: ' (Page ' | append: paginator.page | append: ' of ' | append: paginator.total_pages | append: ')' -%}
+{%- endif -%}
+{%- if page.url -%}
+	{%- assign page_full_url = page.url | prepend: site.baseurl | prepend: site.url -%}
+{%- else -%}
+	{%- assign page_full_url = site.url | append: site.baseurl -%}
+{%- endif -%}
 <head>
 	<meta charset="utf-8" />
 	<!-- Apply saved theme before paint to avoid a flash of the wrong colors -->
@@ -15,8 +59,8 @@
 	<meta name="color-scheme" content="light" />
 	<meta name="theme-color" content="#ffffff" />
 
-	<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
-	<meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
+	<title>{{ page_title }}</title>
+	<meta name="description" content="{{ page_description | escape }}" />
 	{% if site.name %}
 	<meta name="author" content="{{ site.name }}" />
 	<meta name="copyright" content="&copy; {{ site.name }} {{ site.time | date: '%Y' }}" />
@@ -30,10 +74,10 @@
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
 
 	<!-- External libraries -->
+	<!-- v4-shims.min.css was dropped: all icon markup now uses Font Awesome 6
+	     names directly, so the compatibility layer had nothing left to alias. -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 		integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/v4-shims.min.css"
-		integrity="sha384-5Jfdy0XO8+vjCRofsSnGmxGSYjLfsjjTOABKxVr8BkfvlaAm14bIJc7Jcjfq/xQI" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 	<!-- Favicon and other icons -->
 	<link rel="shortcut icon" href="{{ '/assets/icons/favicon.ico' | prepend: site.baseurl }}" type="image/x-icon">
@@ -58,15 +102,18 @@
 
 	<!-- Facebook OGP cards -->
 	{% if site.protocols.fb_image %}
-	<meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
-	<meta property="og:url" content="{% if page.url %}{{ site.url }}{{ page.url }}{% else %}{{ site.url }}{% endif %}" />
+	<meta property="og:description" content="{{ page_description | escape }}" />
+	<meta property="og:url" content="{{ page_full_url }}" />
 	<meta property="og:site_name" content="{{ site.title }}" />
-	<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}" />
+	<meta property="og:title" content="{{ page_title | escape }}" />
 	<meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}" />
-	<meta property="og:image" content="{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.fb_image | prepend: site.baseurl | prepend: site.url }}{% endif %}" />
-	<meta property="og:image:type" content="{{ site.protocols.fb_image_type }}" />
+	<meta property="og:locale" content="{{ og_locale }}" />
+	<meta property="og:image" content="{{ social_image }}" />
+	<meta property="og:image:alt" content="{{ page_title | escape }}" />
+	{% unless page.cover %}<meta property="og:image:type" content="{{ site.protocols.fb_image_type }}" />
 	<meta property="og:image:width" content="{{ site.protocols.fb_image_width }}" />
 	<meta property="og:image:height" content="{{ site.protocols.fb_image_height }}" />
+	{% endunless %}
 	{% if page.layout == 'post' %}
 	<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
 	{% if page.author %}<meta property="article:author" content="{{ page.author }}" />{% endif %}
@@ -77,10 +124,15 @@
 
 	<!-- Twitter: card tags -->
 	{% if site.protocols.twitter_image %}
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}" />	<meta name="twitter:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
-	<meta name="twitter:image" content="{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.twitter_image | prepend: site.baseurl | prepend: site.url }}{% endif %}" />
-	<meta name="twitter:url" content="{% if page.url %}{{ site.url }}{{ page.url }}{% else %}{{ site.url }}{% endif %}" />
+	<!-- Every image used here (page covers and the site default) is a wide
+	     banner, so the large card is the right form; `summary` cropped them all
+	     into a thumbnail. -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="{{ page_title | escape }}" />
+	<meta name="twitter:description" content="{{ page_description | escape }}" />
+	<meta name="twitter:image" content="{{ social_image }}" />
+	<meta name="twitter:image:alt" content="{{ page_title | escape }}" />
+	<meta name="twitter:url" content="{{ page_full_url }}" />
 	{% endif %}
 
 	<!-- Open Source Protocol -->
@@ -102,13 +154,18 @@
 	{
 	  "@context": "https://schema.org",
 	  "@type": "BlogPosting",
-	  "headline": {{ page.title | jsonify }},
-	  "url": "{{ page.url | prepend: site.baseurl | prepend: site.url }}",
-	  "mainEntityOfPage": "{{ page.url | prepend: site.baseurl | prepend: site.url }}",
+	  {%- comment -%}
+	    Google drops Article rich results when headline runs past ~110 chars, and
+	    several paper titles here are longer than that.
+	  {%- endcomment -%}
+	  "headline": {{ page.title | truncate: 110 | jsonify }},
+	  "url": "{{ page_full_url }}",
+	  "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ page_full_url }}" },
+	  "inLanguage": "{{ page_lang }}",
 	  "datePublished": "{{ page.date | date_to_xmlschema }}",
 	  "dateModified": "{{ page.date | date_to_xmlschema }}",
-	  "description": {% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 | jsonify }}{% else %}{{ site.description | strip_newlines | jsonify }}{% endif %},
-	  "image": "{% if page.cover %}{{ page.cover | prepend: site.baseurl | prepend: site.url }}{% else %}{{ site.protocols.fb_image | prepend: site.baseurl | prepend: site.url }}{% endif %}",
+	  "description": {{ page_description | jsonify }},
+	  "image": "{{ social_image }}",
 	  "author": { "@type": "{% if page.author %}Organization{% else %}Person{% endif %}", "name": {% if page.author %}{{ page.author | jsonify }}{% else %}{{ site.name | jsonify }}{% endif %} },
 	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
@@ -121,7 +178,8 @@
 	  "@type": "WebSite",
 	  "name": {{ site.title | jsonify }},
 	  "url": "{{ site.url }}{{ site.baseurl }}/",
-	  "description": {{ site.description | strip_newlines | jsonify }},
+	  "inLanguage": "{{ page_lang }}",
+	  "description": {{ page_description | jsonify }},
 	  "author": { "@type": "Person", "name": {{ site.name | jsonify }} }
 	}
 	</script>
@@ -166,11 +224,6 @@
 	</script>
 	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 	{% endif %}
-
-	<!-- Tooltips -->
-	<script type="text/javascript">
-		window.tooltips = [];
-	</script>
 
 	<!-- Google Analytics -->
 	{% if site.ga_tracking_id %}

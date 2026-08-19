@@ -1,6 +1,6 @@
 // Site behaviors: theme toggle, code-copy, mobile menu, nav highlight, smooth
-// scroll, sticky-nav class, share popups, image zoom (GLightbox), tooltips
-// (Tippy), and the post table of contents. Vanilla JS, no jQuery.
+// scroll, sticky-nav class, share popups, image zoom (GLightbox), and the post
+// table of contents. Vanilla JS, no jQuery.
 document.addEventListener('DOMContentLoaded', function () {
   // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
   // The OS setting is intentionally NOT followed.
@@ -123,11 +123,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Image zoom (GLightbox reads .glightbox elements)
   if (window.GLightbox) GLightbox({ selector: '.glightbox' });
-
-  // Tooltips via Tippy.js
-  if (Array.isArray(window.tooltips)) {
-    window.tooltips.forEach(function (t) { tippy(t[0], t[1]); });
-  }
 
   // Build a table of contents from post h2 headings (3+ only). The <details>
   // ships with `open`, so it starts expanded; visitors can collapse it.

@@ -1,23 +1,24 @@
 ---
 layout: post
 title: "Writing Context Into Your Data — AI-Ready Data, Semantic Layers, Knowledge Graphs, Ontologies"
+description: >-
+  "AI-ready data" isn't clean data — it's context written in machine-executable
+  form. Why the same schema takes text-to-SQL accuracy from 16.7% to 54.2%.
 date: 2026-07-27 12:00:00
 categories: ["Insights", "Data-Architecture"]
 tags: ["AI-Ready-Data", "Semantic-Layer", "Knowledge-Graph", "Ontology", "GraphRAG", "Agentic-AI", "Model-Context-Protocol", "Data-Governance"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: true
 lang: en
 translation_id: ai-ready-data-semantic-layer-knowledge-graph
 ---
-
-# Writing Context Into Your Data — AI-Ready Data, Semantic Layers, Knowledge Graphs, Ontologies
 
 > "Generic AI solutions often struggle with text-to-SQL conversions when given only a database schema, as schemas lack critical knowledge like business process definitions and metrics handling."
 > — [Snowflake Cortex Analyst documentation](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) (undated, accessed 2026-07-26)
 
 *Disclosure: I work at AWS. This post treats AWS services as one vendor architecture among several, but every interpretation, assessment, and criticism here is my own and not an official AWS position. It isn't a pitch for any product — it's a close look at one problem in data architecture.*
 
-### TL;DR
+## TL;DR
 
 - **"AI-ready data" isn't clean data. It's data with its semantics written down in a form machines can execute.** Hand GPT-4 an enterprise schema and ask business questions, and zero-shot text-to-SQL lands at **16.7%** accuracy. Ask the same questions over the same data wrapped in an ontology and mappings, and it hits **54.2%** ([Sequeda et al., 2023](https://arxiv.org/abs/2311.07509)).
 - **There are three paths, one per data shape** — knowledge graphs for unstructured data, semantic layers for structured data, and catalogs for "which data lives where." They aren't competing technologies but complementary layers, and since 2025 they've been converging on a single interface for agents: [MCP](https://www.anthropic.com/news/model-context-protocol).

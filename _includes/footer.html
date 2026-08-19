@@ -48,15 +48,13 @@
 
 <!-- Scripts -->
 <!-- Code is highlighted server-side by Rouge (theme in _sass/_syntax.scss); no client-side highlighter needed. -->
-<!-- GLightbox (vanilla, no jQuery) for image zoom; Tippy.js for tooltips. -->
+<!-- GLightbox (vanilla, no jQuery) for image zoom. -->
+<!-- Tippy.js/Popper.js were dropped: window.tooltips was always empty, so the
+     two extra CDN scripts initialised nothing on every page load. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"
 	integrity="sha384-GPAzSuZc0kFvdIev6wm9zg8gnafE8tLso7rsAYQfc9hAdWCpOcpcNI5W9lWkYcsd" crossorigin="anonymous" />
 <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"
 	integrity="sha384-/+Fc1LD6ksHYZ+2MChiSfjEXBcl4q2axUWhs6/CdnfqY5aLmrPwtysVzyeP0s60b" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-	integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"
-	integrity="sha384-AiTRpehQ7zqeua0Ypfa6Q4ki/ddhczZxrKtiQbTQUlJIhBkTeyoZP9/W/5ulFt29" crossorigin="anonymous"></script>
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
 

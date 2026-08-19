@@ -2,6 +2,9 @@
 layout: page
 title: Paper Reviews
 permalink: /paper-reviews/
+description: >-
+  Deep teardowns of key AI/ML papers — LLMs, multimodal, fine-tuning, RAG — down
+  to their design decisions and trade-offs, grouped by topic.
 main_nav: true
 nav_order: 3
 ---

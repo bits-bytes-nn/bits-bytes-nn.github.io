@@ -1,20 +1,19 @@
 ---
 layout: post
 title: "Claude Code Architecture Analysis"
+subtitle: "Claude Code Exposed: Anatomy of an Agentic AI Through an npm Source Map Leak"
 date: 2026-03-31 12:00:01
 categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: false
 lang: en
 translation_id: claude-code-architecture-analysis
 ---
 
-# Claude Code Exposed: Anatomy of an Agentic AI Through an npm Source Map Leak
-
 > Between what Anthropic calls "open source" and what is actually open, there was a gap of 4,600 files.
 
-### TL;DR
+## TL;DR
 - An npm source map mishap exposed Claude Code's proprietary core engine — all 4,600+ files of it
 - The official "open source" release was just a plugin shell (279 files) — the core engine was commercially closed
 - Inside lies a sophisticated production architecture: 8-layer security, 4-tier message compaction, cost-aware error recovery, and more

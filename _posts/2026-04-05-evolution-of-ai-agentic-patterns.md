@@ -1,21 +1,20 @@
 ---
 layout: post
 title: "프롬프트에서 하네스까지 — AI 에이전틱 패턴 4년의 기록"
+subtitle: "엔지니어링의 엄밀함은 사라지지 않는다 — 이동할 뿐이다. AI 에이전틱 패턴 4년의 기록"
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: false
 lang: ko
 translation_id: evolution-of-ai-agentic-patterns
 ---
 
-# 엔지니어링의 엄밀함은 사라지지 않는다 — 이동할 뿐이다. AI 에이전틱 패턴 4년의 기록
-
 > "가장 핫한 새 프로그래밍 언어는 영어입니다." — Andrej Karpathy, 2023.
 > 3년 뒤, 그 말은 절반만 맞았습니다.
 
-### TL;DR
+## TL;DR
 - 2022-2026, AI 개발 패러다임이 세 번 바뀌었습니다. Prompt Engineering → Context Engineering → Harness Engineering
 - 각 전환의 진짜 동인은 "이전 패러다임이 약속한 것을 지키지 못했기 때문"입니다
 - 엔지니어링의 엄밀함은 사라지지 않았습니다. 프롬프트에서 컨텍스트로, 컨텍스트에서 하네스로 이동했을 뿐입니다 (Chad Fowler의 "[Relocating Rigor](https://www.honeycomb.io/blog/production-is-where-the-rigor-goes)")

@@ -2,13 +2,16 @@
 layout: page
 title: About
 permalink: /about/
+description: >-
+  Jonas Kim — Senior Data Scientist at AWS Professional Services Korea. Fifteen
+  years at the seam between research papers and production ML systems.
 main_nav: true
 nav_order: 1
 ---
 
 ![Profile Picture]({{ site.baseurl }}/assets/my-profile.png "Profile Picture"){:.profile}
 
-# Hello, I'm Jonas Kim
+## Hello, I'm Jonas Kim
 
 I'm a **Senior Data Scientist at AWS Professional Services Korea**. For over 15 years I've worked as a data scientist and machine learning engineer, living at the seam between research papers and production systems — turning frontier ideas into things that actually run.
 
