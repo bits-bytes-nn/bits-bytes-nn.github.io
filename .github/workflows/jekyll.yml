@@ -20,11 +20,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          # libxml2-utils provides xmllint, used by script/validate-site.sh.
-          sudo apt-get install -y build-essential libssl-dev libyaml-dev libreadline-dev zlib1g-dev libffi-dev libxml2-utils
+      # No apt step. The packages it installed are already in the ubuntu-latest
+      # image — a past run's log showed libyaml-dev/zlib1g-dev/libffi-dev
+      # "already the newest version" and only 2 incidental upgrades — and the
+      # -dev headers were only ever needed to compile Ruby itself, which
+      # ruby/setup-ruby avoids by fetching a prebuilt build. The native gems
+      # (sassc, eventmachine) need g++/make, which the image ships as well.
+      #
+      # What it did cost was `apt-get update` on every deploy: a network-bound
+      # step that stalled for 45+ minutes twice in one day on a pipeline whose
+      # other steps total under a minute. If this assumption is ever wrong the
+      # build job fails and `deploy` (needs: build) publishes nothing.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
