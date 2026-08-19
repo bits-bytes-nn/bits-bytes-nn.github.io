@@ -52,14 +52,14 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
 | 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
 | 검색 | `search.json`(전체 본문 색인) 위에 `simple-jekyll-search` | 서버 없이 브라우저에서 도는 검색. 미리 만들어 둔 색인 파일을 받아 클라이언트가 직접 찾는다 |
-| 다크모드 | 라이트가 기본, 토글로 opt-in(`_sass/_dark.scss`, `[data-theme="dark"]`) | OS의 다크모드 설정은 **따르지 않고**, 사용자가 버튼을 눌러 켜야 한다 |
-| 호스팅/CI | GitHub Actions로 GitHub Pages 배포(`.github/workflows/jekyll.yml`) | `main`에 푸시하면 자동으로 빌드·검사·배포 |
+| 다크모드 | 라이트가 기본, 토글로 opt-in(`_sass/_dark.scss`, `[data-theme="dark"]`) | OS의 다크모드 설정은 **따르지 않고**, 사용자가 버튼을 눌러 켜야 한다. 테마에 따라 바뀌어야 하는 두 값이 CSS 밖에 있다 — `color-scheme`(스크롤바 등 브라우저 위젯)은 `_dark.scss`가 `data-theme`으로 처리하고, `theme-color`(모바일 주소창)는 메타 태그라 `head.html`의 인라인 스크립트와 `main.js`의 토글이 함께 갱신한다 |
+| 호스팅/CI | GitHub Actions로 GitHub Pages 배포(`.github/workflows/jekyll.yml`) | `main`에 푸시하면 자동으로 빌드·검사·배포. 같은 검사가 `main`으로 향하는 PR에서도 돌아 머지 전에 막는다 |
 
 > **용어 — CDN과 SRI.** *CDN*은 인기 라이브러리를 전 세계 서버에서 빠르게 내려주는 공용
 > 배포망이다(예: cdnjs, jsDelivr). 문제는 그 외부 파일이 몰래 바뀌면 우리 사이트에
@@ -107,7 +107,9 @@ Pages가 그대로 서빙.**
 포스트는 프런트매터에 **2단계** 카테고리를 가진다: `categories: ["<유형>", "<주제>"]`.
 
 - **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights` 중 하나.
-  글이 어느 내비 탭에 들어갈지를 정한다. 각각 전용 페이지를 가진다.
+  글이 어느 섹션 페이지에 들어갈지를 정한다. 넷 다 전용 페이지를 가지지만, 지금 글이 있는
+  유형은 `Paper Reviews`(28편)와 `Insights`(7편)뿐이고 내비에는 이 둘만 올라간다(아래
+  "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
 - **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`,
   `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 세부 주제이며 필요하면 자유롭게 추가한다.
 
@@ -133,11 +135,17 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 | nav_order | 페이지 | 소스 |
 |-----------|--------|------|
 | 1 | About | `about.md` |
-| 2 | Paper Summaries | `paper-summaries.md` — `site.categories['Paper Summaries']` 필터 |
 | 3 | Paper Reviews | `paper-reviews.md` — `site.categories['Paper Reviews']` 필터, 주제별 그룹화 |
-| 4 | Tech Guides | `tech-guides.md` — `site.categories['Tech Guides']` 필터 |
 | 5 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
 | 6 | Search | `search.md` |
+
+`nav_order`의 2·4번이 빈 것은 실수가 아니다. `paper-summaries.md`(2)와
+`tech-guides.md`(4)는 **글이 0편이라 내비에서 내렸다** — 여섯 탭 중 둘이
+"this space will fill up soon"으로 이어지고 있었고, 같은 페이지가 사이트맵에도 올라가
+검색엔진에 빈 페이지를 내밀고 있었다. 두 파일은 `main_nav` 없이 `sitemap: false`로
+남아 있고(URL로는 계속 열린다), 첫 글이 그 유형으로 들어오면 프런트매터 주석이 지시하는
+대로 `main_nav: true`와 원래 `nav_order`를 되살리면 된다. 번호를 다시 매기지 않은 이유가
+이것이다.
 
 `categories.html`(`/categories/`)과 `tags.html`(`/tags/`)은 *모든* 카테고리/태그를 가로지르는
 전체 색인 페이지다. 메인 내비에는 없고, 각 포스트 하단의 메타데이터에서 링크된다.
@@ -152,7 +160,29 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 > **함정 — 앵커 점프 깨짐.** 메타데이터의 카테고리/태그 링크는 모두 `slugify` 필터로 ID를
 > 만든다. 과거에는 링크 쪽은 `downcase`(공백 유지), 제목(H2)의 id는 원본 케이스(`Paper
 > Reviews`)를 써서 서로 어긋났고, 클릭해도 해당 위치로 점프하지 못했다(html-proofer가
-> 128건 적발). 지금은 양쪽 다 `slugify`로 통일했다.
+> 128건 적발). 지금은 양쪽 다 `slugify`로 통일했다 — `paper-reviews.md`가 마지막까지
+> `id="{{cat}}"`로 원본 케이스를 내고 있었는데, 그 앵커를 가리키는 링크가 없어 html-proofer가
+> 잡지 못했다. 새 목록 페이지를 만들 땐 `| slugify`를 빼먹지 않는다.
+
+### 태그: 세부 태그 + 통제된 주제 태그
+
+태그는 자유 형식이지만 **두 층**으로 쓴다.
+
+- **세부 태그** — 논문 하나의 기여를 서술한다(`Fine-Grained-Expert-Segmentation`,
+  `Dependency-Aware-Tree-Traversal`). 논문 색인으로는 정확하다.
+- **주제 태그** — 글을 서로 잇는다. `Agentic-AI`, `Alignment`, `DeepSeek`,
+  `Knowledge-Graph`, `Llama`, `Mixture-of-Experts`, `Multimodal-Models`,
+  `Reasoning-Models`, `Retrieval-Augmented-Generation`.
+
+세부 태그만 있으면 관련 글 기능이 굶는다. 태그 264개 중 220개(83%)가 단 한 편에만 붙어
+있었고, `related_posts.rb`가 공유 태그를 요구하므로 11편이 관련 글 0개였다 — 그중 넷은
+RAPTOR·GraphRAG·LightRAG·Zep, 즉 서로 붙어야 마땅한 그래프 RAG 논문들이었다. 한 주제를 세
+이름으로 부른 것(`Agentic-Architecture`/`Agentic-Patterns`/`Agentic-Infrastructure`)도 같은
+증상을 만들었다.
+
+주제 태그를 한 층 얹어 35편 전부가 관련 글을 얻게 했다. 고친 곳이 `related_posts.rb`의
+규칙이 아니라 **글의 프런트매터**라는 점이 중요하다 — 규칙을 느슨하게 풀면 공통점 없는 글이
+서로 추천된다. 세부 태그는 지우지 않았다(살아 있는 `/tags/` 앵커가 움직인다).
 
 ## 4. 수식 렌더링
 
@@ -206,8 +236,13 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
   없이 단순 부분문자열 매칭을 한다. 즉 색인에 없는 글자는 못 찾는다. 예전에 snippet(앞
   40단어)만 색인했더니, "어텐션"·"트랜스포머"가 본문 중·후반에 18개 포스트나 있는데 발췌엔
   안 들어가 검색 결과가 **0건**으로 나왔다. `content`로 전체를 색인해 한글 재현율을 회복했다.
-  파일은 약 2.7 MB지만 gzip 압축 후 ~786 KB이고, `/search/` 페이지에서만 로드되므로 다른
-  페이지 속도엔 영향이 없다.
+  대가는 실측 **3.2 MB, gzip 991 KB**다(글이 늘면 같이 는다). `/search/`에서만 내려받으므로
+  다른 페이지 속도엔 영향이 없다.
+
+  > **알려진 한계 — 매치가 안 보일 수 있다.** 색인은 본문 전체인데 결과 카드에 찍히는 건
+  > 앞 40단어짜리 `snippet`뿐이다. 그래서 5만 번째 글자에서 걸린 검색어는 스니펫에 없고
+  > `<mark>` 강조도 안 걸려서, 맞는 결과가 엉뚱한 결과처럼 보인다. 고치려면 매치 위치
+  > 주변을 잘라 보여 주는 스니펫이 필요하다(`simple-jekyll-search`의 템플릿 밖 작업).
 - **`js/search.js`** 가 `simple-jekyll-search`(CDN 버전 **고정 + SRI**: `1.10.0`)를
   `search.md`의 `#search-input` 입력칸에 연결한다. 매칭된 키워드를 `<mark>`로 강조하고
   결과 개수를 라이브 상태줄에 표시한다. 강조 처리는 결과가 다 그려진 뒤 **디바운스**로 단
@@ -217,9 +252,10 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
   > 마지막 입력 뒤 잠깐 멈출 때까지 기다렸다가 **딱 한 번만** 함수를 실행하는 기법이다.
 - `category`/`tags`도 색인에 들어가므로 제목·본문뿐 아니라 메타데이터로도 검색된다.
   색인에는 **글(`site.posts`)만** 들어간다 — `search.json`이 `site.posts`를 순회하므로
-  About·Search·index 같은 페이지는 애초에 후보가 아니다. (`_config.yml`에 남아 있는
-  `simple_jekyll_search.exclude`는 아무것도 하지 않는다. `simple-jekyll-search`는
-  브라우저에서 도는 JS라 `_config.yml`을 읽을 수 없다.)
+  About·Search·index 같은 페이지는 애초에 후보가 아니다. (`_config.yml`에 `about.md`·
+  `search.md`·`index.html`을 열거하던 `simple_jekyll_search.exclude` 블록이 있었는데,
+  `simple-jekyll-search`는 브라우저에서 도는 JS라 `_config.yml`을 읽을 수 없어 아무것도 하지
+  않았다. 지워졌고, 왜 없는지가 `_config.yml`의 주석으로 남아 있다.)
 
 ## 6. 스타일 (Sass)
 
@@ -265,6 +301,11 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   깨졌으면 **배포를 막는다**(외부 링크는 느리고 불안정해 건너뛴다). 그래서 푸시 전에 로컬에서
   `bundle exec htmlproofer ./_site --disable-external`로 미리 확인하면 배포 실패를 예방할 수
   있다.
+
+  같은 워크플로가 **`main`으로 향하는 PR에서도** 돈다(`deploy` 잡과 아티팩트 업로드만
+  `github.event_name != 'pull_request'`로 건너뛴다). 이게 없던 동안 네 게이트는 머지 **후에만**
+  돌았다 — 잘못된 PR이 main에 착지한 다음 배포에 실패해서, 사이트는 마지막 정상 배포를 계속
+  서빙하지만 main이 빨간 상태로 남았다. 지금은 머지 전에 걸린다.
 
   > **용어 — CI.** Continuous Integration. 코드를 올리면 정해 둔 검사·빌드·배포를 자동으로
   > 돌려주는 파이프라인이다. 여기서는 GitHub Actions가 그 역할을 한다.

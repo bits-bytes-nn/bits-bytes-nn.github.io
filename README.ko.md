@@ -87,10 +87,10 @@ search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 test/              _plugins/ 로직의 minitest 단위 테스트
 script/            validate-site.sh (빌드 후 검색 노출 검사)
 sitemap-index.xml  사이트맵 인덱스 — Search Console에 제출할 URL
-.github/workflows/ CI: 빌드 → html-proofer → validate-site → main 푸시 시 배포
+.github/workflows/ CI: 테스트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
 ```
 
-**최상위 페이지:** `index.html`(홈), 네 개의 섹션 탭인 `paper-reviews.md`·
+**최상위 페이지:** `index.html`(홈), 네 개의 섹션 페이지인 `paper-reviews.md`·
 `paper-summaries.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
 `tags.html`·`search.md`·`about.md`.
 
@@ -138,9 +138,33 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 카테고리는 **두 단계**입니다.
 
 - `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Tech Guides`,
-  `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다.
+  `Insights` 중 하나. 글이 어느 섹션 페이지에 들어갈지를 정합니다. 현재 글이 있는 유형은
+  `Paper Reviews`와 `Insights`뿐이라 내비에도 이 둘만 있습니다 — `paper-summaries.md`와
+  `tech-guides.md`는 `main_nav` 없이 `sitemap: false` 상태이고, 첫 글이 들어오면 어떤 두
+  값을 되살리면 되는지가 각 파일 프런트매터에 적혀 있습니다.
 - `categories[1]` — **주제**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 필요하면 자유롭게 추가합니다.
+
+### 태그: 세부 태그 위에 주제 태그를 하나
+
+태그는 자유 형식·하이픈 연결이고, 대부분 논문 하나의 기여를 서술합니다
+(`Fine-Grained-Expert-Segmentation`). 색인으로는 좋지만 글을 **잇지는** 못합니다 — 태그
+264개 중 220개가 단 한 편에만 붙어 있었고, `_plugins/related_posts.rb`는 **공유** 태그를
+요구하므로 11편이 관련 글을 하나도 얻지 못했습니다. 서로 남남이던 그래프 RAG 논문 네 편이
+거기 있었습니다.
+
+그래서 글마다 아래 통제된 주제 태그를 최소 하나 답니다.
+
+```
+Agentic-AI  Alignment  DeepSeek  Knowledge-Graph  Llama
+Mixture-of-Experts  Multimodal-Models  Reasoning-Models
+Retrieval-Augmented-Generation
+```
+
+기존 세부 태그는 **그대로 남깁니다.** 주제 태그가 담지 못하는 내용을 담고 있고, 지우면 이미
+살아 있는 `/tags/` 앵커가 움직입니다. 새 주제 태그를 만들기 전에 위 목록이나 이미 두 편
+이상이 쓰는 태그로 덮이는지 먼저 확인하세요. `Agentic-Architecture`·`Agentic-Patterns`·
+`Agentic-Infrastructure`가 한 주제의 세 이름이었던 것이 그 묶음에 링크가 없던 이유입니다.
 
 Jekyll은 이 둘과 날짜를 합쳐 출력 경로를 만듭니다.
 
@@ -192,7 +216,9 @@ CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 �
 
 ## 배포
 
-`main`에 푸시하면 `.github/workflows/jekyll.yml`이 다음을 수행합니다.
+`.github/workflows/jekyll.yml`은 `main` 푸시뿐 아니라 **`main`으로 향하는 PR에서도**
+돕니다. 그래서 아래 네 게이트가 잘못된 머지를 보고만 하지 않고 막습니다. 1~4단계는 양쪽
+모두에서, 5단계는 PR에서 건너뜁니다.
 
 1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
 2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
