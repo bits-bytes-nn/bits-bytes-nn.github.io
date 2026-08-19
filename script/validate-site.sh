@@ -63,6 +63,19 @@ if [ -f "$SITE/sitemap.xml" ]; then
   fi
 fi
 
+# --- reproducible post URLs --------------------------------------------------
+# Post permalinks embed :year/:month/:day and front-matter dates carry no offset,
+# so an unset `timezone` resolves them in the build machine's timezone. Building
+# from KST instead of CI's UTC moved 19 URLs by a day. Nothing in _site/ shows
+# this, so the invariant has to be checked at the config.
+if [ -f _config.yml ]; then
+  if grep -qE '^timezone:[[:space:]]*\S' _config.yml; then
+    pass "_config.yml pins a timezone (post URLs are build-host independent)"
+  else
+    fail "_config.yml sets no timezone — post URLs depend on the build machine"
+  fi
+fi
+
 # --- robots.txt --------------------------------------------------------------
 if [ ! -f "$SITE/robots.txt" ]; then
   fail "robots.txt is missing"
