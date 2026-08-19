@@ -142,11 +142,10 @@ share one.
 Categories are **two levels**:
 
 - `categories[0]` — the **type**: `Paper Reviews`, `Paper Summaries`,
-  `Tech Guides`, or `Insights`. This decides which section page the post appears
-  on. Only `Paper Reviews` and `Insights` have posts today, so only those two are
-  in the nav — `paper-summaries.md` and `tech-guides.md` sit at `sitemap: false`
-  with no `main_nav`, and their front matter says which two keys to restore when
-  the first post lands in either.
+  `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
+  `Paper Summaries` and `Tech Guides` have no posts yet and still keep their tabs:
+  they render an empty-state line, because a missing tab reads as a section that
+  was removed rather than one still filling up.
 - `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, … (add new ones
   freely).

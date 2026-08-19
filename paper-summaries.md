@@ -5,12 +5,13 @@ permalink: /paper-summaries/
 description: >-
   Concise digests of AI/ML papers, posts, and talks — distilled to their core
   contributions and insights.
-# No `main_nav` and `sitemap: false` while this category is empty: every post so
-# far is a Paper Review or an Insight, so the nav advertised a section whose only
-# content was "check back soon", and the sitemap offered search engines a page
-# with no posts on it. Restore both — `main_nav: true` and `nav_order: 2` — with
-# the first post filed under this category.
-sitemap: false
+# Stays in the nav even with no posts yet. It was briefly pulled out on the
+# grounds that a tab leading to "check back soon" is friction — wrong call: a
+# missing tab reads as a section that was removed, not one that is still filling
+# up. The empty-state line below is the honest signal, and the tab is what says
+# this blog does summaries.
+main_nav: true
+nav_order: 2
 ---
 
 {%- comment -%} No heading here — see insights.md. {%- endcomment -%}

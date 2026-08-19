@@ -107,9 +107,9 @@ Pages가 그대로 서빙.**
 포스트는 프런트매터에 **2단계** 카테고리를 가진다: `categories: ["<유형>", "<주제>"]`.
 
 - **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights` 중 하나.
-  글이 어느 섹션 페이지에 들어갈지를 정한다. 넷 다 전용 페이지를 가지지만, 지금 글이 있는
-  유형은 `Paper Reviews`(28편)와 `Insights`(7편)뿐이고 내비에는 이 둘만 올라간다(아래
-  "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
+  글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가진다. 지금 글이 있는
+  유형은 `Paper Reviews`(28편)와 `Insights`(7편)뿐이고, 나머지 둘은 빈 상태 문구를 띄운다
+  (아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
 - **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`,
   `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 세부 주제이며 필요하면 자유롭게 추가한다.
 
@@ -135,17 +135,21 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 | nav_order | 페이지 | 소스 |
 |-----------|--------|------|
 | 1 | About | `about.md` |
+| 2 | Paper Summaries | `paper-summaries.md` — `site.categories['Paper Summaries']` 필터 |
 | 3 | Paper Reviews | `paper-reviews.md` — `site.categories['Paper Reviews']` 필터, 주제별 그룹화 |
+| 4 | Tech Guides | `tech-guides.md` — `site.categories['Tech Guides']` 필터 |
 | 5 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
 | 6 | Search | `search.md` |
 
-`nav_order`의 2·4번이 빈 것은 실수가 아니다. `paper-summaries.md`(2)와
-`tech-guides.md`(4)는 **글이 0편이라 내비에서 내렸다** — 여섯 탭 중 둘이
-"this space will fill up soon"으로 이어지고 있었고, 같은 페이지가 사이트맵에도 올라가
-검색엔진에 빈 페이지를 내밀고 있었다. 두 파일은 `main_nav` 없이 `sitemap: false`로
-남아 있고(URL로는 계속 열린다), 첫 글이 그 유형으로 들어오면 프런트매터 주석이 지시하는
-대로 `main_nav: true`와 원래 `nav_order`를 되살리면 된다. 번호를 다시 매기지 않은 이유가
-이것이다.
+**빈 섹션도 탭을 유지한다.** `Paper Summaries`와 `Tech Guides`는 아직 머지된 글이 0편이라
+`_includes/category-posts.html`의 `empty` 문구를 띄운다("Summaries are in the works…").
+한때 "빈 탭은 마찰"이라는 이유로 둘을 내비에서 내렸는데 잘못된 판단이었다 — 탭이 사라지면
+채우는 중인 섹션이 아니라 **없어진 섹션**으로 읽힌다. 빈 상태 문구가 정직한 신호이고,
+탭 자체가 "이 블로그는 이 종류의 글도 쓴다"는 선언이다.
+
+> 참고: 두 섹션에 글이 없는 건 자동 생성 PR(#37·#38 `MAI-Thinking-1`, #39~#43 Argo CD)이
+> 머지되지 않고 닫혔기 때문이다. `MAI-Thinking-1` 초안은 아직
+> `origin/paper-reviews/mai-thinking-1-...` 브랜치에 남아 있다.
 
 `categories.html`(`/categories/`)과 `tags.html`(`/tags/`)은 *모든* 카테고리/태그를 가로지르는
 전체 색인 페이지다. 메인 내비에는 없고, 각 포스트 하단의 메타데이터에서 링크된다.

@@ -138,10 +138,9 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 카테고리는 **두 단계**입니다.
 
 - `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Tech Guides`,
-  `Insights` 중 하나. 글이 어느 섹션 페이지에 들어갈지를 정합니다. 현재 글이 있는 유형은
-  `Paper Reviews`와 `Insights`뿐이라 내비에도 이 둘만 있습니다 — `paper-summaries.md`와
-  `tech-guides.md`는 `main_nav` 없이 `sitemap: false` 상태이고, 첫 글이 들어오면 어떤 두
-  값을 되살리면 되는지가 각 파일 프런트매터에 적혀 있습니다.
+  `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. `Paper Summaries`와
+  `Tech Guides`는 아직 글이 없지만 **탭은 유지합니다** — 빈 상태 문구를 대신 띄웁니다.
+  탭이 없으면 "아직 채우는 중인 섹션"이 아니라 "없어진 섹션"으로 읽히기 때문입니다.
 - `categories[1]` — **주제**: `Language-Models`, `Multimodal-Learning`,
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 필요하면 자유롭게 추가합니다.
 
