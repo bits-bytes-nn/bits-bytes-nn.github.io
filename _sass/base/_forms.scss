@@ -50,6 +50,13 @@ textarea {
   &:focus {
     border-color: $action-color;
     box-shadow: $form-box-shadow-focus;
+  }
+
+  // Suppress the outline for pointer focus only. A bare `outline: none` on
+  // `:focus` is more specific than the global `input:focus-visible` ring in
+  // _layout.scss, so it removed the keyboard indicator too and left the border
+  // recolour as the only focus signal.
+  &:focus:not(:focus-visible) {
     outline: none;
   }
 

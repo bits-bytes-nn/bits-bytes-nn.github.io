@@ -215,9 +215,9 @@
   }
 
   // Language switcher (ko/en translation link)
+  // Now a meta item in .post-header-info, so it inherits that row's layout
+  // instead of owning a full-width right-aligned band of its own.
   .language-switcher {
-    margin: 1.5em 0;
-    text-align: right;
 
     a {
       display: inline-block;

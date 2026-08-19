@@ -141,9 +141,52 @@
   .search-result h3 a { color: $fg; &:hover { color: $link; } }
   .search-status, .post-category { color: $fg-muted; }
   .result-snippet, .search-result p { color: $fg; }
-  mark { background-color: #b8860b; color: #fff; }
+  // #fff on #b8860b is 3.25:1, and bold 0.9em is not large text. Dark text on the
+  // same fill is 7.9:1.
+  mark { background-color: #b8860b; color: $bg; }
 
   .post-list hr, .posts-list li { border-color: $border; }
+
+  // --- Light-theme colours that leak through on more specific selectors -------
+  // The `a { color: $link }` above is specificity (0,1,2). Several base rules are
+  // more specific and win, so $action-color (#1c5d99) survives onto the near-black
+  // background at 2.77:1 (2.53:1 on $surface). Each selector below is one the base
+  // theme states more specifically than the bare `a`.
+  .page-content .post .language-switcher a,
+  .page-content .post .related-posts-link .related-posts-title { color: $link; }
+
+  // The "you are here" nav item was the least readable thing in the header.
+  .navigation li.nav-link a.active {
+    color: $link;
+    &::after { background: $link; }
+  }
+
+  // The keyboard focus ring is $action-color from _layout.scss, which is 2.77:1 on
+  // the page and 2.18:1 on a code block — below the 3:1 that WCAG 1.4.11 asks of a
+  // non-text indicator. That last one matters most: it is the ring on every
+  // code-copy button.
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible { outline-color: $link; }
+  .code-copy:focus-visible { outline-color: $link; }
+
+  // $medium-gray (#767676) is 4.17:1 here and 3.81:1 on $surface. The dark rules
+  // above only repaint it inside `.page-content .post`, so these five — two of
+  // them on the site's entry pages — kept the light value.
+  .page-content .pagination,
+  .page-content .post-list .post-meta,
+  .page-content .page .posts-list .post-date,
+  .page-content .post .related-posts-link .related-posts-sub,
+  .page-content .post .post-toc .post-toc-count { color: $fg-muted; }
+
+  // The related-post cards kept the light `1px solid #ddd`, which reads as glaring
+  // white boxes on dark.
+  .related-posts-link { border-color: $border; }
+
+  // The pagination arrow is a white glyph over a square tinted by the inherited
+  // link colour: #fff on #58a6ff is 2.53:1. Inverting it gives 7.49:1.
+  .pagination a .fa-inverse { color: $bg; }
 }
 
 // Opt-in only: dark applies solely when the visitor toggles it on.
