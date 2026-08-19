@@ -81,6 +81,7 @@ js/                main.js(테마 토글·코드 복사·목차·메뉴·이미�
 assets/images/     토픽별로 재사용하는 공용 커버 이미지
 assets/<slug>/     글마다 하나씩 두는 그림 폴더
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
+test/              _plugins/ 로직의 minitest 단위 테스트
 script/            validate-site.sh (빌드 후 검색 노출 검사)
 sitemap-index.xml  사이트맵 인덱스 — Search Console에 제출할 URL
 .github/workflows/ CI: 빌드 → html-proofer → validate-site → main 푸시 시 배포
@@ -159,12 +160,19 @@ kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합
 ### 푸시 전에 확인하세요
 
 ```bash
+ruby test/run_all.rb                                  # 플러그인 로직이 여전히 맞나?
 bundle exec jekyll build                              # 빌드가 깨끗한가?
 bundle exec htmlproofer ./_site --disable-external    # 깨진 링크·이미지는 없나?
-script/validate-site.sh                               # 사이트맵·피드·메타데이터
+script/validate-site.sh                               # 사이트맵·피드·메타데이터·헤딩
 ```
 
-CI도 같은 두 검사를 돌립니다. 로컬에서 미리 잡으면 배포 실패를 막을 수 있습니다.
+CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 실패를 막을 수 있습니다.
+
+`test/`는 `_plugins/`를 검사합니다 — 설명문 추출, 읽기 시간 계산, 이미지 lazy-load
+치환. `bundle exec`가 아니라 plain `ruby`인 이유는, 플러그인이 Jekyll·Liquid 등록을
+`defined?`로 감싸 로직만 단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기
+때문입니다. **`_plugins/`를 건드리면 사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기
+전에 테스트 케이스를 먼저 추가하세요.
 
 > **검사 결과가 말이 안 되면 먼저 떠 있는 `jekyll serve`를 찾으세요.** 파일을 감시하며
 > `_site/`를 계속 덮어쓰고, `site.url`을 `http://localhost:4000`으로 바꾸며(사이트맵 URL이
@@ -183,13 +191,14 @@ CI도 같은 두 검사를 돌립니다. 로컬에서 미리 잡으면 배포 �
 
 `main`에 푸시하면 `.github/workflows/jekyll.yml`이 다음을 수행합니다.
 
-1. `JEKYLL_ENV=production`으로 사이트를 빌드하고
-2. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
-3. **`script/validate-site.sh`**로 사이트맵·피드 파싱, 페이지별 설명문·canonical,
-   설명문·제목 중복을 검사한 뒤
-4. GitHub Pages에 배포합니다.
+1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
+2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
+3. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
+4. **`script/validate-site.sh`**로 사이트맵·피드 파싱, 페이지당 `h1` 1개, 헤딩 레벨
+   건너뜀 없음, 페이지별 설명문·canonical, 설명문·제목 중복을 검사한 뒤
+5. GitHub Pages에 배포합니다.
 
-워크플로우가 실패한다면 대개 2·3단계입니다. Actions 로그에 어떤 링크·이미지·페이지가
+워크플로우가 실패한다면 대개 3·4단계입니다. Actions 로그에 어떤 링크·이미지·페이지가
 문제인지 그대로 나옵니다. 수동 배포 단계는 없습니다.
 
 > **⚠ `google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**

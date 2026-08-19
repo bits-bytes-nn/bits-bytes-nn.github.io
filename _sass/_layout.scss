@@ -517,6 +517,12 @@ blockquote {
 	background-color: $highlight-color;
 	color: $white;
 
+	// The markup is an h2 so the page outline doesn't skip a level, but it keeps
+	// the h3 size it rendered at before that change.
+	.footer-heading {
+		font-size: modular-scale(2);
+	}
+
 	a {
 		color: $link-color;
 		transition: $transition-all;

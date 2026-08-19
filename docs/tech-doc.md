@@ -272,8 +272,13 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   루트의 `sitemap-index.xml`은 `sitemap.xml`을 가리키는 사이트맵 인덱스로, Search Console에
   제출하는 URL이다(굳은 제출 항목을 우회하는 용도 — README 참고).
 - **검색 노출 검사** — `script/validate-site.sh`가 빌드 후 `_site/`를 훑어 사이트맵·피드가
-  파싱되는지, 모든 페이지에 설명문과 canonical이 있는지, 설명문·제목이 중복되지 않는지
-  확인한다. htmlproofer가 보지 않는 영역이고, 실제로 한 번 깨졌던 부분이라 CI 게이트로 둔다.
+  파싱되는지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든 페이지에 설명문과
+  canonical이 있는지, 설명문·제목이 중복되지 않는지 확인한다. htmlproofer가 보지 않는
+  영역이고, 실제로 한 번 깨졌던 부분이라 CI 게이트로 둔다.
+- **플러그인 단위 테스트** — `test/`가 `_plugins/`의 순수 로직(설명문 추출, 읽기시간,
+  이미지 lazy-load 치환)을 minitest로 검사한다. `ruby test/run_all.rb`로 돌리며 CI에서
+  빌드보다 먼저 실행된다. 플러그인은 모든 페이지의 메타데이터를 만들기 때문에, 여기서
+  조용히 동작이 바뀌면 사이트 전체 콘텐츠가 바뀐다.
 - **소유권 인증 토큰 파일** — 루트의 `google*.html`, `naver*.html`은 Google Search
   Console / 네이버가 "이 사이트가 정말 네 것이냐"를 확인하는 인증 파일이다. 사이트 루트에서
   **그대로 서빙돼야** 인증이 유지되고 사이트맵 크롤링이 된다. 그래서 `_config.yml`의

@@ -40,7 +40,11 @@ module PostDescription
     # Trims to a word boundary and drops trailing punctuation before the ellipsis.
     # Public so the Liquid filter can shorten an author-written description too.
     def truncate(text, limit)
-      return text if limit <= 0 || text.length <= limit
+      # A non-positive limit means a caller passed something Liquid coerced to 0.
+      # Falling back is safer than returning the text unbounded — that path would
+      # put a whole 20,000-character post body into a meta description.
+      limit = LIMIT if limit <= 0
+      return text if text.length <= limit
 
       head = text[0, limit]
       cut = head.rindex(" ")
@@ -66,15 +70,19 @@ module PostDescription
         next if in_fence
 
         if line.empty?
-          candidate = paragraph.join(" ").strip
+          candidate = accept(paragraph)
+          return candidate if candidate
           paragraph = []
-          return candidate unless candidate.empty?
           next
         end
 
-        # A skippable line also terminates whatever was accumulating, so a
-        # paragraph is never stitched across a heading or a table.
+        # A skippable line ends the current paragraph. If prose was already
+        # accumulating, that prose is the answer — discarding it here would skip
+        # past the first paragraph whenever a heading follows with no blank line
+        # between them.
         if line.match?(SKIP_LINE)
+          candidate = accept(paragraph)
+          return candidate if candidate
           paragraph = []
           next
         end
@@ -82,8 +90,18 @@ module PostDescription
         paragraph << line
       end
 
-      candidate = paragraph.join(" ").strip
-      candidate.empty? ? nil : candidate
+      accept(paragraph)
+    end
+
+    # A paragraph qualifies unless it is empty or is entirely emphasised — on
+    # this blog that shape is the "*공개(Disclosure): ...*" preamble or a figure
+    # caption, never a summary of the post.
+    def accept(lines)
+      candidate = lines.join(" ").strip
+      return nil if candidate.empty?
+      return nil if candidate.match?(WHOLLY_EMPHASISED)
+
+      candidate
     end
 
     def strip_inline(text)
@@ -94,25 +112,16 @@ module PostDescription
       out.gsub!(/!\[[^\]]*\]\([^)]*\)/, " ")     # images
       out.gsub!(/\[([^\]]*)\]\([^)]*\)/, '\1')   # links -> link text
       out.gsub!(/\[\^[^\]]+\]/, "")              # footnote references
-      out.gsub!(/<[^>]+>/, " ")                  # inline HTML
+      # <br> is a space; every other tag closes up. Korean attaches particles
+      # directly to the emphasised word, so "<em>16.7%</em>였습니다" must not
+      # become "16.7% 였습니다".
+      out.gsub!(%r{<br\s*/?>}i, " ")
+      out.gsub!(/<[^>]+>/, "")                   # inline HTML
       out.gsub!(/(\*\*|__)(.*?)\1/m, '\2')       # bold
       out.gsub!(/(\*|_)(?=\S)(.*?)(?<=\S)\1/m, '\2') # italic
       out.gsub!(/~~(.*?)~~/m, '\1')              # strikethrough
       out.gsub(/\s+/, " ").strip
     end
-  end
-end
-
-# Fill in `description` before anything renders, so head.html, jekyll-feed and
-# index.html all read the same value.
-Jekyll::Hooks.register :site, :pre_render do |site|
-  site.posts.docs.each do |post|
-    next if post.data["description"].to_s.strip != ""
-
-    # An author-written subtitle is a better pitch than anything derived.
-    derived = post.data["subtitle"].to_s.strip
-    derived = PostDescription.derive(post.content) if derived.empty?
-    post.data["description"] = derived unless derived.empty?
   end
 end
 
@@ -124,4 +133,23 @@ module DescriptionFilter
   end
 end
 
-Liquid::Template.register_filter(DescriptionFilter)
+# --- Jekyll wiring -----------------------------------------------------------
+# Guarded so test/ can require this file for the logic above without Jekyll or
+# Liquid loaded, and without registering anything.
+
+if defined?(Jekyll::Hooks)
+  # Fill in `description` before anything renders, so head.html, jekyll-feed and
+  # index.html all read the same value.
+  Jekyll::Hooks.register :site, :pre_render do |site|
+    site.posts.docs.each do |post|
+      next if post.data["description"].to_s.strip != ""
+
+      # An author-written subtitle is a better pitch than anything derived.
+      derived = post.data["subtitle"].to_s.strip
+      derived = PostDescription.derive(post.content) if derived.empty?
+      post.data["description"] = derived unless derived.empty?
+    end
+  end
+end
+
+Liquid::Template.register_filter(DescriptionFilter) if defined?(Liquid::Template)

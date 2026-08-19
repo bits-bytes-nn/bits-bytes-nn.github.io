@@ -83,6 +83,7 @@ js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
 assets/images/     Shared cover images, reused across posts by topic
 assets/<slug>/     Per-post figures, one folder per post
 search.json        Full-text search index (consumed by simple-jekyll-search)
+test/              minitest unit tests for the _plugins/ logic
 script/            validate-site.sh (post-build discoverability checks)
 sitemap-index.xml  Sitemap index — the URL to submit to Search Console
 .github/workflows/ CI: build → html-proofer → validate-site → deploy on push to main
@@ -164,12 +165,19 @@ dollar signs like `$10M` are fine — they're not math.)
 ### Validate before pushing
 
 ```bash
+ruby test/run_all.rb                                  # plugin logic still correct?
 bundle exec jekyll build                              # does it build clean?
 bundle exec htmlproofer ./_site --disable-external    # any broken links/images?
-script/validate-site.sh                               # sitemap, feed, metadata
+script/validate-site.sh                               # sitemap, feed, metadata, headings
 ```
 
-CI runs the same two checks, so catching it locally saves a failed deploy.
+CI runs the same three checks, so catching it locally saves a failed deploy.
+
+`test/` covers `_plugins/` — the description derivation, the read-time estimate,
+and the lazy-image rewrite. Plain `ruby`, not `bundle exec`: the plugins guard
+their Jekyll/Liquid registration behind `defined?` so their logic loads
+standalone, and minitest ships with Ruby. **Anything you change in `_plugins/`
+changes every page on the site**, so add a case there before changing behaviour.
 
 > **If the checks report something impossible, look for a running `jekyll serve`
 > first.** It watches the tree and rewrites `_site/` behind you, it overrides
@@ -189,13 +197,15 @@ CI runs the same two checks, so catching it locally saves a failed deploy.
 
 Pushing to `main` triggers `.github/workflows/jekyll.yml`, which:
 
-1. builds the site with `JEKYLL_ENV=production`,
-2. runs **html-proofer** over `_site/` (internal links, images, anchors),
-3. runs **`script/validate-site.sh`** (sitemap/feed parse, per-page description
-   and canonical, no duplicate descriptions or titles), and
-4. deploys to GitHub Pages.
+1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
+2. builds the site with `JEKYLL_ENV=production`,
+3. runs **html-proofer** over `_site/` (internal links, images, anchors),
+4. runs **`script/validate-site.sh`** (sitemap/feed parse, one `h1` per page, no
+   heading-level skips, per-page description and canonical, no duplicate
+   descriptions or titles), and
+5. deploys to GitHub Pages.
 
-If the workflow fails, it's almost always step 2 or 3 — open the Actions log,
+If the workflow fails, it's almost always step 3 or 4 — open the Actions log,
 which names the exact link, image, or page. No manual deploy step is needed.
 
 > **⚠ Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**

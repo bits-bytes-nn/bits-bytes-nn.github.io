@@ -133,6 +133,30 @@ else
   pass "every page has exactly one <h1>"
 fi
 
+# A heading outline that jumps h2 -> h4 breaks screen-reader navigation. Every
+# paper post used to do worse than that: "### TL;DR" above the "##" sections it
+# preceded, and "#" reused for the post's own sections.
+skips=$(env -u RUBYOPT -u BUNDLE_GEMFILE ruby -e '
+  files = STDIN.read.split("\n").reject(&:empty?)
+  tag = /<[^>]+>/
+  files.each do |f|
+    prev = nil
+    File.read(f, encoding: "UTF-8", invalid: :replace).scan(%r{<h([1-6])[^>]*>(.*?)</h\1>}m) do |lvl, txt|
+      lvl = lvl.to_i
+      if prev && lvl > prev + 1
+        puts "h#{prev} -> h#{lvl}  #{f}  \"#{txt.gsub(tag, "").strip[0, 40]}\""
+      end
+      prev = lvl
+    end
+  end
+' <<< "$pages")
+if [ -n "$skips" ]; then
+  fail "heading outlines that skip a level:"
+  printf '%s\n' "$skips" | sed 's/^/          /' >&2
+else
+  pass "no heading outline skips a level"
+fi
+
 if [ -n "$missing_desc" ]; then
   fail "pages with an empty meta description:"
   printf '%s' "$missing_desc" | sed 's/^/          /' >&2
