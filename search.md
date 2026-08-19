@@ -11,7 +11,7 @@ head_extra: <link rel="stylesheet" href="/css/search.css">
 ---
 
 <div id="search-container">
-  <input type="text" id="search-input" placeholder="Search posts by title, content, category, or tag…"
+  <input type="search" id="search-input" placeholder="Search posts by title, content, category, or tag…"
          autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search posts">
   <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
   <div id="results-container"></div>

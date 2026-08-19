@@ -1,3 +1,10 @@
+// Monokai, with two colours raised for contrast against the #272822 background:
+//   comments  #75715e -> #a1a08f  (3.03:1 -> 5.62:1)
+//   keywords  #f92672 -> #ff6188  (3.93:1 -> 5.18:1, the Monokai Pro pink)
+// Comments are 29% of all code characters on this blog and are usually the Korean
+// explanation of the snippet, i.e. the highest-value text in the block. Code
+// renders at 14.4px normal weight, so the large-text exemption does not apply and
+// the threshold is 4.5:1.
 // Rouge syntax-highlighting theme (monokai.sublime), scoped to .highlight.
 // Generated with: bundle exec rougify style monokai.sublime
 // Replaces the previous client-side highlight.js pass — rouge tokenizes
@@ -26,19 +33,19 @@
   color: #f6aa11;
 }
 .highlight .cm {
-  color: #75715e;
+  color: #a1a08f;
 }
 .highlight .cp {
-  color: #75715e;
+  color: #a1a08f;
 }
 .highlight .c1 {
-  color: #75715e;
+  color: #a1a08f;
 }
 .highlight .cs {
-  color: #75715e;
+  color: #a1a08f;
 }
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cpf {
-  color: #75715e;
+  color: #a1a08f;
 }
 .highlight .err {
   color: #960050;
@@ -184,20 +191,20 @@
   background-color: #272822;
 }
 .highlight .ow {
-  color: #f92672;
+  color: #ff6188;
 }
 .highlight .nt {
-  color: #f92672;
+  color: #ff6188;
 }
 .highlight .k, .highlight .kv {
-  color: #f92672;
+  color: #ff6188;
 }
 .highlight .kn {
-  color: #f92672;
+  color: #ff6188;
 }
 .highlight .kp {
-  color: #f92672;
+  color: #ff6188;
 }
 .highlight .o {
-  color: #f92672;
+  color: #ff6188;
 }

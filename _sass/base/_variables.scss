@@ -42,7 +42,7 @@ $action-color: $blue;
 // Header/footer fill. Must carry white text (AA ≥ 4.5), so it's a deep blue —
 // NOT the old mix(blue, white, 85%) which was a pale tint that white text
 // vanished against (contrast 1.2).
-$highlight-color: mix($action-color, black, 80%); // #216694, white-on-this = 6.19
+$highlight-color: mix($action-color, black, 80%); // #164a7a, white-on-this = 9.15
 
 // Border
 $base-border-color: $light-gray;

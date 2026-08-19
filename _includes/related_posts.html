@@ -8,9 +8,13 @@
 {%- endcomment -%}
 {% if page.related and page.related.size > 0 %}
 <nav class="related-posts" aria-labelledby="related-posts-heading">
-  <h2 id="related-posts-heading" class="related-posts-heading">
-    {%- if page.lang == 'en' -%}Related reading{%- else -%}함께 읽기{%- endif -%}
-  </h2>
+  {%- comment -%}
+    English, like every other UI string on this site ("Published", "Read time",
+    "Contents", "Site Map"). The chrome is one language by design; only content is
+    bilingual. An earlier version branched on page.lang here, which was the only
+    place that did and made the heading the odd one out.
+  {%- endcomment -%}
+  <h2 id="related-posts-heading" class="related-posts-heading">Related reading</h2>
   <ul>
     {% for other in page.related %}
     <li>

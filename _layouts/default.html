@@ -4,9 +4,15 @@
   {% include head.html %}
 
   <body>
+    <!-- Nine focusable elements sit before <main> on every page (logo, menu
+         button, six nav links, theme toggle), and a long post then leads with a
+         copy button per code block. Screen readers can jump by landmark; sighted
+         keyboard users had no shortcut. -->
+    <a class="skip-link" href="#content">Skip to content</a>
+
     {% include header.html %}
 
-    <main class="page-content">
+    <main class="page-content" id="content">
       {{ content }}
     </main>
 

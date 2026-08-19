@@ -89,12 +89,24 @@ layout: default
           {% capture full_url %}{{ site.url }}{{ site.baseurl }}{{ page.url }}{% endcapture %}
           {% assign share_link = social.share_url %}
           {% if social.share_params %}
-            {% capture params %}{% for p in social.share_params %} &{{ p.key }}={{ p.value | replace: 'URL', full_url | replace: 'TITLE', page.title | replace: 'USERNAME', social.username | cgi_escape }}{% endfor %}{% endcapture %}
+            {%- comment -%}
+              No space before the `&`. There used to be one, and `remove_first: '&'`
+              stripped only the ampersand — so every share URL shipped as
+              "share? text=Title &url=…", with the stray space landing inside the
+              text parameter too.
+            {%- endcomment -%}
+            {% capture params %}{% for p in social.share_params %}&{{ p.key }}={{ p.value | replace: 'URL', full_url | replace: 'TITLE', page.title | replace: 'USERNAME', social.username | cgi_escape }}{% endfor %}{% endcapture %}
             {% assign share_link = share_link | append: '?' | append: params | remove_first: '&' %}
           {% endif %}
 
-          <a href="{{ share_link }}" class="social-link js-share-popup">
-            <i class="fa-brands fa-{{ social.icon }} fa-lg"></i>
+          {%- comment -%}
+            The link has no text, so it needs an explicit name — otherwise it
+            announces as bare "link" and voice control has nothing to say. The
+            footer social links already do this with a visible username span.
+          {%- endcomment -%}
+          <a href="{{ share_link }}" class="social-link js-share-popup"
+             aria-label="Share on {{ social.name }}">
+            <i class="fa-brands fa-{{ social.icon }} fa-lg" aria-hidden="true"></i>
           </a>
         {% endif %}
       {% endfor %}

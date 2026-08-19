@@ -12,9 +12,15 @@
 }
 
 #search-input:focus {
-  outline: none;
   border-color: #2980b9;
   box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.15);
+}
+
+/* Pointer focus only — see the note in _sass/base/_forms.scss. Removing the
+   outline on plain :focus also removed the keyboard focus ring, because this
+   selector outranks the global input:focus-visible rule. */
+#search-input:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .search-status {
