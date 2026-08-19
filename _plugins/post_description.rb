@@ -19,15 +19,37 @@
 # which fires after generators have created the feed page and before anything is
 # rendered, so every consumer observes the same value.
 module PostDescription
-  LIMIT = 300
+  # The two budgets, declared once. Templates call the filters by name rather than
+  # passing a number, so a limit cannot drift between Ruby and Liquid.
+  LIMIT = 300       # the stored description, and what the feed and home cards use
+  META_LIMIT = 160  # <meta name="description"> — roughly what Google renders
 
-  # Block-level markdown that is never a description: headings, blockquotes,
-  # list items, tables, fences, raw HTML, rules, and reference definitions.
-  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d+[.)]\s|\||```|~~~|<|---|===|\[\^?[^\]]+\]:)/
+  # How much of the budget a word-boundary cut must preserve before it is worth
+  # taking; below this, cut hard instead. See truncate.
+  MIN_BOUNDARY_FRACTION = 0.6
 
-  # A paragraph that is entirely emphasised is a note or caption on this blog
+  # Block-level markdown that is never prose: headings, blockquotes, list items,
+  # tables, fences, raw HTML, and reference definitions.
+  #
+  # `---`/`===` are deliberately absent. In Markdown a line of them *underlines*
+  # the preceding line into a heading, so treating them as a skip would make the
+  # heading above them the description. Leaving them out means such a line just
+  # joins the paragraph and gets stripped later, and a thematic-break `---` is
+  # already preceded by a blank line.
+  #
+  # The ordered-list alternative is capped at two digits: `\d+[.)]\s` also matched
+  # a Korean date opening ("2024. 5. 14. 공개된 …"), silently discarding the first
+  # paragraph of any post written that way.
+  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:)/
+
+  # A paragraph that is emphasised *end to end* is a note or caption on this blog
   # (the "*공개(Disclosure): ...*" preamble), not a summary of the post.
-  WHOLLY_EMPHASISED = /\A(\*|_){1,2}[^*_].*\1{1,2}\z/m
+  #
+  # The inner class excludes `*` and `_` so this only fires when the delimiters
+  # really span the paragraph. Anchoring on the first and last character alone
+  # also swallowed ordinary prose that merely begins and ends with emphasis —
+  # "**핵심**은 데이터입니다. 그래서 **중요합니다**" is an idiomatic Korean opening.
+  WHOLLY_EMPHASISED = /\A(\*{1,2}|_{1,2})[^*_]+\1\z/m
 
   class << self
     def derive(markdown, limit = LIMIT)
@@ -48,9 +70,13 @@ module PostDescription
 
       head = text[0, limit]
       cut = head.rindex(" ")
-      # Honour the space only if it keeps most of the budget — Korean runs can go
-      # a long way without one, where a hard cut reads better than a short stub.
-      head = head[0, cut] if cut && cut > limit * 0.6
+      # Back off to the last space only when that still keeps most of the budget.
+      # Not because Korean lacks spaces — it separates 어절 with them, and across
+      # all 35 posts this floor fires on 0 of 53 real truncations. It is a floor
+      # against degenerate input: text whose only space sits near the start would
+      # otherwise collapse to a stub ("짧게 " + 200 characters, cut at 100, returns
+      # "짧게…"). Cheap insurance, and the test below pins the degenerate case.
+      head = head[0, cut] if cut && cut > limit * MIN_BOUNDARY_FRACTION
       "#{head.sub(/[\s,.;:·—–-]+\z/, '')}…"
     end
 
@@ -126,10 +152,17 @@ module PostDescription
 end
 
 module DescriptionFilter
-  # {{ page.description | shorten: 160 }} — meta descriptions want ~160 chars,
-  # while the feed and the home page cards can take the full paragraph.
-  def shorten(input, limit)
-    PostDescription.truncate(input.to_s.strip, limit.to_i)
+  # Named rather than numeric so no template carries a character budget:
+  #   {{ page.description | shorten_meta }}  -> <meta name="description">
+  #   {{ post.description | shorten_card }}  -> home-page excerpt cards
+  # A numeric argument would also mean a typo Liquid coerced to 0 silently fell
+  # back to the larger limit.
+  def shorten_meta(input)
+    PostDescription.truncate(input.to_s.strip, PostDescription::META_LIMIT)
+  end
+
+  def shorten_card(input)
+    PostDescription.truncate(input.to_s.strip, PostDescription::LIMIT)
   end
 end
 
@@ -140,13 +173,18 @@ end
 if defined?(Jekyll::Hooks)
   # Fill in `description` before anything renders, so head.html, jekyll-feed and
   # index.html all read the same value.
+  # `subtitle` is deliberately NOT consulted here. It was, and it reintroduced the
+  # very defect this module exists to remove: on paper posts the subtitle is the
+  # Korean rendering of the English title, so 14 posts shipped a description that
+  # merely restated their own title ("Qwen3 Technical Report" -> "Qwen3 기술
+  # 보고서", 12 characters). Each restatement is unique, so the duplicate-description
+  # gate could not see it. `description:` means description; `subtitle:` means
+  # subtitle. A post whose subtitle *is* the best description says so explicitly.
   Jekyll::Hooks.register :site, :pre_render do |site|
     site.posts.docs.each do |post|
       next if post.data["description"].to_s.strip != ""
 
-      # An author-written subtitle is a better pitch than anything derived.
-      derived = post.data["subtitle"].to_s.strip
-      derived = PostDescription.derive(post.content) if derived.empty?
+      derived = PostDescription.derive(post.content)
       post.data["description"] = derived unless derived.empty?
     end
   end

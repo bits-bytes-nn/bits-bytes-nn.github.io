@@ -12,7 +12,11 @@
 set -uo pipefail
 
 SITE="${1:-_site}"
-BASE_URL="https://bits-bytes-nn.github.io"
+# Resolved from the script's own location, not the caller's cwd — the timezone
+# check below reads _config.yml, and keying it on cwd meant it silently vanished
+# whenever the script was run from anywhere but the repo root.
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CONFIG="$ROOT/_config.yml"
 failures=0
 
 fail() { printf '  FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
@@ -20,17 +24,27 @@ pass() { printf '  ok    %s\n' "$1"; }
 
 # XML well-formedness through Ruby's bundled REXML rather than xmllint, so this
 # script needs no toolchain beyond the Ruby the build already requires — CI used
-# to apt-install libxml2-utils purely for this.
-#
-# RUBYOPT/BUNDLE_GEMFILE are cleared because bundler injects bundler/setup, which
-# restricts $LOAD_PATH to the Gemfile's gems; rexml is not one of them.
+# to apt-install libxml2-utils purely for this. rexml is in the bundle
+# (Gemfile.lock, via html-proofer), so this works under `bundle exec` too.
 xml_wellformed() {
-  env -u RUBYOPT -u BUNDLE_GEMFILE -u BUNDLE_BIN_PATH \
-    ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV[0]))' "$1" 2>/dev/null
+  ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV[0]))' "$1" 2>/dev/null
 }
 
 if [ ! -d "$SITE" ]; then
   echo "no such directory: $SITE" >&2
+  exit 1
+fi
+
+if [ ! -f "$CONFIG" ]; then
+  echo "no _config.yml at $CONFIG" >&2
+  exit 1
+fi
+
+# Read the canonical URL from config rather than repeating it here, so the gate
+# cannot end up checking a domain the site no longer uses.
+BASE_URL=$(sed -nE 's/^url:[[:space:]]*"?([^"[:space:]]+)"?[[:space:]]*$/\1/p' "$CONFIG" | head -1)
+if [ -z "$BASE_URL" ]; then
+  echo "could not read 'url:' from $CONFIG" >&2
   exit 1
 fi
 
@@ -79,12 +93,10 @@ fi
 # so an unset `timezone` resolves them in the build machine's timezone. Building
 # from KST instead of CI's UTC moved 19 URLs by a day. Nothing in _site/ shows
 # this, so the invariant has to be checked at the config.
-if [ -f _config.yml ]; then
-  if grep -qE '^timezone:[[:space:]]*\S' _config.yml; then
-    pass "_config.yml pins a timezone (post URLs are build-host independent)"
-  else
-    fail "_config.yml sets no timezone — post URLs depend on the build machine"
-  fi
+if grep -qE '^timezone:[[:space:]]*\S' "$CONFIG"; then
+  pass "_config.yml pins a timezone (post URLs are build-host independent)"
+else
+  fail "_config.yml sets no timezone — post URLs depend on the build machine"
 fi
 
 # --- robots.txt --------------------------------------------------------------
@@ -101,7 +113,11 @@ fi
 # also end in .html but are plain text by design.
 pages=$(grep -rl '<!DOCTYPE html>' "$SITE" --include='*.html' | sort)
 page_count=$(printf '%s\n' "$pages" | grep -c .)
-pass "$page_count rendered pages found"
+if [ "$page_count" -lt 1 ]; then
+  fail "no rendered pages found in $SITE — the six per-page checks below would pass vacuously"
+else
+  pass "$page_count rendered pages found"
+fi
 
 extract_meta() { # file, meta-name
   grep -m1 -oE "<meta name=\"$2\" content=\"[^\"]*\"" "$1" 2>/dev/null |
@@ -111,6 +127,7 @@ extract_meta() { # file, meta-name
 missing_desc=""
 missing_canonical=""
 bad_h1=""
+short_desc=""
 descs=""
 titles=""
 while IFS= read -r f; do
@@ -120,8 +137,12 @@ while IFS= read -r f; do
   grep -q 'rel="canonical"' "$f" || missing_canonical="$missing_canonical$f"$'\n'
   h1=$(grep -oE '<h1[^>]*>' "$f" | grep -c .)
   [ "$h1" = "1" ] || bad_h1="$bad_h1$h1  $f"$'\n'
+  t=$(grep -m1 -oE '<title>[^<]*</title>' "$f" | sed -E 's|</?title>||g')
+  if [ -n "$d" ] && [ "${#d}" -le "${#t}" ]; then
+    short_desc="$short_desc${#d} vs ${#t}  $f"$'\n'"          title: $t"$'\n'"          desc : $d"$'\n'
+  fi
   descs="$descs$d"$'\n'
-  titles="$titles$(grep -m1 -oE '<title>[^<]*</title>' "$f")"$'\n'
+  titles="$titles<title>$t</title>"$'\n'
 done <<< "$pages"
 
 # The layout renders the title as the page's h1. A post that also opens with
@@ -136,7 +157,7 @@ fi
 # A heading outline that jumps h2 -> h4 breaks screen-reader navigation. Every
 # paper post used to do worse than that: "### TL;DR" above the "##" sections it
 # preceded, and "#" reused for the post's own sections.
-skips=$(env -u RUBYOPT -u BUNDLE_GEMFILE ruby -e '
+skips=$(ruby -e '
   files = STDIN.read.split("\n").reject(&:empty?)
   tag = /<[^>]+>/
   files.each do |f|
@@ -162,6 +183,17 @@ if [ -n "$missing_desc" ]; then
   printf '%s' "$missing_desc" | sed 's/^/          /' >&2
 else
   pass "every page has a meta description"
+fi
+
+# A description no longer than the page's own title cannot be adding information.
+# This is what shipped when `subtitle:` was reused as the description: 14 posts got
+# the Korean rendering of their English title ("Qwen3 Technical Report" -> "Qwen3
+# 기술 보고서"). Each was unique, so the duplicate check below saw nothing wrong.
+if [ -n "$short_desc" ]; then
+  fail "pages whose meta description is no longer than their <title>:"
+  printf '%s' "$short_desc" | sed 's/^/          /' >&2
+else
+  pass "every meta description is longer than its page title"
 fi
 
 if [ -n "$missing_canonical" ]; then

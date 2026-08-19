@@ -2,7 +2,12 @@
 	<div class="navigation-wrapper">
 		<a href="{{ site.baseurl }}/" class="logo">
 			{% if site.logo %}
+			<!-- loading="eager" is the opt-out documented in _plugins/lazy_images.rb.
+			     The header is position: fixed; top: 0, so this is the one image on the
+			     site that is always in the initial viewport — without this the plugin
+			     lazy-loads it and the logo paints late on every page. -->
 			<img
+				loading="eager"
 				src="{{ site.logo | prepend: site.baseurl }}"
 				alt="{{ site.title }}"
 			/>

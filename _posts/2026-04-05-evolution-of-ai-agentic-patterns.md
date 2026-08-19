@@ -2,6 +2,9 @@
 layout: post
 title: "프롬프트에서 하네스까지 — AI 에이전틱 패턴 4년의 기록"
 subtitle: "엔지니어링의 엄밀함은 사라지지 않는다 — 이동할 뿐이다. AI 에이전틱 패턴 4년의 기록"
+description: >-
+  엔지니어링의 엄밀함은 사라지지 않았습니다, 이동했을 뿐입니다. 프롬프트에서 컨텍스트로,
+  컨텍스트에서 하네스로 패러다임이 세 번 바뀐 2022-2026년을 각 시대가 왜 실패했는지로 추적합니다.
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]

@@ -2,6 +2,9 @@
 layout: post
 title: "Claude Code 내부 아키텍처 분석"
 subtitle: "Claude Code의 속살이 드러났습니다. npm Source Map 유출로 본 에이전틱 AI의 해부학."
+description: >-
+  npm Source Map 유출로 Claude Code의 비공개 코어 엔진 4,600여 파일이 드러났습니다.
+  8계층 보안과 4단 메시지 압축, 에이전틱 루프를 아키텍처로 읽습니다.
 date: 2026-03-31 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]

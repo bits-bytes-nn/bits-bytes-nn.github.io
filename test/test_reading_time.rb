@@ -50,10 +50,14 @@ class TestReadingTime < Minitest::Test
     assert_equal 1, @filter.reading_time(html)
   end
 
+  # 800 chars, not 400: at 400 the assertion is 1 minute either way, so the test
+  # passed even with Han/Hiragana/Katakana deleted from the CJK class — those
+  # characters fell through to the Latin branch, counted 0, and `[_, 1].max`
+  # returned 1. 800 only reaches 2 if the script is actually recognised.
   def test_covers_the_other_cjk_scripts
-    assert_equal 1, @filter.reading_time("漢" * 400)      # Han
-    assert_equal 1, @filter.reading_time("ひ" * 400)      # Hiragana
-    assert_equal 1, @filter.reading_time("カ" * 400)      # Katakana
+    assert_equal 2, @filter.reading_time("漢" * 800)      # Han
+    assert_equal 2, @filter.reading_time("ひ" * 800)      # Hiragana
+    assert_equal 2, @filter.reading_time("カ" * 800)      # Katakana
   end
 
   def test_never_reports_less_than_one_minute

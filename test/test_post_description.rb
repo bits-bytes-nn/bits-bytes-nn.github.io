@@ -163,8 +163,8 @@ class TestTruncate < Minitest::Test
     assert_includes text.split, result.delete_suffix("…").split.last
   end
 
-  # Korean can run well past the limit without a space; a hard cut reads better
-  # than backing off to a space near the start of the budget.
+  # Degenerate input: the only space sits near the start, so backing off to it
+  # would return a 3-character stub instead of using the budget.
   def test_hard_cuts_when_the_only_space_is_too_early
     text = "짧게 " + "가" * 200
     result = PostDescription.truncate(text, 100)
@@ -186,22 +186,31 @@ class TestTruncate < Minitest::Test
   end
 end
 
-class TestShortenFilter < Minitest::Test
-  # The Liquid filter head.html and index.html call.
+class TestShortenFilters < Minitest::Test
+  # The Liquid filters head.html and index.html call. They take no argument, so a
+  # character budget never appears in a template.
   def setup
     @filter = Object.new.extend(DescriptionFilter)
   end
 
-  def test_shortens_to_the_requested_length
-    assert_equal "abc", @filter.shorten("  abc  ", 160)
+  def test_meta_filter_uses_the_meta_limit
+    text = "word " * 200
+    assert_operator @filter.shorten_meta(text).length, :<=, PostDescription::META_LIMIT + 1
   end
 
-  def test_accepts_a_string_limit_as_liquid_passes_it
-    text = "a" * 100
-    assert_equal 21, @filter.shorten(text, "20").length
+  def test_card_filter_uses_the_full_limit
+    text = "word " * 200
+    assert_operator @filter.shorten_card(text).length, :<=, PostDescription::LIMIT + 1
+    assert_operator @filter.shorten_card(text).length, :>, PostDescription::META_LIMIT
   end
 
-  def test_handles_nil
-    assert_equal "", @filter.shorten(nil, 160)
+  def test_filters_strip_surrounding_whitespace
+    assert_equal "abc", @filter.shorten_meta("  abc  ")
+    assert_equal "abc", @filter.shorten_card("  abc  ")
+  end
+
+  def test_filters_handle_nil
+    assert_equal "", @filter.shorten_meta(nil)
+    assert_equal "", @filter.shorten_card(nil)
   end
 end

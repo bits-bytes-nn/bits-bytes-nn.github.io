@@ -2,6 +2,9 @@
 layout: post
 title: "Amazon Bedrock AgentCore를 하네스로 읽다"
 subtitle: "에이전트의 '나머지 전부' — Amazon Bedrock AgentCore를 하네스의 렌즈로 뜯어봅니다"
+description: >-
+  에이전트의 '나머지 전부'를 AWS는 어떻게 제품화했나. Amazon Bedrock AgentCore를
+  Build·Deploy·Assess 세 층으로 열어 하네스 체크리스트의 어디를 채우고 어디를 비워 두었는지 짚습니다.
 date: 2026-04-12 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "MCP", "Cedar-Policy", "Managed-RAG", "Agent-Registry"]
