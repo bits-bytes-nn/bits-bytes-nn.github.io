@@ -70,13 +70,15 @@ bundle exec jekyll build
 _posts/            Posts — YYYY-MM-DD-slug.md (Korean; English twin is -en.md)
 _layouts/          Page templates: default → post / page / archive
 _includes/         Reusable fragments: head, header, footer, nav_links,
-                   page_divider, category-posts, language_switcher
+                   page_divider, category-posts, language_switcher,
+                   related_posts
 _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
                    _dark (dark mode), base/*
                    ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
 _plugins/          reading_time.rb      (KO/EN-aware read time)
                    lazy_images.rb       (adds loading="lazy" to <img>)
                    post_description.rb  (fills page.description for posts)
+                   related_posts.rb     (fills page.related for posts)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)

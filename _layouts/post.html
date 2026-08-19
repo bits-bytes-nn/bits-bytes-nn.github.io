@@ -59,6 +59,8 @@ layout: default
       {{ content }}
     </article>
 
+    {% include related_posts.html %}
+
     {% if page.previous.url or page.next.url %}
     <nav class="post-nav" aria-label="Adjacent posts">
       {% if page.previous.url %}

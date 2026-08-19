@@ -68,13 +68,15 @@ bundle exec jekyll build   # 결과물은 _site/ 에 생성
 _posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역본은 -en.md)
 _layouts/          페이지 템플릿: default → post / page / archive
 _includes/         재사용 조각: head, header, footer, nav_links,
-                   page_divider, category-posts, language_switcher
+                   page_divider, category-posts, language_switcher,
+                   related_posts
 _sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
                    _dark(다크모드), base/*
                    ⚠ bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
 _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    lazy_images.rb       (<img>에 loading="lazy" 추가)
                    post_description.rb  (글의 page.description 채우기)
+                   related_posts.rb     (글의 page.related 채우기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
