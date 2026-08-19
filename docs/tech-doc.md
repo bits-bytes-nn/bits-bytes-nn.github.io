@@ -107,9 +107,8 @@ Pages가 그대로 서빙.**
 포스트는 프런트매터에 **2단계** 카테고리를 가진다: `categories: ["<유형>", "<주제>"]`.
 
 - **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights` 중 하나.
-  글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가진다. 지금 글이 있는
-  유형은 `Paper Reviews`(28편)와 `Insights`(7편)뿐이고, 나머지 둘은 빈 상태 문구를 띄운다
-  (아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
+  글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가지며, 글이 없는 유형은
+  빈 상태 문구를 띄운다(아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
 - **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`,
   `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 세부 주제이며 필요하면 자유롭게 추가한다.
 
@@ -141,15 +140,11 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 | 5 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
 | 6 | Search | `search.md` |
 
-**빈 섹션도 탭을 유지한다.** `Paper Summaries`와 `Tech Guides`는 아직 머지된 글이 0편이라
-`_includes/category-posts.html`의 `empty` 문구를 띄운다("Summaries are in the works…").
-한때 "빈 탭은 마찰"이라는 이유로 둘을 내비에서 내렸는데 잘못된 판단이었다 — 탭이 사라지면
-채우는 중인 섹션이 아니라 **없어진 섹션**으로 읽힌다. 빈 상태 문구가 정직한 신호이고,
-탭 자체가 "이 블로그는 이 종류의 글도 쓴다"는 선언이다.
-
-> 참고: 두 섹션에 글이 없는 건 자동 생성 PR(#37·#38 `MAI-Thinking-1`, #39~#43 Argo CD)이
-> 머지되지 않고 닫혔기 때문이다. `MAI-Thinking-1` 초안은 아직
-> `origin/paper-reviews/mai-thinking-1-...` 브랜치에 남아 있다.
+**빈 섹션도 탭을 유지한다.** 글이 없는 유형은 `_includes/category-posts.html`의 `empty`
+문구를 띄운다("Summaries are in the works…"). 편수가 0이라고 `main_nav`를 떼지 않는다 —
+탭이 사라지면 채우는 중인 섹션이 아니라 **없어진 섹션**으로 읽히고, 남은 탭이 로고 옆에
+좁게 뭉쳐 전체 폭 히어로와 어긋난다. 빈 상태 문구가 정직한 신호이고, 탭 자체가 "이 블로그는
+이 종류의 글도 쓴다"는 선언이다.
 
 `categories.html`(`/categories/`)과 `tags.html`(`/tags/`)은 *모든* 카테고리/태그를 가로지르는
 전체 색인 페이지다. 메인 내비에는 없고, 각 포스트 하단의 메타데이터에서 링크된다.
@@ -178,15 +173,14 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
   `Knowledge-Graph`, `Llama`, `Mixture-of-Experts`, `Multimodal-Models`,
   `Reasoning-Models`, `Retrieval-Augmented-Generation`.
 
-세부 태그만 있으면 관련 글 기능이 굶는다. 태그 264개 중 220개(83%)가 단 한 편에만 붙어
-있었고, `related_posts.rb`가 공유 태그를 요구하므로 11편이 관련 글 0개였다 — 그중 넷은
-RAPTOR·GraphRAG·LightRAG·Zep, 즉 서로 붙어야 마땅한 그래프 RAG 논문들이었다. 한 주제를 세
-이름으로 부른 것(`Agentic-Architecture`/`Agentic-Patterns`/`Agentic-Infrastructure`)도 같은
-증상을 만들었다.
+**세부 태그만 달면 관련 글이 안 붙는다.** 논문 하나의 기여를 그대로 옮긴 태그는 그 논문에만
+붙을 수 있고, `related_posts.rb`는 공유 태그를 요구한다. 그래서 세부 태그만 달린 글은
+"Related reading" 없이 배포된다. 한 주제를 여러 이름으로 부르는 것도 같은 증상을 만든다
+(`Agentic-Architecture`/`Agentic-Patterns`/`Agentic-Infrastructure`가 그랬다).
 
-주제 태그를 한 층 얹어 35편 전부가 관련 글을 얻게 했다. 고친 곳이 `related_posts.rb`의
-규칙이 아니라 **글의 프런트매터**라는 점이 중요하다 — 규칙을 느슨하게 풀면 공통점 없는 글이
-서로 추천된다. 세부 태그는 지우지 않았다(살아 있는 `/tags/` 앵커가 움직인다).
+고칠 지점은 `related_posts.rb`의 규칙이 아니라 **글의 프런트매터**다. 규칙을 느슨하게 풀어
+카테고리만으로 연결하면 공통점 없는 글이 서로 추천된다(위 `TAG_WEIGHT` 설명 참조). 그리고
+세부 태그는 지우지 않는다 — 살아 있는 `/tags/` 앵커가 움직인다. 주제 태그를 **얹기만** 한다.
 
 ## 4. 수식 렌더링
 
@@ -240,8 +234,9 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
   없이 단순 부분문자열 매칭을 한다. 즉 색인에 없는 글자는 못 찾는다. 예전에 snippet(앞
   40단어)만 색인했더니, "어텐션"·"트랜스포머"가 본문 중·후반에 18개 포스트나 있는데 발췌엔
   안 들어가 검색 결과가 **0건**으로 나왔다. `content`로 전체를 색인해 한글 재현율을 회복했다.
-  대가는 실측 **3.2 MB, gzip 991 KB**다(글이 늘면 같이 는다). `/search/`에서만 내려받으므로
-  다른 페이지 속도엔 영향이 없다.
+  대가는 파일 크기다 — 본문 전체가 들어가므로 **글 수에 비례해 선형으로 커진다**(현재 규모는
+  MB 단위, gzip 후 그 3분의 1 아래). `/search/`에서만 내려받으므로 다른 페이지 속도엔 영향이
+  없다. 실제 값이 궁금하면 `curl -so /dev/null -w '%{size_download}' <url>/search.json`.
 
   > **알려진 한계 — 매치가 안 보일 수 있다.** 색인은 본문 전체인데 결과 카드에 찍히는 건
   > 앞 40단어짜리 `snippet`뿐이다. 그래서 5만 번째 글자에서 걸린 검색어는 스니펫에 없고

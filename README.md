@@ -152,12 +152,11 @@ Categories are **two levels**:
 
 ### Tags: one topic tag on top of the specific ones
 
-Tags are free-form and hyphenated, and most describe one paper's contribution
-(`Fine-Grained-Expert-Segmentation`). Those are a good index but they connect
-nothing: 220 of 264 tags were used by exactly one post, and since
-`_plugins/related_posts.rb` requires a **shared** tag, 11 posts got no related
-reading at all — including four graph-RAG papers that share no tag with each
-other.
+Tags are free-form and hyphenated, and a tag phrased as one paper's contribution
+(`Fine-Grained-Expert-Segmentation`) can only ever apply to that paper. Those
+make a precise index and connect nothing, and `_plugins/related_posts.rb`
+requires a **shared** tag — so a post tagged only that way ships with no
+"Related reading" block at all.
 
 So also give each post at least one tag from the controlled topic layer:
 
