@@ -77,6 +77,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    lazy_images.rb       (<img>에 loading="lazy" 추가)
                    post_description.rb  (글의 page.description 채우기)
                    related_posts.rb     (글의 page.related 채우기)
+                   scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -196,8 +197,11 @@ CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 �
 1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
 2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
 3. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
-4. **`script/validate-site.sh`**로 사이트맵·피드 파싱, 페이지당 `h1` 1개, 헤딩 레벨
-   건너뜀 없음, 페이지별 설명문·canonical, 설명문·제목 중복을 검사한 뒤
+4. **`script/validate-site.sh`**로 사이트맵·피드가 byte 0에서 파싱되는지, 사이트맵 URL이
+   설정된 `url` 아래인지, 빌드 타임존이 고정됐는지, `robots.txt`가 막지 않는지, 렌더된
+   페이지가 1개 이상인지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든
+   페이지에 설명문·canonical이 있는지, 설명문이 자기 제목보다 긴지, 설명문·제목이
+   중복되지 않는지, 저작 원본이 배포되지 않았는지를 검사한 뒤
 5. GitHub Pages에 배포합니다.
 
 워크플로우가 실패한다면 대개 3·4단계입니다. Actions 로그에 어떤 링크·이미지·페이지가
@@ -213,7 +217,8 @@ CI도 같은 세 검사를 돌립니다. 로컬에서 미리 잡으면 배포 �
 
 ```bash
 curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # 200, application/xml 기대
-curl -sS  https://bits-bytes-nn.github.io/sitemap.xml | xmllint --noout -
+curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
+  ruby -rrexml/document -e 'REXML::Document.new(File.read("/tmp/s.xml")); puts "well-formed"'
 curl -sS  https://bits-bytes-nn.github.io/robots.txt
 ```
 
