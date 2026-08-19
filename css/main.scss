@@ -12,5 +12,5 @@
   "post",             // Post-specific styles
   "tags",             // Tags listing page
   "syntax",           // Rouge syntax-highlighting theme (server-side)
-  "dark"              // prefers-color-scheme: dark overrides (loaded last)
+  "dark"              // opt-in html[data-theme="dark"] overrides (loaded last)
 ;
