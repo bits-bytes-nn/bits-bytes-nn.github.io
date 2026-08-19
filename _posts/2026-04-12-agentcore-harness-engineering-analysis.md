@@ -7,7 +7,7 @@ description: >-
   Build·Deploy·Assess 세 층으로 열어 하네스 체크리스트의 어디를 채우고 어디를 비워 두었는지 짚습니다.
 date: 2026-04-12 12:00:00
 categories: ["Insights", "Agentic-AI"]
-tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "MCP", "Cedar-Policy", "Managed-RAG", "Agent-Registry"]
+tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "Model-Context-Protocol", "Cedar-Policy", "Managed-RAG", "Agent-Registry", "Agentic-AI"]
 cover: /assets/images/insights.jpg
 use_math: false
 ---

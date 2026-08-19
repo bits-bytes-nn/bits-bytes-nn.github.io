@@ -7,7 +7,7 @@ description: >-
   Its 8-layer security and 4-tier message compaction, read as architecture.
 date: 2026-03-31 12:00:01
 categories: ["Insights", "Agentic-AI"]
-tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture"]
+tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture", "Agentic-AI"]
 cover: /assets/images/insights.jpg
 use_math: false
 lang: en

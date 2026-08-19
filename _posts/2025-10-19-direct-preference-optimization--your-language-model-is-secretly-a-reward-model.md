@@ -4,7 +4,7 @@ title: "Direct Preference Optimization: Your Language Model is Secretly a Reward
 date: 2023-05-29 17:57:46
 author: "Stanford University"
 categories: ["Paper Reviews", "Finetuning"]
-tags: ["Direct-Preference-Optimization", "Implicit-Reward-Modeling", "Bradley-Terry-Preference-Framework", "KL-Constrained-Reward-Maximization", "Binary-Cross-Entropy-Policy-Optimization", "Reward-Reparameterization", "Policy-Implicit-Reward-Function", "Closed-Form-Optimal-Policy-Extraction", "RL-Free-Preference-Learning", "Dynamic-Per-Example-Importance-Weighting"]
+tags: ["Direct-Preference-Optimization", "Implicit-Reward-Modeling", "Bradley-Terry-Preference-Framework", "KL-Constrained-Reward-Maximization", "Binary-Cross-Entropy-Policy-Optimization", "Reward-Reparameterization", "Policy-Implicit-Reward-Function", "Closed-Form-Optimal-Policy-Extraction", "RL-Free-Preference-Learning", "Dynamic-Per-Example-Importance-Weighting", "Alignment"]
 cover: /assets/images/finetuning.jpg
 use_math: true
 ---

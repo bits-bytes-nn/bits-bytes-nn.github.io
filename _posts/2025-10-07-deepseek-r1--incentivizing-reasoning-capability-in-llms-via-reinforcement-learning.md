@@ -5,7 +5,7 @@ subtitle: "DeepSeek-R1: 강화학습을 통한 대규모 언어 모델의 추론
 date: 2025-01-22 15:19:35
 author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Reinforcement-Learning-with-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Verifiable-Rewards-Reinforcement-Learning", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Iterative-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning"]
+tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Reinforcement-Learning-with-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Verifiable-Rewards-Reinforcement-Learning", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Iterative-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning", "Reasoning-Models", "Alignment", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
