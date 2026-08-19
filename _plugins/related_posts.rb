@@ -13,7 +13,11 @@
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper
 # and predictable.
 module RelatedPosts
-  TAG_WEIGHT = 3          # the only thing that qualifies a candidate
+  # The category terms must sum to less than TAG_WEIGHT, or they stop being
+  # tie-breakers and start deciding the ranking. At 3/2/1 they summed to exactly
+  # TAG_WEIGHT, so a candidate sharing one tag plus both categories (3+3) tied
+  # with one sharing two tags (6) — and recency, not topic, broke the tie.
+  TAG_WEIGHT = 10         # the only thing that qualifies a candidate
   SUBCATEGORY_WEIGHT = 2  # categories[1] — Agentic-AI, Language-Models, … (tie-break)
   CATEGORY_WEIGHT = 1     # categories[0] — Insights, Paper Reviews, …    (tie-break)
   LIMIT = 3

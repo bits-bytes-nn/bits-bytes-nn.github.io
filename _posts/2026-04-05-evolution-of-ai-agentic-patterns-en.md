@@ -2,6 +2,9 @@
 layout: post
 title: "From Prompts to Harnesses — Four Years of AI Agentic Patterns"
 subtitle: "Engineering Rigor Doesn't Disappear — It Relocates. Four Years of AI Agentic Patterns"
+description: >-
+  Engineering rigor never disappeared — it relocated. Four years, three paradigm
+  shifts from prompts to context to harnesses, traced by why each era failed.
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]

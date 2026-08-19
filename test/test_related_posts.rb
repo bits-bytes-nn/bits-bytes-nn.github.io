@@ -38,6 +38,22 @@ class TestScore < Minitest::Test
     assert_equal expected, RelatedPosts.score(a, b)
   end
 
+  # The invariant the weights exist to satisfy. Asserted on the constants
+  # themselves, because the previous values (3/2/1) satisfied every behavioural
+  # test while quietly letting categories outrank a whole extra shared tag.
+  def test_category_bonuses_cannot_outweigh_one_shared_tag
+    assert_operator RelatedPosts::SUBCATEGORY_WEIGHT + RelatedPosts::CATEGORY_WEIGHT,
+                    :<, RelatedPosts::TAG_WEIGHT
+  end
+
+  # The ordering that the old weights got wrong.
+  def test_two_shared_tags_beat_one_tag_plus_both_categories
+    a = post("/a", tags: %w[X Y], categories: ["Insights", "Agentic-AI"])
+    two_tags = post("/two", tags: %w[X Y], categories: ["Paper Reviews", "Other"], date: "2020-01-01")
+    one_tag  = post("/one", tags: %w[X],   categories: ["Insights", "Agentic-AI"], date: "2026-01-01")
+    assert_equal ["/two", "/one"], RelatedPosts.rank(a, [one_tag, two_tags])
+  end
+
   def test_unrelated_posts_score_zero
     a = post("/a", tags: %w[X], categories: ["Insights", "Agentic-AI"])
     b = post("/b", tags: %w[Y], categories: ["Paper Reviews", "Language-Models"])

@@ -9,7 +9,7 @@
   text. Listing pages declare theirs in front matter, because a description
   derived from a page of links would be noise.
 {%- endcomment -%}
-{%- assign page_description = page.description | default: site.description | shorten: 160 -%}
+{%- assign page_description = page.description | default: site.description | shorten_meta -%}
 
 {%- comment -%}
   A page `cover` is a wide banner of unknown size, so its dimensions are not
@@ -222,7 +222,14 @@
       }
 	};
 	</script>
-	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+	<!-- Pinned to an exact version with an integrity hash, like every other
+	     external asset here. `mathjax@3` is a floating jsdelivr alias (it resolves
+	     to 3.2.2 today), so it could not carry an SRI hash and the bytes running
+	     on 30 pages could change without a commit. -->
+	<script id="MathJax-script" async
+		src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"
+		integrity="sha384-AHAnt9ZhGeHIrydA1Kp1L7FN+2UosbF7RQg6C+9Is/a7kDpQ1684C2iH2VWil6r4"
+		crossorigin="anonymous"></script>
 	{% endif %}
 
 	<!-- Google Analytics -->

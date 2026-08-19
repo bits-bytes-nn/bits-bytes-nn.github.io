@@ -43,7 +43,7 @@ pagination:
 					  raw TeX from math posts. `post.description` is the same text the
 					  meta tags and the feed use — see _plugins/post_description.rb.
 					{%- endcomment -%}
-					<p>{{ post.description | shorten: 300 | escape }}</p>
+					<p>{{ post.description | shorten_card | escape }}</p>
 				</section>
 				<section class="post-meta">
 					<div class="post-date">{{ post.date | date: "%B %-d, %Y" }}</div>

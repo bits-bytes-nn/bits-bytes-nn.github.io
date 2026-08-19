@@ -1,8 +1,15 @@
 /* Client-side search over /search.json (simple-jekyll-search).
  *
  * Refactor notes:
- *  - search.json now ships a 40-word snippet instead of full post bodies
- *    (2.6 MB → ~70 KB), plus `category` and `tags` so those are searchable too.
+ *  - search.json carries a 40-word `snippet` for display *and* each post's full
+ *    body in `content`, plus `category` and `tags`. `content` is what makes this
+ *    full-text rather than title-only: no `searchFields` is configured, so
+ *    simple-jekyll-search matches every field. That is deliberate — see
+ *    "fix(search): index full body for Korean recall".
+ *    The cost is real and should not be discovered by surprise: search.json is
+ *    3.2 MB raw / ~970 KB gzip, fetched only by this page. An earlier version of
+ *    this comment claimed the body had been dropped for a ~70 KB index; it never
+ *    was, and the claim was wrong for months.
  *  - Keyword highlighting runs once per render via a debounced handler — the old
  *    code stacked a fresh setTimeout on every keystroke, racing itself.
  *  - A live status line reports match counts for screen readers and sighted users.
