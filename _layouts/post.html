@@ -60,18 +60,24 @@ layout: default
 
     {% include related_posts.html %}
 
-    {% if page.previous.url or page.next.url %}
+    {%- comment -%}
+      adjacent_older / adjacent_newer come from _plugins/related_posts.rb, not
+      Jekyll's page.previous / page.next. The built-ins walk raw date order, and
+      every translation pair here shares a date — so "← Previous" on the newest
+      Korean post was that same article in English.
+    {%- endcomment -%}
+    {% if page.adjacent_older or page.adjacent_newer %}
     <nav class="post-nav" aria-label="Adjacent posts">
-      {% if page.previous.url %}
-      <a class="post-nav-link prev" href="{{ page.previous.url | prepend: site.baseurl }}" rel="prev">
+      {% if page.adjacent_older %}
+      <a class="post-nav-link prev" href="{{ page.adjacent_older.url | prepend: site.baseurl }}" rel="prev">
         <span class="post-nav-dir">← Previous</span>
-        <span class="post-nav-title">{{ page.previous.title }}</span>
+        <span class="post-nav-title">{{ page.adjacent_older.title }}</span>
       </a>
       {% else %}<span></span>{% endif %}
-      {% if page.next.url %}
-      <a class="post-nav-link next" href="{{ page.next.url | prepend: site.baseurl }}" rel="next">
+      {% if page.adjacent_newer %}
+      <a class="post-nav-link next" href="{{ page.adjacent_newer.url | prepend: site.baseurl }}" rel="next">
         <span class="post-nav-dir">Next →</span>
-        <span class="post-nav-title">{{ page.next.title }}</span>
+        <span class="post-nav-title">{{ page.adjacent_newer.title }}</span>
       </a>
       {% else %}<span></span>{% endif %}
     </nav>
