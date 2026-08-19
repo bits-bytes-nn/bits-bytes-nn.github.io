@@ -313,6 +313,48 @@
   .code-copy:hover { background: rgba(#fff, 0.2); }
 
   // Previous / next post navigation
+  .related-posts {
+    margin: 2.5em 0 0;
+
+    .related-posts-heading {
+      font-size: modular-scale(1);
+      margin-bottom: 0.6em;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.6em;
+    }
+  }
+
+  .related-posts-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    padding: 0.8em 1.1em;
+    border: 1px solid $base-border-color;
+    border-radius: $base-border-radius;
+    text-decoration: none;
+    transition: border-color $transition-normal;
+
+    &:hover { border-color: $action-color; }
+
+    .related-posts-title {
+      color: $action-color;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .related-posts-sub {
+      font-size: 0.85rem;
+      color: $medium-gray;
+      line-height: 1.4;
+    }
+  }
+
   .post-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;

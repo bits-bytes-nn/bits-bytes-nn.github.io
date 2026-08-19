@@ -1,0 +1,25 @@
+{%- comment -%}
+  Topically related posts, computed in _plugins/related_posts.rb and exposed as
+  page.related. Complements the prev/next nav, which is ordered by date and so
+  pairs posts that have nothing to do with each other.
+
+  The link text is the post title on purpose: it is what a reader scans, and it
+  is also the anchor text that tells search engines what the target is about.
+{%- endcomment -%}
+{% if page.related and page.related.size > 0 %}
+<nav class="related-posts" aria-labelledby="related-posts-heading">
+  <h2 id="related-posts-heading" class="related-posts-heading">
+    {%- if page.lang == 'en' -%}Related reading{%- else -%}함께 읽기{%- endif -%}
+  </h2>
+  <ul>
+    {% for other in page.related %}
+    <li>
+      <a class="related-posts-link" href="{{ other.url | prepend: site.baseurl }}">
+        <span class="related-posts-title">{{ other.title }}</span>
+        {% if other.subtitle %}<span class="related-posts-sub">{{ other.subtitle }}</span>{% endif %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
