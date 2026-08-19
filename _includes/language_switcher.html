@@ -14,15 +14,14 @@
   {% if counterpart %}
     {% if page.lang == 'ko' %}{% assign other_label = 'English' %}{% else %}{% assign other_label = '한국어' %}{% endif %}
     {%- comment -%}
-      Rendered as a meta item inside .post-header-info, next to Published / Read
-      time / Category. It used to sit in its own band between the meta panel and
-      the table of contents, right-aligned against nothing — a lone button in an
-      empty strip, which read as leftover markup rather than a control.
+      A standalone button between the meta panel and the table of contents, not a
+      meta item inside .post-header-info. "Read this in English" is an action the
+      reader takes, unlike the date or category next to it, and it carries its own
+      label in the link text — so it needs neither a Language: caption nor a
+      column in that row.
     {%- endcomment -%}
-    <div class="post-language language-switcher">
-      <span class="meta-label">Language</span>
-      <a class="meta-value" href="{{ counterpart.url | prepend: site.baseurl }}"
-         rel="alternate" hreflang="{{ counterpart.lang }}">
+    <div class="language-switcher">
+      <a href="{{ counterpart.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ counterpart.lang }}">
         {{ other_label }}로 읽기 →
       </a>
     </div>
