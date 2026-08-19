@@ -13,8 +13,6 @@ feed:
 # breaks search indexing.
 exclude:
   - /vendor/
-  - circle.yml
-  - stackbit.yaml
   - README.md
   - README.ko.md
   - docs/
@@ -65,11 +63,10 @@ kramdown:
 paginate: 5
 paginate_path: /page/:num/
 
-simple_jekyll_search:
-  exclude:
-    - about.md
-    - search.md
-    - index.html
+# NOTE: no `simple_jekyll_search:` block. simple-jekyll-search is a client-side
+# script that reads search.json and knows nothing about Jekyll config, so the
+# `exclude:` list that used to sit here excluded nothing. search.json is built
+# from `site.posts` only, which already leaves out the pages it named.
 
 ga_tracking_id: G-MRH9Z5ETSQ
 
