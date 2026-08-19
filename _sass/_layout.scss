@@ -171,14 +171,33 @@ blockquote {
 		background-position: 50% 50%;
 		background-size: cover;
 
+		// The hero title had one size at every width. modular-scale(6) is 47.8px,
+		// which on a 390px phone turned a long post title into six lines and a
+		// 675px hero — about 80% of the first screen, all of it decoration. Step up
+		// with the viewport instead: phones get scale(3), tablets scale(5),
+		// desktops the original scale(6).
 		.title {
-			font-size: modular-scale(6);
-			letter-spacing: -0.02em;
+			font-size: modular-scale(3);
+			letter-spacing: -0.01em;
+
+			@include media($mobile) {
+				font-size: modular-scale(5);
+				letter-spacing: -0.02em;
+			}
+
+			@include media($tablet) {
+				font-size: modular-scale(6);
+			}
 		}
 
+		// 700, not 500. modular-scale(1) is 19.2px, and WCAG counts >=18.66px bold as
+		// large text — so this only needs 3:1 rather than 4.5:1, which the scrim
+		// below does reach even over the brightest cover. Darkening the scrim far
+		// enough to give 19.2px/500 its 4.5:1 would have meant alpha 0.50, washing
+		// out the artwork. text-shadow helps perceptually but counts for nothing.
 		.subtitle, .info {
 			font-size: modular-scale(1);
-			font-weight: 500;
+			font-weight: 700;
 			letter-spacing: 0.01em;
 			text-shadow: 0 2px 4px rgba(0,0,0,0.6);
 		}
@@ -189,15 +208,25 @@ blockquote {
 		transition: background-color $transition-normal;
 
 		&.has-cover {
-			background-color: rgba(0,0,0,0.3);
-			padding: 6em 1em !important;
+			// 0.3 left white text at 2.46:1 over the brightest 24px block of the worst
+			// cover (finetuning.jpg). 0.45 takes that to 3.85:1, which clears the 3:1
+			// that both the hero title (47.8px/700) and the subtitle (19.2px/700, see
+			// above) need as large text. Reaching 4.5:1 there would have required 0.50
+			// and visibly flattened the artwork.
+			background-color: rgba(0,0,0,0.45);
+			// Scaled with the title above, so the hero no longer fills a phone screen.
+			padding: 3em 1em !important;
+
+			@include media($mobile) {
+				padding: 6em 1em !important;
+			}
 
 			@include media($tablet) {
 				padding: 9em 1em !important;
 			}
 
 			&:hover {
-				background-color: rgba(0,0,0,0.4);
+				background-color: rgba(0,0,0,0.55);
 			}
 		}
 	}
@@ -234,12 +263,24 @@ blockquote {
 	*	Navigation Menu - http://refills.bourbon.io/unstyled/ (see "Navigation")
 	*/
 	.navigation-menu-button {
+		// base/_buttons.scss styles every <button> as a filled action button
+		// (blue background, 4px radius, 14.8px/29.6px padding). This one is
+		// display:none above $tablet, so on desktop nobody ever saw it — on a phone
+		// it rendered as a chunky blue block next to a header of plain text links.
+		background-color: transparent;
+		color: $action-color;
+		border-radius: 0;
+		padding: 0.5em 0 0;
 		display: block;
 		float: right;
 		margin: 0;
 		font-size: 1.5em;
-		padding-top: 0.5em;
 		transition: $transition-transform;
+
+		&:hover, &:focus {
+			background-color: transparent;
+			color: $action-color;
+		}
 
 		&:hover {
 			transform: scale(1.1);

@@ -33,6 +33,7 @@ layout: default
           {% endfor %}
         </div>
         {% endif %}
+        {% include language_switcher.html %}
       </div>
       {% if page.tags.size > 0 %}
       <div class="post-tags">
@@ -43,8 +44,6 @@ layout: default
       </div>
       {% endif %}
     </section>
-
-    {% include language_switcher.html %}
 
     <details id="post-toc" class="post-toc" open hidden>
       <summary>
