@@ -18,4 +18,5 @@ module ReadingTimeFilter
   end
 end
 
-Liquid::Template.register_filter(ReadingTimeFilter)
+# Guarded so test/ can require this file without Liquid loaded.
+Liquid::Template.register_filter(ReadingTimeFilter) if defined?(Liquid::Template)

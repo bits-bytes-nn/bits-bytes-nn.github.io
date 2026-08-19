@@ -2,7 +2,10 @@
 
   <div class="wrapper">
 
-    <h3 class="footer-heading">{{ site.title }}</h3>
+    <!-- h2, not h3: the footer is a top-level section of the page, and on pages
+         whose body has no h2 (e.g. /search/) an h3 here made the outline jump
+         h1 -> h3. `.footer-heading` keeps the h3 size it has always rendered at. -->
+    <h2 class="footer-heading">{{ site.title }}</h2>
 
     <div class="site-navigation">
 

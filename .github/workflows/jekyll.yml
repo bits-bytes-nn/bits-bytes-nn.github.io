@@ -37,6 +37,12 @@ jobs:
           # 3.3+: html-proofer's async→console dependency requires Ruby >= 3.3.
           ruby-version: '3.3'
           bundler-cache: true
+      - name: Unit-test the Jekyll plugins
+        # Plain `ruby`, not `bundle exec`: the plugins guard their Jekyll/Liquid
+        # registrations behind `defined?`, so their logic loads standalone, and
+        # minitest ships with Ruby. Runs before the build — these plugins decide
+        # every page's description and read time.
+        run: ruby test/run_all.rb
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
