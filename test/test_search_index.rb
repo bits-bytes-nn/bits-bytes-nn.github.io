@@ -75,3 +75,44 @@ class TestPlainText < Minitest::Test
     assert_equal plain, SearchIndex.plain_text(plain)
   end
 end
+
+class TestMathDelimiters < Minitest::Test
+  # kramdown leaves these in the HTML as text, so an excerpt landing on a formula
+  # used to show the reader `\(O(L^2)\)`.
+  def test_strips_inline_delimiters_and_keeps_the_tex
+    assert_equal "메커니즘의 O(L^2) 계산 복잡도",
+                 SearchIndex.plain_text("<p>메커니즘의 \\(O(L^2)\\) 계산 복잡도</p>")
+  end
+
+  def test_strips_display_delimiters
+    assert_equal "앞 E = mc^2 뒤", SearchIndex.plain_text("앞 \\[E = mc^2\\] 뒤")
+  end
+
+  # Inline math gets no padding: Korean attaches a particle straight onto the
+  # symbol, and a space here would break the word in two.
+  def test_inline_math_does_not_gain_a_space_before_a_korean_particle
+    assert_equal "비율 \\theta로 나눕니다",
+                 SearchIndex.plain_text("비율 \\(\\theta\\)로 나눕니다")
+  end
+
+  def test_handles_several_formulas_in_one_paragraph
+    assert_equal "a x b y c",
+                 SearchIndex.plain_text("<p>a \\(x\\) b \\(y\\) c</p>")
+  end
+
+  # The symbol stays searchable — that is why the TeX is kept rather than dropped.
+  def test_the_contents_remain_findable
+    assert_includes SearchIndex.plain_text("<p>복잡도는 \\(O(L^2)\\)입니다</p>"), "O(L^2)"
+  end
+
+  # An opening delimiter with no partner is left alone rather than eating the rest
+  # of the post.
+  def test_an_unclosed_delimiter_is_left_as_is
+    assert_equal "열린 \\( 그리고 나머지 본문",
+                 SearchIndex.plain_text("<p>열린 \\( 그리고 나머지 본문</p>")
+  end
+
+  def test_a_lone_backslash_paren_in_prose_is_untouched
+    assert_equal "함수 f(x) 는 그대로", SearchIndex.plain_text("<p>함수 f(x) 는 그대로</p>")
+  end
+end

@@ -22,13 +22,26 @@ module SearchIndex
                   |tbody|tr|td|th|section|article|header|footer|figure|figcaption
                   |br|hr)\b[^>]*>}xi
 
+  # kramdown's mathjax engine leaves the delimiters in the HTML as literal text,
+  # so a flattened post reads "메커니즘의 \(O(L^2)\) 계산 복잡도" and an excerpt landing
+  # there showed the delimiters to the reader. Only the delimiters go; the TeX
+  # inside stays, both because it is what the sentence is about and so that a
+  # symbol inside a formula is still findable.
+  INLINE_MATH = /\\\((.+?)\\\)/m
+  DISPLAY_MATH = /\\\[(.+?)\\\]/m
+
   def self.plain_text(html)
     text = html.to_s.gsub(NON_PROSE, " ").gsub(COMMENT, " ")
     # Strip before decoding, never after. A post that quotes markup contains
     # `&lt;script&gt;` as text; decoding first would make it a real tag and the
     # strip would then delete the words the author actually wrote.
     text = text.gsub(BOUNDARY, " ").gsub(/<[^>]*>/, "")
-    CGI.unescapeHTML(text).gsub(/\s+/, " ").strip
+    text = CGI.unescapeHTML(text)
+    # Display math is its own block, so it may take spaces. Inline math must not:
+    # Korean attaches particles directly, and `\(\theta\)로` has to stay one word.
+    text = text.gsub(DISPLAY_MATH) { " #{Regexp.last_match(1)} " }
+    text = text.gsub(INLINE_MATH) { Regexp.last_match(1) }
+    text.gsub(/\s+/, " ").strip
   end
 end
 
