@@ -2,6 +2,9 @@
 layout: page
 title: Search
 permalink: /search/
+description: >-
+  Full-text search across every post on this blog — by title, body, category,
+  or tag.
 main_nav: true
 nav_order: 6
 head_extra: <link rel="stylesheet" href="/css/search.css">

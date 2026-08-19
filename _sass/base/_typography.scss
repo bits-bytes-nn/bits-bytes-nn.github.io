@@ -38,14 +38,18 @@ h4 {
   font-weight: 600;
 }
 
+// h5/h6 used to be set *below* body size (-1 / -2), so a fifth-level heading
+// read as fine print rather than a heading. Weight and letter-spacing carry the
+// distinction at this depth instead.
 h5 {
-  font-size: modular-scale(-1);
-  font-weight: 600;
+  font-size: modular-scale(0);
+  font-weight: 700;
 }
 
 h6 {
-  font-size: modular-scale(-2);
+  font-size: modular-scale(0);
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 p {

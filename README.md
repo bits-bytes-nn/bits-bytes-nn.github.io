@@ -58,8 +58,9 @@ bundle exec jekyll build
 ```
 
 > **Why plain `jekyll` and not `github-pages`?** This site uses custom Ruby
-> plugins in `_plugins/` (read time, lazy images), which the sandboxed
-> `github-pages` gem disallows. So both local builds and CI run Jekyll directly.
+> plugins in `_plugins/` (read time, lazy images, post descriptions), which the
+> sandboxed `github-pages` gem disallows. So both local builds and CI run Jekyll
+> directly.
 
 ---
 
@@ -73,15 +74,18 @@ _includes/         Reusable fragments: head, header, footer, nav_links,
 _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
                    _dark (dark mode), base/*
                    ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
-_plugins/          reading_time.rb (KO/EN-aware read time)
-                   lazy_images.rb  (adds loading="lazy" to <img>)
+_plugins/          reading_time.rb      (KO/EN-aware read time)
+                   lazy_images.rb       (adds loading="lazy" to <img>)
+                   post_description.rb  (fills page.description for posts)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
 assets/images/     Shared cover images, reused across posts by topic
 assets/<slug>/     Per-post figures, one folder per post
 search.json        Full-text search index (consumed by simple-jekyll-search)
-.github/workflows/ CI: build → html-proofer link check → deploy on push to main
+script/            validate-site.sh (post-build discoverability checks)
+sitemap-index.xml  Sitemap index — the URL to submit to Search Console
+.github/workflows/ CI: build → html-proofer → validate-site → deploy on push to main
 ```
 
 **Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
@@ -100,8 +104,11 @@ research → draft → proofread workflow. To add one by hand, create
 ---
 layout: post
 title: "<Post Title>"
+subtitle: "<one-line pitch>"       # optional — shown under the title in the header
 date: YYYY-MM-DD HH:MM:SS
 author: "<Author>"                 # the paper's org; omit for Insights/opinion posts
+description: >-                    # optional — see below
+  <search-snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
 tags: ["<Tag-1>", "<Tag-2>"]
 cover: /assets/images/<topic>.(jpg|png)
@@ -110,6 +117,21 @@ lang: ko                           # optional — with translation_id below…
 translation_id: <shared-slug>      # …links a Korean post to its -en twin
 ---
 ```
+
+**Don't repeat the title as an H1 in the body.** The layout already renders it,
+so a leading `# Title` produces two `<h1>`s and leaks into the search snippet.
+Put a tagline in `subtitle:` instead.
+
+### `description:` — the search snippet
+
+`description:` is what Google shows under the link, what social cards quote, and
+what the RSS `<summary>` carries. If you omit it, `_plugins/post_description.rb`
+derives one from the post's first real prose paragraph, which is usually good
+enough. Write it by hand when the first paragraph opens on a pull quote or a
+disclosure note — that is, on most Insights posts.
+
+Descriptions must be **unique across the site**; CI fails the build if two pages
+share one.
 
 ### Categories drive the URL
 
@@ -144,10 +166,22 @@ dollar signs like `$10M` are fine — they're not math.)
 ```bash
 bundle exec jekyll build                              # does it build clean?
 bundle exec htmlproofer ./_site --disable-external    # any broken links/images?
+script/validate-site.sh                               # sitemap, feed, metadata
 ```
 
-CI runs the same html-proofer check, so catching it locally saves a failed
-deploy.
+CI runs the same two checks, so catching it locally saves a failed deploy.
+
+> **If the checks report something impossible, look for a running `jekyll serve`
+> first.** It watches the tree and rewrites `_site/` behind you, it overrides
+> `site.url` with `http://localhost:4000` (so every sitemap URL looks wrong), and
+> it keeps the `_config.yml` it started with — so `exclude` entries added since
+> then don't apply. Either stop it, or build somewhere else:
+>
+> ```bash
+> ps aux | grep '[j]ekyll serve'
+> bundle exec jekyll build --destination /tmp/site-verify
+> script/validate-site.sh /tmp/site-verify
+> ```
 
 ---
 
@@ -156,16 +190,33 @@ deploy.
 Pushing to `main` triggers `.github/workflows/jekyll.yml`, which:
 
 1. builds the site with `JEKYLL_ENV=production`,
-2. runs **html-proofer** over `_site/` (internal links, images, anchors), and
-3. deploys to GitHub Pages.
+2. runs **html-proofer** over `_site/` (internal links, images, anchors),
+3. runs **`script/validate-site.sh`** (sitemap/feed parse, per-page description
+   and canonical, no duplicate descriptions or titles), and
+4. deploys to GitHub Pages.
 
-If the workflow fails, it's almost always step 2 — open the Actions log to see
-exactly which link or image is broken. No manual deploy step is needed.
+If the workflow fails, it's almost always step 2 or 3 — open the Actions log,
+which names the exact link, image, or page. No manual deploy step is needed.
 
 > **⚠ Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**
 > They're Search Console / Naver ownership-verification tokens that must ship to
-> the site root. Excluding them silently breaks search indexing — the symptom is
-> "Google can't read the sitemap."
+> the site root. Excluding them silently breaks ownership verification.
+
+### If Search Console says it can't fetch the sitemap
+
+Check the file first — it is usually fine:
+
+```bash
+curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # expect 200, application/xml
+curl -sS  https://bits-bytes-nn.github.io/sitemap.xml | xmllint --noout -
+curl -sS  https://bits-bytes-nn.github.io/robots.txt
+```
+
+If those pass, the failure is a cached Search Console verdict, not the site.
+Search Console keys a sitemap by URL and keeps the first result it recorded, so
+re-submitting the same path reuses the stale entry. Remove the entry and submit
+**`sitemap-index.xml`** instead — a URL it has not seen before — then use URL
+Inspection → Request Indexing on a couple of posts to prompt a crawl.
 
 ---
 

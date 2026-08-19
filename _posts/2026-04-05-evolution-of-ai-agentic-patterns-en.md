@@ -1,21 +1,20 @@
 ---
 layout: post
 title: "From Prompts to Harnesses — Four Years of AI Agentic Patterns"
+subtitle: "Engineering Rigor Doesn't Disappear — It Relocates. Four Years of AI Agentic Patterns"
 date: 2026-04-05 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: false
 lang: en
 translation_id: evolution-of-ai-agentic-patterns
 ---
 
-# Engineering Rigor Doesn't Disappear — It Relocates. Four Years of AI Agentic Patterns
-
 > "The hottest new programming language is English." — Andrej Karpathy, 2023.
 > Three years later, he was only half right.
 
-### TL;DR
+## TL;DR
 - Between 2022 and 2026, the AI development paradigm shifted three times: Prompt Engineering → Context Engineering → Harness Engineering.
 - The real driver behind each shift: the previous paradigm couldn't deliver on its promises.
 - Engineering rigor never disappeared. It moved — from prompts to context, from context to harnesses (Chad Fowler's "[Relocating Rigor](https://www.honeycomb.io/blog/production-is-where-the-rigor-goes)").

@@ -2,6 +2,9 @@
 layout: page
 title: Paper Summaries
 permalink: /paper-summaries/
+description: >-
+  Concise digests of AI/ML papers, posts, and talks — distilled to their core
+  contributions and insights.
 main_nav: true
 nav_order: 2
 ---

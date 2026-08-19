@@ -1,5 +1,8 @@
 ---
 layout: default
+description: >-
+  AI/ML 논문을 설계 결정과 트레이드오프까지 파고들어 읽고, 에이전틱 AI·데이터 아키텍처 현장에서
+  겪은 문제를 정리하는 기술 블로그입니다.
 pagination:
   enabled: true
 ---
@@ -34,7 +37,13 @@ pagination:
 					>
 				</h2>
 				<section class="post-excerpt" itemprop="description">
-					<p>{{ post.content | strip_html | truncatewords: 50 }}</p>
+					{%- comment -%}
+					  `post.content | strip_html | truncatewords: 50` used to reproduce
+					  the leading H1 (so every card repeated its own title) and dumped
+					  raw TeX from math posts. `post.description` is the same text the
+					  meta tags and the feed use — see _plugins/post_description.rb.
+					{%- endcomment -%}
+					<p>{{ post.description | shorten: 300 | escape }}</p>
 				</section>
 				<section class="post-meta">
 					<div class="post-date">{{ post.date | date: "%B %-d, %Y" }}</div>
@@ -52,29 +61,33 @@ pagination:
 			{% endif %} {% endfor %}
 		</ul>
 
-		<nav class="pagination" role="navigation">
+		{%- comment -%}
+		  Icons are Font Awesome 6 names (fa-solid/fa-angles-*), not the v4 aliases
+		  (fa/fa-angle-double-*) — those were the only reason the v4-shims
+		  stylesheet was loaded on every page.
+
+		  Both directions are links, so both need an accessible name: the icons are
+		  decorative and carry no text. The forward link is `older-posts`; it used
+		  to reuse `newer-posts`, which is what the CSS keys off.
+		{%- endcomment -%}
+		<nav class="pagination" aria-label="Post list pages">
 			<p>
-				{% if paginator.previous_page %} {% if paginator.page == 2 %}
-				<a class="newer-posts" href="{{ site.baseurl }}/">
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-square fa-stack-2x"></i>
-						<i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
+				{% if paginator.previous_page %}
+				<a
+					class="newer-posts"
+					rel="prev"
+					aria-label="Newer posts"
+					href="{% if paginator.page == 2 %}{{ site.baseurl }}/{% else %}{{ site.baseurl }}{{ paginator.previous_page_path }}{% endif %}"
+				>
+					<span class="fa-stack fa-lg" aria-hidden="true">
+						<i class="fa-solid fa-square fa-stack-2x"></i>
+						<i class="fa-solid fa-angles-left fa-stack-1x fa-inverse"></i>
 					</span>
 				</a>
 				{% else %}
-				<a
-					class="newer-posts"
-					href="{{ site.baseurl }}{{ paginator.previous_page_path }}"
-				>
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-square fa-stack-2x"></i>
-						<i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
-					</span>
-				</a>
-				{% endif %} {% else %}
-				<span class="fa-stack fa-lg">
-					<i class="fa fa-square fa-stack-2x"></i>
-					<i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
+				<span class="fa-stack fa-lg is-disabled" aria-hidden="true">
+					<i class="fa-solid fa-square fa-stack-2x"></i>
+					<i class="fa-solid fa-angles-left fa-stack-1x fa-inverse"></i>
 				</span>
 				{% endif %}
 				<span class="page-number"
@@ -82,18 +95,20 @@ pagination:
 				>
 				{% if paginator.next_page %}
 				<a
-					class="newer-posts"
+					class="older-posts"
+					rel="next"
+					aria-label="Older posts"
 					href="{{ site.baseurl }}{{ paginator.next_page_path }}"
 				>
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-square fa-stack-2x"></i>
-						<i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
+					<span class="fa-stack fa-lg" aria-hidden="true">
+						<i class="fa-solid fa-square fa-stack-2x"></i>
+						<i class="fa-solid fa-angles-right fa-stack-1x fa-inverse"></i>
 					</span>
 				</a>
 				{% else %}
-				<span class="fa-stack fa-lg">
-					<i class="fa fa-square fa-stack-2x"></i>
-					<i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
+				<span class="fa-stack fa-lg is-disabled" aria-hidden="true">
+					<i class="fa-solid fa-square fa-stack-2x"></i>
+					<i class="fa-solid fa-angles-right fa-stack-1x fa-inverse"></i>
 				</span>
 				{% endif %}
 			</p>

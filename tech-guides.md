@@ -2,6 +2,9 @@
 layout: page
 title: Tech Guides
 permalink: /tech-guides/
+description: >-
+  Hands-on technical guides and tutorials for the libraries, frameworks, tools,
+  and platforms I work with.
 main_nav: true
 nav_order: 4
 ---

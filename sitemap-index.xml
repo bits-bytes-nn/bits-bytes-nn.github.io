@@ -1,0 +1,20 @@
+---
+layout: null
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A sitemap index pointing at the jekyll-sitemap output.
+
+  Search Console keys a submitted sitemap by URL and keeps the first fetch result
+  it recorded, so re-submitting the same /sitemap.xml reuses the existing entry
+  instead of retrying from scratch. Submitting this path gives it a URL it has
+  never seen, which creates a fresh entry. It is also the conventional place to
+  add further sitemaps (images, news) later without re-submitting anything.
+-->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>{{ '/sitemap.xml' | absolute_url }}</loc>
+    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+  </sitemap>
+</sitemapindex>

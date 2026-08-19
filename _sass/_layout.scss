@@ -418,13 +418,18 @@ blockquote {
 			padding: 0 1em;
 		}
 
-		a.newer-posts {
+		a.newer-posts, a.older-posts {
 			text-decoration: none;
 			transition: $transition-color;
 
 			&:hover {
 				color: $blue;
 			}
+		}
+
+		// Non-link arrow at the first/last page.
+		.is-disabled {
+			opacity: 0.35;
 		}
 	}
 

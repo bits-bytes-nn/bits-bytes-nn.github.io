@@ -1,20 +1,19 @@
 ---
 layout: post
 title: "Amazon Bedrock AgentCore를 하네스로 읽다"
+subtitle: "에이전트의 '나머지 전부' — Amazon Bedrock AgentCore를 하네스의 렌즈로 뜯어봅니다"
 date: 2026-04-12 12:00:00
 categories: ["Insights", "Agentic-AI"]
 tags: ["AgentCore", "AWS-Bedrock", "Harness-Engineering", "Agentic-Infrastructure", "MCP", "Cedar-Policy", "Managed-RAG", "Agent-Registry"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: false
 ---
-
-# 에이전트의 '나머지 전부' — Amazon Bedrock AgentCore를 하네스의 렌즈로 뜯어봅니다
 
 > "하네스는 에이전트에서 모델을 뺀 나머지 전부입니다(A harness is everything about an agent except the model)." — Mitchell Hashimoto, HashiCorp 공동 설립자, [*My AI Adoption Journey*](https://mitchellh.com/writing/my-ai-adoption-journey), 2026.02
 
 *공개(Disclosure): 저는 AWS에 재직 중이지만, 이 글의 모든 의견·해석·평가·비판은 전적으로 개인의 것이며 AWS의 공식 입장이나 정책 방향과는 무관합니다. 사실관계는 공개된 공식 문서·블로그를 출처로 밝혔고, 그 위에 얹은 판단은 저자의 몫입니다.*
 
-### TL;DR
+## TL;DR
 - [McKinsey 'State of AI 2025'](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai): **기업의 62퍼센트가 에이전트를 실험 중**이지만 그중 프로덕션 스케일에 도달한 곳은 **25퍼센트 미만**. 이른바 '파일럿의 늪'입니다
 - 발목을 잡는 것은 모델 성능이 아니라 **운영** — 보안, 격리, 거버넌스, 관찰가능성입니다
 - AWS의 답은 **Amazon Bedrock AgentCore**. 2025년 7월 프리뷰, 10월 GA, 그 뒤로 거의 분기마다 모듈이 붙었고, 특히 2026년 6월에는 Managed Knowledge Base·Web Search·Agent Performance Loop가 한꺼번에 GA되며 **출시 1년 만에** 플랫폼의 표면적이 한 단계 더 넓어졌습니다

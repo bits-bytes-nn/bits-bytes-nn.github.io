@@ -1,23 +1,24 @@
 ---
 layout: post
 title: "데이터에 맥락을 새겨 넣는 법 — AI Ready Data, Semantic Layer, Knowledge Graph, Ontology"
+description: >-
+  'AI-ready 데이터'는 깨끗한 데이터가 아니라 맥락을 기계가 실행할 수 있는 형태로 새겨 넣은
+  데이터입니다. 같은 스키마에서 text-to-SQL 정확도가 16.7%에서 54.2%로 오른 이유를 짚습니다.
 date: 2026-07-27 12:00:00
 categories: ["Insights", "Data-Architecture"]
 tags: ["AI-Ready-Data", "Semantic-Layer", "Knowledge-Graph", "Ontology", "GraphRAG", "Agentic-AI", "Model-Context-Protocol", "Data-Governance"]
-cover: /assets/images/insights.png
+cover: /assets/images/insights.jpg
 use_math: true
 lang: ko
 translation_id: ai-ready-data-semantic-layer-knowledge-graph
 ---
-
-# 데이터에 맥락을 새겨 넣는 법 — AI Ready Data, Semantic Layer, Knowledge Graph, Ontology
 
 > "범용 AI는 데이터베이스 스키마만 받으면 text-to-SQL 변환에서 자주 헤맵니다. 스키마에는 업무 프로세스의 정의나 지표를 어떻게 다루는지 같은 핵심 지식이 빠져 있기 때문입니다(Generic AI solutions often struggle with text-to-SQL conversions when given only a database schema, as schemas lack critical knowledge like business process definitions and metrics handling)."
 > — [Snowflake Cortex Analyst 공식 문서](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) (게재일 미표기, 2026-07-26 열람)
 
 *공개(Disclosure): 필자는 AWS(Amazon Web Services)에 소속돼 있습니다. 본문은 AWS 서비스를 여러 벤더 아키텍처 중 하나로 다루지만, 서술한 해석·평가·비판은 전부 개인 의견이며 AWS의 공식 입장이 아닙니다. 특정 제품을 권하는 글이 아니라 데이터 아키텍처의 한 문제를 깊이 들여다보는 글입니다.*
 
-### TL;DR
+## TL;DR
 
 - **"AI-ready 데이터"의 정체는 깨끗한 데이터가 아니라 맥락(semantics)을 기계가 실행할 수 있는 형태로 새겨 넣은 데이터입니다.** 데이터베이스 스키마만 주고 GPT-4가 기업 실무 질문에 답하게 하면 zero-shot text-to-SQL 정확도가 **16.7%**에 그칩니다. 반면 같은 데이터를 온톨로지·매핑으로 감싼 지식 그래프 위에서 질문하면 정확도가 **54.2%**로 오릅니다([Sequeda et al., 2023](https://arxiv.org/abs/2311.07509)).
 - **이 방식에는 세 갈래가 있습니다 — 비정형 데이터는 지식 그래프로, 정형 데이터는 시맨틱 레이어로, 그리고 "어떤 데이터가 어디 있나"는 카탈로그로.** 셋은 경쟁 기술이 아니라 데이터 형태별로 맥락을 공급하는 상보적 층위이며, 2025년 들어서는 [MCP](https://www.anthropic.com/news/model-context-protocol)가 에이전트와 이 세 층을 잇는 공통 규격으로 자리 잡고 있습니다.

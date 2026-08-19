@@ -21,12 +21,22 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - LICENSE
+  # Diagram sources and their render script are authoring inputs, not site
+  # assets. Without these they get copied into _site and served publicly.
+  - "**/*.excalidraw"
+  - assets/images/render-diagrams.sh
+  - script/
 
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
 email: aldente0630@gmail.com
 name: Jonas Kim
-description: |
+# jekyll-feed reads `author` (not `name`) for the Atom <author> element. Without
+# it every entry ships an empty <author><name></name></author>.
+author: Jonas Kim
+# `>-` (folded, chomped) not `|` — a literal block keeps the trailing newline,
+# which then leaks into meta content="" attributes and the feed <subtitle>.
+description: >-
   A tech blog focusing on AI/ML paper reviews and latest research trends
 baseurl: ''
 url: https://bits-bytes-nn.github.io
@@ -109,12 +119,16 @@ social:
 
 
 protocols:
-  fb_image: /assets/my_logo.png
-  fb_image_width: 612
-  fb_image_height: 605
-  fb_image_type: image/png
+  # Default social card image, used only when a page sets no `cover`. The old
+  # value was my_logo.png declared as 612x605 — the file is actually 192x192,
+  # below the 200x200 floor Facebook/LinkedIn need to render a card at all.
+  # my_header_image.jpg is the site cover and its declared size is real.
+  fb_image: /assets/my_header_image.jpg
+  fb_image_width: 1920
+  fb_image_height: 600
+  fb_image_type: image/jpeg
 
-  twitter_image: /assets/my_logo.png
+  twitter_image: /assets/my_header_image.jpg
 
   os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
   os_rcs_type: git

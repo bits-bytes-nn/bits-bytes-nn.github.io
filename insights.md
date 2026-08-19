@@ -2,6 +2,9 @@
 layout: page
 title: Insights
 permalink: /insights/
+description: >-
+  The threads a single paper can't hold — agentic-AI architecture, industry
+  shifts, and the design decisions underneath them.
 main_nav: true
 nav_order: 5
 ---
