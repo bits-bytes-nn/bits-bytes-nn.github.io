@@ -23,7 +23,13 @@ nav_order: 3
 
 {% for cat in topics %}
   {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
-  <h2 id="{{cat}}">{{ cat_display }}</h2>
+  {%- comment -%}
+    slugify, like every other category anchor on the site (post metadata links,
+    /categories/). This emitted the raw value — id="Language-Models" — so it was
+    the one page whose heading ids did not match the convention documented in
+    docs/tech-doc.md §3.
+  {%- endcomment -%}
+  <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">
   {% for post in review_posts %}
     {% if post.categories contains cat %}
