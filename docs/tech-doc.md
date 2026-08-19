@@ -52,7 +52,7 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
@@ -83,12 +83,12 @@ Pages가 그대로 서빙.**
 2. **마크다운 → HTML** — 본문을 kramdown이 HTML로 변환한다. 입력 방언은 GFM(GitHub
    Flavored Markdown)이다. 이 단계에서 Rouge가 코드 블록을 토큰별로 잘라 색을 입힌다.
 3. **Liquid로 틀에 끼우기** — `_layouts/default.html`이 모든 페이지의 바깥 틀이다(`<head>`
-   + 머리글 + 본문 자리 + 바닥글). 그 안의 본문 자리에 `post`/`page`/`archive` 레이아웃이
+   + 머리글 + 본문 자리 + 바닥글). 그 안의 본문 자리에 `post`/`page` 레이아웃이
    들어가 확장된다. 머리글·바닥글 같은 공통 조각은 `_includes/`에서 가져온다.
 
    ```
    default.html  (가장 바깥 틀: <html><head>…<body> 머리글 + {{ content }} + 바닥글)
-     └─ post.html / page.html / archive.html  (본문 영역을 채우는 레이아웃)
+     └─ post.html / page.html  (본문 영역을 채우는 레이아웃)
           └─ 실제 글 내용
    ```
 
@@ -216,7 +216,10 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
   > **용어 — 디바운스(debounce).** 사용자가 빠르게 연속으로 일으키는 이벤트(타이핑 등)에서,
   > 마지막 입력 뒤 잠깐 멈출 때까지 기다렸다가 **딱 한 번만** 함수를 실행하는 기법이다.
 - `category`/`tags`도 색인에 들어가므로 제목·본문뿐 아니라 메타데이터로도 검색된다.
-  `_config.yml`의 `simple_jekyll_search.exclude`가 About/Search/index 페이지를 결과에서 뺀다.
+  색인에는 **글(`site.posts`)만** 들어간다 — `search.json`이 `site.posts`를 순회하므로
+  About·Search·index 같은 페이지는 애초에 후보가 아니다. (`_config.yml`에 남아 있는
+  `simple_jekyll_search.exclude`는 아무것도 하지 않는다. `simple-jekyll-search`는
+  브라우저에서 도는 JS라 `_config.yml`을 읽을 수 없다.)
 
 ## 6. 스타일 (Sass)
 

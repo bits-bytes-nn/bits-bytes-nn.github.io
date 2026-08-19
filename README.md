@@ -79,6 +79,7 @@ _plugins/          reading_time.rb      (KO/EN-aware read time)
                    lazy_images.rb       (adds loading="lazy" to <img>)
                    post_description.rb  (fills page.description for posts)
                    related_posts.rb     (fills page.related for posts)
+                   scrollable_tables.rb (wraps wide tables so they scroll)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
@@ -202,9 +203,12 @@ Pushing to `main` triggers `.github/workflows/jekyll.yml`, which:
 1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
 2. builds the site with `JEKYLL_ENV=production`,
 3. runs **html-proofer** over `_site/` (internal links, images, anchors),
-4. runs **`script/validate-site.sh`** (sitemap/feed parse, one `h1` per page, no
-   heading-level skips, per-page description and canonical, no duplicate
-   descriptions or titles), and
+4. runs **`script/validate-site.sh`** — sitemap/feed parse at byte 0, every
+   sitemap URL under the configured `url`, a pinned build timezone, `robots.txt`
+   not blocking, at least one rendered page, exactly one `h1` per page, no
+   heading-level skips, a description and a canonical on every page, every
+   description longer than its own title, no duplicate description or title, and
+   no authoring sources published — and
 5. deploys to GitHub Pages.
 
 If the workflow fails, it's almost always step 3 or 4 — open the Actions log,
@@ -220,7 +224,8 @@ Check the file first — it is usually fine:
 
 ```bash
 curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # expect 200, application/xml
-curl -sS  https://bits-bytes-nn.github.io/sitemap.xml | xmllint --noout -
+curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
+  ruby -rrexml/document -e 'REXML::Document.new(File.read("/tmp/s.xml")); puts "well-formed"'
 curl -sS  https://bits-bytes-nn.github.io/robots.txt
 ```
 
