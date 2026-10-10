@@ -30,7 +30,14 @@
   Paginated listings all render index.html, so without a page-number suffix
   /page/2..7 ship byte-identical titles and descriptions.
 {%- endcomment -%}
+{%- comment -%}
+  Section and utility pages ("About", "Tags") carry the site name too; a bare
+  one-word title says nothing in a results list or a tab. Posts keep their own.
+{%- endcomment -%}
 {%- assign page_title = page.title | default: site.title -%}
+{%- if page.layout == 'page' -%}
+	{%- assign page_title = page_title | append: ' | ' | append: site.title -%}
+{%- endif -%}
 {%- if paginator and paginator.page > 1 -%}
 	{%- assign page_title = page_title | append: ' — Page ' | append: paginator.page -%}
 	{%- assign page_description = page_description | append: ' (Page ' | append: paginator.page | append: ' of ' | append: paginator.total_pages | append: ')' -%}
@@ -147,16 +154,13 @@
 	  "dateModified": "{{ page.date | date_to_xmlschema }}",
 	  "description": {{ page_description | jsonify }},
 	  "image": "{{ social_image }}",
-	  {%- comment -%}
-	    Always the blog's author. Front-matter `author` on paper posts names the
-	    paper's organisation, which did not write this post.
-	  {%- endcomment %}
 	  "author": { "@type": "Person", "name": {{ site.name | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
 	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
 	}
 	</script>
-	{% else %}
+	{% elsif page.url == '/' %}
+	{%- comment -%} Google reads WebSite (the site name) from the home page only. {%- endcomment %}
 	<script type="application/ld+json">
 	{
 	  "@context": "https://schema.org",
@@ -199,12 +203,18 @@
 	      textsc: ['\\mathrm{#1}', 1]
 	    }
 	  },
-      chtml: {
-        linebreaks: { automatic: true }
-      },
-      svg: {
-        linebreaks: { automatic: true }
-      }
+	  // MathJax 3 cannot line-break, so an inline formula wider than its paragraph
+	  // would widen the page. Those few scroll in place instead (`.is-wide` in
+	  // _sass/_layout.scss); display equations are handled there by CSS alone.
+	  startup: {
+	    pageReady: function () {
+	      return MathJax.startup.defaultPageReady().then(function () {
+	        document.querySelectorAll('.post-content mjx-container:not([display])').forEach(function (el) {
+	          if (el.getBoundingClientRect().width > el.parentElement.clientWidth) el.classList.add('is-wide');
+	        });
+	      });
+	    }
+	  }
 	};
 	</script>
 	<!-- Pinned to an exact version with an integrity hash, like every other

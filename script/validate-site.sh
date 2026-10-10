@@ -230,12 +230,14 @@ else
 fi
 
 # --- authoring sources must not ship ----------------------------------------
-leaked=$(find "$SITE" -type f \( -name '*.excalidraw' -o -name '*.sh' -o -name '*.rb' \) | sort)
+# A .md without front matter is copied as-is, so a stray authoring note would ship.
+leaked=$(find "$SITE" -type f \( -name '*.excalidraw' -o -name '*.drawio' -o -name '*.sh' \
+  -o -name '*.rb' -o -name '*.md' -o -name '*.map' \) | sort)
 if [ -n "$leaked" ]; then
   fail "authoring sources copied into the site:"
   printf '%s\n' "$leaked" | sed 's/^/          /' >&2
 else
-  pass "no diagram sources, scripts or tests in the published output"
+  pass "no diagram sources, scripts, tests, notes or source maps in the published output"
 fi
 
 echo

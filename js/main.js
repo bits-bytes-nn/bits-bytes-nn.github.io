@@ -89,13 +89,16 @@ document.addEventListener('DOMContentLoaded', function () {
       var open = menu.classList.toggle('show');
       menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    // Escape is the expected way out of an expanded disclosure.
-    menu.addEventListener('keydown', function (e) {
+    // Escape is the expected way out of an expanded disclosure, whether focus is
+    // in the menu or still on the button that opened it.
+    function closeOnEscape(e) {
       if (e.key !== 'Escape' || !menu.classList.contains('show')) return;
       menu.classList.remove('show');
       menuToggle.setAttribute('aria-expanded', 'false');
       menuToggle.focus();
-    });
+    }
+    menu.addEventListener('keydown', closeOnEscape);
+    menuToggle.addEventListener('keydown', closeOnEscape);
   }
 
   // Highlight the current page in the nav
@@ -144,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // it depends on measurement: only containers that actually overflow become tab
   // stops, so tables that fit add nothing to the tab order.
   // Re-measured on resize, since rotating a phone changes which ones overflow.
-  var scrollers = document.querySelectorAll('.post-content .table-container, .post-content pre.highlight');
+  var scrollers = document.querySelectorAll('.post-content .table-container, .post-content pre');
   function markScrollers() {
     scrollers.forEach(function (el) {
       var overflows = el.scrollWidth > el.clientWidth + 1;

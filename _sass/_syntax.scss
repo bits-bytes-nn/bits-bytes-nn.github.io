@@ -47,8 +47,10 @@
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cpf {
   color: #a1a08f;
 }
+// Rouge marks characters its lexer did not expect (a bare `$`, `>`) as errors.
+// Monokai's #960050 is 1.71:1 on the block; show them as plain text instead.
 .highlight .err {
-  color: #960050;
+  color: #f8f8f2;
 }
 .highlight .gr {
   color: #960050;
