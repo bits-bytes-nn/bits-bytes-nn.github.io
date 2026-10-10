@@ -86,13 +86,13 @@ assets/<slug>/     글마다 하나씩 두는 그림 폴더
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 test/              _plugins/ 로직의 minitest 단위 테스트
 script/            validate-site.sh (빌드 후 검색 노출 검사)
-sitemap-index.xml  사이트맵 인덱스 — Search Console에 제출할 URL
 .github/workflows/ CI: 테스트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
 ```
 
 **최상위 페이지:** `index.html`(홈), 네 개의 섹션 페이지인 `paper-reviews.md`·
 `paper-summaries.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
-`tags.html`·`search.md`·`about.md`.
+`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`feed.xml`·`robots.txt`는
+플러그인이 생성하며 원본 파일이 없습니다.
 
 ---
 
@@ -197,7 +197,8 @@ ruby test/run_all.rb                                        # 플러그인 로�
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # 빌드가 깨끗한가?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-enforce-https                      # 깨진 링크·이미지·앵커는 없나?
+  --allow-hash-href --no-enforce-https \
+  --ignore-urls "/^\/page\/\d+/"                            # 깨진 링크·이미지·앵커는 없나?
 script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
 ```
 
@@ -227,7 +228,7 @@ script/validate-site.sh /tmp/site-verify                    # 사이트맵·피�
 2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
 3. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
 4. **`script/validate-site.sh`**로 사이트맵·피드가 byte 0에서 파싱되는지, 사이트맵 URL이
-   설정된 `url` 아래인지, 빌드 타임존이 고정됐는지, `robots.txt`가 막지 않는지, 렌더된
+   설정된 `url` 아래인지, 빌드 타임존이 고정됐는지, `robots.txt`가 막지 않고 사이트맵을 가리키는지, 렌더된
    페이지가 1개 이상인지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든
    페이지에 설명문·canonical이 있는지, 설명문이 자기 제목보다 긴지, 설명문·제목이
    중복되지 않는지, 저작 원본이 배포되지 않았는지를 검사한 뒤
@@ -251,10 +252,20 @@ curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
 curl -sS  https://bits-bytes-nn.github.io/robots.txt
 ```
 
-세 개가 다 통과하면 원인은 사이트가 아니라 Search Console에 캐시된 판정입니다.
-Search Console은 사이트맵을 URL로 식별하고 처음 기록한 결과를 유지하므로, 같은 경로를
-다시 제출해도 굳은 항목을 재사용합니다. 그 항목을 삭제하고 **`sitemap-index.xml`** —
-한 번도 본 적 없는 URL — 을 제출한 뒤, URL 검사 → 색인 생성 요청으로 크롤링을 재촉하세요.
+세 개가 다 통과하면 원인은 사이트가 아니고, 파일을 고쳐서 해결되지 않습니다. "가져올 수
+없음"은 요청 실패가 아니라 Google이 아직 사이트맵을 가져가지 않았다는 표시이고, 언제
+가져갈지는 Google의 크롤링 일정이 정합니다. `*.github.io` 속성에서 흔하며 다른 URL로 다시
+제출해도 달라지지 않습니다.
+
+대신 이렇게 합니다.
+
+- `https://bits-bytes-nn.github.io/sitemap.xml` 하나만 제출하고 그대로 둡니다. 다른
+  사이트맵 항목은 삭제합니다.
+- 색인 여부는 사이트맵 행이 아니라 **색인 생성 → 페이지** 보고서와 몇몇 글의 **URL 검사**로
+  판단합니다. 모든 글이 홈·섹션 페이지·`/tags/`에서 링크되고 `robots.txt`가 사이트맵을
+  알리므로, 사이트맵이 처리되지 않아도 Google은 글을 찾을 수 있습니다.
+- 사이트맵을 가져가게 했다고 보고된 방법은 커스텀 도메인으로 옮겨 도메인 속성으로 인증하는
+  것뿐입니다. 모든 URL이 바뀌어 리디렉션이 필요하므로 별도로 결정할 일입니다.
 
 ---
 

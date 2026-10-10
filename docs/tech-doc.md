@@ -331,9 +331,12 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 - **CI(자동 배포)** — `.github/workflows/jekyll.yml`이 `main` 브랜치에 푸시될 때마다
   `JEKYLL_ENV=production`으로 빌드하고 `actions/deploy-pages`로 GitHub Pages에 올린다.
   빌드 직후 **html-proofer**가 내부 링크·이미지·앵커가 다 살아 있는지 검사하고, 하나라도
-  깨졌으면 **배포를 막는다**(외부 링크는 느리고 불안정해 건너뛴다). 그래서 푸시 전에 로컬에서
-  `bundle exec htmlproofer ./_site --disable-external`로 미리 확인하면 배포 실패를 예방할 수
-  있다.
+  깨졌으면 **배포를 막는다**(외부 링크는 느리고 불안정해 건너뛴다). 푸시 전에 README의
+  "Validate before pushing" 명령으로 같은 검사를 로컬에서 돌리면 배포 실패를 예방할 수 있다.
+
+  권한은 잡별로 나눈다. 워크플로 기본값은 `contents: read`이고, Pages 쓰기와 OIDC 토큰은
+  `deploy` 잡에만 준다. 동시 실행 그룹은 ref별이라 PR 실행이 대기 중인 배포를 밀어내지 않고,
+  같은 PR의 이전 실행은 새 커밋이 오면 취소된다.
 
   같은 워크플로가 **`main`으로 향하는 PR에서도** 돈다(`deploy` 잡과 아티팩트 업로드만
   `github.event_name != 'pull_request'`로 건너뛴다). 그래서 게이트가 머지를 **막는다.** PR
@@ -344,10 +347,13 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   > 돌려주는 파이프라인이다. 여기서는 GitHub Actions가 그 역할을 한다.
 
 - **사이트맵/피드** — `jekyll-sitemap`이 `/sitemap.xml`(검색엔진이 페이지 목록을 파악하는
-  지도)을, `jekyll-feed`가 `/feed.xml`(RSS 구독용)을 자동 생성한다. `robots.txt`가 크롤러를
-  사이트맵으로 안내하고, `head.html`이 `<link rel="alternate">`로 피드 위치를 알린다.
-  루트의 `sitemap-index.xml`은 `sitemap.xml`을 가리키는 사이트맵 인덱스로, Search Console에
-  제출하는 URL이다(굳은 제출 항목을 우회하는 용도 — README 참고).
+  지도)을, `jekyll-feed`가 `/feed.xml`(RSS 구독용)을 자동 생성한다. 원본에 `robots.txt`가
+  없으면 `jekyll-sitemap`이 `Sitemap:` 한 줄짜리 `robots.txt`를 만들어 크롤러를 사이트맵으로
+  안내한다. 손으로 만든 `robots.txt`를 두면 그 생성이 꺼진다. `head.html`은
+  `<link rel="alternate">`로 피드 위치를 알린다. 내용이 없는 `/search/`와 `404.html`은
+  `sitemap: false`로 사이트맵에서 뺀다.
+- **구조화 데이터** — 글의 JSON-LD `author`는 항상 블로그 저자(`site.name`)다. 논문 글의
+  프런트매터 `author`는 논문을 낸 기관이고, 화면의 "by …" 표기에만 쓰인다.
 - **검색 노출 검사** — `script/validate-site.sh`가 빌드된 사이트를 훑어 사이트맵·피드가
   파싱되는지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든 페이지에 설명문과
   canonical이 있는지, 설명문·제목이 중복되지 않는지 등을 확인한다. **검사 목록의 정본은
