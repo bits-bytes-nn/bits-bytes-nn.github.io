@@ -79,6 +79,13 @@ if [ -f "$SITE/sitemap.xml" ]; then
   else
     pass "sitemap.xml lists $n URLs"
   fi
+  spaced=$(printf '%s\n' "$locs" | grep -F '%20' || true)
+  if [ -n "$spaced" ]; then
+    fail "sitemap.xml has URLs with an escaped space (unslugified category?):"
+    printf '%s\n' "$spaced" | sed 's/^/          /' >&2
+  else
+    pass "no sitemap URL contains a space"
+  fi
   bad=$(printf '%s\n' "$locs" | grep -v "^$BASE_URL/" || true)
   if [ -n "$bad" ]; then
     fail "sitemap.xml has URLs outside $BASE_URL/:"
@@ -117,10 +124,32 @@ else
   fi
 fi
 
+# --- legacy-URL redirects ----------------------------------------------------
+# jekyll-redirect-from stubs at the old /paper%20reviews/… paths. Each must land
+# on a page this build actually contains, or the old link becomes a redirect
+# to a 404.
+redirects=$(grep -rl 'http-equiv="refresh"' "$SITE" --include='*.html' | sort)
+dangling=""
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  to=$(grep -m1 -oE 'http-equiv="refresh" content="0; url=[^"]+"' "$f" | sed -E 's/.*url=//; s/"$//')
+  rel=$(ruby -ruri -e 'print URI.decode_uri_component(URI(ARGV[0]).path.delete_prefix("/"))' "$to")
+  [ -f "$SITE/$rel" ] || dangling="$dangling$f -> $to"$'\n'
+done <<< "$redirects"
+if [ -n "$dangling" ]; then
+  fail "redirect stubs pointing at pages that do not exist:"
+  printf '%s' "$dangling" | sed 's/^/          /' >&2
+else
+  pass "$(printf '%s\n' "$redirects" | grep -c .) redirect stub(s), every target exists"
+fi
+
 # --- rendered pages ----------------------------------------------------------
 # Only Jekyll-rendered documents; the search-engine ownership-verification files
-# also end in .html but are plain text by design.
-pages=$(grep -rl '<!DOCTYPE html>' "$SITE" --include='*.html' | sort)
+# also end in .html but are plain text by design, and redirect stubs (above) are
+# not pages a reader stays on.
+# --null/-0 because output paths can contain spaces ("paper reviews/").
+pages=$(grep -rl --null '<!DOCTYPE html>' "$SITE" --include='*.html' |
+  xargs -0 grep -L 'http-equiv="refresh"' | sort)
 page_count=$(printf '%s\n' "$pages" | grep -c .)
 if [ "$page_count" -lt 1 ]; then
   fail "no rendered pages found in $SITE — the six per-page checks below would pass vacuously"

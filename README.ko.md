@@ -78,6 +78,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
                    scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
                    search_index.rb      (search.json용 plain_text 필터)
+                   legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -145,16 +146,21 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, `Data-Architecture` 등.
   필요하면 자유롭게 추가합니다.
 
-Jekyll은 이 둘과 날짜를 합쳐 출력 경로를 만듭니다.
+Jekyll은 이 둘을 슬러그로 바꾸고(`_config.yml`의 `permalink`) 날짜와 합쳐 출력 경로를
+만듭니다.
 
 ```
 categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
         ↓
-_site/paper reviews/language-models/2025/01/23/<slug>.html
+_site/paper-reviews/language-models/2025/01/23/<slug>.html
 ```
 
 그래서 **이미 게시된 글의 카테고리나 날짜를 바꾸면 URL이 바뀝니다.** 외부에서 걸린 링크와
 검색 결과가 깨지므로, 한 번 정하면 그대로 둡니다.
+
+예전 규칙으로 게시된 옛 URL(`/paper%20reviews/…`)은 계속 동작합니다.
+`_plugins/legacy_urls.rb`가 그 경로를 글의 `redirect_from`에 넣고, jekyll-redirect-from이 그
+자리에 새 URL로 보내는 페이지를 만듭니다.
 
 ### 태그: 세부 태그 위에 주제 태그를 하나
 

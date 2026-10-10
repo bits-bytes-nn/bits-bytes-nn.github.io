@@ -2,6 +2,7 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
   - jekyll-feed
+  - jekyll-redirect-from
 
 feed:
   excerpt_only: true
@@ -52,6 +53,12 @@ url: https://bits-bytes-nn.github.io
 # afternoon-dated posts onto the next day and 404 their live URLs. Pinned to UTC
 # because every published URL was built that way.
 timezone: UTC
+# Slugified, so "Paper Reviews" becomes paper-reviews/ rather than the
+# space-escaped paper%20reviews/ that plain `:categories` produces. Posts first
+# published under the old form redirect from it — see _plugins/legacy_urls.rb.
+permalink: /:slugified_categories/:year/:month/:day/:title:output_ext
+redirect_from:
+  json: false  # no consumer for the redirects.json index
 cover: /assets/my_header_image.jpg
 logo: /assets/my_logo.png
 
