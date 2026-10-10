@@ -39,16 +39,18 @@ module PostDescription
   # The ordered-list alternative is capped at two digits: `\d+[.)]\s` also matched
   # a Korean date opening ("2024. 5. 14. 공개된 …"), silently discarding the first
   # paragraph of any post written that way.
-  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:)/
+  # `{:` is a kramdown attribute list (`{: .notice}`), which styles the block
+  # next to it and is not text.
+  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:|\{:)/
 
   # A paragraph that is emphasised *end to end* is a note or caption on this blog
   # (the "*공개(Disclosure): ...*" preamble), not a summary of the post.
   #
-  # The inner class excludes `*` and `_` so this only fires when the delimiters
-  # really span the paragraph. Anchoring on the first and last character alone
-  # also swallowed ordinary prose that merely begins and ends with emphasis —
-  # "**핵심**은 데이터입니다. 그래서 **중요합니다**" is an idiomatic Korean opening.
-  WHOLLY_EMPHASISED = /\A(\*{1,2}|_{1,2})[^*_]+\1\z/m
+  # The inner text may not contain the opening delimiter, so this only fires when
+  # one emphasis really spans the paragraph — not on prose that merely begins and
+  # ends with emphasis ("**핵심**은 데이터입니다. 그래서 **중요합니다**"). Only the
+  # delimiter that opened is excluded, so a note naming `snake_case` still counts.
+  WHOLLY_EMPHASISED = /\A(?:(\*{1,2})[^*]+\1|(_{1,2})[^_]+\2)\z/m
 
   class << self
     def derive(markdown, limit = LIMIT)
@@ -86,8 +88,11 @@ module PostDescription
 
       markdown.each_line do |raw|
         line = raw.rstrip
+        # Block syntax is recognised indented too: a nested list item or a fence
+        # under a list item is still not prose.
+        lead = line.lstrip
 
-        if line.start_with?("```", "~~~")
+        if lead.start_with?("```", "~~~")
           in_fence = !in_fence
           next
         end
@@ -104,7 +109,7 @@ module PostDescription
         # accumulating, that prose is the answer — discarding it here would skip
         # past the first paragraph whenever a heading follows with no blank line
         # between them.
-        if line.match?(SKIP_LINE)
+        if lead.match?(SKIP_LINE)
           candidate = accept(paragraph)
           return candidate if candidate
           paragraph = []
@@ -117,12 +122,13 @@ module PostDescription
       accept(paragraph)
     end
 
-    # A paragraph qualifies unless it is empty or is entirely emphasised — on
-    # this blog that shape is the "*공개(Disclosure): ...*" preamble or a figure
-    # caption, never a summary of the post.
+    # A paragraph qualifies unless it is empty, is nothing but an image or
+    # math once markup is stripped, or is entirely emphasised — on this blog that
+    # shape is the "*공개(Disclosure): ...*" preamble or a figure caption, never a
+    # summary of the post.
     def accept(lines)
       candidate = lines.join(" ").strip
-      return nil if candidate.empty?
+      return nil if strip_inline(candidate).empty?
       return nil if candidate.match?(WHOLLY_EMPHASISED)
 
       candidate

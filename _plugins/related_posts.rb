@@ -19,8 +19,8 @@
 # better than a wrong suggestion.
 #
 # That strictness depends on tags that can meet. Per-paper contribution tags
-# rarely do, so every post also carries a controlled topic tag (the list is in
-# README) — a looser rule here is not the fix for a post with no suggestions.
+# rarely do, so each post should also carry a controlled topic tag (the list is
+# in README) — a looser rule here is not the fix for a post with no suggestions.
 #
 # Jekyll's built-in site.related_posts is either "the 10 most recent posts" or
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper

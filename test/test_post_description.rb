@@ -87,6 +87,36 @@ class TestDerive < Minitest::Test
     assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
   end
 
+  def test_skips_a_wholly_emphasised_note_that_names_an_identifier
+    md = "*설정값은 `max_tokens`와 snake_case 이름을 따릅니다.*\n\n본문 첫 단락입니다.\n"
+    assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
+  end
+
+  # Otherwise the derived description is empty and the post falls back to the
+  # site description, which every such post would then share.
+  def test_skips_a_paragraph_that_is_only_an_image_or_math
+    md = "![구조도](/assets/a.png)\n\n$$E = mc^2$$\n\n본문 첫 단락입니다.\n"
+    assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
+  end
+
+  def test_skips_indented_list_items_and_fences
+    md = <<~MD
+      1. 첫째
+         ```python
+         x = 1
+         ```
+        - 하위 항목입니다
+
+      본문 첫 단락입니다.
+    MD
+    assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
+  end
+
+  def test_skips_kramdown_attribute_lines
+    md = "{: .notice}\n본문 첫 단락입니다.\n"
+    assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
+  end
+
   def test_keeps_a_paragraph_with_inline_emphasis
     md = "맥락은 **중요합니다**. 그래서 이 글을 씁니다.\n"
     assert_equal "맥락은 중요합니다. 그래서 이 글을 씁니다.", PostDescription.derive(md)
