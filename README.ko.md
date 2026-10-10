@@ -81,8 +81,8 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
-assets/images/     토픽별로 재사용하는 공용 커버 이미지
-assets/<slug>/     글마다 하나씩 두는 그림 폴더
+assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(플랫)
+assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 test/              _plugins/ 로직의 minitest 단위 테스트
 script/            validate-site.sh (빌드 후 검색 노출 검사)
@@ -107,7 +107,7 @@ layout: post
 title: "<글 제목>"
 subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
 date: YYYY-MM-DD HH:MM:SS
-author: "<저자>"                   # 논문 저자(기관). Insights·의견 글이면 생략
+paper_author: "<저자>"             # 논문 저자(기관). Insights·의견 글이면 생략
 description: >-                    # 선택 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
 categories: ["<유형>", "<주제>"]
@@ -142,7 +142,8 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
   **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
   없어진 섹션으로 읽히기 때문입니다.
 - `categories[1]` — **주제**: `Language-Models`, `Multimodal-Learning`,
-  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 필요하면 자유롭게 추가합니다.
+  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, `Data-Architecture` 등.
+  필요하면 자유롭게 추가합니다.
 
 Jekyll은 이 둘과 날짜를 합쳐 출력 경로를 만듭니다.
 

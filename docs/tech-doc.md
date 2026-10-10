@@ -110,7 +110,8 @@ Pages가 그대로 서빙.**
   글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가지며, 글이 없는 유형은
   빈 상태 문구를 띄운다(아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
 - **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`,
-  `Retrieval-Augmented-Generation`, `Agentic-AI` 등. 세부 주제이며 필요하면 자유롭게 추가한다.
+  `Retrieval-Augmented-Generation`, `Agentic-AI`, `Data-Architecture` 등. 세부 주제이며
+  필요하면 자유롭게 추가한다.
 
 이 둘과 **날짜**가 합쳐져 출력 경로(=URL)가 된다:
 
@@ -151,7 +152,7 @@ _site/paper reviews/language-models/2025/01/23/<slug>.html
 
 > **함정 — 카테고리 "누수".** Liquid의 `site.categories`는 그 이름이 달린 글을 **유형
 > 구분 없이** 전부 모은다. 그래서 *모든* 카테고리를 순회하는 페이지를 만들면, 다른 유형의
-> 글이 같은 1단계 주제를 공유할 때 엉뚱하게 딸려 온다(예: `Agentic-AI` 태그가 붙은
+> 글이 같은 1단계 주제를 공유할 때 엉뚱하게 딸려 온다(예: 1단계 주제가 `Agentic-AI`인
 > `Insights` 글이 Paper Reviews 목록에 노출). 유형 페이지들은 이를 막으려고 **반드시
 > `site.categories['<유형>']`으로 먼저 거른 뒤** 주제별로 그룹화한다 — 절대 반대 순서로
 > 하지 않는다.
@@ -352,8 +353,10 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   안내한다. 손으로 만든 `robots.txt`를 두면 그 생성이 꺼진다. `head.html`은
   `<link rel="alternate">`로 피드 위치를 알린다. 내용이 없는 `/search/`와 `404.html`은
   `sitemap: false`로 사이트맵에서 뺀다.
-- **구조화 데이터** — 글의 JSON-LD `author`는 항상 블로그 저자(`site.name`)다. 논문 글의
-  프런트매터 `author`는 논문을 낸 기관이고, 화면의 "by …" 표기에만 쓰인다.
+- **저자 표기** — 글의 저자는 항상 블로그 저자다. JSON-LD `author`는 `site.name`, 피드의
+  `<author>`는 `site.author`를 쓴다. 논문을 낸 기관은 `author`가 아니라 `paper_author`에
+  적고 화면에 "Paper by …"로만 표시한다 — jekyll-feed가 글의 `author`를 피드 저자로 쓰기
+  때문이다.
 - **검색 노출 검사** — `script/validate-site.sh`가 빌드된 사이트를 훑어 사이트맵·피드가
   파싱되는지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든 페이지에 설명문과
   canonical이 있는지, 설명문·제목이 중복되지 않는지 등을 확인한다. **검사 목록의 정본은
@@ -390,8 +393,9 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 - **검색 색인이 조용히 망가짐** — `google*.html`/`naver*.html`을 `exclude`하면 소유권
   인증이 풀림. → `exclude`에 넣지 않는다. (§7)
 - **다이어그램 폰트가 손글씨체가 아닌 일반체로 나옴** — Resvg(다이어그램 PNG 변환기)는
-  Excalidraw의 woff2 `@font-face`를 못 읽는다. → `assets/images/render-diagrams.sh`처럼
-  전체 Excalifont `.ttf`를 `fontFiles`로 넘긴다. 또한 Excalifont에 없는 글자(`→`,`✓`,`✗`)는
+  Excalidraw의 woff2 `@font-face`를 못 읽는다. → `assets/images/render-diagrams.sh`가 SVG에서
+  `@font-face`를 지우고 `font-family`를 Excalifont로 바꾼 뒤 시스템 폰트로 렌더한다. 그래서
+  전체 Excalifont `.ttf`가 시스템에 설치돼 있어야 한다(설치 방법은 스크립트 머리 주석). 또한 Excalifont에 없는 글자(`→`,`✓`,`✗`)는
   라벨 전체를 기본 폰트로 fallback시키므로, 다이어그램 텍스트에서는 ASCII(`->` 등)로 바꾼다.
 
 ## 9. 알려진 이슈 / 백로그

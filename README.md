@@ -83,8 +83,8 @@ _plugins/          reading_time.rb      (KO/EN-aware read time)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
-assets/images/     Shared cover images, reused across posts by topic
-assets/<slug>/     Per-post figures, one folder per post
+assets/images/     Topic cover images, plus post figures and diagrams (flat)
+assets/<slug>/     Figures of some older posts; new posts use assets/images/
 search.json        Full-text search index (consumed by simple-jekyll-search)
 test/              minitest unit tests for the _plugins/ logic
 script/            validate-site.sh (post-build discoverability checks)
@@ -111,7 +111,7 @@ layout: post
 title: "<Post Title>"
 subtitle: "<one-line pitch>"       # optional — shown under the title in the header
 date: YYYY-MM-DD HH:MM:SS
-author: "<Author>"                 # the paper's org; omit for Insights/opinion posts
+paper_author: "<Author>"           # the paper's org; omit for Insights/opinion posts
 description: >-                    # optional — see below
   <search-snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
@@ -147,8 +147,8 @@ Categories are **two levels**:
   A type with no posts yet keeps its tab and renders an empty-state line: a
   missing tab reads as a section that was removed, not one still filling up.
 - `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
-  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, … (add new ones
-  freely).
+  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`,
+  `Data-Architecture`, … (add new ones freely).
 
 Jekyll combines the two with the date to build the output path:
 
