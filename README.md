@@ -118,7 +118,7 @@ categories: ["<Type>", "<Topic>"]
 tags: ["<Tag-1>", "<Tag-2>"]
 cover: /assets/images/<topic>.(jpg|png)
 use_math: true                     # ONLY if the post has equations (loads MathJax)
-lang: ko                           # optional — with translation_id below…
+lang: ko                           # required with translation_id (ko | en)…
 translation_id: <shared-slug>      # …links a Korean post to its -en twin
 ---
 ```

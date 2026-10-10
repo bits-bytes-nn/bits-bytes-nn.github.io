@@ -114,7 +114,7 @@ categories: ["<유형>", "<주제>"]
 tags: ["<태그-1>", "<태그-2>"]
 cover: /assets/images/<topic>.(jpg|png)
 use_math: true                     # 수식이 있을 때만 (MathJax를 불러옵니다)
-lang: ko                           # 선택 — 아래 translation_id와 함께 쓰면…
+lang: ko                           # translation_id를 쓰면 필수(ko | en)…
 translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다
 ---
 ```

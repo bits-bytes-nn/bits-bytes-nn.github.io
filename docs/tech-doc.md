@@ -368,9 +368,9 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   전체 콘텐츠가 바뀐다.
 - **소유권 인증 토큰 파일** — 루트의 `google*.html`, `naver*.html`은 Google Search
   Console / 네이버가 "이 사이트가 정말 네 것이냐"를 확인하는 인증 파일이다. 사이트 루트에서
-  **그대로 서빙돼야** 인증이 유지되고 사이트맵 크롤링이 된다. 그래서 `_config.yml`의
-  `exclude` 목록에 **넣으면 안 된다**. 다시 제외하면 검색 색인이 조용히 망가진다 — 증상은
-  "구글이 사이트맵을 못 읽음"이다.
+  **그대로 서빙돼야** 소유권 인증이 유지된다. 그래서 `_config.yml`의 `exclude` 목록에 **넣으면
+  안 된다**. 빼면 Search Console 속성의 소유권이 풀리지만, 크롤링·색인 자체와는 무관하다.
+  사이트맵에서는 `defaults`로 뺀다(`sitemap: false`).
 
 ## 8. 함정 모음 (디버깅 전에 읽을 것)
 
@@ -390,8 +390,8 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   돌려 리터럴로 나감. → `_sass/` 파셜에 작성. (§6)
 - **Sass 빌드 실패** — `jekyll-sass-converter` 3.x(dart-sass)가 벤더 Bourbon/Neat의 구식
   `/` 나눗셈에서 에러. → 2.x(libsass)로 고정돼 있음(`Gemfile` 건드리지 말 것). (§1)
-- **검색 색인이 조용히 망가짐** — `google*.html`/`naver*.html`을 `exclude`하면 소유권
-  인증이 풀림. → `exclude`에 넣지 않는다. (§7)
+- **Search Console 소유권 인증이 풀림** — `google*.html`/`naver*.html`을 `exclude`하면
+  생긴다. → `exclude`에 넣지 않는다. (§7)
 - **다이어그램 폰트가 손글씨체가 아닌 일반체로 나옴** — Resvg(다이어그램 PNG 변환기)는
   Excalidraw의 woff2 `@font-face`를 못 읽는다. → `assets/images/render-diagrams.sh`가 SVG에서
   `@font-face`를 지우고 `font-family`를 Excalifont로 바꾼 뒤 시스템 폰트로 렌더한다. 그래서
