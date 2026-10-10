@@ -5,9 +5,8 @@
 #
 # Three separate renderers need a post description: the meta/OG/Twitter/JSON-LD
 # block in _includes/head.html, the Atom <summary> that jekyll-feed builds, and
-# the excerpt card on the home page. Each of them used to fall back to Jekyll's
-# `page.excerpt`, which is the first block up to the excerpt separator — and on
-# this blog that block is almost never prose:
+# the excerpt card on the home page. Jekyll's `page.excerpt` is the first block
+# up to the excerpt separator — and on this blog that block is almost never prose:
 #
 #   * paper posts open with "### TL;DR" immediately followed by "#### <first
 #     question>", so all of them produced the *same* description; and
@@ -71,11 +70,10 @@ module PostDescription
       head = text[0, limit]
       cut = head.rindex(" ")
       # Back off to the last space only when that still keeps most of the budget.
-      # Not because Korean lacks spaces — it separates 어절 with them, and across
-      # all 35 posts this floor fires on 0 of 53 real truncations. It is a floor
-      # against degenerate input: text whose only space sits near the start would
-      # otherwise collapse to a stub ("짧게 " + 200 characters, cut at 100, returns
-      # "짧게…"). Cheap insurance, and the test below pins the degenerate case.
+      # Not because Korean lacks spaces — it separates 어절 with them, so real
+      # prose never hits this. It is a floor against degenerate input: text whose
+      # only space sits near the start would otherwise collapse to a stub
+      # ("짧게 " + 200 characters, cut at 100, returns "짧게…"). The test pins it.
       head = head[0, cut] if cut && cut > limit * MIN_BOUNDARY_FRACTION
       "#{head.sub(/[\s,.;:·—–-]+\z/, '')}…"
     end
@@ -173,13 +171,11 @@ end
 if defined?(Jekyll::Hooks)
   # Fill in `description` before anything renders, so head.html, jekyll-feed and
   # index.html all read the same value.
-  # `subtitle` is deliberately NOT consulted here. It was, and it reintroduced the
-  # very defect this module exists to remove: on paper posts the subtitle is the
-  # Korean rendering of the English title, so 14 posts shipped a description that
-  # merely restated their own title ("Qwen3 Technical Report" -> "Qwen3 기술
-  # 보고서", 12 characters). Each restatement is unique, so the duplicate-description
-  # gate could not see it. `description:` means description; `subtitle:` means
-  # subtitle. A post whose subtitle *is* the best description says so explicitly.
+  # `subtitle` is deliberately NOT consulted here. On paper posts the subtitle is
+  # the Korean rendering of the English title ("Qwen3 Technical Report" -> "Qwen3
+  # 기술 보고서"), so using it would restate the title — and each restatement is
+  # unique, so the duplicate-description gate could not catch it. A post whose
+  # subtitle *is* the best description says so with `description:`.
   Jekyll::Hooks.register :site, :pre_render do |site|
     site.posts.docs.each do |post|
       next if post.data["description"].to_s.strip != ""

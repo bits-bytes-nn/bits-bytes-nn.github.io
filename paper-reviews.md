@@ -9,7 +9,7 @@ main_nav: true
 nav_order: 3
 ---
 
-<p class="desc"><em>Deep teardowns of key AI/ML papers — LLMs, multimodal, fine-tuning, RAG — down to their design decisions and trade-offs, grouped by topic.</em></p>
+<p class="desc"><em>{{ page.description }}</em></p>
 
 {%- comment -%} Only "Paper Reviews" posts, grouped by their secondary topic — prevents other top-level categories (e.g. Insights) from leaking in via shared subcategories {%- endcomment -%}
 {% assign review_posts = site.categories['Paper Reviews'] %}
@@ -25,9 +25,7 @@ nav_order: 3
   {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
   {%- comment -%}
     slugify, like every other category anchor on the site (post metadata links,
-    /categories/). This emitted the raw value — id="Language-Models" — so it was
-    the one page whose heading ids did not match the convention documented in
-    docs/tech-doc.md §3.
+    /categories/) — the convention in docs/tech-doc.md §3.
   {%- endcomment -%}
   <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">

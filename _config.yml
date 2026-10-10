@@ -24,6 +24,7 @@ exclude:
   - "**/*.excalidraw"
   - assets/images/render-diagrams.sh
   - script/
+  - test/
 
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
@@ -40,10 +41,9 @@ baseurl: ''
 url: https://bits-bytes-nn.github.io
 # Post URLs embed :year/:month/:day, and front-matter dates carry no offset, so
 # without this Jekyll resolves them in the *build machine's* timezone. CI runs in
-# UTC while local machines here run in KST (+9), which pushed 19 afternoon-dated
-# posts onto the next day — meaning a deploy from a local machine would have
-# silently moved 19 live URLs and 404'd the originals. Pinned to UTC because that
-# is what every deploy so far used, so the published URLs do not move.
+# UTC while local machines here run in KST (+9), so a local build would move
+# afternoon-dated posts onto the next day and 404 their live URLs. Pinned to UTC
+# because every published URL was built that way.
 timezone: UTC
 cover: /assets/my_header_image.jpg
 logo: /assets/my_logo.png
@@ -62,11 +62,6 @@ kramdown:
 
 paginate: 5
 paginate_path: /page/:num/
-
-# NOTE: no `simple_jekyll_search:` block. simple-jekyll-search is a client-side
-# script that reads search.json and knows nothing about Jekyll config, so the
-# `exclude:` list that used to sit here excluded nothing. search.json is built
-# from `site.posts` only, which already leaves out the pages it named.
 
 ga_tracking_id: G-MRH9Z5ETSQ
 
@@ -133,7 +128,3 @@ protocols:
   fb_image_type: image/jpeg
 
   twitter_image: /assets/my_header_image.jpg
-
-  os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
-  os_rcs_type: git
-  os_src: git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git

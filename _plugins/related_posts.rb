@@ -9,21 +9,18 @@
 # Both answers obey the same two eligibility rules (`eligible?`), which is why
 # they live together: never point a reader at this post's own translation, and
 # never cross languages. Jekyll's built-in `page.previous`/`page.next` know
-# neither rule, and all three translation pairs on this site share a date — so
-# the newest Korean post's "← Previous" was its own English version.
+# neither rule, and a translation pair shares a date — so a Korean post's
+# "← Previous" would be its own English version.
 #
 # A shared topic tag is required. Sharing only a category is not a reading
-# recommendation: "Paper Reviews / Language-Models" holds 17 posts, so category
-# overlap alone would put LLaMA and Llama 2 under DeepSeek-V3 with nothing
-# actually in common. Categories only break ties between posts that already share
-# a tag, and an empty block is better than a wrong suggestion.
+# recommendation: a broad subcategory like "Paper Reviews / Language-Models"
+# would put LLaMA under DeepSeek-V3 with nothing actually in common. Categories
+# only break ties between posts that already share a tag, and an empty block is
+# better than a wrong suggestion.
 #
-# That strictness only pays off if the tags can actually meet. They could not at
-# first: 220 of 264 tags were per-paper contribution phrases used by exactly one
-# post, and three near-synonyms (Agentic-Architecture / Agentic-Patterns /
-# Agentic-Infrastructure) split the one cluster the feature was built for — so 11
-# posts got nothing. The fix was a controlled topic layer in the posts' front
-# matter, not a looser rule here. All 35 posts now get suggestions.
+# That strictness depends on tags that can meet. Per-paper contribution tags
+# rarely do, so every post also carries a controlled topic tag (the list is in
+# README) — a looser rule here is not the fix for a post with no suggestions.
 #
 # Jekyll's built-in site.related_posts is either "the 10 most recent posts" or
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper

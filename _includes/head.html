@@ -1,8 +1,6 @@
 {%- comment -%}
   Single source of truth for the description / social image / locale used by the
-  meta, OpenGraph, Twitter and JSON-LD blocks below. Each of those four used to
-  inline its own `page.excerpt` expression, so they drifted and all four
-  inherited the same defect.
+  meta, OpenGraph, Twitter and JSON-LD blocks below, so the four cannot drift.
 
   `page.description` is authoritative: posts that don't declare one get it filled
   in by _plugins/post_description.rb, which also makes jekyll-feed emit the same
@@ -44,7 +42,6 @@
 {%- endif -%}
 <head>
 	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<!-- Light is the default; dark is opt-in via the toggle, not the OS setting.
 	     The matching `color-scheme` lives in _sass/_dark.scss, keyed off
@@ -76,35 +73,21 @@
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<!-- Only weights actually used (400 body, 500/600/700 headings/labels); the
-	     unused 300 (light) was dropped to trim the font payload. -->
+	<!-- Only the weights actually used: 400 body, 500/600/700 headings/labels. -->
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
 
 	<!-- External libraries -->
-	<!-- v4-shims.min.css was dropped: all icon markup now uses Font Awesome 6
-	     names directly, so the compatibility layer had nothing left to alias. -->
+	<!-- Font Awesome 6 names only, so the v4-shims stylesheet is not needed. -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 		integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-	<!-- Favicon and other icons -->
-	<link rel="shortcut icon" href="{{ '/assets/icons/favicon.ico' | prepend: site.baseurl }}" type="image/x-icon">
-	<link rel="icon" href="{{ '/assets/icons/favicon.ico' | prepend: site.baseurl }}" type="image/x-icon">
-	<link rel="apple-touch-icon" sizes="57x57" href="{{ '/assets/icons/apple-icon-57x57.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="60x60" href="{{ '/assets/icons/apple-icon-60x60.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="72x72" href="{{ '/assets/icons/apple-icon-72x72.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="76x76" href="{{ '/assets/icons/apple-icon-76x76.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="114x114" href="{{ '/assets/icons/apple-icon-114x114.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="120x120" href="{{ '/assets/icons/apple-icon-120x120.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="144x144" href="{{ '/assets/icons/apple-icon-144x144.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="152x152" href="{{ '/assets/icons/apple-icon-152x152.png' | prepend: site.baseurl }}">
-	<link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/icons/apple-icon-180x180.png' | prepend: site.baseurl }}">
-	<link rel="icon" type="image/png" sizes="192x192" href="{{ '/assets/icons/android-icon-192x192.png' | prepend: site.baseurl }}">
+	<!-- Icons: the .ico and a 32px PNG for tabs, the 180px touch icon iOS asks
+	     for, and the manifest for Android. Browsers scale these for every other
+	     size, so the older per-device sizes are not listed. -->
+	<link rel="icon" href="{{ '/assets/icons/favicon.ico' | prepend: site.baseurl }}" sizes="16x16">
 	<link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/icons/favicon-32x32.png' | prepend: site.baseurl }}">
-	<link rel="icon" type="image/png" sizes="96x96" href="{{ '/assets/icons/favicon-96x96.png' | prepend: site.baseurl }}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{{ '/assets/icons/favicon-16x16.png' | prepend: site.baseurl }}">
+	<link rel="apple-touch-icon" href="{{ '/assets/icons/apple-icon-180x180.png' | prepend: site.baseurl }}">
 	<link rel="manifest" href="{{ '/assets/icons/manifest.json' | prepend: site.baseurl }}">
-	<meta name="msapplication-TileColor" content="#ffffff" />
-	<meta name="msapplication-TileImage" content="{{ '/assets/icons/ms-icon-144x144.png' | prepend: site.baseurl }}">
 
 	<!-- Facebook OGP cards -->
 	{% if site.protocols.fb_image %}
@@ -122,7 +105,6 @@
 	{% endunless %}
 	{% if page.layout == 'post' %}
 	<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
-	{% if page.author %}<meta property="article:author" content="{{ page.author }}" />{% endif %}
 	{% for cat in page.categories %}<meta property="article:section" content="{{ cat }}" />
 	{% endfor %}{% for tag in page.tags %}<meta property="article:tag" content="{{ tag | replace: '-', ' ' }}" />
 	{% endfor %}{% endif %}
@@ -141,16 +123,9 @@
 	<meta name="twitter:url" content="{{ page_full_url }}" />
 	{% endif %}
 
-	<!-- Open Source Protocol -->
-	{% if site.protocols.os_repo and site.protocols.os_rcs_type and site.protocols.os_src %}
-	<link rel="profile" href="https://osprotocol.com" />
-	<meta property="os:repo" content="{{ site.protocols.os_repo }}" />
-	<meta property="os:rcs_type" content="{{ site.protocols.os_rcs_type }}" />
-	<meta property="os:src" content="{{ site.protocols.os_src }}" />
-	{% endif %}
-
 	<!-- Site styles -->
 	<link rel="stylesheet" href="{{ '/css/main.css' | prepend: site.baseurl }}">
+	{% if page.stylesheet %}<link rel="stylesheet" href="{{ page.stylesheet | prepend: site.baseurl }}">{% endif %}
 	<link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}" />
 	<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
@@ -172,7 +147,11 @@
 	  "dateModified": "{{ page.date | date_to_xmlschema }}",
 	  "description": {{ page_description | jsonify }},
 	  "image": "{{ social_image }}",
-	  "author": { "@type": "{% if page.author %}Organization{% else %}Person{% endif %}", "name": {% if page.author %}{{ page.author | jsonify }}{% else %}{{ site.name | jsonify }}{% endif %} },
+	  {%- comment -%}
+	    Always the blog's author. Front-matter `author` on paper posts names the
+	    paper's organisation, which did not write this post.
+	  {%- endcomment %}
+	  "author": { "@type": "Person", "name": {{ site.name | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
 	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
 	}
@@ -229,9 +208,8 @@
 	};
 	</script>
 	<!-- Pinned to an exact version with an integrity hash, like every other
-	     external asset here. `mathjax@3` is a floating jsdelivr alias (it resolves
-	     to 3.2.2 today), so it could not carry an SRI hash and the bytes running
-	     on 30 pages could change without a commit. -->
+	     external asset here. A floating alias such as `mathjax@3` cannot carry an
+	     SRI hash, so the bytes it serves could change without a commit. -->
 	<script id="MathJax-script" async
 		src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"
 		integrity="sha384-AHAnt9ZhGeHIrydA1Kp1L7FN+2UosbF7RQg6C+9Is/a7kDpQ1684C2iH2VWil6r4"
@@ -249,5 +227,4 @@
 	</script>
 	{% endif %}
 
-	{{ page.head_extra }}
 </head>

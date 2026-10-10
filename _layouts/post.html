@@ -96,10 +96,9 @@ layout: default
           {% assign share_link = social.share_url %}
           {% if social.share_params %}
             {%- comment -%}
-              No space before the `&`. There used to be one, and `remove_first: '&'`
-              stripped only the ampersand — so every share URL shipped as
-              "share? text=Title &url=…", with the stray space landing inside the
-              text parameter too.
+              No space before the `&`: `remove_first: '&'` strips only the
+              ampersand, so a space would land inside the share URL as
+              "share? text=Title &url=…".
             {%- endcomment -%}
             {% capture params %}{% for p in social.share_params %}&{{ p.key }}={{ p.value | replace: 'URL', full_url | replace: 'TITLE', page.title | replace: 'USERNAME', social.username | cgi_escape }}{% endfor %}{% endcapture %}
             {% assign share_link = share_link | append: '?' | append: params | remove_first: '&' %}
@@ -110,7 +109,7 @@ layout: default
             announces as bare "link" and voice control has nothing to say. The
             footer social links already do this with a visible username span.
           {%- endcomment -%}
-          <a href="{{ share_link }}" class="social-link js-share-popup"
+          <a href="{{ share_link }}" class="social-link" target="_blank" rel="noopener"
              aria-label="Share on {{ social.name }}">
             <i class="fa-brands fa-{{ social.icon }} fa-lg" aria-hidden="true"></i>
           </a>

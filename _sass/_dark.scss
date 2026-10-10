@@ -195,11 +195,9 @@
 // Opt-in only: dark applies solely when the visitor toggles it on.
 // `color-scheme` is what tells the browser to render its OWN widgets — the
 // scrollbar, the search field's clear button, form controls — for a dark page.
-// It used to be a single unconditional `<meta name="color-scheme"
-// content="light">` in head.html, so those stayed light-rendered against
-// #0d1117. Declared here instead of in the meta tag because only this file knows
-// which theme is active, and the inline bootstrap in head.html sets data-theme
-// before first paint, so there is no flash.
+// Declared here, not as a meta tag, because a meta tag cannot follow the toggle;
+// the inline bootstrap in head.html sets data-theme before first paint, so there
+// is no flash.
 html { color-scheme: light; }
 
 html[data-theme="dark"] {

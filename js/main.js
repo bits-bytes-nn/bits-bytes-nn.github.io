@@ -1,6 +1,7 @@
-// Site behaviors: theme toggle, code-copy, mobile menu, nav highlight, smooth
-// scroll, sticky-nav class, share popups, image zoom (GLightbox), and the post
-// table of contents. Vanilla JS, no jQuery.
+// Site behaviors: theme toggle, code-copy, mobile menu, nav highlight,
+// sticky-nav class, image zoom (GLightbox), and the post table of contents.
+// Vanilla JS, no jQuery. In-page anchor scrolling is CSS (`scroll-margin-top` and
+// `scroll-behavior` in _sass/_layout.scss), not script.
 document.addEventListener('DOMContentLoaded', function () {
   // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
   // The OS setting is intentionally NOT followed.
@@ -107,33 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Smooth scroll for in-page anchors, offset for the fixed header.
-  //
-  // preventDefault() cancels the native fragment navigation, so focus and the URL
-  // hash have to be moved by hand — otherwise a reader who clicks a
-  // table-of-contents entry keeps focus on the link, Tab continues from the TOC
-  // rather than the section, and a screen reader announces nothing at all.
-  //
-  // 'smooth' is passed explicitly, which overrides the `scroll-behavior: auto
-  // !important` in the reduced-motion block in _sass/_layout.scss, so that
-  // preference is checked here too.
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      var id = a.getAttribute('href');
-      if (id.length < 2) return;
-      var target = document.querySelector(id);
-      if (!target) return;
-      e.preventDefault();
-      var top = target.getBoundingClientRect().top + window.pageYOffset - 80;
-      window.scrollTo({ top: top, behavior: reduceMotion && reduceMotion.matches ? 'auto' : 'smooth' });
-      // -1 so headings stay out of the tab order but can still receive focus.
-      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-      target.focus({ preventScroll: true });
-      if (history.replaceState) history.replaceState(null, '', id);
-    });
-  });
-
   // Add a class to the nav once the page is scrolled
   var nav = document.querySelector('.navigation');
   if (nav) {
@@ -141,14 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
       nav.classList.toggle('scrolled', window.pageYOffset > 50);
     }, { passive: true });
   }
-
-  // Share links open in a small popup window
-  document.querySelectorAll('.js-share-popup').forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      e.preventDefault();
-      window.open(a.getAttribute('href'), 'Share', 'noopener');
-    });
-  });
 
   // Wrap plain Markdown images in a .glightbox anchor so they're zoomable too
   // (hand-written <a class="glightbox"> images are already covered).
@@ -162,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function () {
     a.className = 'glightbox';
     a.setAttribute('data-gallery', 'post-images');
     // data-title, not data-glightbox: GLightbox parses the latter by splitting on
-    // ';' then ':', so alts like "TL;DR Best of N" or "Chain-of-Thought: …" —
-    // 10 of them on this site — produced a mangled caption.
+    // ';' then ':', so alts like "TL;DR Best of N" or "Chain-of-Thought: …"
+    // produced a mangled caption.
     if (img.alt) a.setAttribute('data-title', img.alt);
     img.parentNode.insertBefore(a, img);
     a.appendChild(img);
@@ -176,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // focusable — Safari and Firefox have no equivalent of Chrome's keyboard-
   // focusable scrollers. This is done here rather than in the templates because
   // it depends on measurement: only containers that actually overflow become tab
-  // stops, so the 200-odd tables that fit add nothing to the tab order.
+  // stops, so tables that fit add nothing to the tab order.
   // Re-measured on resize, since rotating a phone changes which ones overflow.
   var scrollers = document.querySelectorAll('.post-content .table-container, .post-content pre.highlight');
   function markScrollers() {
@@ -212,8 +178,13 @@ document.addEventListener('DOMContentLoaded', function () {
       heads.forEach(function (h, i) {
         var li = document.createElement('li');
         var a = document.createElement('a');
+        var num = document.createElement('span');
         a.href = '#' + h.id;
-        a.innerHTML = '<span class="toc-num">' + (i + 1) + '</span>' + h.textContent;
+        num.className = 'toc-num';
+        num.textContent = i + 1;
+        // Text node, not innerHTML: a heading that names a tag ("<think> 토큰")
+        // would otherwise be parsed as markup.
+        a.append(num, h.textContent);
         li.appendChild(a);
         ul.appendChild(li);
       });
