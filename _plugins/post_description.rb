@@ -148,7 +148,11 @@ module PostDescription
       out.gsub!(%r{<br\s*/?>}i, " ")
       out.gsub!(/<[^>]+>/, "")                   # inline HTML
       out.gsub!(/(\*\*|__)(.*?)\1/m, '\2')       # bold
-      out.gsub!(/(\*|_)(?=\S)(.*?)(?<=\S)\1/m, '\2') # italic
+      out.gsub!(/\*(?=\S)(.*?)(?<=\S)\*/m, '\1')    # italic
+      # `_` only at word edges, as in Markdown itself, so identifiers like
+      # max_new_tokens keep their underscores. `*` needs no such guard, and must
+      # not have one: Korean attaches particles directly ("*강조*된").
+      out.gsub!(/(?<![[:alnum:]])_(?=\S)(.*?)(?<=\S)_(?![[:alnum:]])/m, '\1')
       out.gsub!(/~~(.*?)~~/m, '\1')              # strikethrough
       out.gsub(/\s+/, " ").strip
     end

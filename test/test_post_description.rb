@@ -117,6 +117,17 @@ class TestDerive < Minitest::Test
     assert_equal "본문 첫 단락입니다.", PostDescription.derive(md)
   end
 
+  # Begins and ends with emphasis, but no one emphasis spans it: this is prose.
+  def test_keeps_a_paragraph_that_only_begins_and_ends_with_emphasis
+    md = "**핵심**은 데이터입니다. 그래서 **중요합니다**\n"
+    assert_equal "핵심은 데이터입니다. 그래서 중요합니다", PostDescription.derive(md)
+  end
+
+  def test_keeps_underscores_inside_identifiers
+    md = "설정은 `max_new_tokens`와 `top_p`를 씁니다. _강조_ 표현도 있습니다.\n"
+    assert_equal "설정은 max_new_tokens와 top_p를 씁니다. 강조 표현도 있습니다.", PostDescription.derive(md)
+  end
+
   def test_keeps_a_paragraph_with_inline_emphasis
     md = "맥락은 **중요합니다**. 그래서 이 글을 씁니다.\n"
     assert_equal "맥락은 중요합니다. 그래서 이 글을 씁니다.", PostDescription.derive(md)
