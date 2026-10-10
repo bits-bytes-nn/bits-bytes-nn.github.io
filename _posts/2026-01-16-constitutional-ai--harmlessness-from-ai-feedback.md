@@ -3,7 +3,7 @@ layout: post
 title: "Constitutional AI: Harmlessness from AI Feedback"
 subtitle: "Constitutional AI: AI 피드백을 통한 무해성 구현"
 date: 2022-12-15 06:19:23
-author: "Anthropic"
+paper_author: "Anthropic"
 categories: ["Paper Reviews", "Finetuning"]
 tags: ["Constitutional-AI", "Reinforcement-Learning-from-AI-Feedback", "Self-Critique-and-Revision-Pipeline", "Chain-of-Thought-Reasoning-for-AI-Evaluation", "AI-Generated-Preference-Labels", "Scaling-Supervision", "Non-Evasive-Harmlessness-Training", "Model-Based-Feedback-Generation", "Constitutional-Principles-for-Behavior-Steering", "Preference-Model-Training-with-AI-Feedback", "Alignment"]
 cover: /assets/images/finetuning.jpg

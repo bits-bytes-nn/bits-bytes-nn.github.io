@@ -3,7 +3,7 @@ layout: post
 title: "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model"
 subtitle: "DeepSeek-V2: 강력하고 경제적이며 효율적인 Mixture-of-Experts 언어 모델"
 date: 2024-05-07 15:56:43
-author: "DeepSeek AI"
+paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Multi-Head-Latent-Attention", "DeepSeekMoE", "Low-Rank-Key-Value-Joint-Compression", "Decoupled-Rotary-Position-Embedding", "Device-Limited-Routing", "Auxiliary-Loss-for-Load-Balance", "Token-Dropping-Strategy", "Sparse-Mixture-of-Experts", "Expert-Parallelism", "Efficient-Long-Context-Attention-Mechanism", "Mixture-of-Experts", "DeepSeek"]
 cover: /assets/images/language-models.jpg

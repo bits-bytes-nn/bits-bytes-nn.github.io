@@ -3,7 +3,7 @@ layout: post
 title: "Qwen3 Technical Report"
 subtitle: "Qwen3 기술 보고서"
 date: 2025-05-14 13:41:34
-author: "Alibaba Group"
+paper_author: "Alibaba Group"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Thinking-Budget-Mechanism", "Strong-to-Weak-Distillation", "Dynamic-Mode-Switching", "Mixture-of-Experts-Architecture", "Fine-Grained-Expert-Segmentation", "Global-Batch-Load-Balancing-Loss", "Long-Chain-of-Thought-Cold-Start", "Reasoning-Reinforcement-Learning", "Thinking-Mode-Fusion", "Multi-Stage-Post-Training-Recipe", "Mixture-of-Experts", "Reasoning-Models"]
 cover: /assets/images/language-models.jpg
