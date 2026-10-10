@@ -105,7 +105,6 @@
 
   // Tags listing page
   .tag-title { color: $fg; border-bottom-color: rgba($link, 0.3); }
-  .tag-description { color: $fg-muted; }
   .tag-section .post-item { border-bottom-color: $border; }
   .tag-section .post-link { color: $link; &:hover { color: lighten($link, 8%); } }
   .tag-section .post-date { color: $fg-muted; }

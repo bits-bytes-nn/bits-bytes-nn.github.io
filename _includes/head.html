@@ -30,17 +30,19 @@
   Paginated listings all render index.html, so without a page-number suffix
   /page/2..7 ship byte-identical titles and descriptions.
 {%- endcomment -%}
-{%- comment -%}
-  Section and utility pages ("About", "Tags") carry the site name too; a bare
-  one-word title says nothing in a results list or a tab. Posts keep their own.
-{%- endcomment -%}
 {%- assign page_title = page.title | default: site.title -%}
-{%- if page.layout == 'page' -%}
-	{%- assign page_title = page_title | append: ' | ' | append: site.title -%}
-{%- endif -%}
 {%- if paginator and paginator.page > 1 -%}
 	{%- assign page_title = page_title | append: ' — Page ' | append: paginator.page -%}
 	{%- assign page_description = page_description | append: ' (Page ' | append: paginator.page | append: ' of ' | append: paginator.total_pages | append: ')' -%}
+{%- endif -%}
+{%- comment -%}
+  Section and utility pages ("About", "Tags") carry the site name in <title>; a
+  bare one-word title says nothing in a results list or a tab. Only there: the
+  social cards already name the site in og:site_name.
+{%- endcomment -%}
+{%- assign html_title = page_title -%}
+{%- if page.layout == 'page' -%}
+	{%- assign html_title = page_title | append: ' | ' | append: site.title -%}
 {%- endif -%}
 {%- if page.url -%}
 	{%- assign page_full_url = page.url | prepend: site.baseurl | prepend: site.url -%}
@@ -70,7 +72,7 @@
 		})();
 	</script>
 
-	<title>{{ page_title }}</title>
+	<title>{{ html_title }}</title>
 	<meta name="description" content="{{ page_description | escape }}" />
 	{% if site.name %}
 	<meta name="author" content="{{ site.name }}" />
@@ -134,7 +136,7 @@
 	<link rel="stylesheet" href="{{ '/css/main.css' | prepend: site.baseurl }}">
 	{% if page.stylesheet %}<link rel="stylesheet" href="{{ page.stylesheet | prepend: site.baseurl }}">{% endif %}
 	<link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}" />
-	<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
+	<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
 	<!-- Structured data (schema.org JSON-LD) for rich search results -->
 	{% if page.layout == 'post' %}
@@ -210,7 +212,10 @@
 	    pageReady: function () {
 	      return MathJax.startup.defaultPageReady().then(function () {
 	        document.querySelectorAll('.post-content mjx-container:not([display])').forEach(function (el) {
-	          if (el.getBoundingClientRect().width > el.parentElement.clientWidth) el.classList.add('is-wide');
+	          // The enclosing block, not the parent: inside <strong> or <a> the
+	          // parent is inline and its clientWidth is 0.
+	          var block = el.closest('p, li, td, th, dd, blockquote') || el.parentElement;
+	          if (el.getBoundingClientRect().width > block.clientWidth) el.classList.add('is-wide');
 	        });
 	      });
 	    }

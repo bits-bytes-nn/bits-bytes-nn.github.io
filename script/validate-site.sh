@@ -88,6 +88,22 @@ if [ -f "$SITE/sitemap.xml" ]; then
   fi
 fi
 
+# --- feed authorship ---------------------------------------------------------
+# jekyll-feed takes each entry's <author> from the post's `author`, falling back
+# to the site's. Paper posts name the paper's organisation in `paper_author`; one
+# that says `author:` instead credits that organisation with this blog's post.
+SITE_AUTHOR=$(sed -nE 's/^author:[[:space:]]*"?([^"]*[^"[:space:]])"?[[:space:]]*$/\1/p' "$CONFIG" | head -1)
+if [ -f "$SITE/feed.xml" ]; then
+  others=$(grep -oE '<author><name>[^<]*' "$SITE/feed.xml" | sed 's/<author><name>//' |
+    grep -vxF "$SITE_AUTHOR" | sort -u || true)
+  if [ -n "$others" ]; then
+    fail "feed.xml credits someone other than '$SITE_AUTHOR' (a post set author: instead of paper_author:?):"
+    printf '%s\n' "$others" | sed 's/^/          /' >&2
+  else
+    pass "every feed entry is credited to $SITE_AUTHOR"
+  fi
+fi
+
 # --- reproducible post URLs --------------------------------------------------
 # Post permalinks embed :year/:month/:day and front-matter dates carry no offset,
 # so an unset `timezone` resolves them in the build machine's timezone: a build

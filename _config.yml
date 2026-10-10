@@ -8,9 +8,8 @@ feed:
   posts_limit: 20
 
 # NOTE: the Google/Naver site-verification HTML files are intentionally NOT
-# excluded — they must be served at the site root for Search Console / Naver
-# to verify ownership and crawl sitemap.xml + feed.xml. Excluding them silently
-# breaks search indexing.
+# excluded — they must be served at the site root, or Search Console / Naver
+# lose ownership verification of the property.
 exclude:
   - /vendor/
   - README.md

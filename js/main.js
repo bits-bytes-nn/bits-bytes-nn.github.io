@@ -164,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   if (scrollers.length) {
     markScrollers();
+    // Lazy images and MathJax can widen a table after DOMContentLoaded.
+    window.addEventListener('load', markScrollers);
     var resizeTimer;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
