@@ -47,6 +47,13 @@
   .page-divider .one { background: $link; box-shadow: 0 0 8px rgba($link, 0.5); }
   .page-divider .two { background: $bg; }
 
+  // $action-color is 2.75:1 on $bg.
+  .navigation .navigation-menu-button { color: $link; }
+
+  // The footer keeps its blue band in dark mode, and the generic dark `a` color
+  // above would otherwise win over its white links.
+  .site-footer a { color: #fff; }
+
   .navigation {
     background: rgba($bg, 0.95);
     box-shadow: 0 2px 4px rgba(#000, 0.4);
@@ -98,7 +105,6 @@
 
   // Tags listing page
   .tag-title { color: $fg; border-bottom-color: rgba($link, 0.3); }
-  .tag-description { color: $fg-muted; }
   .tag-section .post-item { border-bottom-color: $border; }
   .tag-section .post-link { color: $link; &:hover { color: lighten($link, 8%); } }
   .tag-section .post-date { color: $fg-muted; }
@@ -142,7 +148,7 @@
   // .result-tags was missing here, so it kept search.css's #767676 — a value
   // chosen to clear 4.5:1 on white, which lands at 4.2:1 on #0d1117 and fails AA
   // for text this size.
-  .search-status, .post-category, .result-tags { color: $fg-muted; }
+  .search-status, .post-category, .result-tags, .search-result .post-date { color: $fg-muted; }
   .result-snippet, .search-result p { color: $fg; }
   // #fff on #b8860b is 3.25:1, and bold 0.9em is not large text. Dark text on the
   // same fill is 7.9:1.
@@ -172,7 +178,6 @@
   button:focus-visible,
   input:focus-visible,
   [tabindex]:focus-visible { outline-color: $link; }
-  .code-copy:focus-visible { outline-color: $link; }
 
   // $medium-gray (#767676) is 4.17:1 here and 3.81:1 on $surface. The dark rules
   // above only repaint it inside `.page-content .post`, so these five — two of
@@ -195,11 +200,9 @@
 // Opt-in only: dark applies solely when the visitor toggles it on.
 // `color-scheme` is what tells the browser to render its OWN widgets — the
 // scrollbar, the search field's clear button, form controls — for a dark page.
-// It used to be a single unconditional `<meta name="color-scheme"
-// content="light">` in head.html, so those stayed light-rendered against
-// #0d1117. Declared here instead of in the meta tag because only this file knows
-// which theme is active, and the inline bootstrap in head.html sets data-theme
-// before first paint, so there is no flash.
+// Declared here, not as a meta tag, because a meta tag cannot follow the toggle;
+// the inline bootstrap in head.html sets data-theme before first paint, so there
+// is no flash.
 html { color-scheme: light; }
 
 html[data-theme="dark"] {

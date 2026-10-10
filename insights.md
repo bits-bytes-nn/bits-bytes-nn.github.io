@@ -18,7 +18,7 @@ nav_order: 5
   spelling a heading tag inside it also trips the "exactly one h1 per page" check
   in script/validate-site.sh, which counts occurrences in the served markup.
 {%- endcomment -%}
-<p class="desc"><em>The threads a single paper can't hold — agentic-AI architecture, industry shifts, and the design decisions underneath them.</em></p>
+<p class="desc"><em>{{ page.description }}</em></p>
 
 {% include category-posts.html category="Insights" empty="The first piece is on its way — check back soon." %}
 <br>

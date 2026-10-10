@@ -2,7 +2,7 @@
 layout: post
 title: "LightRAG: Simple and Fast Retrieval-Augmented Generation"
 date: 2024-10-08 08:00:12
-author: "Beijing University of Posts and Telecommunications"
+paper_author: "Beijing University of Posts and Telecommunications"
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["Graph-Based-Text-Indexing", "Dual-Level-Retrieval-Paradigm", "Low-Level-Entity-Retrieval", "High-Level-Relationship-Retrieval", "Graph-Enhanced-Entity-and-Relationship-Extraction", "LLM-Profiling-for-Key-Value-Pair-Generation", "Incremental-Knowledge-Base-Updates", "Graph-Vector-Hybrid-Retrieval", "Multi-Hop-Subgraph-Information-Extraction", "Deduplication-for-Graph-Optimization", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg

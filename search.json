@@ -4,14 +4,13 @@ layout: null
 {%- comment -%}
   The client-side search index. Every post, as plain text.
 
-  `plain_text` is _plugins/search_index.rb, replacing `strip_html |
+  `plain_text` is _plugins/search_index.rb rather than `strip_html |
   strip_newlines`: it decodes HTML entities (kramdown escapes a literal `>` to
-  `&gt;`, which the result card used to print verbatim) and leaves a space at
-  block boundaries (`<p>끝</p><p>시작</p>` had been indexing as one token).
+  `&gt;`) and leaves a space at block boundaries, so `<p>끝</p><p>시작</p>` is two
+  words, not one.
 
-  There is no separate `snippet` field. It held the first 40 words, which is not
-  where a match usually is — js/search.js cuts the shown excerpt around the match
-  in `content` instead.
+  There is no `snippet` field: js/search.js cuts the shown excerpt around the
+  match in `content`.
 
   Every field here is searched: simple-jekyll-search walks each key and matches a
   post when all query words appear in one of them.
@@ -22,8 +21,8 @@ layout: null
       "title": {{ post.title | jsonify }},
       "url": "{{ site.baseurl }}{{ post.url }}",
       "date": "{{ post.date | date: '%Y-%m-%d' }}",
-      "category": "{% if post.categories %}{{ post.categories | join: ', ' }}{% endif %}",
-      "tags": "{% if post.tags %}{{ post.tags | join: ', ' | replace: '-', ' ' }}{% endif %}",
+      "category": {{ post.categories | join: ', ' | jsonify }},
+      "tags": {{ post.tags | join: ', ' | replace: '-', ' ' | jsonify }},
       "content": {{ post.content | plain_text | jsonify }}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}

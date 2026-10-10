@@ -5,9 +5,8 @@
 #
 # Three separate renderers need a post description: the meta/OG/Twitter/JSON-LD
 # block in _includes/head.html, the Atom <summary> that jekyll-feed builds, and
-# the excerpt card on the home page. Each of them used to fall back to Jekyll's
-# `page.excerpt`, which is the first block up to the excerpt separator — and on
-# this blog that block is almost never prose:
+# the excerpt card on the home page. Jekyll's `page.excerpt` is the first block
+# up to the excerpt separator — and on this blog that block is almost never prose:
 #
 #   * paper posts open with "### TL;DR" immediately followed by "#### <first
 #     question>", so all of them produced the *same* description; and
@@ -40,16 +39,18 @@ module PostDescription
   # The ordered-list alternative is capped at two digits: `\d+[.)]\s` also matched
   # a Korean date opening ("2024. 5. 14. 공개된 …"), silently discarding the first
   # paragraph of any post written that way.
-  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:)/
+  # `{:` is a kramdown attribute list (`{: .notice}`), which styles the block
+  # next to it and is not text.
+  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:|\{:)/
 
   # A paragraph that is emphasised *end to end* is a note or caption on this blog
   # (the "*공개(Disclosure): ...*" preamble), not a summary of the post.
   #
-  # The inner class excludes `*` and `_` so this only fires when the delimiters
-  # really span the paragraph. Anchoring on the first and last character alone
-  # also swallowed ordinary prose that merely begins and ends with emphasis —
-  # "**핵심**은 데이터입니다. 그래서 **중요합니다**" is an idiomatic Korean opening.
-  WHOLLY_EMPHASISED = /\A(\*{1,2}|_{1,2})[^*_]+\1\z/m
+  # The inner text may not contain the opening delimiter, so this only fires when
+  # one emphasis really spans the paragraph — not on prose that merely begins and
+  # ends with emphasis ("**핵심**은 데이터입니다. 그래서 **중요합니다**"). Only the
+  # delimiter that opened is excluded, so a note naming `snake_case` still counts.
+  WHOLLY_EMPHASISED = /\A(?:(\*{1,2})[^*]+\1|(_{1,2})[^_]+\2)\z/m
 
   class << self
     def derive(markdown, limit = LIMIT)
@@ -71,11 +72,10 @@ module PostDescription
       head = text[0, limit]
       cut = head.rindex(" ")
       # Back off to the last space only when that still keeps most of the budget.
-      # Not because Korean lacks spaces — it separates 어절 with them, and across
-      # all 35 posts this floor fires on 0 of 53 real truncations. It is a floor
-      # against degenerate input: text whose only space sits near the start would
-      # otherwise collapse to a stub ("짧게 " + 200 characters, cut at 100, returns
-      # "짧게…"). Cheap insurance, and the test below pins the degenerate case.
+      # Not because Korean lacks spaces — it separates 어절 with them, so real
+      # prose never hits this. It is a floor against degenerate input: text whose
+      # only space sits near the start would otherwise collapse to a stub
+      # ("짧게 " + 200 characters, cut at 100, returns "짧게…"). The test pins it.
       head = head[0, cut] if cut && cut > limit * MIN_BOUNDARY_FRACTION
       "#{head.sub(/[\s,.;:·—–-]+\z/, '')}…"
     end
@@ -88,8 +88,11 @@ module PostDescription
 
       markdown.each_line do |raw|
         line = raw.rstrip
+        # Block syntax is recognised indented too: a nested list item or a fence
+        # under a list item is still not prose.
+        lead = line.lstrip
 
-        if line.start_with?("```", "~~~")
+        if lead.start_with?("```", "~~~")
           in_fence = !in_fence
           next
         end
@@ -106,7 +109,7 @@ module PostDescription
         # accumulating, that prose is the answer — discarding it here would skip
         # past the first paragraph whenever a heading follows with no blank line
         # between them.
-        if line.match?(SKIP_LINE)
+        if lead.match?(SKIP_LINE)
           candidate = accept(paragraph)
           return candidate if candidate
           paragraph = []
@@ -119,12 +122,13 @@ module PostDescription
       accept(paragraph)
     end
 
-    # A paragraph qualifies unless it is empty or is entirely emphasised — on
-    # this blog that shape is the "*공개(Disclosure): ...*" preamble or a figure
-    # caption, never a summary of the post.
+    # A paragraph qualifies unless it is empty, is nothing but an image or
+    # math once markup is stripped, or is entirely emphasised — on this blog that
+    # shape is the "*공개(Disclosure): ...*" preamble or a figure caption, never a
+    # summary of the post.
     def accept(lines)
       candidate = lines.join(" ").strip
-      return nil if candidate.empty?
+      return nil if strip_inline(candidate).empty?
       return nil if candidate.match?(WHOLLY_EMPHASISED)
 
       candidate
@@ -144,7 +148,11 @@ module PostDescription
       out.gsub!(%r{<br\s*/?>}i, " ")
       out.gsub!(/<[^>]+>/, "")                   # inline HTML
       out.gsub!(/(\*\*|__)(.*?)\1/m, '\2')       # bold
-      out.gsub!(/(\*|_)(?=\S)(.*?)(?<=\S)\1/m, '\2') # italic
+      out.gsub!(/\*(?=\S)(.*?)(?<=\S)\*/m, '\1')    # italic
+      # `_` only at word edges, as in Markdown itself, so identifiers like
+      # max_new_tokens keep their underscores. `*` needs no such guard, and must
+      # not have one: Korean attaches particles directly ("*강조*된").
+      out.gsub!(/(?<![[:alnum:]])_(?=\S)(.*?)(?<=\S)_(?![[:alnum:]])/m, '\1')
       out.gsub!(/~~(.*?)~~/m, '\1')              # strikethrough
       out.gsub(/\s+/, " ").strip
     end
@@ -173,13 +181,11 @@ end
 if defined?(Jekyll::Hooks)
   # Fill in `description` before anything renders, so head.html, jekyll-feed and
   # index.html all read the same value.
-  # `subtitle` is deliberately NOT consulted here. It was, and it reintroduced the
-  # very defect this module exists to remove: on paper posts the subtitle is the
-  # Korean rendering of the English title, so 14 posts shipped a description that
-  # merely restated their own title ("Qwen3 Technical Report" -> "Qwen3 기술
-  # 보고서", 12 characters). Each restatement is unique, so the duplicate-description
-  # gate could not see it. `description:` means description; `subtitle:` means
-  # subtitle. A post whose subtitle *is* the best description says so explicitly.
+  # `subtitle` is deliberately NOT consulted here. On paper posts the subtitle is
+  # the Korean rendering of the English title ("Qwen3 Technical Report" -> "Qwen3
+  # 기술 보고서"), so using it would restate the title — and each restatement is
+  # unique, so the duplicate-description gate could not catch it. A post whose
+  # subtitle *is* the best description says so with `description:`.
   Jekyll::Hooks.register :site, :pre_render do |site|
     site.posts.docs.each do |post|
       next if post.data["description"].to_s.strip != ""

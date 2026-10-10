@@ -53,17 +53,24 @@ class TestScrollableTables < Minitest::Test
     assert_equal "", ScrollableTables.apply("")
   end
 
-  def test_wrapped_detects_an_already_processed_document
+  def test_a_second_pass_is_a_no_op
     once = ScrollableTables.apply("<table><tr><td>a</td></tr></table>")
-    assert ScrollableTables.wrapped?(once)
-    refute ScrollableTables.wrapped?("<table><tr><td>a</td></tr></table>")
+    assert_equal once, ScrollableTables.apply(once)
   end
 
-  # The hook skips already-wrapped documents; this pins that a second pass would
-  # otherwise nest, so the guard is load-bearing rather than decorative.
-  def test_a_second_pass_would_nest_which_is_why_the_hook_guards
-    once = ScrollableTables.apply("<table><tr><td>a</td></tr></table>")
-    twice = ScrollableTables.apply(once)
-    assert_equal 2, twice.scan('<div class="table-container">').length
+  # A document-wide "already wrapped?" check would have skipped the second table
+  # here because the first one carries a wrapper.
+  def test_wraps_bare_tables_next_to_an_already_wrapped_one
+    html = '<div class="table-container"><table><tr><td>1</td></tr></table></div>' \
+           "<p>between</p><table><tr><td>2</td></tr></table>"
+    result = ScrollableTables.apply(html)
+    assert_equal 2, result.scan('<div class="table-container">').length
+    refute_includes result, '<div class="table-container"><div class="table-container">'
+  end
+
+  # kramdown emits a hand-written wrapper with a newline before the table.
+  def test_leaves_a_hand_wrapped_table_with_whitespace_alone
+    html = %(<div class="table-container">\n<table><tr><td>a</td></tr></table>\n</div>)
+    assert_equal html, ScrollableTables.apply(html)
   end
 end

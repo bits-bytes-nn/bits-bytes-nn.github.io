@@ -3,7 +3,7 @@ layout: post
 title: "Zep: A Temporal Knowledge Graph Architecture for Agent Memory"
 subtitle: "Zep: 에이전트 메모리를 위한 시간 인식 지식 그래프 아키텍처"
 date: 2025-01-20 16:52:48
-author: "Preston Rasmussen et al."
+paper_author: "Preston Rasmussen et al."
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["Temporally-Aware-Knowledge-Graph-Engine", "Bi-Temporal-Knowledge-Graph-Modeling", "Hierarchical-Knowledge-Graph-Construction", "Dynamic-Edge-Invalidation-for-Temporal-Reasoning", "Episodic-and-Semantic-Memory-Subgraphs", "Community-Detection-with-Label-Propagation", "Hybrid-Search-with-Breadth-First-Graph-Traversal", "Non-Lossy-Knowledge-Graph-Updates", "Multi-Hop-Entity-and-Relationship-Extraction", "Graph-Based-Memory-Retrieval-for-LLM-Agents", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg

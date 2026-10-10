@@ -53,7 +53,7 @@ echo "Validating $SITE"
 # --- XML feeds ---------------------------------------------------------------
 # A byte before the declaration (BOM, stray newline from front matter) makes
 # strict parsers reject the whole document.
-for rel in sitemap.xml sitemap-index.xml feed.xml; do
+for rel in sitemap.xml feed.xml; do
   f="$SITE/$rel"
   if [ ! -f "$f" ]; then
     fail "$rel is missing"
@@ -88,11 +88,27 @@ if [ -f "$SITE/sitemap.xml" ]; then
   fi
 fi
 
+# --- feed authorship ---------------------------------------------------------
+# jekyll-feed takes each entry's <author> from the post's `author`, falling back
+# to the site's. Paper posts name the paper's organisation in `paper_author`; one
+# that says `author:` instead credits that organisation with this blog's post.
+SITE_AUTHOR=$(sed -nE 's/^author:[[:space:]]*"?([^"]*[^"[:space:]])"?[[:space:]]*$/\1/p' "$CONFIG" | head -1)
+if [ -f "$SITE/feed.xml" ]; then
+  others=$(grep -oE '<author><name>[^<]*' "$SITE/feed.xml" | sed 's/<author><name>//' |
+    grep -vxF "$SITE_AUTHOR" | sort -u || true)
+  if [ -n "$others" ]; then
+    fail "feed.xml credits someone other than '$SITE_AUTHOR' (a post set author: instead of paper_author:?):"
+    printf '%s\n' "$others" | sed 's/^/          /' >&2
+  else
+    pass "every feed entry is credited to $SITE_AUTHOR"
+  fi
+fi
+
 # --- reproducible post URLs --------------------------------------------------
 # Post permalinks embed :year/:month/:day and front-matter dates carry no offset,
-# so an unset `timezone` resolves them in the build machine's timezone. Building
-# from KST instead of CI's UTC moved 19 URLs by a day. Nothing in _site/ shows
-# this, so the invariant has to be checked at the config.
+# so an unset `timezone` resolves them in the build machine's timezone: a build
+# from KST instead of CI's UTC moves afternoon-dated posts a day. Nothing in
+# _site/ shows this, so the invariant has to be checked at the config.
 if grep -qE '^timezone:[[:space:]]*\S' "$CONFIG"; then
   pass "_config.yml pins a timezone (post URLs are build-host independent)"
 else
@@ -100,12 +116,21 @@ else
 fi
 
 # --- robots.txt --------------------------------------------------------------
+# jekyll-sitemap writes robots.txt whenever the source has none, so it always
+# names the sitemap at the configured url. A hand-written one replaces that.
 if [ ! -f "$SITE/robots.txt" ]; then
   fail "robots.txt is missing"
-elif grep -qE '^[[:space:]]*Disallow:[[:space:]]*/[[:space:]]*$' "$SITE/robots.txt"; then
-  fail "robots.txt disallows the whole site"
 else
-  pass "robots.txt does not block crawling"
+  if grep -qE '^[[:space:]]*Disallow:[[:space:]]*/[[:space:]]*$' "$SITE/robots.txt"; then
+    fail "robots.txt disallows the whole site"
+  else
+    pass "robots.txt does not block crawling"
+  fi
+  if grep -qxF "Sitemap: $BASE_URL/sitemap.xml" "$SITE/robots.txt"; then
+    pass "robots.txt points at $BASE_URL/sitemap.xml"
+  else
+    fail "robots.txt does not name $BASE_URL/sitemap.xml"
+  fi
 fi
 
 # --- rendered pages ----------------------------------------------------------
@@ -154,9 +179,8 @@ else
   pass "every page has exactly one <h1>"
 fi
 
-# A heading outline that jumps h2 -> h4 breaks screen-reader navigation. Every
-# paper post used to do worse than that: "### TL;DR" above the "##" sections it
-# preceded, and "#" reused for the post's own sections.
+# A heading outline that jumps h2 -> h4 breaks screen-reader navigation. The usual
+# cause is a "### TL;DR" above the "##" sections it precedes.
 skips=$(ruby -e '
   files = STDIN.read.split("\n").reject(&:empty?)
   tag = /<[^>]+>/
@@ -185,10 +209,10 @@ else
   pass "every page has a meta description"
 fi
 
-# A description no longer than the page's own title cannot be adding information.
-# This is what shipped when `subtitle:` was reused as the description: 14 posts got
-# the Korean rendering of their English title ("Qwen3 Technical Report" -> "Qwen3
-# 기술 보고서"). Each was unique, so the duplicate check below saw nothing wrong.
+# A description no longer than the page's own title cannot be adding information
+# — e.g. a subtitle that only translates the title ("Qwen3 Technical Report" ->
+# "Qwen3 기술 보고서"). Each such restatement is unique, so the duplicate check
+# below cannot see it.
 if [ -n "$short_desc" ]; then
   fail "pages whose meta description is no longer than their <title>:"
   printf '%s' "$short_desc" | sed 's/^/          /' >&2
@@ -203,8 +227,8 @@ else
   pass "every page has rel=canonical"
 fi
 
-# Duplicates are what made 28 paper posts share one description: the template
-# derived it from Jekyll's excerpt, which for those posts was a heading.
+# Duplicates appear when descriptions come from a block every post shares, such
+# as a "TL;DR" heading at the top of each paper post.
 dup_desc=$(printf '%s' "$descs" | sort | uniq -d | grep -c .)
 if [ "$dup_desc" -gt 0 ]; then
   fail "$dup_desc meta description(s) used on more than one page:"
@@ -222,12 +246,14 @@ else
 fi
 
 # --- authoring sources must not ship ----------------------------------------
-leaked=$(find "$SITE" -type f \( -name '*.excalidraw' -o -name '*.sh' \) | sort)
+# A .md without front matter is copied as-is, so a stray authoring note would ship.
+leaked=$(find "$SITE" -type f \( -name '*.excalidraw' -o -name '*.drawio' -o -name '*.sh' \
+  -o -name '*.rb' -o -name '*.md' -o -name '*.map' \) | sort)
 if [ -n "$leaked" ]; then
   fail "authoring sources copied into the site:"
   printf '%s\n' "$leaked" | sed 's/^/          /' >&2
 else
-  pass "no diagram sources or scripts in the published output"
+  pass "no diagram sources, scripts, tests, notes or source maps in the published output"
 fi
 
 echo

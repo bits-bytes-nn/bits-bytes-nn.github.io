@@ -24,13 +24,12 @@ input:focus-visible,
 	border-radius: 1px;
 }
 
-// Off-screen until focused. scroll-margin-top clears the fixed 66px header, which
-// would otherwise cover the top of whatever the jump lands on.
+// Off-screen until focused.
 .skip-link {
 	position: absolute;
 	left: -9999px;
 	top: 0;
-	z-index: 100;
+	z-index: 1001; // above the fixed header (1000), or it is focused but hidden
 	padding: 0.6em 1em;
 	background: $white;
 	color: $action-color;
@@ -41,8 +40,15 @@ input:focus-visible,
 	}
 }
 
-#content {
-	scroll-margin-top: 80px;
+// Whatever the browser scrolls into view clears the fixed 66px header, which
+// would otherwise cover it: fragment targets (the TOC, /tags/#… from another
+// page, the skip link's #content) and the control keyboard focus moves to.
+// Done here rather than in a click handler so it also holds for links followed
+// from elsewhere and for ids a CSS selector cannot parse ("#1-서론").
+// The reduced-motion block below resets scroll-behavior to `auto`.
+html {
+	scroll-padding-top: 80px;
+	scroll-behavior: smooth;
 }
 
 // Visible to assistive technology, not on screen. Used by the copy-button live
@@ -96,6 +102,9 @@ blockquote {
 	margin-left: 0;
 	padding-left: 2em;
 	line-height: 1.6;
+
+	// The muted blockquote gray is too light on the code chip's gray.
+	code { color: $dark-gray; }
 }
 
 // Rouge code blocks (.highlight wraps <pre><code>); theme colors live in _syntax.scss
@@ -108,7 +117,42 @@ blockquote {
 
 .highlight pre.highlight {
 	padding: 1em 1.2em;
+}
+
+// Anything wider than the column scrolls inside its own box instead of widening
+// the page — which on a phone pushes the fixed header's menu button off-screen.
+// Bare <pre> covers fences in a language Rouge does not know; mjx-container is a
+// display equation.
+.post-content pre,
+.post-content mjx-container[display="true"] {
 	overflow-x: auto;
+	max-width: 100%;
+}
+
+.post-content mjx-container[display="true"] {
+	overflow-y: hidden;
+}
+
+// Set by the MathJax startup hook in head.html on inline formulas wider than
+// their paragraph. Only those: overflow on an inline box moves its baseline.
+.post-content mjx-container.is-wide {
+	display: inline-block;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	vertical-align: middle;
+	padding-block: 0.15em; // room for descenders the overflow box would clip
+}
+
+// A run with no break opportunity — a long URL, "Observability·Evaluations·
+// Performance" — breaks rather than widening the page. Inline code chips are
+// inline-block, which `break-word` does not shrink, so they need `anywhere`.
+.post-content {
+	overflow-wrap: break-word;
+}
+
+.post-content :not(pre) > code {
+	overflow-wrap: anywhere;
 }
 
 // Reset the inline-`code` chip styling inside fenced blocks, so the gray inline
@@ -154,11 +198,6 @@ blockquote {
 		border-radius: 50%;
 		@include hover-transform(1.1);
 	}
-}
-
-.tooltip {
-	border-bottom: 1px dotted $medium-gray;
-	cursor: help;
 }
 
 .site-header-container, .post-header-container {
@@ -295,6 +334,9 @@ blockquote {
 	.theme-toggle {
 		margin: 0;
 		padding: 0;
+		// The icon alone is 15x20px; this is the 24px minimum target size.
+		min-width: 24px;
+		min-height: 24px;
 		font-size: 1.15em;
 		line-height: 1;
 		color: $medium-gray;

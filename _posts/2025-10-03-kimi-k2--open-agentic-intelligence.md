@@ -3,7 +3,7 @@ layout: post
 title: "Kimi K2: Open Agentic Intelligence"
 subtitle: "Kimi K2: 오픈 에이전틱 인텔리전스"
 date: 2025-07-28 05:35:43
-author: "Moonshot AI"
+paper_author: "Moonshot AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["MuonClip-Optimizer", "QK-Clip-Attention-Stabilization", "Large-Scale-Agentic-Data-Synthesis", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Mixture-of-Experts-Sparsity-Scaling-Law", "Synthetic-Data-Rephrasing-for-Token-Efficiency", "Verifiable-Rewards-Reinforcement-Learning", "Agentic-Intelligence-Framework", "Computational-Efficiency-in-Large-Language-Models", "Efficient-Mixture-of-Experts-Architecture", "Mixture-of-Experts"]
 cover: /assets/images/language-models.jpg

@@ -3,7 +3,7 @@ layout: post
 title: "Mixtral of Experts"
 subtitle: "Mixtral of Experts: 전문가 혼합 모델의 새로운 지평"
 date: 2024-01-08 18:47:34
-author: "Mistral AI"
+paper_author: "Mistral AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Sparse-Mixture-of-Experts", "Dynamic-Expert-Routing", "Two-Expert-Token-Processing", "Efficient-Inference-with-Reduced-Active-Parameters", "Routing-Network-Token-Selection", "Expert-Selection-Locality-Analysis", "Multilingual-Performance-Scaling", "Long-Context-Retrieval-Optimization", "Instruction-Fine-Tuning-with-Direct-Preference-Optimization", "Mixture-of-Experts"]
 cover: /assets/images/language-models.jpg

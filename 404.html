@@ -1,0 +1,20 @@
+---
+layout: page
+title: Page not found
+permalink: /404.html
+description: >-
+  The page you were looking for is not on this blog. It may have moved, or the
+  link may be mistyped — search the posts or start from the home page.
+sitemap: false
+lang: en
+---
+{%- comment -%}
+  GitHub Pages serves this file, with a 404 status, for any path it has no file
+  for. Without it, a broken link dropped the reader on GitHub's generic page with
+  no way back into the site.
+{%- endcomment -%}
+<p>There is nothing at this address. The post may have moved, or the link may be mistyped.</p>
+<ul>
+  <li><a href="{{ site.baseurl }}/search/">Search the posts</a></li>
+  <li><a href="{{ site.baseurl }}/">Go to the home page</a></li>
+</ul>

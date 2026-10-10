@@ -366,14 +366,14 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "pages/*.md, *.html",
+   "text": "*.md, *.html pages",
    "fontSize": 16,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "baseline": 16,
    "containerId": null,
-   "originalText": "pages/*.md, *.html",
+   "originalText": "*.md, *.html pages",
    "lineHeight": 1.25
   },
   {

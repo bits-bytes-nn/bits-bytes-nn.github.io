@@ -2,7 +2,7 @@
 layout: post
 title: "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"
 date: 2024-01-05 18:59:13
-author: "DeepSeek AI"
+paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Scaling-Open-Source-Language-Models-with-Longtermism", "Compute-Optimal-Scaling", "Non-Embedding-FLOPs-per-Token", "Multi-Step-Learning-Rate-Scheduler", "Optimal-Model-Data-Scaling-Allocation", "Direct-Preference-Optimization", "Grouped-Query-Attention", "Language-Model-Scaling-Laws", "Efficient-Model-Training", "Depth-Over-Width-Scaling", "DeepSeek"]
 cover: /assets/images/language-models.jpg
@@ -144,6 +144,7 @@ GPU 메모리 사용을 더욱 최적화하기 위해 인플레이스 크로스 
 배치 크기와 학습률에 대해 최종적으로 피팅된 공식은 다음과 같습니다.
 
 $$\eta_{\mathrm{opt}} = 0.3118 \cdot C^{-0.1250}$$
+
 $$B_{\mathrm{opt}} = 0.2920 \cdot C^{0.3271}$$
 
 이러한 공식의 유효성을 검증하기 위해 1e20 컴퓨트 예산을 가진 일련의 모델들에 대해 테스트를 수행했으며, 특정 모델 크기(2.94B FLOPs/토큰)에 대한 결과는 피팅된 파라미터가 최적의 파라미터 공간의 중심에 위치한다는 것을 보여주었습니다. 이후 섹션에서도 DeepSeek LLM 7B와 67B 모델에 대해 피팅된 파라미터들이 유사하게 좋은 성능을 달성했음을 확인할 수 있습니다.
@@ -160,7 +161,9 @@ $$B_{\mathrm{opt}} = 0.2920 \cdot C^{0.3271}$$
 $$6N_1$$, $$6N_2$$, $$M$$ 사이의 구체적인 차이는 다음 공식들로 나타낼 수 있습니다.  
   
 $$6N_1 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2$$  
+
 $$6N_2 = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+6\,n_{\mathrm{vocab}}\,d_{\mathrm{model}}$$  
+
 $$M = 72\,n_{\mathrm{layer}}\,d_{\mathrm{model}}^2+12\,n_{\mathrm{layer}}\,d_{\mathrm{model}}\,l_{\mathrm{seq}}$$  
   
 여기서 $$n_{\mathrm{layer}}$$는 레이어 수, $$d_{\mathrm{model}}$$은 모델 너비, $$n_{\mathrm{vocab}}$$은 어휘 크기, $$l_{\mathrm{seq}}$$는 시퀀스 길이를 나타냅니다.
@@ -181,6 +184,7 @@ $$M_{\mathrm{opt}}(C),D_{\mathrm{opt}}(C)=\underset{M,D\,\mathrm{s.t.}\,C=MD}{\m
 IsoFLOP 곡선과 모델/데이터 스케일링 곡선은 각 컴퓨트 예산에 대한 최적의 모델/데이터 할당을 사용하여 피팅되었습니다. 최적의 비임베딩 FLOPs/토큰 $$M_{\mathrm{opt}}$$와 최적의 토큰 수 $$D_{\mathrm{opt}}$$에 대한 구체적인 공식은 다음과 같습니다.
 
 $$M_{\mathrm{opt}} = M_{\mathrm{base}} \cdot C^a, \quad M_{\mathrm{base}} = 0.1715, \quad a = 0.5243$$
+
 $$D_{\mathrm{opt}} = D_{\mathrm{base}} \cdot C^b, \quad D_{\mathrm{base}} = 5.8316, \quad b = 0.4757$$
 
 이러한 스케일링 법칙은 컴퓨트 예산이 증가할 때 모델과 데이터 규모를 어떻게 최적으로 조정해야 하는지에 대한 명확한 지침을 제공합니다. 특히 지수 $$a$$와 $$b$$의 값은 컴퓨트 예산 증가분의 약 52.43%를 모델 스케일링에, 47.57%를 데이터 스케일링에 할당해야 한다는 것을 시사합니다.
