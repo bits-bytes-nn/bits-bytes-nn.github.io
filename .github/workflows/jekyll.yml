@@ -18,7 +18,8 @@ permissions:
 
 # One group per ref. A single shared group let a PR run displace a queued
 # deploy: GitHub keeps at most one pending run per group and cancels the older
-# one. Superseded PR runs are cancelled; pushes to main always run to the end.
+# one. Superseded PR runs are cancelled. A main run that has started always
+# finishes; one still queued is replaced by a newer push, which deploys instead.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -85,7 +86,7 @@ jobs:
         run: script/validate-site.sh ./_site
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
 
   deploy:

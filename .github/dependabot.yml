@@ -11,3 +11,16 @@ updates:
         update-types:
           - minor
           - patch
+  # The gems only run in CI (build, html-proofer), but html-proofer pulls in
+  # nokogiri, which gets security releases.
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      gems-minor-and-patch:
+        update-types:
+          - minor
+          - patch
