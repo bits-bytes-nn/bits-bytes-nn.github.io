@@ -40,17 +40,14 @@ input:focus-visible,
 	}
 }
 
-// Every fragment target — headings from the TOC, /tags/#… and /categories/#…
-// from another page, the skip link's #content — clears the fixed 66px header,
-// which would otherwise cover the top of whatever the jump lands on. Done here
-// rather than in a click handler so it also holds for links followed from
-// elsewhere and for ids a CSS selector cannot parse ("#1-서론").
-[id] {
-	scroll-margin-top: 80px;
-}
-
-// The reduced-motion block below resets this to `auto`.
+// Whatever the browser scrolls into view clears the fixed 66px header, which
+// would otherwise cover it: fragment targets (the TOC, /tags/#… from another
+// page, the skip link's #content) and the control keyboard focus moves to.
+// Done here rather than in a click handler so it also holds for links followed
+// from elsewhere and for ids a CSS selector cannot parse ("#1-서론").
+// The reduced-motion block below resets scroll-behavior to `auto`.
 html {
+	scroll-padding-top: 80px;
 	scroll-behavior: smooth;
 }
 

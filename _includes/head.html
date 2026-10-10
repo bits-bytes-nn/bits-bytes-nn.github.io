@@ -205,6 +205,11 @@
 	      textsc: ['\\mathrm{#1}', 1]
 	    }
 	  },
+	  // MathJax's context menu makes every formula a Tab stop — some posts would
+	  // have more than a hundred. The menu stays available on right-click.
+	  options: {
+	    menuOptions: { settings: { inTabOrder: false } }
+	  },
 	  // MathJax 3 cannot line-break, so an inline formula wider than its paragraph
 	  // would widen the page. Those few scroll in place instead (`.is-wide` in
 	  // _sass/_layout.scss); display equations are handled there by CSS alone.
