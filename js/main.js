@@ -99,6 +99,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     menu.addEventListener('keydown', closeOnEscape);
     menuToggle.addEventListener('keydown', closeOnEscape);
+    // Tabbing out of the open menu would otherwise leave it covering the page
+    // the focus has moved into.
+    menu.addEventListener('focusout', function (e) {
+      var to = e.relatedTarget; // null when focus leaves the window, not the menu
+      if (!menu.classList.contains('show') || !to || menu.contains(to) || to === menuToggle) return;
+      menu.classList.remove('show');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
   }
 
   // Highlight the current page in the nav

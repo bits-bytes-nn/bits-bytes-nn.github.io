@@ -148,7 +148,7 @@
   // .result-tags was missing here, so it kept search.css's #767676 — a value
   // chosen to clear 4.5:1 on white, which lands at 4.2:1 on #0d1117 and fails AA
   // for text this size.
-  .search-status, .post-category, .result-tags { color: $fg-muted; }
+  .search-status, .post-category, .result-tags, .search-result .post-date { color: $fg-muted; }
   .result-snippet, .search-result p { color: $fg; }
   // #fff on #b8860b is 3.25:1, and bold 0.9em is not large text. Dark text on the
   // same fill is 7.9:1.

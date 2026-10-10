@@ -208,16 +208,25 @@
 	  // MathJax 3 cannot line-break, so an inline formula wider than its paragraph
 	  // would widen the page. Those few scroll in place instead (`.is-wide` in
 	  // _sass/_layout.scss); display equations are handled there by CSS alone.
+	  // Re-measured on resize, since rotating a phone changes which ones fit.
 	  startup: {
 	    pageReady: function () {
-	      return MathJax.startup.defaultPageReady().then(function () {
+	      function markWide() {
 	        document.querySelectorAll('.post-content mjx-container:not([display])').forEach(function (el) {
+	          el.classList.remove('is-wide');
 	          // The enclosing block, not the parent: inside <strong> or <a> the
-	          // parent is inline and its clientWidth is 0.
+	          // parent is inline and its clientWidth is 0. +1 absorbs subpixel
+	          // widths (202.4 against a 202 cell).
 	          var block = el.closest('p, li, td, th, dd, blockquote') || el.parentElement;
-	          if (el.getBoundingClientRect().width > block.clientWidth) el.classList.add('is-wide');
+	          if (el.getBoundingClientRect().width > block.clientWidth + 1) el.classList.add('is-wide');
 	        });
-	      });
+	      }
+	      var timer;
+	      window.addEventListener('resize', function () {
+	        clearTimeout(timer);
+	        timer = setTimeout(markWide, 150);
+	      }, { passive: true });
+	      return MathJax.startup.defaultPageReady().then(markWide);
 	    }
 	  }
 	};

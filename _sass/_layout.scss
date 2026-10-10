@@ -29,7 +29,7 @@ input:focus-visible,
 	position: absolute;
 	left: -9999px;
 	top: 0;
-	z-index: 100;
+	z-index: 1001; // above the fixed header (1000), or it is focused but hidden
 	padding: 0.6em 1em;
 	background: $white;
 	color: $action-color;
@@ -144,6 +144,7 @@ blockquote {
 	overflow-x: auto;
 	overflow-y: hidden;
 	vertical-align: middle;
+	padding-block: 0.15em; // room for descenders the overflow box would clip
 }
 
 // A run with no break opportunity — a long URL, "Observability·Evaluations·
