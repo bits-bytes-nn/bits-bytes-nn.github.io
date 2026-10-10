@@ -11,21 +11,30 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Read-only by default. Only `deploy` gets the Pages and OIDC grants, so a PR
+# run never holds a token that can publish.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# One group per ref. A single shared group let a PR run displace a queued
+# deploy: GitHub keeps at most one pending run per group and cancels the older
+# one. Superseded PR runs are cancelled; pushes to main always run to the end.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: read  # configure-pages reads the site's base path
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       # No apt step. The packages it installed are already in the ubuntu-latest
       # image — a past run's log showed libyaml-dev/zlib1g-dev/libffi-dev
       # "already the newest version" and only 2 incidental upgrades — and the
@@ -38,7 +47,7 @@ jobs:
       # other steps total under a minute. If this assumption is ever wrong the
       # build job fails and `deploy` (needs: build) publishes nothing.
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1
         with:
           # 3.3+: html-proofer's async→console dependency requires Ruby >= 3.3.
           ruby-version: '3.3'
@@ -51,7 +60,7 @@ jobs:
         run: ruby test/run_all.rb
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}" --strict-front-matter
         env:
@@ -77,16 +86,20 @@ jobs:
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.
         if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
