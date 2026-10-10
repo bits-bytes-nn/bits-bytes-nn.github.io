@@ -45,10 +45,11 @@ input:focus-visible,
 // page, the skip link's #content) and the control keyboard focus moves to.
 // Done here rather than in a click handler so it also holds for links followed
 // from elsewhere and for ids a CSS selector cannot parse ("#1-서론").
-// The reduced-motion block below resets scroll-behavior to `auto`.
+//
+// No `scroll-behavior: smooth`. A smooth jump passes lazy images that load on
+// the way and grow the page, so on long posts it stopped short of the heading.
 html {
 	scroll-padding-top: 80px;
-	scroll-behavior: smooth;
 }
 
 // Visible to assistive technology, not on screen. Used by the copy-button live

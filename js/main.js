@@ -1,7 +1,7 @@
 // Site behaviors: theme toggle, code-copy, mobile menu, nav highlight,
 // sticky-nav class, image zoom (GLightbox), and the post table of contents.
-// Vanilla JS, no jQuery. In-page anchor scrolling is CSS (`scroll-padding-top` and
-// `scroll-behavior` in _sass/_layout.scss), not script.
+// Vanilla JS, no jQuery. The fixed-header offset for in-page jumps is CSS
+// (`scroll-padding-top` in _sass/_layout.scss), not script.
 document.addEventListener('DOMContentLoaded', function () {
   // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
   // The OS setting is intentionally NOT followed.

@@ -206,14 +206,17 @@
 	    }
 	  },
 	  // MathJax's context menu makes every formula a Tab stop — some posts would
-	  // have more than a hundred. The menu stays available on right-click.
+	  // have more than a hundred. The menu stays available on right-click; only
+	  // formulas that scroll become Tab stops, below.
 	  options: {
 	    menuOptions: { settings: { inTabOrder: false } }
 	  },
 	  // MathJax 3 cannot line-break, so an inline formula wider than its paragraph
 	  // would widen the page. Those few scroll in place instead (`.is-wide` in
 	  // _sass/_layout.scss); display equations are handled there by CSS alone.
-	  // Re-measured on resize, since rotating a phone changes which ones fit.
+	  // Any formula that scrolls is made focusable, as js/main.js does for tables
+	  // and code: Safari cannot keyboard-scroll a box that is not. Re-measured on
+	  // resize, since rotating a phone changes which ones fit.
 	  startup: {
 	    pageReady: function () {
 	      function markWide() {
@@ -224,6 +227,18 @@
 	          // widths (202.4 against a 202 cell).
 	          var block = el.closest('p, li, td, th, dd, blockquote') || el.parentElement;
 	          if (el.getBoundingClientRect().width > block.clientWidth + 1) el.classList.add('is-wide');
+	        });
+	        document.querySelectorAll('.post-content mjx-container[display="true"], .post-content mjx-container.is-wide').forEach(function (el) {
+	          var scrolls = el.scrollWidth > el.clientWidth + 1;
+	          if (scrolls && !el.hasAttribute('tabindex')) {
+	            el.setAttribute('tabindex', '0');
+	            el.setAttribute('role', 'region');
+	            el.setAttribute('aria-label', 'Equation, scrollable');
+	          } else if (!scrolls && el.getAttribute('role') === 'region') {
+	            el.removeAttribute('tabindex');
+	            el.removeAttribute('role');
+	            el.removeAttribute('aria-label');
+	          }
 	        });
 	      }
 	      var timer;
