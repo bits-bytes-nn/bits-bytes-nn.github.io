@@ -228,9 +228,12 @@
 	          var block = el.closest('p, li, td, th, dd, blockquote') || el.parentElement;
 	          if (el.getBoundingClientRect().width > block.clientWidth + 1) el.classList.add('is-wide');
 	        });
-	        document.querySelectorAll('.post-content mjx-container[display="true"], .post-content mjx-container.is-wide').forEach(function (el) {
-	          var scrolls = el.scrollWidth > el.clientWidth + 1;
-	          if (scrolls && !el.hasAttribute('tabindex')) {
+	        // Every formula, not just the ones that scroll now: one that stopped
+	        // scrolling on a resize has to lose its Tab stop again.
+	        document.querySelectorAll('.post-content mjx-container').forEach(function (el) {
+	          var scrolls = (el.hasAttribute('display') || el.classList.contains('is-wide')) &&
+	            el.scrollWidth > el.clientWidth;
+	          if (scrolls && el.getAttribute('tabindex') !== '0') {
 	            el.setAttribute('tabindex', '0');
 	            el.setAttribute('role', 'region');
 	            el.setAttribute('aria-label', 'Equation, scrollable');
