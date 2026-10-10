@@ -51,8 +51,8 @@ Pages가 그대로 서빙.**
 | 영역 | 선택 | 한 줄 설명 |
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
-| 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성, 옛 URL 리디렉션 페이지 생성 |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
@@ -120,11 +120,22 @@ Pages가 그대로 서빙.**
 ```
 categories: ["Paper Reviews", "Language-Models"]  +  date: 2025-01-23
         ↓
-_site/paper reviews/language-models/2025/01/23/<slug>.html
+_site/paper-reviews/language-models/2025/01/23/<slug>.html
 ```
+
+경로 규칙은 `_config.yml`의 `permalink`(`:slugified_categories`)다. 카테고리를 소문자로 바꾸고
+공백을 `-`로 바꾸므로, 앵커에 쓰는 `slugify`와 결과가 같다.
 
 그래서 **이미 게시된 글의 카테고리나 날짜를 바꾸면 URL이 바뀐다** — 외부에서 걸린 링크와
 검색 색인이 깨지므로 함부로 고치지 않는다(§9의 "날짜 드리프트" 참조).
+
+> **옛 URL 리디렉션.** 예전 규칙(`:categories`)은 공백을 그대로 둬 `Paper Reviews` 글이
+> `/paper%20reviews/…`로 게시됐다. `_plugins/legacy_urls.rb`가 옛 규칙으로 계산한 경로가 지금
+> URL과 다르면 그 경로를 글의 `redirect_from`에 넣고, `jekyll-redirect-from`이 그 자리에 새
+> URL로 보내는 페이지(즉시 meta refresh, 새 URL을 canonical로 지정)를 만든다. GitHub Pages는
+> 301을 보낼 수 없어서 쓰는 방식이며, Google은 이를 영구 이동으로 처리한다.
+> `validate-site.sh`가 모든 리디렉션의 목적지가 빌드에 있는지와 사이트맵에 공백 URL이 없는지를
+> 검사한다.
 
 ### 내비게이션은 코드가 아니라 데이터가 만든다
 
