@@ -3,9 +3,9 @@ layout: post
 title: "Zep: A Temporal Knowledge Graph Architecture for Agent Memory"
 subtitle: "Zep: 에이전트 메모리를 위한 시간 인식 지식 그래프 아키텍처"
 date: 2025-01-20 16:52:48
-paper_author: "Preston Rasmussen et al."
+paper_author: "Zep AI"
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
-tags: ["Temporally-Aware-Knowledge-Graph-Engine", "Bi-Temporal-Knowledge-Graph-Modeling", "Hierarchical-Knowledge-Graph-Construction", "Dynamic-Edge-Invalidation-for-Temporal-Reasoning", "Episodic-and-Semantic-Memory-Subgraphs", "Community-Detection-with-Label-Propagation", "Hybrid-Search-with-Breadth-First-Graph-Traversal", "Non-Lossy-Knowledge-Graph-Updates", "Multi-Hop-Entity-and-Relationship-Extraction", "Graph-Based-Memory-Retrieval-for-LLM-Agents", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
+tags: ["Temporally-Aware-Knowledge-Graph-Engine", "Bi-Temporal-Knowledge-Graph-Modeling", "Hierarchical-Knowledge-Graph-Construction", "Dynamic-Edge-Invalidation-for-Temporal-Reasoning", "Episodic-and-Semantic-Memory-Subgraphs", "Community-Detection", "Hybrid-Retrieval", "Non-Lossy-Knowledge-Graph-Updates", "Entity-and-Relationship-Extraction", "Graph-Based-Memory-Retrieval-for-LLM-Agents", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg
 use_math: true
 ---
@@ -75,7 +75,7 @@ $$ \phi : \mathcal{E} \to \mathcal{N} \times \mathcal{N} $$
 
 에피소드 엣지(episodic edge)는 다음과 같이 정의됩니다.
 
-$$ e\_i \in \mathcal{E}\_e \subseteq \phi^{*}(\mathcal{N}\_e \times \mathcal{N}\_s) $$
+$$ e_i \in \mathcal{E}_e \subseteq \phi^{*}(\mathcal{N}_e \times \mathcal{N}_s) $$
 
 이 표기에서 \\(\phi^{*}\\)의 위첨자 별표(\\(*\\))는 앞서 정의한 결합 함수 \\(\phi\\)를, 개별 원소가 아니라 **두 노드 집합의 곱집합(product space) 전체 위로 확장(lift)한 유도 사상**을 의미한다고 이해할 수 있습니다. 다시 말해 \\(\phi^{*}(\mathcal{N}_e \times \mathcal{N}_s)\\)는 에피소드 노드 집합 \\(\mathcal{N}_e\\)와 의미 개체 노드 집합 \\(\mathcal{N}_s\\) 사이에 결합 함수로 형성될 수 있는 모든 가능한 엣지의 모집합을 가리키며, 실제 에피소드 엣지 집합 \\(\mathcal{E}_e\\)는 그 부분집합(\\(\subseteq\\))으로 존재합니다. 결국 에피소드 엣지는 하나의 에피소드를, 그 안에서 언급된 의미 개체에 연결하는 역할을 합니다.
 
@@ -85,7 +85,7 @@ $$ e\_i \in \mathcal{E}\_e \subseteq \phi^{*}(\mathcal{N}\_e \times \mathcal{N}\
 
 개체 엣지(entity edge), 즉 **의미 엣지(semantic edge)**는 다음과 같이 정의됩니다.
 
-$$ e\_i \in \mathcal{E}\_s \subseteq \phi^{*}(\mathcal{N}\_s \times \mathcal{N}\_s) $$
+$$ e_i \in \mathcal{E}_s \subseteq \phi^{*}(\mathcal{N}_s \times \mathcal{N}_s) $$
 
 에피소드 엣지가 서로 다른 두 종류의 노드 집합(에피소드와 개체)을 이었던 것과 달리, 의미 엣지는 동일한 개체 노드 집합 \\(\mathcal{N}_s\\) 내부의 두 개체를 잇습니다. 이 엣지들은 에피소드로부터 추출된 개체 간의 관계, 즉 "사실(fact)"을 표현합니다.
 
@@ -95,7 +95,7 @@ $$ e\_i \in \mathcal{E}\_s \subseteq \phi^{*}(\mathcal{N}\_s \times \mathcal{N}\
 
 커뮤니티 엣지(community edge)는 다음과 같이 정의됩니다.
 
-$$ e\_i \in \mathcal{E}\_c \subseteq \phi^{*}(\mathcal{N}\_c \times \mathcal{N}\_s) $$
+$$ e_i \in \mathcal{E}_c \subseteq \phi^{*}(\mathcal{N}_c \times \mathcal{N}_s) $$
 
 즉 커뮤니티 엣지는 각 커뮤니티 노드를 그 구성원인 개체 노드들과 연결합니다. 커뮤니티 탐지에 사용되는 레이블 전파(label propagation) 알고리즘과 동적 갱신 방식은 이후 커뮤니티를 다루는 부분에서 자세히 살펴봅니다.
 
@@ -244,7 +244,7 @@ Zep의 커뮤니티 탐지 기법은 GraphRAG에서 서술된 방식을 토대�
 
 레이블 전파 알고리즘의 작동 방식을 직관적으로 이해해 보겠습니다. 처음에는 모든 노드가 각자 고유한 커뮤니티를 갖습니다. 그다음 각 노드는 자신의 이웃 노드들이 가장 많이 속한 커뮤니티, 즉 **다수결(plurality)로 결정되는 커뮤니티**를 자신의 새 레이블로 채택합니다. 이 과정을 어떤 노드의 레이블도 더 이상 바뀌지 않을 때까지 반복하면, 결국 강하게 연결된 노드들이 같은 레이블로 수렴하면서 자연스럽게 군집이 형성됩니다. 관련 연구에서 정리한 갱신 규칙은 다음과 같이 표현할 수 있습니다.
 
-$$ y\_i^{(t+1)} = \text{argmax}\_c \sum\_{j \in \mathcal{N}(i)} w\_{ij} \, \mathbb{1}[y\_j^{(t)} = c] $$
+$$ y_i^{(t+1)} = \text{argmax}_c \sum_{j \in \mathcal{N}(i)} w_{ij} \, \mathbb{1}[y_j^{(t)} = c] $$
 
 여기서 \\(y_i^{(t+1)}\\)은 노드 \\(i\\)가 \\(t+1\\) 시점에 새로 채택하는 커뮤니티 레이블, \\(\mathcal{N}(i)\\)는 노드 \\(i\\)의 이웃 집합, \\(w_{ij}\\)는 노드 \\(i\\)와 \\(j\\) 사이 엣지의 가중치, 그리고 \\(\mathbb{1}[\cdot]\\)는 이웃 \\(j\\)가 커뮤니티 \\(c\\)에 속할 때만 1이 되는 지시 함수(indicator function)입니다. 직관적으로 이 식은 "각 이웃이 자신의 커뮤니티에 가중치만큼 투표를 던지고, 가장 많은 표를 받은 커뮤니티를 채택한다"는 가중 다수결 투표를 형식화한 것입니다.
 
@@ -408,19 +408,19 @@ $$ f : S \to S $$
 
 첫 번째 단계는 **검색(Search)** 단계로, 함수 \\(\varphi\\)로 표현됩니다. 이 단계는 관련 정보를 담고 있을 가능성이 있는 후보 노드와 엣지를 식별하는 데서 시작합니다. Zep은 여러 가지 서로 다른 검색 방법을 사용하지만, 전체 검색 함수는 다음과 같이 하나로 표현할 수 있습니다.
 
-$$ \varphi : S \to \mathcal{E}\_s^n \times \mathcal{N}\_s^n \times \mathcal{N}\_c^n $$
+$$ \varphi : S \to \mathcal{E}_s^n \times \mathcal{N}_s^n \times \mathcal{N}_c^n $$
 
 여기서 \\(\varphi\\)는 질의 문자열을 받아 세 가지 요소로 이루어진 3-튜플(3-tuple)로 변환합니다. 그 세 요소는 각각 의미 엣지(semantic edge)의 리스트 \\(\mathcal{E}_s^n\\), 개체 노드(entity node)의 리스트 \\(\mathcal{N}_s^n\\), 그리고 커뮤니티 노드(community node)의 리스트 \\(\mathcal{N}_c^n\\)입니다. 위첨자 \\(n\\)은 각 유형마다 여러 개의 결과가 리스트 형태로 반환됨을 나타냅니다. 앞서 지식 그래프 구축 부분에서 정의했던 세 가지 그래프 요소—의미 엣지, 개체 노드, 커뮤니티 노드—가 바로 관련 텍스트 정보를 담고 있는 세 가지 그래프 유형이며, 검색 단계는 질의에 대해 이 세 유형 각각에서 후보를 길어 올리는 역할을 합니다.
 
 두 번째 단계는 **재순위화(Reranker)** 단계로, 함수 \\(\rho\\)로 표현됩니다. 이 단계는 검색 결과를 재정렬하는 역할을 합니다. 재순위화 함수 혹은 모델은 검색 결과의 리스트를 받아 그것을 재정렬한 버전을 산출합니다.
 
-$$ \rho : \varphi(\alpha), \ldots \to \mathcal{E}\_s^n \times \mathcal{N}\_s^n \times \mathcal{N}\_c^n $$
+$$ \rho : \varphi(\alpha), \ldots \to \mathcal{E}_s^n \times \mathcal{N}_s^n \times \mathcal{N}_c^n $$
 
 이 시그니처에서 주목할 부분은 입력에 \\(\varphi(\alpha)\\) 뒤에 붙은 줄임표(\\(\ldots\\))입니다. 이는 재순위화 함수가 단순히 검색 결과만 받는 것이 아니라 추가적인 인자를 함께 받을 수 있음을 시사합니다. 실제로 뒤에서 살펴볼 여러 재순위화 방식 중 일부는 중심 노드나 질의 같은 부가 정보를 함께 활용합니다. 출력 공간은 검색 단계의 출력과 동일한 3-튜플 형태이므로, 재순위화는 결과의 "구성"을 바꾸는 것이 아니라 그 "순서"를 바꾸는 변환임을 알 수 있습니다.
 
 세 번째 단계는 **구성(Constructor)** 단계로, 함수 \\(\chi\\)로 표현됩니다. 이 마지막 단계는 관련 노드와 엣지를 텍스트 맥락으로 변환합니다.
 
-$$ \chi : \mathcal{E}\_s^n \times \mathcal{N}\_s^n \times \mathcal{N}\_c^n \to S $$
+$$ \chi : \mathcal{E}_s^n \times \mathcal{N}_s^n \times \mathcal{N}_c^n \to S $$
 
 구성 함수가 각 그래프 요소로부터 정확히 어떤 필드를 끄집어내는지가 중요한데, 이는 앞서 다룬 이중 시간 모델과 직접 연결됩니다. 각 의미 엣지 \\(e_i \in \mathcal{E}_s\\)에 대해서는 사실(fact)과 함께 \\(t_{\text{valid}}\\), \\(t_{\text{invalid}}\\) 필드를 반환합니다. 즉 단순히 "무엇이 사실인가"뿐 아니라 "그 사실이 언제부터 언제까지 참이었는가"라는 시간 범위를 함께 제공하는 것입니다. 앞서 엣지 무효화 과정에서 관리하던 사건 타임라인 상의 두 타임스탬프가 바로 이 지점에서 LLM에게 전달되어, 에이전트가 시간적 추론을 수행할 수 있게 됩니다. 각 개체 노드 \\(n_i \in \mathcal{N}_s\\)에 대해서는 이름(name)과 요약(summary) 필드를, 그리고 각 커뮤니티 노드 \\(n_i \in \mathcal{N}_c\\)에 대해서는 요약 필드를 반환합니다.
 

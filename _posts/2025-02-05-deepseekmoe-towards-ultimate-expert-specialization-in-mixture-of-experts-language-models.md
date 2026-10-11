@@ -1,10 +1,11 @@
 ---
 layout: post
 title: "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models"
+seo_title: "DeepSeekMoE: Ultimate Expert Specialization in MoE"  # <title> only; the paper title runs past a results list
 date: 2024-01-11 17:31:42
 paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Ultimate-Expert-Specialization", "Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Mixture-of-Experts-Architecture", "Parameter-Efficient-Language-Model-Scaling", "Sparse-Mixture-of-Experts", "Efficient-Transformer-Architecture", "Economical-Training", "Multi-Level-Load-Balancing", "Efficient-Inference", "Mixture-of-Experts", "DeepSeek"]
+tags: ["Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Mixture-of-Experts", "Parameter-Efficient-Language-Model-Scaling", "Economical-Training", "Multi-Level-Load-Balancing", "Efficient-Inference", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

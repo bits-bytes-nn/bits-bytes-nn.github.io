@@ -1,10 +1,11 @@
 ---
 layout: post
 title: "DeepSeek-Coder: When the Large Language Model Meets Programming - The Rise of Code Intelligence"
+seo_title: "DeepSeek-Coder: The Rise of Code Intelligence"  # <title> only; the paper title runs past a results list
 date: 2024-01-25 14:17:53
 paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Repository-Level-Deduplication", "Dependency-Aware-Training", "Project-Level-Code-Understanding", "Cross-File-Dependency-Analysis", "Topological-Sorting-For-Code-Learning", "LeetCode-Competition-Benchmark", "DeepSeek"]
+tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Repository-Level-Deduplication", "Dependency-Aware-Training", "Project-Level-Code-Understanding", "Cross-File-Dependency-Analysis", "Topological-Sorting-for-Code-Learning", "LeetCode-Competition-Benchmark", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

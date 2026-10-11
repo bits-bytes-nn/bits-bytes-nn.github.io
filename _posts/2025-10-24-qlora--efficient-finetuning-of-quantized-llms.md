@@ -5,7 +5,7 @@ subtitle: "QLoRA: 양자화된 대규모 언어 모델의 효율적인 파인튜
 date: 2023-05-23 17:50:33
 paper_author: "University of Washington"
 categories: ["Paper Reviews", "Finetuning"]
-tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning-with-Direct-Preference-Optimization"]
+tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning", "Quantization"]
 cover: /assets/images/finetuning.jpg
 use_math: true
 ---
@@ -317,9 +317,8 @@ Double Quantization(DQ)은 성능 저하 없이 메모리 사용량을 추가로
 
 첫 번째 설정에서는 125M부터 3B 파라미터까지의 RoBERTa와 T5 모델을 GLUE와 Super-NaturalInstructions 데이터셋에서 전체 16비트 파인튜닝과 비교하였습니다.
 
-| 데이터셋       | GLUE (정확도) | Super-NaturalInstructions (RougeL) |
-| -------------- | ------------- | ---------------------------------- |
-| 모델           | RoBERTa-large | T5-80M                             | T5-250M | T5-780M | T5-3B | T5-11B |
+| 방법 | GLUE (정확도) RoBERTa-large | Super-NaturalInstructions (RougeL) T5-80M | Super-NaturalInstructions (RougeL) T5-250M | Super-NaturalInstructions (RougeL) T5-780M | Super-NaturalInstructions (RougeL) T5-3B | Super-NaturalInstructions (RougeL) T5-11B |
+| --- | --- | --- | --- | --- | --- | --- |
 | BF16           | 88.6          | 40.1                               | 42.1    | 48.0    | 54.3  | 62.0   |
 | BF16 복제      | 88.6          | 40.0                               | 42.2    | 47.3    | 54.9  | -      |
 | LoRA BF16      | 88.8          | 40.5                               | 42.6    | 47.1    | 55.4  | 60.7   |
@@ -513,11 +512,8 @@ Guanaco는 놀랍도록 강한 마음 이론 능력을 보여줍니다. 예를 �
 
 분석에서 자동화된 평가 시스템이 눈에 띄는 편향을 가지고 있다는 것도 발견하였습니다. 예를 들어, GPT-4가 프롬프트에서 먼저 나타나는 시스템에 더 높은 점수를 할당하는 강한 순서 효과를 관찰하였습니다. GPT-4와 인간 주석자 간의 상대적으로 약한 샘플 수준 일치도(Fleiss $$\kappa = 0.25$$)는 인간 주석자와 자동화된 시스템이 항상 일치하지 않는 선호도에 의존할 수 있음을 시사합니다.
 
-| 벤치마크    | Vicuna            | Vicuna   | Open Assistant |
-| ----------- | ----------------- | -------- | -------------- |
-| 프롬프트 수 | 80                | 80       | 953            |
-| 평가자      | 인간 평가자       | GPT-4    | GPT-4          |
-| 중앙값 순위 | 모델              | Elo 순위 | Elo 순위       | Elo 순위 |
+| 중앙값 순위 | 모델              | Vicuna (프롬프트 80개), 인간 평가자 Elo | Vicuna (프롬프트 80개), GPT-4 평가 Elo | Open Assistant (프롬프트 953개), GPT-4 평가 Elo |
+| ----------- | ----------------- | -------- | -------------- | -------- |
 | 1           | GPT-4             | 1176     | 1348           | 1129     |
 | 2           | Guanaco-65B       | 1023     | 1022           | 1008     |
 | 3           | Guanaco-33B       | 1009     | 999            | 1002     |

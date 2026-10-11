@@ -5,7 +5,7 @@ subtitle: "Gemma 2: 실용적 크기에서 오픈 언어 모델 개선"
 date: 2024-07-31 19:13:07
 paper_author: "Google DeepMind"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Knowledge-Distillation-for-Small-Language-Models", "Interleaving-Local-Global-Attention", "Grouped-Query-Attention", "Logit-Soft-Capping", "RMSNorm-Stabilization", "Multi-Stage-Post-Training-Recipe", "Sliding-Window-Attention-Optimization", "Instruction-Fine-Tuning-with-Direct-Preference-Optimization", "Model-Merging-through-Weight-Averaging", "Responsible-Open-Model-Development"]
+tags: ["Knowledge-Distillation", "Interleaved-Local-Global-Attention", "Grouped-Query-Attention", "Logit-Soft-Capping", "RMSNorm", "Multi-Stage-Post-Training-Recipe", "Sliding-Window-Attention", "Instruction-Fine-Tuning", "Model-Merging-through-Weight-Averaging", "Responsible-AI-Development", "Efficient-Attention", "Alignment"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---

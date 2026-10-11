@@ -5,7 +5,7 @@ subtitle: "Gemini: 고도로 능력 있는 멀티모달 모델 패밀리"
 date: 2023-12-19 02:39:27
 paper_author: "Google DeepMind"
 categories: ["Paper Reviews", "Multimodal-Learning"]
-tags: ["Natively-Multimodal-Transformer-Architecture", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Long-Context-Attention-Mechanism", "Multimodal-Safety-Evaluation-Framework", "Responsible-Multimodal-Model-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model", "Multimodal-Models"]
+tags: ["Natively-Multimodal-Transformer", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Attention", "Multimodal-Safety-Evaluation-Framework", "Responsible-AI-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model", "Multimodal-Models"]
 cover: /assets/images/multimodal-learning.jpg
 use_math: true
 ---
@@ -397,9 +397,8 @@ AI를 사용자에게 더 가깝게 가져오기 위해, 연구팀은 온디바�
 
 Nano-1과 Nano-2 모델 크기는 각각 1.8B와 3.25B 파라미터에 불과합니다. 크기에도 불구하고 사실성, 즉 검색 관련 작업에서 예외적으로 강력한 성능을 보이며, 추론, STEM, 코딩, 멀티모달 및 다국어 작업에서 상당한 성능을 보여줍니다.
 
-| 벤치마크                       | Gemini Nano 1       | Gemini Nano 2 |
-| ------------------------------ | ------------------- | ------------- |
-| **정확도**                     | **Pro 대비 정규화** | **정확도**    | **Pro 대비 정규화** |
+| 벤치마크                       | Nano 1 정확도 | Nano 1 Pro 대비 정규화 | Nano 2 정확도 | Nano 2 Pro 대비 정규화 |
+| ------------------------------ | ------------- | ---------------------- | ------------- | ---------------------- |
 | BoolQ                          | 71.6                | 0.81          | 79.3                | 0.90 |
 | TydiQA (GoldP)                 | 68.9                | 0.85          | 74.2                | 0.91 |
 | NaturalQuestions (Retrieved)   | 38.6                | 0.69          | 46.5                | 0.83 |
@@ -521,9 +520,8 @@ Gemini Ultra는 광범위한 이미지 이해 벤치마크에서 최신 기술 �
 
 [MMMU](https://arxiv.org/pdf/2311.16502v4)는 최근 출시된 평가 벤치마크로, 이러한 질문들을 해결하기 위해 대학 수준의 지식이 필요한 6개 분야의 여러 과목에 걸친 이미지에 대한 질문들로 구성되어 있습니다. Gemini Ultra는 이 벤치마크에서 최고 점수를 달성하여 최신 기술 수준 결과를 5퍼센트 포인트 이상 향상시켰으며, 6개 분야 중 5개에서 이전 최고 결과를 능가했습니다.
 
-| MMMU (val)        | Gemini Ultra (0-shot) | GPT-4V (0-shot) |
-| ----------------- | --------------------- | --------------- |
-|                   | Maj@32                | pass@1          | pass@1 |
+| MMMU (val)        | Gemini Ultra (0-shot) Maj@32 | Gemini Ultra (0-shot) pass@1 | GPT-4V (0-shot) pass@1 |
+| ----------------- | ---------------------------- | ---------------------------- | ---------------------- |
 | 예술 & 디자인     | 74.2                  | 70.0            | 65.8   |
 | 비즈니스          | 62.7                  | 56.7            | 59.3   |
 | 과학              | 49.3                  | 48.0            | 54.7   |
@@ -540,9 +538,8 @@ Gemini 모델들은 또한 모달리티와 다양한 글로벌 언어 세트에�
 
 연구팀은 모든 모델에 대해 미세 조정 없이 [Flamingo 평가 프로토콜](https://arxiv.org/abs/2204.14198)을 사용하여 4-shot 설정에서 Crossmodal-3600(XM-3600) 벤치마크의 선택된 언어 하위 집합에서 이미지 설명 생성 성능을 평가했습니다.
 
-| XM-3600 (CIDER) | Gemini Ultra | Gemini Pro | Google PaLI-X |
-| --------------- | ------------ | ---------- | ------------- |
-|                 | 4-shot       | 4-shot     | 4-shot        |
+| XM-3600 (CIDER) | Gemini Ultra 4-shot | Gemini Pro 4-shot | Google PaLI-X 4-shot |
+| --- | --- | --- | --- |
 | 영어            | 86.4         | 87.1       | 77.8          |
 | 프랑스어        | 77.9         | 76.7       | 62.5          |
 | 힌디어          | 31.1         | 29.8       | 22.2          |
