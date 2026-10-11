@@ -76,10 +76,12 @@ _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
                    ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
 _plugins/          reading_time.rb      (KO/EN-aware read time)
                    lazy_images.rb       (adds loading="lazy" to <img>)
+                   image_dimensions.rb  (width/height on local <img>)
                    post_description.rb  (fills page.description for posts)
                    related_posts.rb     (page.related, and the prev/next links)
                    scrollable_tables.rb (wraps wide tables so they scroll)
                    search_index.rb      (plain_text filter for search.json)
+                   legacy_urls.rb       (redirects pre-slug post URLs)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
@@ -150,16 +152,21 @@ Categories are **two levels**:
   `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`,
   `Data-Architecture`, … (add new ones freely).
 
-Jekyll combines the two with the date to build the output path:
+Jekyll slugifies the two and combines them with the date to build the output
+path (`permalink` in `_config.yml`):
 
 ```
 categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
         ↓
-_site/paper reviews/language-models/2025/01/23/<slug>.html
+_site/paper-reviews/language-models/2025/01/23/<slug>.html
 ```
 
 So **changing the categories or date of a published post changes its URL**, which
 breaks inbound links and search results. Set them once and leave them.
+
+Posts first published under the old unslugified form (`/paper%20reviews/…`) keep
+working: `_plugins/legacy_urls.rb` adds that path to each post's `redirect_from`,
+and jekyll-redirect-from writes a stub there that redirects to the new URL.
 
 ### Tags: one topic tag on top of the specific ones
 
