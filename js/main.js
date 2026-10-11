@@ -7,13 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // The OS setting is intentionally NOT followed.
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
-    var icon = themeToggle.querySelector('i');
     var themeColor = document.querySelector('meta[name="theme-color"]');
     function isDark() {
       return document.documentElement.getAttribute('data-theme') === 'dark';
     }
     function syncTheme() {
-      if (icon) icon.className = isDark() ? 'fa-solid fa-sun' : 'fa-regular fa-moon';
       // aria-label is static, so without this a screen-reader user cannot tell
       // whether dark mode is currently on.
       themeToggle.setAttribute('aria-pressed', isDark() ? 'true' : 'false');

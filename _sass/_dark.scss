@@ -50,9 +50,18 @@
   // $action-color is 2.75:1 on $bg.
   .navigation .navigation-menu-button { color: $link; }
 
-  // The footer keeps its blue band in dark mode, and the generic dark `a` color
-  // above would otherwise win over its white links.
-  .site-footer a { color: #fff; }
+  // The footer drops its blue band here: on a near-black page it was the
+  // brightest thing on the screen. It becomes a raised panel like the meta box.
+  // Its links stay body-coloured, as on the blue band, rather than taking the
+  // generic dark `a` blue above.
+  .site-footer {
+    background-color: $surface;
+    border-top: 1px solid $border;
+    color: $fg;
+    a { color: $fg; &:hover, &:focus { color: #fff; } }
+    a::after { background: $fg; }
+    a:focus-visible { outline-color: $link; }
+  }
 
   .navigation {
     background: rgba($bg, 0.95);
@@ -108,6 +117,8 @@
   .tag-section .post-item { border-bottom-color: $border; }
   .tag-section .post-link { color: $link; &:hover { color: lighten($link, 8%); } }
   .tag-section .post-date { color: $fg-muted; }
+  .tag-index a { border-color: $border; &:hover { border-color: $link; } }
+  .tag-index .tag-index-label, .tag-index .tag-count { color: $fg-muted; }
 
   // Post navigation (prev/next)
   .post-nav .post-nav-link {
@@ -154,7 +165,19 @@
   // same fill is 7.9:1.
   mark { background-color: #b8860b; color: $bg; }
 
-  .post-list hr, .posts-list li { border-color: $border; }
+  .post-list > li, .posts-list li { border-color: $border; }
+
+  // The table scroll cue (base/_tables.scss), on the dark page.
+  .table-container {
+    background:
+      linear-gradient(to right, $bg 30%, rgba($bg, 0)) left / 2.5em 100% no-repeat local,
+      linear-gradient(to left, $bg 30%, rgba($bg, 0)) right / 2.5em 100% no-repeat local,
+      linear-gradient(to right, rgba($fg, 0.18), rgba($fg, 0)) left / 0.9em 100% no-repeat scroll,
+      linear-gradient(to left, rgba($fg, 0.18), rgba($fg, 0)) right / 0.9em 100% no-repeat scroll;
+  }
+
+  // The generic dark link colour landed on the skip link's white box at 1.98:1.
+  .skip-link { background: $surface; color: $link; }
 
   // --- Light-theme colours that leak through on more specific selectors -------
   // The `a { color: $link }` above is specificity (0,1,2). Several base rules are
@@ -194,7 +217,7 @@
 
   // The pagination arrow is a white glyph over a square tinted by the inherited
   // link colour: #fff on #58a6ff is 2.53:1. Inverting it gives 7.49:1.
-  .pagination a .fa-inverse { color: $bg; }
+  .pagination a .page-arrow .icon { color: $bg; }
 }
 
 // Opt-in only: dark applies solely when the visitor toggles it on.

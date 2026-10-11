@@ -37,13 +37,45 @@ th {
 // width evenly and squeezes 15 columns into ~23px each on a phone. Inside the
 // wrapper the table sizes to its content instead, with the container width as a
 // floor, so narrow tables look unchanged and wide ones scroll.
+//
+// Cells break between words only. `break-word` above let a cell shrink to one
+// character, so a phone got "2024년 / 월" and "Mixtra/l"; here a column is as
+// wide as its longest word and the table scrolls instead. `overflow-wrap` still
+// splits a single token longer than the screen. Both cells get the same right
+// padding, or adjacent figures run together ("68.7%43.2%").
+//
+// The shading at either edge says there is more to scroll to: the solid
+// gradients scroll with the content and cover the shadows at the ends.
 .table-container {
+  $cover: $base-background-color;
   overflow-x: auto;
   margin-bottom: $base-spacing;
+  background:
+    linear-gradient(to right, $cover 30%, rgba($cover, 0)) left / 2.5em 100% no-repeat local,
+    linear-gradient(to left, $cover 30%, rgba($cover, 0)) right / 2.5em 100% no-repeat local,
+    linear-gradient(to right, rgba(#000, 0.18), rgba(#000, 0)) left / 0.9em 100% no-repeat scroll,
+    linear-gradient(to left, rgba(#000, 0.18), rgba(#000, 0)) right / 0.9em 100% no-repeat scroll;
 
   table {
     table-layout: auto;
     width: auto;
     min-width: 100%;
   }
+
+  th, td {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    padding-right: 15px;
+
+    // Only between columns: on the last one it made tables scroll by the
+    // padding alone, with nothing hidden.
+    &:last-child { padding-right: 0; }
+  }
+
+  // The inline-code chip's `anywhere` (_layout.scss) would shrink the column
+  // again and split `hook_stopped` as "hook_stop/ped"; here the table scrolls
+  // instead. `.post-content` matches that rule's specificity, and _layout.scss
+  // comes later, so without it this rule loses.
+  .post-content & td code,
+  .post-content & th code { overflow-wrap: break-word; }
 }

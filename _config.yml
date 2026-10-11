@@ -6,7 +6,7 @@ plugins:
 
 feed:
   excerpt_only: true
-  posts_limit: 20
+  posts_limit: 50  # comfortably above the post count; excerpts only, so the feed stays small
 
 # NOTE: the Google/Naver site-verification HTML files are intentionally NOT
 # excluded — they must be served at the site root, or Search Console / Naver
@@ -40,6 +40,9 @@ author: Jonas Kim
 # The site's default language: the feed's xml:lang. Pages and posts still set
 # their own `lang` (layouts fall back to 'ko' when they don't).
 lang: ko
+# Every date shown on a page (post meta, home, tags, category lists) uses this, so
+# one page cannot say "29 May 2023" while another says "May 29, 2023".
+date_format: "%B %-d, %Y"
 # `>-` (folded, chomped) not `|` — a literal block keeps the trailing newline,
 # which then leaks into meta content="" attributes and the feed <subtitle>.
 description: >-

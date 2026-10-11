@@ -4,7 +4,8 @@
     include.category  — exact category name, e.g. "Paper Summaries"
     include.empty     — message shown when the category has no posts
 {%- endcomment -%}
-{% assign posts = site.categories[include.category] %}
+{%- comment -%} `listed`: without a translation whose original is listed. {%- endcomment -%}
+{% assign posts = site.categories[include.category] | listed %}
 {% if posts.size > 0 %}
   <ul class="posts-list">
   {% for post in posts %}
@@ -12,7 +13,7 @@
       <strong>
         <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </strong>
-      <span class="post-date">- {{ post.date | date_to_long_string }}</span>
+      <span class="post-date">- {{ post.date | date: site.date_format }}</span>
     </li>
   {% endfor %}
   </ul>

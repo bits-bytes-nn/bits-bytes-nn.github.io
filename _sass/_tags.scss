@@ -6,6 +6,45 @@
 // Redesigned from the old gradient "box inside a box" look to a clean,
 // flat section: a topic heading with an accent underline over a simple list.
 
+// Chips for the tags several posts share, above the full A-Z list.
+.tag-index {
+	margin: 0 0 2em;
+
+	.tag-index-label {
+		margin-bottom: 0.6em;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: $medium-gray;
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	a {
+		display: inline-block;
+		padding: 0.25em 0.75em;
+		border: $base-border;
+		border-radius: 2em;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		text-decoration: none;
+
+		&:hover { border-color: $action-color; }
+	}
+
+	.tag-count {
+		margin-left: 0.2em;
+		color: $medium-gray;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
 .tag-section {
 	margin: 2.5em 0;
 }
@@ -53,6 +92,3 @@
 	white-space: nowrap;
 }
 
-.tag-divider {
-	display: none; // sections are separated by their own margins now
-}

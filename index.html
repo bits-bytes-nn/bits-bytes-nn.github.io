@@ -43,7 +43,7 @@ description: >-
 					<p>{{ post.description | shorten_card | escape }}</p>
 				</section>
 				<section class="post-meta">
-					<div class="post-date">{{ post.date | date: "%B %-d, %Y" }}</div>
+					<div class="post-date">{{ post.date | date: site.date_format }}</div>
 					<div class="post-categories">
 						{% if post.categories.size > 0 %}in {% for cat in post.categories %}
 						<a href="{{ site.baseurl }}/categories/#{{ cat | slugify }}"
@@ -53,16 +53,10 @@ description: >-
 					</div>
 				</section>
 			</li>
-			{% if forloop.last == false %}
-			<hr />
-			{% endif %} {% endfor %}
+			{% endfor %}
 		</ul>
 
 		{%- comment -%}
-		  Icons are Font Awesome 6 names (fa-solid/fa-angles-*), not the v4 aliases
-		  (fa/fa-angle-double-*) — those were the only reason the v4-shims
-		  stylesheet was loaded on every page.
-
 		  Both directions are links, so both need an accessible name: the icons are
 		  decorative and carry no text. The forward link is `older-posts`; it used
 		  to reuse `newer-posts`, which is what the CSS keys off.
@@ -76,16 +70,10 @@ description: >-
 					aria-label="Newer posts"
 					href="{% if paginator.page == 2 %}{{ site.baseurl }}/{% else %}{{ site.baseurl }}{{ paginator.previous_page_path }}{% endif %}"
 				>
-					<span class="fa-stack fa-lg" aria-hidden="true">
-						<i class="fa-solid fa-square fa-stack-2x"></i>
-						<i class="fa-solid fa-angles-left fa-stack-1x fa-inverse"></i>
-					</span>
+					<span class="page-arrow" aria-hidden="true">{% include icon.html name="angles-left" %}</span>
 				</a>
 				{% else %}
-				<span class="fa-stack fa-lg is-disabled" aria-hidden="true">
-					<i class="fa-solid fa-square fa-stack-2x"></i>
-					<i class="fa-solid fa-angles-left fa-stack-1x fa-inverse"></i>
-				</span>
+				<span class="page-arrow is-disabled" aria-hidden="true">{% include icon.html name="angles-left" %}</span>
 				{% endif %}
 				<span class="page-number"
 					>Page {{ paginator.page }} of {{ paginator.total_pages }}</span
@@ -97,16 +85,10 @@ description: >-
 					aria-label="Older posts"
 					href="{{ site.baseurl }}{{ paginator.next_page_path }}"
 				>
-					<span class="fa-stack fa-lg" aria-hidden="true">
-						<i class="fa-solid fa-square fa-stack-2x"></i>
-						<i class="fa-solid fa-angles-right fa-stack-1x fa-inverse"></i>
-					</span>
+					<span class="page-arrow" aria-hidden="true">{% include icon.html name="angles-right" %}</span>
 				</a>
 				{% else %}
-				<span class="fa-stack fa-lg is-disabled" aria-hidden="true">
-					<i class="fa-solid fa-square fa-stack-2x"></i>
-					<i class="fa-solid fa-angles-right fa-stack-1x fa-inverse"></i>
-				</span>
+				<span class="page-arrow is-disabled" aria-hidden="true">{% include icon.html name="angles-right" %}</span>
 				{% endif %}
 			</p>
 		</nav>

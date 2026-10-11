@@ -68,7 +68,7 @@ _posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역�
 _layouts/          페이지 템플릿: default → post / page
 _includes/         재사용 조각: head, header, footer, nav_links,
                    page_divider, category-posts, language_switcher,
-                   related_posts
+                   related_posts, icon(인라인 SVG 아이콘)
 _sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
                    _dark(다크모드), base/*
                    ⚠ bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
@@ -80,6 +80,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
                    search_index.rb      (search.json용 plain_text 필터)
                    legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
+                   translations.rb      (번역본을 글 목록에서 빼기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -87,8 +88,11 @@ assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(
 assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 test/              _plugins/ 로직의 minitest 단위 테스트
-script/            validate-site.sh (빌드 후 검색 노출 검사)
-.github/workflows/ CI: 테스트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
+script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
+                   validate-site.sh (빌드 후 검색 노출 검사)
+_data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
+                   유일한 정본. scholar-lens도 읽음)
+.github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
 ```
 
 **최상위 페이지:** `index.html`(홈), 네 개의 섹션 페이지인 `paper-reviews.md`·
@@ -110,6 +114,7 @@ title: "<글 제목>"
 subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<저자>"             # 논문 저자(기관). Insights·의견 글이면 생략
+seo_title: "<짧은 제목>"            # 선택 — 논문 제목이 너무 길 때 <title>에 대신 씁니다
 description: >-                    # 선택 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
 categories: ["<유형>", "<주제>"]
@@ -117,9 +122,13 @@ tags: ["<태그-1>", "<태그-2>"]
 cover: /assets/images/<topic>.(jpg|png)
 use_math: true                     # 수식이 있을 때만 (MathJax를 불러옵니다)
 lang: ko                           # translation_id를 쓰면 필수(ko | en)…
-translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다
+translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다.
+                                   #    목록에는 한국어 글만 나옵니다
 ---
 ```
+
+논문 글의 `<title>`은 제목(또는 `seo_title`) 뒤에 "논문 리뷰"·"논문 요약"을 붙입니다.
+독자가 검색하는 말이기 때문이고, 소셜 카드는 원래 제목을 그대로 씁니다.
 
 **본문 첫 줄에 제목을 H1으로 다시 쓰지 마세요.** 레이아웃이 이미 제목을 렌더링하므로
 `# 제목`을 넣으면 `<h1>`이 두 개가 되고, 검색 결과 설명문에도 그 제목이 새어 나갑니다.
@@ -170,20 +179,18 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 글을 **잇지는** 못하고, `_plugins/related_posts.rb`가 **공유** 태그를 요구하므로 그렇게만
 달린 글은 "Related reading"이 아예 붙지 않은 채 배포됩니다.
 
-그래서 글마다 아래 통제된 주제 태그를 최소 하나 답니다.
+그래서 글마다 통제된 주제 태그를 최소 하나 답니다. 목록은
+[`_data/post_conventions.yml`](_data/post_conventions.yml)의 `tags.controlled` 하나뿐이고,
+`script/lint-posts.rb`와 scholar-lens가 같은 파일을 읽습니다.
 
-```
-Agentic-AI  Alignment  DeepSeek  Knowledge-Graph  Llama
-Mixture-of-Experts  Multimodal-Models  Reasoning-Models
-Retrieval-Augmented-Generation
-```
+세부 태그는 **그대로 남깁니다.** 주제 태그가 담지 못하는 내용을 담고 있습니다.
+**주제 태그는 얹는 것이지 바꿔 다는 게 아닙니다.**
 
-기존 세부 태그는 **그대로 남깁니다.** 주제 태그가 담지 못하는 내용을 담고 있고, 지우면 이미
-살아 있는 `/tags/` 앵커가 움직입니다. **주제 태그는 얹는 것이지 바꿔 다는 게 아닙니다.**
-
-새 주제 태그를 만들기 전에 위 목록에 이미 덮이는 게 없는지 확인하세요. 한 개념을 세 이름으로
+새 태그를 만들기 전에 기존 태그로 덮이지 않는지 확인하세요. 한 개념을 세 이름으로
 부르면(`Agentic-Architecture`·`Agentic-Patterns`·`Agentic-Infrastructure`) 글마다 아무도
-공유하지 않는 태그를 하나씩 들고 있게 되고, 그건 주제 태그가 없는 것과 같습니다.
+공유하지 않는 태그를 하나씩 들고 있게 되고, 그건 주제 태그가 없는 것과 같습니다. 두 태그가
+같은 개념이라고 판단되면 하나를 남기고 다른 하나를 `tags.aliases`에 올립니다. 그러면 린트가
+옛 이름을 막습니다.
 
 ### 수식은 반드시 `$$…$$`로
 
@@ -197,11 +204,12 @@ kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합
 
 ### 푸시 전에 확인하세요
 
-CI가 돌리는 네 게이트를 같은 순서로 미리 돌립니다. `_site/`가 아니라 임시 경로로 빌드하는
+CI가 돌리는 게이트를 같은 순서로 미리 돌립니다. `_site/`가 아니라 임시 경로로 빌드하는
 이유는 아래 주의에 있습니다.
 
 ```bash
 ruby test/run_all.rb                                        # 플러그인 로직이 여전히 맞나?
+ruby script/lint-posts.rb                                   # 글 원본이 규칙을 지키나?
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # 빌드가 깨끗한가?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
@@ -230,19 +238,22 @@ script/validate-site.sh /tmp/site-verify                    # 사이트맵·피�
 
 `.github/workflows/jekyll.yml`은 `main` 푸시뿐 아니라 **`main`으로 향하는 PR에서도**
 돕니다. 그래서 아래 게이트가 잘못된 머지를 사후에 보고하는 데 그치지 않고 막습니다.
-1~4단계는 두 경우 모두, 5단계는 PR에서 건너뜁니다. 순서대로:
+1~5단계는 두 경우 모두, 6단계는 PR에서 건너뜁니다. 순서대로:
 
 1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
-2. `JEKYLL_ENV=production`으로 사이트를 빌드하고
-3. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
-4. **`script/validate-site.sh`**로 사이트맵·피드가 byte 0에서 파싱되는지, 사이트맵 URL이
+2. **`ruby script/lint-posts.rb`**로 프런트매터를 `_data/post_conventions.yml`과 대조하고,
+   마크다운 원본의 표·수식·헤딩 규칙을 검사하고
+3. `JEKYLL_ENV=production`으로 사이트를 빌드하고
+4. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
+5. **`script/validate-site.sh`**로 사이트맵·피드가 byte 0에서 파싱되는지, 사이트맵 URL이
    설정된 `url` 아래인지, 빌드 타임존이 고정됐는지, `robots.txt`가 막지 않고 사이트맵을 가리키는지, 렌더된
    페이지가 1개 이상인지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든
    페이지에 설명문·canonical이 있는지, 설명문이 자기 제목보다 긴지, 설명문·제목이
-   중복되지 않는지, 저작 원본이 배포되지 않았는지를 검사한 뒤
-5. GitHub Pages에 배포합니다.
+   중복되지 않는지, 목록 페이지에 번역본이 원본과 함께 나오지 않는지, 저작 원본이
+   배포되지 않았는지를 검사한 뒤
+6. GitHub Pages에 배포합니다.
 
-실패하면 대개 3·4단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로
+실패하면 대개 4·5단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로
 나옵니다. 수동 배포 단계는 없습니다.
 
 > **⚠ `google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**

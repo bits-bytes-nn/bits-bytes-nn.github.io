@@ -21,8 +21,13 @@
       column in that row.
     {%- endcomment -%}
     <div class="language-switcher">
-      <a href="{{ counterpart.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ counterpart.lang }}">
-        {{ other_label }}로 읽기 →
+      {%- comment -%}
+        `lang` marks the words that are in the other language, for screen readers:
+        on a Korean page only "English" (the rest is Korean), on an English page
+        the whole Korean label.
+      {%- endcomment -%}
+      <a href="{{ counterpart.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ counterpart.lang }}"{% if page.lang != 'ko' %} lang="ko"{% endif %}>
+        {% if page.lang == 'ko' %}<span lang="{{ counterpart.lang }}">{{ other_label }}</span>{% else %}{{ other_label }}{% endif %}로 읽기 →
       </a>
     </div>
   {% endif %}

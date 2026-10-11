@@ -274,6 +274,39 @@ else
   pass "every <title> is unique"
 fi
 
+# --- translations stay out of the listings ----------------------------------
+# A translation pair is one article, so the listings show only the version in
+# the site's language (_plugins/translations.rb). A listing page that skips the
+# `listed` filter shows the English twin again; htmlproofer is blind to it, and
+# it does not crawl the paginated home pages at all.
+SITE_LANG=$(sed -nE 's/^lang:[[:space:]]*"?([a-z-]+)"?.*/\1/p' "$CONFIG" | head -1)
+BASE_PATH=$(sed -nE "s/^baseurl:[[:space:]]*['\"]?([^'\"[:space:]]*)['\"]?.*/\1/p" "$CONFIG" | head -1)
+listed_twins=$(ruby -e '
+  site, site_lang, base, base_path = ARGV
+  hreflang = /<link rel="alternate" hreflang="#{Regexp.escape(site_lang)}"/
+  twins = Dir.glob("#{site}/**/*.html").filter_map do |f|
+    html = File.read(f)
+    lang = html[/<html lang="([^"]+)"/, 1]
+    f.delete_prefix(site) if lang && lang != site_lang && html.match?(hreflang)
+  end
+  listings = Dir.glob(["#{site}/index.html", "#{site}/page/*/index.html", "#{site}/*/index.html"])
+  listings.each do |f|
+    html = File.read(f)
+    twins.each do |t|
+      hrefs = [t, "#{base_path}#{t}", "#{base}#{base_path}#{t}"].map { |u| %(href="#{u}") }
+      puts "#{f.delete_prefix(site)} -> #{t}" if hrefs.any? { |h| html.include?(h) }
+    end
+  end
+' "$SITE" "$SITE_LANG" "$BASE_URL" "$BASE_PATH")
+if [ -z "$SITE_LANG" ]; then
+  fail "could not read 'lang:' from $CONFIG"
+elif [ -n "$listed_twins" ]; then
+  fail "listing pages that link a translation besides its original:"
+  printf '%s\n' "$listed_twins" | sed 's/^/          /' >&2
+else
+  pass "listing pages show each translated article once"
+fi
+
 # --- authoring sources must not ship ----------------------------------------
 # A .md without front matter is copied as-is, so a stray authoring note would ship.
 leaked=$(find "$SITE" -type f \( -name '*.excalidraw' -o -name '*.drawio' -o -name '*.sh' \

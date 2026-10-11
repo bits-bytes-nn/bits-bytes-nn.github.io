@@ -52,11 +52,11 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성, 옛 URL 리디렉션 페이지 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG의 `width`/`height`를 파일 헤더에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG의 `width`/`height`를 파일 헤더에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록), `translations.rb`(번역 짝의 다른 언어 글에 `hidden`을 달아 홈·카테고리·태그 목록에서 빼기 — 글 자체와 사이트맵·피드·검색에는 그대로 남는다) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
-| 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
+| 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 아이콘은 Font Awesome 경로를 복사한 인라인 SVG(`_includes/icon.html`)라 아이콘 글꼴을 받지 않는다. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
 | 검색 | `search.json`(전체 본문 색인) 위에 `simple-jekyll-search` | 서버 없이 브라우저에서 도는 검색. 미리 만들어 둔 색인 파일을 받아 클라이언트가 직접 찾는다 |
 | 다크모드 | 라이트가 기본, 토글로 opt-in(`_sass/_dark.scss`, `[data-theme="dark"]`) | OS의 다크모드 설정은 **따르지 않고**, 사용자가 버튼을 눌러 켜야 한다. 테마에 따라 바뀌어야 하는 두 값이 CSS 밖에 있다 — `color-scheme`(스크롤바 등 브라우저 위젯)은 `_dark.scss`가 `data-theme`으로 처리하고, `theme-color`(모바일 주소창)는 메타 태그라 `head.html`의 인라인 스크립트와 `main.js`의 토글이 함께 갱신한다 |
 | 호스팅/CI | GitHub Actions로 GitHub Pages 배포(`.github/workflows/jekyll.yml`) | `main`에 푸시하면 자동으로 빌드·검사·배포. 같은 검사가 `main`으로 향하는 PR에서도 돌아 머지 전에 막는다 |
@@ -65,7 +65,9 @@ Pages가 그대로 서빙.**
 > 배포망이다(예: cdnjs, jsDelivr). 문제는 그 외부 파일이 몰래 바뀌면 우리 사이트에
 > 악성 코드가 섞일 수 있다는 것. *SRI(Subresource Integrity)* 는 `<script>`/`<link>`에
 > `integrity="sha384-..."` 해시를 박아 두어, 받은 파일이 그 해시와 다르면 브라우저가
-> **실행을 거부**하게 만든다. 그래서 외부에서 불러오는 것은 버전을 고정하고 SRI를 붙인다.
+> **실행을 거부**하게 만든다. 그래서 CDN에서 받는 라이브러리 파일(GLightbox, MathJax,
+> simple-jekyll-search)은 버전을 고정하고 SRI를 붙인다. 요청마다 내용이 달라지는 Google
+> Fonts CSS와 Google Analytics 스크립트는 해시를 고정할 수 없어 SRI 대상이 아니다.
 
 > **왜 GitHub Pages 기본 빌드가 아니라 Jekyll을 직접 돌리나?** GitHub Pages의 내장
 > 빌드는 보안 샌드박스라 우리가 `_plugins/`에 만든 커스텀 플러그인을 막는다. 그래서 로컬과
@@ -168,6 +170,12 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 > `site.categories['<유형>']`으로 먼저 거른 뒤** 주제별로 그룹화한다 — 절대 반대 순서로
 > 하지 않는다.
 
+> **함정 — 번역본 이중 노출.** 번역 짝은 한 편의 글이라 목록에는 사이트 언어(`ko`) 쪽만
+> 나온다. `_plugins/translations.rb`가 다른 쪽에 `hidden`을 달고, 홈 페이지네이션
+> (jekyll-paginate)은 그 표시를 스스로 건너뛴다. 나머지 목록은 그렇지 않으므로 글 묶음을
+> 순회하는 새 목록 페이지는 **반드시 `| listed` 필터를 거친다**(예:
+> `site.tags[tag] | listed`). 빠뜨리면 `validate-site.sh`가 막는다.
+
 > **함정 — 앵커 점프 깨짐.** 카테고리·태그 앵커는 **링크 쪽과 헤딩 `id` 쪽이 같은 방식으로
 > 슬러그를 만들어야** 한다. 양쪽 다 `slugify` 필터를 쓴다. 한쪽만 `downcase`거나 원본
 > 케이스(`id="{{cat}}"`)를 내면 클릭해도 해당 위치로 점프하지 않는다. 새 목록 페이지를 만들 땐
@@ -182,9 +190,9 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 
 - **세부 태그** — 논문 하나의 기여를 서술한다(`Fine-Grained-Expert-Segmentation`,
   `Dependency-Aware-Tree-Traversal`). 논문 색인으로는 정확하다.
-- **주제 태그** — 글을 서로 잇는다. `Agentic-AI`, `Alignment`, `DeepSeek`,
-  `Knowledge-Graph`, `Llama`, `Mixture-of-Experts`, `Multimodal-Models`,
-  `Reasoning-Models`, `Retrieval-Augmented-Generation`.
+- **주제 태그** — 글을 서로 잇는다. 목록의 정본은 `_data/post_conventions.yml`의
+  `tags.controlled`다. 카테고리 값, 표지, 금지 키, 폐기된 태그 이름(`tags.aliases`)도 같은
+  파일에 있고, `script/lint-posts.rb`(CI)와 scholar-lens가 이 파일을 함께 읽는다.
 
 **세부 태그만 달면 관련 글이 안 붙는다.** 논문 하나의 기여를 그대로 옮긴 태그는 그 논문에만
 붙을 수 있고, `related_posts.rb`는 공유 태그를 요구한다. 그래서 세부 태그만 달린 글은
@@ -196,8 +204,8 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 이유로 공통점 없는 글이 서로 추천된다. 가중치가 그걸 막는 구조는 플러그인 상단 주석
 (`TAG_WEIGHT`·`SUBCATEGORY_WEIGHT`·`CATEGORY_WEIGHT`)에 설명돼 있다.
 
-그리고 세부 태그는 지우지 않는다 — 살아 있는 `/tags/` 앵커가 움직인다. 주제 태그를
-**얹기만** 한다.
+그리고 세부 태그는 지우지 않고 주제 태그를 **얹기만** 한다. 같은 개념의 두 이름은 하나로
+합치고, 옛 이름을 `tags.aliases`에 남긴다(태그 이름이 바뀌면 `/tags/#…` 앵커도 바뀐다).
 
 ## 4. 수식 렌더링
 
@@ -373,6 +381,11 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   canonical이 있는지, 설명문·제목이 중복되지 않는지 등을 확인한다. **검사 목록의 정본은
   스크립트 자체다** — 각 검사 옆 주석에 그 검사가 왜 있는지가 적혀 있다. htmlproofer가 보지
   않는 영역을 메우는 게 목적이다. 인자로 빌드 경로를 받고, 없으면 `_site`를 본다.
+- **글 원본 린트** — `script/lint-posts.rb`가 `_posts`의 마크다운을 빌드 전에 검사한다.
+  프런트매터는 `_data/post_conventions.yml`과 대조한다(카테고리·표지·금지 키·통제 태그·폐기된
+  태그 이름·태그 형식·번역본 파일명·논문 글의 `paper_author`). 빌드된 HTML에서는 더 보이지 않는 결함도 잡는다: 헤더와
+  열 수가 어긋난 표, 2단 헤더를 펴다 생긴 하위 헤더 행, `$$` 안의 `\_`, 빈 줄 없는 디스플레이
+  수식(목록 안 포함), 본문 H1. 통화 `$$`가 연 수식은 그 사이에 한글이 있을 때만 잡는다. 검사 목록의 정본은 스크립트와 `test/test_lint_posts.rb`다.
 - **플러그인 단위 테스트** — `test/`가 `_plugins/`의 순수 로직을 플러그인당 한 파일씩
   minitest로 검사한다. `ruby test/run_all.rb`로 돌리며 CI에서 빌드보다 먼저 실행된다.
   플러그인은 모든 페이지의 메타데이터를 만들기 때문에, 여기서 조용히 동작이 바뀌면 사이트
