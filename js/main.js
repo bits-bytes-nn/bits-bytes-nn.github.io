@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Spoken, never shown, so in the page's language: a Korean voice reading
   // "Table, scrollable" is unintelligible. (The visible chrome stays English.)
-  var english = document.documentElement.lang === 'en';
+  var english = document.documentElement.lang.indexOf('en') === 0;
   function scrollerLabel(el) {
     if (el.tagName === 'PRE') return english ? 'Code block, scrollable' : '코드 블록, 가로 스크롤';
     return english ? 'Table, scrollable' : '표, 가로 스크롤';

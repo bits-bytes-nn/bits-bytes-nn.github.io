@@ -56,6 +56,13 @@ class TestImageDimensions < Minitest::Test
     assert_equal '<img width="3" height="2" src="/assets/a.png" />', out
   end
 
+  # Hand-written <img> tags in layouts and raw HTML span lines.
+  def test_sizes_a_tag_that_spans_lines
+    out = ImageDimensions.apply(%(<img\n  loading="eager"\n  src="/assets/logo.png"\n  alt="logo"\n/>)) { png(192, 192) }
+    assert out.start_with?('<img width="192" height="192"')
+    assert_includes out, 'loading="eager"'
+  end
+
   def test_leaves_external_and_already_sized_images_alone
     external = '<img src="https://arxiv.org/x.png">'
     sized = '<img src="/assets/a.png" width="10">'

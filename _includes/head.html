@@ -236,7 +236,7 @@
 	          if (scrolls && el.getAttribute('tabindex') !== '0') {
 	            el.setAttribute('tabindex', '0');
 	            el.setAttribute('role', 'region');
-	            el.setAttribute('aria-label', document.documentElement.lang === 'en' ? 'Equation, scrollable' : '수식, 가로 스크롤');
+	            el.setAttribute('aria-label', document.documentElement.lang.indexOf('en') === 0 ? 'Equation, scrollable' : '수식, 가로 스크롤');
 	          } else if (!scrolls && el.getAttribute('role') === 'region') {
 	            el.removeAttribute('tabindex');
 	            el.removeAttribute('role');
