@@ -3,7 +3,7 @@ layout: post
 title: "QLoRA: Efficient Finetuning of Quantized LLMs"
 subtitle: "QLoRA: 양자화된 대규모 언어 모델의 효율적인 파인튜닝"
 date: 2023-05-23 17:50:33
-author: "University of Washington"
+paper_author: "University of Washington"
 categories: ["Paper Reviews", "Finetuning"]
 tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning-with-Direct-Preference-Optimization"]
 cover: /assets/images/finetuning.jpg
@@ -487,7 +487,7 @@ Guanaco는 또한 어떤 종류의 질문이 답변 불가능한지 잘 알고 �
 
 #### 수학
 
-Guanaco의 가장 큰 약점은 수학이며, 이는 많은 언어 모델이 어려움을 겪는 영역입니다. Guanaco가 작업을 보여줄 때는 정확한 경향이 있습니다. 사용자가 "Lee는 잔디를 한 번 깎고 $$33를 청구합니다. 지난주에 그는 16개의 잔디를 깎았고 세 명의 고객이 각각 $$10의 팁을 주었습니다. Lee는 지난주에 잔디를 깎아서 몇 달러를 벌었습니까?"라고 질문하자, Guanaco는 "Lee는 지난주에 잔디를 깎아서 $$582를 벌었습니다. 그가 번 총액을 찾기 위해 먼저 16개의 잔디를 깎아서 번 금액을 계산해야 합니다. $$33 x 16 = $$528. 그런 다음 세 명의 고객으로부터 받은 팁을 더해야 합니다. $$10 x 3 = $$30. 따라서 Lee가 번 총액은: $$528 + $$30 = $$558입니다"라고 답변합니다.
+Guanaco의 가장 큰 약점은 수학이며, 이는 많은 언어 모델이 어려움을 겪는 영역입니다. Guanaco가 작업을 보여줄 때는 정확한 경향이 있습니다. 사용자가 "Lee는 잔디를 한 번 깎고 $33를 청구합니다. 지난주에 그는 16개의 잔디를 깎았고 세 명의 고객이 각각 $10의 팁을 주었습니다. Lee는 지난주에 잔디를 깎아서 몇 달러를 벌었습니까?"라고 질문하자, Guanaco는 "Lee는 지난주에 잔디를 깎아서 $582를 벌었습니다. 그가 번 총액을 찾기 위해 먼저 16개의 잔디를 깎아서 번 금액을 계산해야 합니다. $33 x 16 = $528. 그런 다음 세 명의 고객으로부터 받은 팁을 더해야 합니다. $10 x 3 = $30. 따라서 Lee가 번 총액은: $528 + $30 = $558입니다"라고 답변합니다.
 
 그러나 Guanaco는 단계별로 문제를 분해하지 못하면 간단한 문제에서도 실패할 수 있으며, 이는 알려진 문제입니다. 예를 들어, 다음과 같은 상호작용을 볼 수 있습니다. 사용자가 "1833을 인수분해해 주세요"라고 요청하자, Guanaco는 "물론입니다, 기꺼이 도와드리겠습니다! 1833은 소수이며, 이는 1과 1833이라는 두 개의 인수만 가진다는 것을 의미합니다. 따라서 1833의 고유 인수분해는: 2^1 * 3^2 * 17^1입니다. 도움이 되었기를 바랍니다! 다른 질문이 있으시면 알려주세요"라고 답변합니다.
 

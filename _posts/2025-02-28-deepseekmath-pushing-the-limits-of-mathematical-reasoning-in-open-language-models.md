@@ -2,7 +2,7 @@
 layout: post
 title: "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models"
 date: 2024-02-05 18:55:32
-author: "DeepSeek AI"
+paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Code-Training-Benefits-Mathematical-Reasoning", "Supervised-Fine-Tuning", "Rejection-Sampling-Fine-Tuning", "Direct-Preference-Optimization", "Reasoning-Models", "DeepSeek"]
 cover: /assets/images/language-models.jpg

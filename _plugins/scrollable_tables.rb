@@ -6,9 +6,9 @@
 # The stylesheet has defined `.table-container { overflow-x: auto }` all along
 # (_sass/base/_tables.scss) but nothing ever emitted the wrapper — kramdown
 # produces a bare <table>. Meanwhile `table { table-layout: fixed; width: 100% }`
-# divides the available width evenly no matter how many columns there are: this
-# blog ships 258 tables, and at a 375px viewport the widest (15 columns) gives
-# each column ~23px, about 1.6 Hangul characters per line.
+# divides the available width evenly no matter how many columns there are: at a
+# 375px viewport a 15-column table gives each column ~23px, about 1.6 Hangul
+# characters per line.
 #
 # Keyboard access is deliberately NOT set here. A scroll container needs
 # tabindex="0" to be scrollable by keyboard in Safari and Firefox, but only when
@@ -17,19 +17,18 @@
 module ScrollableTables
   WRAPPER_OPEN = '<div class="table-container">'
   WRAPPER_CLOSE = "</div>"
+  # Captures a wrapper already opened in front of the table (whitespace allowed,
+  # as kramdown puts a newline there), so applying this twice — or to a post that
+  # wraps one table by hand — never nests wrappers.
+  TABLE = %r{(#{Regexp.escape(WRAPPER_OPEN)}\s*)?<table\b.*?</table>}m
 
   def self.apply(html)
     out = html.to_s
     return out unless out.include?("<table")
 
-    out.gsub(%r{<table\b.*?</table>}m) do |table|
-      "#{WRAPPER_OPEN}#{table}#{WRAPPER_CLOSE}"
+    out.gsub(TABLE) do |match|
+      Regexp.last_match(1) ? match : "#{WRAPPER_OPEN}#{match}#{WRAPPER_CLOSE}"
     end
-  end
-
-  # True when this document has already been wrapped, so a re-run is a no-op.
-  def self.wrapped?(html)
-    html.to_s.include?(WRAPPER_OPEN)
   end
 end
 
@@ -38,7 +37,6 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register [:posts, :pages], :post_render do |doc|
     next unless doc.output_ext == ".html"
-    next if ScrollableTables.wrapped?(doc.output)
 
     doc.output = ScrollableTables.apply(doc.output)
   end

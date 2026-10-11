@@ -2,11 +2,9 @@
  *
  * The index is every post's full body — that is what makes Korean recall work,
  * since simple-jekyll-search does plain substring matching and cannot find a
- * character it never indexed. But the result card used to show a fixed excerpt of
- * the first 40 words, and a search term is almost never in the first 40 words:
- * for "어텐션" every matching post matched only past character 300, so every card
- * showed prose with no visible match and nothing highlighted. Correct results
- * looked like wrong ones.
+ * character it never indexed. A search term is rarely in a post's opening lines,
+ * so a fixed excerpt from the top would show no visible match and make correct
+ * results look wrong.
  *
  * So the excerpt is cut around the match instead. That happens in
  * `templateMiddleware`, a simple-jekyll-search hook called once per {placeholder}
@@ -170,7 +168,7 @@
   SimpleJekyllSearch({
     searchInput: searchInput,
     resultsContainer: resultsContainer,
-    json: '/search.json',
+    json: searchInput.getAttribute('data-index'),
     searchResultTemplate:
       '<div class="search-result">' +
         '<h3><a href="{url}">{title}</a></h3>' +

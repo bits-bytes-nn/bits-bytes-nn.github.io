@@ -8,9 +8,8 @@ feed:
   posts_limit: 20
 
 # NOTE: the Google/Naver site-verification HTML files are intentionally NOT
-# excluded — they must be served at the site root for Search Console / Naver
-# to verify ownership and crawl sitemap.xml + feed.xml. Excluding them silently
-# breaks search indexing.
+# excluded — they must be served at the site root, or Search Console / Naver
+# lose ownership verification of the property.
 exclude:
   - /vendor/
   - README.md
@@ -22,16 +21,24 @@ exclude:
   # Diagram sources and their render script are authoring inputs, not site
   # assets. Without these they get copied into _site and served publicly.
   - "**/*.excalidraw"
+  - "**/*.drawio"
   - assets/images/render-diagrams.sh
+  # The READMEs' banner; the site itself uses my_header_image.jpg.
+  - assets/my_header_image_full.jpg
   - script/
+  - test/
 
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
 email: aldente0630@gmail.com
 name: Jonas Kim
 # jekyll-feed reads `author` (not `name`) for the Atom <author> element. Without
-# it every entry ships an empty <author><name></name></author>.
+# it every entry ships an empty <author><name></name></author>. Posts never set
+# `author` themselves — paper posts use `paper_author` — so this is every entry's.
 author: Jonas Kim
+# The site's default language: the feed's xml:lang. Pages and posts still set
+# their own `lang` (layouts fall back to 'ko' when they don't).
+lang: ko
 # `>-` (folded, chomped) not `|` — a literal block keeps the trailing newline,
 # which then leaks into meta content="" attributes and the feed <subtitle>.
 description: >-
@@ -40,13 +47,17 @@ baseurl: ''
 url: https://bits-bytes-nn.github.io
 # Post URLs embed :year/:month/:day, and front-matter dates carry no offset, so
 # without this Jekyll resolves them in the *build machine's* timezone. CI runs in
-# UTC while local machines here run in KST (+9), which pushed 19 afternoon-dated
-# posts onto the next day — meaning a deploy from a local machine would have
-# silently moved 19 live URLs and 404'd the originals. Pinned to UTC because that
-# is what every deploy so far used, so the published URLs do not move.
+# UTC while local machines here run in KST (+9), so a local build would move
+# afternoon-dated posts onto the next day and 404 their live URLs. Pinned to UTC
+# because every published URL was built that way.
 timezone: UTC
 cover: /assets/my_header_image.jpg
 logo: /assets/my_logo.png
+
+# No css/main.css.map in the published site; it only maps to the Sass sources,
+# which are not published either.
+sass:
+  sourcemap: never
 
 markdown: kramdown
 kramdown:
@@ -60,13 +71,16 @@ kramdown:
     preview: true
     preview_as_code: false
 
+# The ownership-verification tokens must ship (see `exclude` above) but are not
+# pages anyone should be sent to, so they stay out of sitemap.xml.
+defaults:
+  - scope: { path: "google*.html" }
+    values: { sitemap: false }
+  - scope: { path: "naver*.html" }
+    values: { sitemap: false }
+
 paginate: 5
 paginate_path: /page/:num/
-
-# NOTE: no `simple_jekyll_search:` block. simple-jekyll-search is a client-side
-# script that reads search.json and knows nothing about Jekyll config, so the
-# `exclude:` list that used to sit here excluded nothing. search.json is built
-# from `site.posts` only, which already leaves out the pages it named.
 
 ga_tracking_id: G-MRH9Z5ETSQ
 
@@ -133,7 +147,3 @@ protocols:
   fb_image_type: image/jpeg
 
   twitter_image: /assets/my_header_image.jpg
-
-  os_repo: https://github.com/bits-bytes-nn/bits-bytes-nn.github.io
-  os_rcs_type: git
-  os_src: git@github.com:bits-bytes-nn/bits-bytes-nn.github.io.git

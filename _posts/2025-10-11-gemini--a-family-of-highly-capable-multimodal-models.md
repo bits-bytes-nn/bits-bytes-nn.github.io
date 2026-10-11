@@ -3,7 +3,7 @@ layout: post
 title: "Gemini: A Family of Highly Capable Multimodal Models"
 subtitle: "Gemini: 고도로 능력 있는 멀티모달 모델 패밀리"
 date: 2023-12-19 02:39:27
-author: "Google DeepMind"
+paper_author: "Google DeepMind"
 categories: ["Paper Reviews", "Multimodal-Learning"]
 tags: ["Natively-Multimodal-Transformer-Architecture", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Long-Context-Attention-Mechanism", "Multimodal-Safety-Evaluation-Framework", "Responsible-Multimodal-Model-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model", "Multimodal-Models"]
 cover: /assets/images/multimodal-learning.jpg
@@ -114,6 +114,7 @@ Gemini 모델은 32k 컨텍스트 길이를 지원하도록 훈련되었으며, 
 멀티 쿼리 어텐션의 핵심 아이디어는 메모리 대역폭 요구사항을 줄이는 것입니다. 기존의 멀티 헤드 어텐션에서는 각 헤드마다 별도의 키와 값 텐서를 사용했지만, 멀티 쿼리 어텐션에서는 모든 헤드가 키와 값 텐서를 공유하면서 쿼리만 헤드별로 다르게 사용합니다. 이는 마치 여러 명의 질문자가 같은 데이터베이스를 공유하면서 각자 다른 관점으로 질문하는 것과 같습니다.
 
 수학적으로 표현하면:
+
 $$\mathbf{Q}_i = \mathbf{x} \mathbf{P}_{q_i}, \quad \mathbf{K} = \mathbf{M} \mathbf{P}_k, \quad \mathbf{V} = \mathbf{M} \mathbf{P}_v$$
 
 여기서 $$i$$는 헤드 인덱스이고, 키 $$\mathbf{K}$$와 값 $$\mathbf{V}$$는 모든 헤드에서 공유됩니다.
@@ -214,6 +215,7 @@ $$\mathbf{C} = \text{Einsum}(\mathbf{A}, \mathbf{B})$$
 여기서 $$\mathbf{A}$$와 $$\mathbf{B}$$가 입력 텐서이고 $$\mathbf{C}$$가 출력 텐서일 때, GSPMD는 각 텐서 차원의 분산을 자동으로 완성합니다. 예를 들어, 배치 차원에서의 데이터 병렬성과 특성 차원에서의 모델 병렬성을 결합하려면:
 
 $$\mathbf{A} = \text{mesh_split}(\mathbf{A}, \text{mesh}, [0, -1])$$
+
 $$\mathbf{B} = \text{mesh_split}(\mathbf{B}, \text{mesh}, [-1, 1])$$
 
 그러면 GSPMD가 출력 $$\mathbf{C}$$의 분산을 자동으로 완성합니다.
@@ -1444,9 +1446,11 @@ Gemini Ultra와 GPT-4 모두에서 제안된 접근법의 이득을 비교한 �
 $$\frac{d}{dx} \sinh x = \cosh x \text{이고 } \frac{dy}{dx} \sinh y = \cosh y \frac{dy}{dx}$$
 
 따라서:
+
 $$\cosh x + \sinh y \frac{dy}{dx} = 1 + \frac{dy}{dx}$$
 
 $$\frac{dy}{dx}$$에 대해 정리하면:
+
 $$\frac{dy}{dx} = \frac{1 - \cosh x}{\sinh y - 1}$$
 
 최종 답은 $$\frac{1-\cosh x}{\sinh y-1}$$입니다.

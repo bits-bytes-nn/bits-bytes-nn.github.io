@@ -10,11 +10,9 @@ description: >-
 {%- comment -%}
   Category names are already written in display case in front matter
   ("Agentic-AI", "Retrieval-Augmented-Generation"), so replacing the separators
-  is the whole job — which is what index.html and _layouts/post.html do.
-
-  This used to title-case each word through `capitalize`, which uppercases the
-  first letter and *lowercases the rest*: "Agentic-AI" shipped as "Agentic Ai"
-  on the live page while every other listing rendered it correctly.
+  is the whole job — which is what index.html and _layouts/post.html do. Not
+  `capitalize`: it lowercases everything after the first letter, so "Agentic-AI"
+  would render as "Agentic Ai".
 {%- endcomment -%}
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}

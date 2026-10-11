@@ -2,7 +2,7 @@
 layout: post
 title: "Gemma 3 Technical Report"
 date: 2025-03-25 15:52:34
-author: "Google DeepMind"
+paper_author: "Google DeepMind"
 categories: ["Paper Reviews", "Multimodal-Learning"]
 tags: ["Alternating-Local-Global-Attention", "Long-Context-Adaptation", "Pan-&-Scan-Image-Processing", "Vision-Encoder-Token-Condensation", "Multimodal-Knowledge-Distillation", "RoPE-Positional-Embedding-Extension", "Grouped-Query-Attention", "Quantization-Aware-Training", "Sliding-Window-Attention-Optimization", "Efficient-Long-Context-Attention-Mechanism", "Multimodal-Models"]
 cover: /assets/images/multimodal-learning.jpg

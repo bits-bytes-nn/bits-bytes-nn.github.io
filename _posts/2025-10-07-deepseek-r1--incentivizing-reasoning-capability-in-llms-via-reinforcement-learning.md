@@ -3,7 +3,7 @@ layout: post
 title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
 subtitle: "DeepSeek-R1: 강화학습을 통한 대규모 언어 모델의 추론 능력 향상"
 date: 2025-01-22 15:19:35
-author: "DeepSeek AI"
+paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Reinforcement-Learning-with-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Verifiable-Rewards-Reinforcement-Learning", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Iterative-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning", "Reasoning-Models", "Alignment", "DeepSeek"]
 cover: /assets/images/language-models.jpg
@@ -40,7 +40,7 @@ DeepSeek-AI 연구팀은 강화학습을 통해 추론 능력을 획기적으로
 
 이러한 문제들을 해결하고 추론 성능을 더욱 향상시키기 위해 연구팀은 다단계 훈련과 콜드 스타트 데이터를 포함하는 DeepSeek-R1을 개발했습니다. DeepSeek-R1은 추론 과제에서 OpenAI-o1-1217과 비교할 만한 성능을 달성했습니다. 연구 커뮤니티를 지원하기 위해 DeepSeek-R1-Zero, DeepSeek-R1, 그리고 DeepSeek-R1에서 증류된 6개의 밀집 모델들(1.5B, 7B, 8B, 14B, 32B, 70B)을 Qwen과 Llama 기반으로 오픈소스로 공개합니다.
 
-![벤치마크 성능 비교](https://arxiv.org/html/2501.12948/x1.png)
+![벤치마크 성능 비교](https://arxiv.org/html/2501.12948v1/x1.png)
 
 위 그림은 다양한 AI 모델들의 벤치마크 성능을 비교한 막대 그래프입니다. AIME 2024, Codeforces, GPQA Diamond, MATH-500, MMLU, SWE-bench Verified 등의 데이터셋에서 DeepSeek-R1, OpenAI-01-1217, DeepSeek-R1-32B, OpenAI-01-mini, DeepSeek-V3 모델들의 정확도나 성능 지표(Pass@1, Percentile, Resolved)를 보여줍니다. 이 비교는 다양한 응용 분야에서 이러한 모델들의 능력을 평가하고 이해하는 데 중요한 의미를 가집니다.
 
@@ -158,7 +158,7 @@ DeepSeek-R1-Zero의 훈련을 위해 연구팀은 기본 모델이 지정된 지
 
 #### DeepSeek-R1-Zero의 성능
 
-![AIME 정확도 변화](https://arxiv.org/html/2501.12948/extracted/6147501/figures/plot_aime_with_maj.png)
+![AIME 정확도 변화](https://arxiv.org/html/2501.12948v1/extracted/6147501/figures/plot_aime_with_maj.png)
 
 위 그래프는 강화학습 훈련 과정에서 DeepSeek-R1-Zero의 AIME 정확도 변화를 보여줍니다. 각 질문에 대해 16개의 응답을 샘플링하고 전체 평균 정확도를 계산하여 안정적인 평가를 보장했습니다. 그래프에서 볼 수 있듯이 DeepSeek-R1-Zero는 강화학습 훈련이 진행됨에 따라 꾸준하고 일관된 성능 향상을 보여줍니다.
 
@@ -177,7 +177,7 @@ DeepSeek-R1-Zero의 훈련을 위해 연구팀은 기본 모델이 지정된 지
 
 #### 자기 진화 과정
 
-![평균 응답 길이 변화](https://arxiv.org/html/2501.12948/extracted/6147501/figures/plot_length.png)
+![평균 응답 길이 변화](https://arxiv.org/html/2501.12948v1/extracted/6147501/figures/plot_length.png)
 
 DeepSeek-R1-Zero의 자기 진화 과정은 강화학습이 어떻게 모델의 추론 능력을 자율적으로 향상시킬 수 있는지를 보여주는 매혹적인 사례입니다. 기본 모델에서 직접 강화학습을 시작함으로써, 연구팀은 지도 미세 조정 단계의 영향 없이 모델의 진행 과정을 면밀히 관찰할 수 있었습니다.
 

@@ -52,8 +52,6 @@
 <!-- Scripts -->
 <!-- Code is highlighted server-side by Rouge (theme in _sass/_syntax.scss); no client-side highlighter needed. -->
 <!-- GLightbox (vanilla, no jQuery) for image zoom. -->
-<!-- Tippy.js/Popper.js were dropped: window.tooltips was always empty, so the
-     two extra CDN scripts initialised nothing on every page load. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"
 	integrity="sha384-GPAzSuZc0kFvdIev6wm9zg8gnafE8tLso7rsAYQfc9hAdWCpOcpcNI5W9lWkYcsd" crossorigin="anonymous" />
 <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"
@@ -61,11 +59,6 @@
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
 
-<!-- Removed from here: a `page.custom_js` loop that no page ever set (pages
-     needing an extra asset use `head_extra`, as search.md does), and a
-     conditional on site.ga_tracking_id whose entire body was a comment saying
-     the tracking lives in head.html. Both were inherited theme scaffolding.
-
-     Note for whoever edits this comment: do not write Liquid tag delimiters in
-     here. Liquid tokenizes tags inside comments too — HTML and Liquid alike —
-     so a tag named in prose is opened for real and the build fails. -->
+<!-- Do not write Liquid tag delimiters in these HTML comments. Liquid tokenizes
+     tags inside comments too, so a tag named in prose is opened for real and the
+     build fails. -->

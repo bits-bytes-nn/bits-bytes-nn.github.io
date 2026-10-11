@@ -3,8 +3,6 @@ layout: default
 description: >-
   AI/ML 논문을 설계 결정과 트레이드오프까지 파고들어 읽고, 에이전틱 AI·데이터 아키텍처 현장에서
   겪은 문제를 정리하는 기술 블로그입니다.
-pagination:
-  enabled: true
 ---
 
 <div class="home">
@@ -36,12 +34,11 @@ pagination:
 						>{{ post.title }}</a
 					>
 				</h2>
-				<section class="post-excerpt" itemprop="description">
+				<section class="post-excerpt">
 					{%- comment -%}
-					  `post.content | strip_html | truncatewords: 50` used to reproduce
-					  the leading H1 (so every card repeated its own title) and dumped
-					  raw TeX from math posts. `post.description` is the same text the
-					  meta tags and the feed use — see _plugins/post_description.rb.
+					  `post.description`, not a cut of `post.content`: the body opens
+					  with headings and raw TeX. It is the same text the meta tags and
+					  the feed use — see _plugins/post_description.rb.
 					{%- endcomment -%}
 					<p>{{ post.description | shorten_card | escape }}</p>
 				</section>
