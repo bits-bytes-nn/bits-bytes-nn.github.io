@@ -5,7 +5,7 @@ subtitle: "QLoRA: 양자화된 대규모 언어 모델의 효율적인 파인튜
 date: 2023-05-23 17:50:33
 paper_author: "University of Washington"
 categories: ["Paper Reviews", "Finetuning"]
-tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning", "Quantization"]
+tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning", "Parameter-Efficient-Fine-Tuning", "Quantization"]
 cover: /assets/images/finetuning.jpg
 use_math: true
 ---

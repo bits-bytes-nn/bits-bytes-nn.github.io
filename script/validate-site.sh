@@ -256,20 +256,25 @@ else
   pass "every page has rel=canonical"
 fi
 
+# Lines that occur more than once. Compared byte for byte: under a UTF-8 locale
+# macOS collates many Hangul syllables as equal, so "논문 리뷰" and "논문 요약"
+# would count as one value.
+dupes() { LC_ALL=C sort | LC_ALL=C uniq -d; }
+
 # Duplicates appear when descriptions come from a block every post shares, such
 # as a "TL;DR" heading at the top of each paper post.
-dup_desc=$(printf '%s' "$descs" | sort | uniq -d | grep -c .)
+dup_desc=$(printf '%s' "$descs" | dupes | grep -c .)
 if [ "$dup_desc" -gt 0 ]; then
   fail "$dup_desc meta description(s) used on more than one page:"
-  printf '%s' "$descs" | sort | uniq -d | cut -c1-90 | sed 's/^/          /' >&2
+  printf '%s' "$descs" | dupes | cut -c1-90 | sed 's/^/          /' >&2
 else
   pass "every meta description is unique"
 fi
 
-dup_title=$(printf '%s' "$titles" | sort | uniq -d | grep -c .)
+dup_title=$(printf '%s' "$titles" | dupes | grep -c .)
 if [ "$dup_title" -gt 0 ]; then
   fail "$dup_title <title> value(s) used on more than one page:"
-  printf '%s' "$titles" | sort | uniq -d | sed 's/^/          /' >&2
+  printf '%s' "$titles" | dupes | sed 's/^/          /' >&2
 else
   pass "every <title> is unique"
 fi
