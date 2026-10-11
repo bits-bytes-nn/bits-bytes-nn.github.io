@@ -21,4 +21,4 @@ gem 'logger'
 gem 'webrick'
 
 # CI quality gate: validates internal links, images, and HTML structure of _site/
-gem 'html-proofer', '~> 5.0'
+gem 'html-proofer', '~> 5.2'
