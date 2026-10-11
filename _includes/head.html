@@ -236,7 +236,7 @@
 	          if (scrolls && el.getAttribute('tabindex') !== '0') {
 	            el.setAttribute('tabindex', '0');
 	            el.setAttribute('role', 'region');
-	            el.setAttribute('aria-label', 'Equation, scrollable');
+	            el.setAttribute('aria-label', document.documentElement.lang.indexOf('en') === 0 ? 'Equation, scrollable' : '수식, 가로 스크롤');
 	          } else if (!scrolls && el.getAttribute('role') === 'region') {
 	            el.removeAttribute('tabindex');
 	            el.removeAttribute('role');
@@ -249,6 +249,8 @@
 	        clearTimeout(timer);
 	        timer = setTimeout(markWide, 150);
 	      }, { passive: true });
+	      // A web font arriving after typesetting changes formula widths too.
+	      if (document.fonts) document.fonts.ready.then(markWide);
 	      return MathJax.startup.defaultPageReady().then(markWide);
 	    }
 	  }

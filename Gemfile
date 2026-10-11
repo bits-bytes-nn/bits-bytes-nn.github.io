@@ -12,6 +12,7 @@ gem 'jekyll-sass-converter', '~> 2.0'
 gem 'jekyll-paginate'
 gem 'jekyll-sitemap'
 gem 'jekyll-feed'
+gem 'jekyll-redirect-from'
 gem 'kramdown-parser-gfm'
 
 gem 'base64'
@@ -20,4 +21,4 @@ gem 'logger'
 gem 'webrick'
 
 # CI quality gate: validates internal links, images, and HTML structure of _site/
-gem 'html-proofer', '~> 5.0'
+gem 'html-proofer', '~> 5.2'
