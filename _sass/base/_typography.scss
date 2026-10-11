@@ -12,10 +12,13 @@ body {
   line-height: 1.75;
 }
 
+// keep-all, as on `p` below: Korean otherwise breaks inside a word ("넣/는").
 h1, h2, h3, h4, h5, h6 {
   font-family: $heading-font-family;
   line-height: $heading-line-height;
   margin: 0 0 $small-spacing;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 h1 {
@@ -69,11 +72,8 @@ a {
     text-decoration: underline;
   }
 
-  &:active,
-  &:focus {
-    outline: 2px solid rgba($action-color, 0.4);
-    outline-offset: 2px;
-  }
+  // No outline here: the `:focus-visible` ring in _layout.scss marks keyboard
+  // focus, and a `:focus` one also stayed on every link after a mouse click.
 }
 
 hr {

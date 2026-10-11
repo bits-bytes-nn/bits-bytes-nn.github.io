@@ -4,7 +4,7 @@ title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
 date: 2023-07-18 14:31:57
 paper_author: "Meta AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Open-Foundation-and-Fine-Tuned-Chat-Models", "Reinforcement-Learning-with-Human-Feedback", "Ghost-Attention", "Rejection-Sampling-Fine-Tuning", "Grouped-Query-Attention", "Proximal-Policy-Optimization", "Red-Team-Safety-Testing", "Safety-Alignment", "System-Message-for-Multi-Turn-Consistency", "Safety-Context-Distillation", "Alignment", "Llama"]
+tags: ["Reinforcement-Learning-with-Human-Feedback", "Ghost-Attention", "Rejection-Sampling-Fine-Tuning", "Grouped-Query-Attention", "Proximal-Policy-Optimization", "Red-Teaming", "Safety-Alignment", "System-Message-for-Multi-Turn-Consistency", "Safety-Context-Distillation", "Alignment", "Llama", "Efficient-Attention"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -79,7 +79,8 @@ Llama 2 모델은 Touvron과 연구진이 제안한 사전학습 접근 방식�
 이 그룹 쿼리 어텐션은 기존 트랜스포머 아키텍처의 멀티헤드 어텐션 메커니즘을 효율적으로 개선한 방식입니다. 전통적인 멀티헤드 어텐션(MHA)에서는 각 어텐션 헤드가 자체 쿼리(\\(Q\\)), 키(\\(K\\)), 벨류(\\(V\\)) 투영을 가지는 반면, GQA에서는 키-벨류 헤드의 수를 줄이고 여러 쿼리 헤드가 동일한 키-벨류 헤드를 공유합니다. 수학적으로는 다음과 같이 표현할 수 있습니다.
 
 • 기존 멀티헤드 어텐션:
-   $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
 • GQA에서의 어텐션:
    - 쿼리 헤드 수: $$h$$

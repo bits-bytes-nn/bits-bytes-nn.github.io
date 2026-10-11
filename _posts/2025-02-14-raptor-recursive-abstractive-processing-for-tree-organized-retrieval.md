@@ -4,7 +4,7 @@ title: "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval"
 date: 2024-01-31 18:30:21
 paper_author: "Stanford University"
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
-tags: ["Recursive-Abstractive-Processing", "Tree-Organized-Retrieval", "Hierarchical-Summarization", "Collapsed-Tree-Retrieval", "Dependency-Aware-Tree-Traversal", "Multi-Level-Abstraction-Retrieval", "Gaussian-Mixture-Model-Clustering", "Semantic-Similarity-Clustering", "Recursive-Summarization", "Contextual-Flexibility-Retrieval", "Retrieval-Augmented-Generation"]
+tags: ["Tree-Organized-Retrieval", "Hierarchical-Summarization", "Collapsed-Tree-Retrieval", "Dependency-Aware-Tree-Traversal", "Multi-Level-Abstraction-Retrieval", "Gaussian-Mixture-Model-Clustering", "Semantic-Similarity-Clustering", "Contextual-Flexibility-Retrieval", "Retrieval-Augmented-Generation"]
 cover: /assets/images/retrieval-augmented-generation.jpg
 use_math: true
 ---

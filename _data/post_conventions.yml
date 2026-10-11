@@ -1,0 +1,97 @@
+# Post conventions, as data.
+#
+# The one list of the values a post's front matter may use. script/lint-posts.rb
+# checks every post in _posts against it, in CI before the build, and
+# scholar-lens reads this same file before it opens a pull request here, so a
+# generated post and a hand-written one answer to the same rules. The prose
+# conventions (README.md "Writing a post", docs/tech-doc.md) point here instead
+# of repeating the lists.
+
+# categories[0]. `paper`: the post reviews one paper, so it names the paper's
+# organisation in `paper_author`. `cover`: the image every post of the type uses;
+# without one, the topic's image below.
+types:
+  Paper Reviews: { paper: true }
+  Paper Summaries: { paper: true }
+  Tech Guides: {}
+  Insights: { cover: /assets/images/insights.jpg }
+
+# categories[1], with the cover a post of that topic uses unless its type brings
+# its own (Insights). With neither, any image that exists in the repo will do.
+topics:
+  Language-Models: /assets/images/language-models.jpg
+  Multimodal-Learning: /assets/images/multimodal-learning.jpg
+  Finetuning: /assets/images/finetuning.jpg
+  Retrieval-Augmented-Generation: /assets/images/retrieval-augmented-generation.jpg
+  Agentic-AI:
+  Data-Architecture:
+
+# Never in front matter. jekyll-feed reads `author` as the entry's author, which
+# is the site's (see _config.yml); a paper's authors go in `paper_author`.
+forbidden_keys: [author]
+
+tags:
+  # Every post carries at least one: it is what _plugins/related_posts.rb joins
+  # posts on. A tag only one paper can have connects nothing.
+  controlled:
+    - Agentic-AI
+    - Alignment
+    - DeepSeek
+    - Efficient-Attention
+    - Knowledge-Graph
+    - Llama
+    - Mixture-of-Experts
+    - Multimodal-Models
+    - Quantization
+    - Reasoning-Models
+    - Retrieval-Augmented-Generation
+  # Lowercase inside a tag, as in a title: Leiden-Algorithm-for-Text.
+  lowercase_words: [a, an, and, as, at, by, for, from, in, of, on, or, the, to, via, vs, with]
+  # Retired names and the tag that replaced each. A post may not use the old one.
+  aliases:
+    Mixture-of-Experts-Architecture: Mixture-of-Experts
+    Sparse-Mixture-of-Experts: Mixture-of-Experts
+    Sparse-Mixture-of-Experts-Architecture: Mixture-of-Experts
+    Efficient-Mixture-of-Experts-Architecture: Mixture-of-Experts
+    DeepSeekMoE-Architecture: DeepSeekMoE
+    Verifiable-Rewards-Reinforcement-Learning: Reinforcement-Learning-with-Verifiable-Rewards
+    Interleaving-Local-Global-Attention: Interleaved-Local-Global-Attention
+    Alternating-Local-Global-Attention: Interleaved-Local-Global-Attention
+    Natively-Multimodal-Transformer-Architecture: Natively-Multimodal-Transformer
+    Long-Chain-of-Thought-Cold-Start-Integration: Long-Chain-of-Thought-Cold-Start
+    Reinforcement-Learning-with-Cold-Start: Long-Chain-of-Thought-Cold-Start
+    Group-Relative-Policy-Optimization-Scaling: Group-Relative-Policy-Optimization
+    Rejection-Sampling-and-Supervised-Fine-Tuning: Rejection-Sampling-Fine-Tuning
+    Scaling-Laws-for-Large-Language-Models: Scaling-Laws
+    Language-Model-Scaling-Laws: Scaling-Laws
+    Multi-Dimensional-Scaling-Laws: Scaling-Laws
+    Efficient-Inference-with-Reduced-Active-Parameters: Efficient-Inference
+    Thinking-Budget-Mechanism: Thinking-Budget
+    Dynamic-Thinking-Budget: Thinking-Budget
+    Red-Team-Safety-Testing: Red-Teaming
+    Automated-Red-Teaming: Red-Teaming
+    Responsible-Open-Model-Development: Responsible-AI-Development
+    Responsible-Multimodal-Model-Development: Responsible-AI-Development
+    Sliding-Window-Attention-Optimization: Sliding-Window-Attention
+    RMSNorm-Pre-Normalization: RMSNorm
+    RMSNorm-Stabilization: RMSNorm
+    Community-Detection-for-RAG: Community-Detection
+    Community-Detection-with-Label-Propagation: Community-Detection
+    Multi-Hop-Entity-and-Relationship-Extraction: Entity-and-Relationship-Extraction
+    Graph-Enhanced-Entity-and-Relationship-Extraction: Entity-and-Relationship-Extraction
+    Entity-Knowledge-Graph-Extraction: Entity-and-Relationship-Extraction
+    Graph-Vector-Hybrid-Retrieval: Hybrid-Retrieval
+    Hybrid-Search-with-Breadth-First-Graph-Traversal: Hybrid-Retrieval
+    Large-Scale-Agentic-Data-Synthesis: Agentic-Data-Synthesis
+    Large-Scale-Agentic-Task-Synthesis-Pipeline: Agentic-Data-Synthesis
+    Synthetic-Data-Generation-for-Mathematics: Synthetic-Data-Generation
+    Skill-Specific-Synthetic-Data-Generation: Synthetic-Data-Generation
+    Efficient-Long-Context-Attention-Mechanism: Efficient-Attention
+    Memory-Efficient-Attention: Efficient-Attention
+    Knowledge-Distillation-for-Small-Language-Models: Knowledge-Distillation
+    Reasoning-Reinforcement-Learning: Reasoning-Oriented-Reinforcement-Learning
+    Efficient-Model-Training: Economical-Training
+    Instruction-Fine-Tuning-with-Direct-Preference-Optimization: Instruction-Fine-Tuning
+    Graph-RAG: GraphRAG
+    AWS-Bedrock: Amazon-Bedrock
+    Pre-fill-and-Chunking: Prefill-and-Chunking

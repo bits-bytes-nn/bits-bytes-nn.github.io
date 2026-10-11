@@ -13,21 +13,28 @@ description: >-
   is the whole job — which is what index.html and _layouts/post.html do. Not
   `capitalize`: it lowercases everything after the first letter, so "Agentic-AI"
   would render as "Agentic Ai".
+
+  `listed` drops a translation whose original is listed (_plugins/translations.rb).
+  The divider goes before each group after the first, so a category left empty by
+  the filter leaves no stray line behind.
 {%- endcomment -%}
+{% assign shown = false %}
 {% for category in site.categories %}
   {% capture cat %}{{ category | first }}{% endcapture %}
+  {% assign cat_posts = site.categories[cat] | listed %}
+  {% if cat_posts.size == 0 %}{% continue %}{% endif %}
+  {% if shown %}<hr>{% endif %}{% assign shown = true %}
   {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
   <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">
-  {% for post in site.categories[cat] %}
+  {% for post in cat_posts %}
     <li>
       <strong>
         <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </strong>
-      <span class="post-date">- {{ post.date | date_to_long_string }}</span>
+      <span class="post-date">- {{ post.date | date: site.date_format }}</span>
     </li>
   {% endfor %}
   </ul>
-  {% if forloop.last == false %}<hr>{% endif %}
 {% endfor %}
 <br>

@@ -3,8 +3,8 @@ name: Build and deploy Jekyll site to GitHub Pages
 on:
   push:
     branches: [ "main" ]
-  # Runs the same four gates on the PR, so a change that breaks the build, the
-  # plugin tests, an internal link, or the sitemap/metadata checks is caught
+  # Runs the same gates on the PR, so a change that breaks the build, the plugin
+  # tests, the post lint, an internal link, or the sitemap/metadata checks is caught
   # before it lands. Without this the gates only ran after a merge: a bad PR
   # reached main and merely failed to deploy, leaving main red.
   pull_request:
@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # No apt step. The packages it installed are already in the ubuntu-latest
+      # No apt step. The packages it installed are already in the ubuntu-24.04
       # image — a past run's log showed libyaml-dev/zlib1g-dev/libffi-dev
       # "already the newest version" and only 2 incidental upgrades — and the
       # -dev headers were only ever needed to compile Ruby itself, which
@@ -59,6 +59,10 @@ jobs:
         # minitest ships with Ruby. Runs before the build — these plugins decide
         # every page's description and read time.
         run: ruby test/run_all.rb
+      - name: Lint the post sources
+        # Front matter against _data/post_conventions.yml, plus table, math and
+        # heading rules the built HTML no longer shows.
+        run: ruby script/lint-posts.rb
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
@@ -97,7 +101,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs: build
     steps:

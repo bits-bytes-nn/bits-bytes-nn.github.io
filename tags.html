@@ -7,27 +7,49 @@ description: >-
   agentic patterns, fine-tuning, and more.
 ---
 
-{% assign sorted_tags = site.tags | sort %} {% for tag in sorted_tags %} {%
-capture tag_name %}{{ tag | first }}{% endcapture %}
+{%- comment -%}
+  `listed` drops a translation whose original is listed (_plugins/translations.rb);
+  a tag left with no posts is skipped. `sort_natural` so case does not split the
+  order ("AWS…" before "Advanced…" under plain `sort`).
+
+  Most tags name one paper's own contribution and hold a single post. The index
+  at the top lists the ones shared by several posts, which are the ones worth
+  browsing by.
+{%- endcomment -%}
+{% capture tag_names %}{% for tag in site.tags %}{{ tag | first }}{% unless forloop.last %}|{% endunless %}{% endfor %}{% endcapture %}
+{% assign tag_names = tag_names | split: "|" | sort_natural %}
+
+<nav class="tag-index" aria-label="Tags shared by several posts">
+	<p class="tag-index-label">Shared by several posts</p>
+	<ul>
+		{% for tag_name in tag_names %}
+		{% assign tag_posts = site.tags[tag_name] | listed %}
+		{% if tag_posts.size > 1 %}
+		<li><a href="#{{ tag_name | slugify }}">{{ tag_name | replace: '-', ' ' }} <span class="tag-count">{{ tag_posts.size }}</span></a></li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+</nav>
+
+{% for tag_name in tag_names %}
+{% assign tag_posts = site.tags[tag_name] | listed %}
+{% if tag_posts.size == 0 %}{% continue %}{% endif %}
 <div class="tag-section">
 	<h2 id="{{ tag_name | slugify }}" class="tag-title">
 		{{ tag_name | replace: '-', ' ' }}
 	</h2>
 
 	<ul class="posts-list">
-		{% for post in site.tags[tag_name] %}
+		{% for post in tag_posts %}
 		<li class="post-item">
 			<strong>
 				<a href="{{ post.url | prepend: site.baseurl }}" class="post-link"
 					>{{ post.title }}</a
 				>
 			</strong>
-			<span class="post-date"> {{ post.date | date: "%B %-d, %Y" }} </span>
+			<span class="post-date"> {{ post.date | date: site.date_format }} </span>
 		</li>
 		{% endfor %}
 	</ul>
 </div>
-
-{% if forloop.last == false %}
-<hr class="tag-divider" />
-{% endif %} {% endfor %}
+{% endfor %}

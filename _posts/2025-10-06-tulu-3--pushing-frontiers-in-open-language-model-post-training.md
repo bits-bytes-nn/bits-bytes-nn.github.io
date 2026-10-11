@@ -5,7 +5,7 @@ subtitle: "Tülu 3: 오픈 언어 모델 사후 훈련의 새로운 지평"
 date: 2024-11-22 18:44:04
 paper_author: "Allen Institute for AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Reinforcement-Learning-with-Verifiable-Rewards", "Multi-Stage-Post-Training-Recipe", "Direct-Preference-Optimization", "Persona-Driven-Data-Synthesis", "Skill-Specific-Synthetic-Data-Generation", "Prompt-Decontamination", "Open-Language-Model-Evaluation-System", "Length-Normalized-Preference-Optimization", "Asynchronous-Reinforcement-Learning-Infrastructure", "Skill-Targeted-Model-Training", "Alignment"]
+tags: ["Reinforcement-Learning-with-Verifiable-Rewards", "Multi-Stage-Post-Training-Recipe", "Direct-Preference-Optimization", "Persona-Driven-Data-Synthesis", "Synthetic-Data-Generation", "Prompt-Decontamination", "Open-Language-Model-Evaluation-System", "Length-Normalized-Preference-Optimization", "Asynchronous-Reinforcement-Learning-Infrastructure", "Skill-Targeted-Model-Training", "Alignment"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -505,7 +505,7 @@ Tülu 3 8B DPO와 Tülu 3 70B DPO에 대한 최고의 선호도 데이터셋 믹
 | LLM 판단자     | 평균 | MMLU | TQA  | PopQA | BBH  | CHU  | CHU+ | GSM8k | Drop | MATH | IFEval | AE   | Safety |
 | -------------- | ---- | ---- | ---- | ----- | ---- | ---- | ---- | ----- | ---- | ---- | ------ | ---- | ------ |
 | GPT-4o         | 57.3 | 64.8 | 56.1 | 30.1  | 66.3 | 87.0 | 80.7 | 75.3  | 62.7 | 20.3 | 60.4   | 20.6 | 62.7   |
-| Llama 3.1 405B | 64.8 | 56.0 | 30.3 | 67.4  | 86.2 | 80.8 | 75.1 | 62.0  | 20.1 | 59.0 | 21.5   | 62.8 |
+| Llama 3.1 405B | 57.2 | 64.8 | 56.0 | 30.3  | 67.4 | 86.2 | 80.8 | 75.1  | 62.0 | 20.1 | 59.0   | 21.5 | 62.8   |
 | GPT-4 Turbo    | 57.0 | 64.6 | 55.7 | 30.1  | 66.4 | 86.6 | 79.4 | 75.5  | 62.6 | 20.1 | 59.9   | 20.6 | 62.2   |
 | GPT-4o Mini    | 56.9 | 64.4 | 55.4 | 30.4  | 66.2 | 86.6 | 79.8 | 74.8  | 60.7 | 20.9 | 60.1   | 21.4 | 61.6   |
 | Llama 3.1 70B  | 56.6 | 64.3 | 55.5 | 30.2  | 66.6 | 85.3 | 81.4 | 74.8  | 62.1 | 20.1 | 58.2   | 18.6 | 62.2   |
@@ -965,9 +965,8 @@ LLM의 정확한 지시 따르기 능력을 테스트하고 IFEval에 포함된 
 
 **훈련 파이프라인**: 다음 표는 8B와 70B 크기의 Tülu 3의 SFT, DPO, 최종 체크포인트가 각 핵심 기술에 대한 하나의 개발 및 하나의 미공개 평가에서의 성능을 보여줍니다.
 
-| 기술                              | 8B SFT    | 8B DPO    | 8B Final  | 70B SFT   | 70B DPO   | 70B Final |
-| --------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- |
-|                                   | Dev. Uns. | Dev. Uns. | Dev. Uns. | Dev. Uns. | Dev. Uns. | Dev. Uns. |
+| 기술 | 8B SFT Dev. Uns. | 8B DPO Dev. Uns. | 8B Final Dev. Uns. | 70B SFT Dev. Uns. | 70B DPO Dev. Uns. | 70B Final Dev. Uns. |
+| --- | --- | --- | --- | --- | --- | --- |
 | 평균                              | 64.9 29.9 | 68.3 31.9 | 68.8 32.4 | 78.1 41.0 | 80.5 44.4 | 80.7 44.4 |
 | 지식 회상 (MMLU → GPQA)           | 65.9 31.9 | 68.7 31.2 | 68.2 35.7 | 78.9 43.3 | 83.3 48.0 | 83.1 48.0 |
 | 추론 (BBH → AGIEval)              | 67.9 56.2 | 65.8 61.8 | 66.0 59.3 | 82.7 73.2 | 81.8 75.0 | 82.0 75.0 |
@@ -979,9 +978,8 @@ LLM의 정확한 지시 따르기 능력을 테스트하고 IFEval에 포함된 
 
 **SFT를 위한 데이터 믹싱**: SFT를 위해 내린 데이터 믹싱 선택이 미공개 평가에 일반화되는지 평가하기 위해, 최종 SFT 체크포인트와 함께 다양한 데이터 절제 SFT 모델의 성능을 평가했습니다.
 
-| 모델             | 지식 회상          | 추론      | 수학      | 코딩      | 지시 따르기 |
-| ---------------- | ------------------ | --------- | --------- | --------- | ----------- |
-|                  | Dev. Avg Uns. Avg. | MMLU GPQA | BBH AGIE  | MATH DMM  | CHE BCB     | IFE IFEO  |
+| 모델 | 평균 (Dev./Uns.) | 지식 회상 (MMLU/GPQA) | 추론 (BBH/AGIE) | 수학 (MATH/DMM) | 코딩 (CHE/BCB) | 지시 따르기 (IFE/IFEO) |
+| --- | --- | --- | --- | --- | --- | --- |
 | Tülu 3 8B SFT    | 64.1 29.9          | 62.1 31.9 | 67.9 56.2 | 31.5 32.3 | 86.2 11.5   | 72.8 17.6 |
 | w/o WildChat     | 62.8 28.8          | 61.0 31.5 | 65.6 53.1 | 31.8 31.2 | 85.3 7.4    | 70.1 20.8 |
 | w/o Safety       | 63.7 29.7          | 62.0 31.9 | 68.3 55.6 | 32.6 32.6 | 84.5 10.8   | 71.0 17.6 |

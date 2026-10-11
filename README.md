@@ -70,7 +70,7 @@ _posts/            Posts — YYYY-MM-DD-slug.md (Korean; English twin is -en.md)
 _layouts/          Page templates: default → post / page
 _includes/         Reusable fragments: head, header, footer, nav_links,
                    page_divider, category-posts, language_switcher,
-                   related_posts
+                   related_posts, icon (inline SVG icons)
 _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
                    _dark (dark mode), base/*
                    ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
@@ -82,6 +82,7 @@ _plugins/          reading_time.rb      (KO/EN-aware read time)
                    scrollable_tables.rb (wraps wide tables so they scroll)
                    search_index.rb      (plain_text filter for search.json)
                    legacy_urls.rb       (redirects pre-slug post URLs)
+                   translations.rb      (keeps a post's translation out of the lists)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
@@ -89,8 +90,11 @@ assets/images/     Topic cover images, plus post figures and diagrams (flat)
 assets/<slug>/     Figures of some older posts; new posts use assets/images/
 search.json        Full-text search index (consumed by simple-jekyll-search)
 test/              minitest unit tests for the _plugins/ logic
-script/            validate-site.sh (post-build discoverability checks)
-.github/workflows/ CI: tests → build → html-proofer → validate-site; deploys on push to main
+script/            lint-posts.rb (post sources vs the conventions, before the build)
+                   validate-site.sh (post-build discoverability checks)
+_data/             post_conventions.yml (categories, covers, controlled and
+                   retired tags — the one copy, also read by scholar-lens)
+.github/workflows/ CI: tests → lint → build → html-proofer → validate-site; deploys on push to main
 ```
 
 **Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
@@ -114,6 +118,7 @@ title: "<Post Title>"
 subtitle: "<one-line pitch>"       # optional — shown under the title in the header
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<Author>"           # the paper's org; omit for Insights/opinion posts
+seo_title: "<shorter title>"       # optional — for <title> when the paper title is too long
 description: >-                    # optional — see below
   <search-snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
@@ -121,9 +126,13 @@ tags: ["<Tag-1>", "<Tag-2>"]
 cover: /assets/images/<topic>.(jpg|png)
 use_math: true                     # ONLY if the post has equations (loads MathJax)
 lang: ko                           # required with translation_id (ko | en)…
-translation_id: <shared-slug>      # …links a Korean post to its -en twin
+translation_id: <shared-slug>      # …links a Korean post to its -en twin;
+                                   #    only the Korean one is listed
 ---
 ```
+
+A paper post's `<title>` is its title (or `seo_title`) plus "논문 리뷰" / "논문
+요약", the words a reader searches with; social cards keep the plain title.
 
 **Don't repeat the title as an H1 in the body.** The layout already renders it,
 so a leading `# Title` produces two `<h1>`s and leaks into the search snippet.
@@ -176,21 +185,20 @@ make a precise index and connect nothing, and `_plugins/related_posts.rb`
 requires a **shared** tag — so a post tagged only that way ships with no
 "Related reading" block at all.
 
-So also give each post at least one tag from the controlled topic layer:
+So also give each post at least one tag from the controlled topic layer,
+`tags.controlled` in [`_data/post_conventions.yml`](_data/post_conventions.yml).
+That file is the one copy of the list; `script/lint-posts.rb` and scholar-lens
+both read it.
 
-```
-Agentic-AI  Alignment  DeepSeek  Knowledge-Graph  Llama
-Mixture-of-Experts  Multimodal-Models  Reasoning-Models
-Retrieval-Augmented-Generation
-```
+Keep the specific tags — they say something the topic tag does not. **Add the
+topic tag, don't swap for it.**
 
-Keep the specific tags — they say something the topic tag does not, and dropping
-them would move live `/tags/` anchors. **Add the topic tag, don't swap for it.**
-
-Before coining a new topic tag, check that nothing above already covers it. Three
-names for one idea (`Agentic-Architecture`, `Agentic-Patterns`,
+Before coining a new tag, check that an existing one doesn't already cover it.
+Three names for one idea (`Agentic-Architecture`, `Agentic-Patterns`,
 `Agentic-Infrastructure`) leave every post holding a tag no other post shares,
-which is the same as having no topic tag at all.
+which is the same as having no topic tag at all. When two tags turn out to name
+one idea, keep one and add the other to `tags.aliases`; the lint then rejects the
+retired name.
 
 ### Math: always use `$$…$$`
 
@@ -204,11 +212,12 @@ dollar signs like `$10M` are fine — they're not math.)
 
 ### Validate before pushing
 
-These are the four gates CI runs, in the same order. Build to a throwaway
+These are the gates CI runs, in the same order. Build to a throwaway
 directory rather than `_site/`, for the reason in the note below:
 
 ```bash
 ruby test/run_all.rb                                        # plugin logic still correct?
+ruby script/lint-posts.rb                                   # post sources follow the conventions?
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # does it build clean?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
@@ -239,21 +248,25 @@ case before changing behaviour.
 
 `.github/workflows/jekyll.yml` runs on **pull requests to `main` as well as
 pushes to it**, so the gates below block a bad merge rather than merely reporting
-one after the fact. Steps 1–4 run on both events; step 5 is skipped for pull
+one after the fact. Steps 1–5 run on both events; step 6 is skipped for pull
 requests. In order, it:
 
 1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
-2. builds the site with `JEKYLL_ENV=production`,
-3. runs **html-proofer** over `_site/` (internal links, images, anchors),
-4. runs **`script/validate-site.sh`** — sitemap/feed parse at byte 0, every
+2. runs **`ruby script/lint-posts.rb`** — front matter against
+   `_data/post_conventions.yml`, plus table, math and heading rules in the
+   Markdown source,
+3. builds the site with `JEKYLL_ENV=production`,
+4. runs **html-proofer** over `_site/` (internal links, images, anchors),
+5. runs **`script/validate-site.sh`** — sitemap/feed parse at byte 0, every
    sitemap URL under the configured `url`, a pinned build timezone, `robots.txt`
    not blocking and naming the sitemap, at least one rendered page, exactly one `h1` per page, no
    heading-level skips, a description and a canonical on every page, every
-   description longer than its own title, no duplicate description or title, and
-   no authoring sources published — and
-5. deploys to GitHub Pages.
+   description longer than its own title, no duplicate description or title, no
+   listing page showing a translation beside its original, and no authoring
+   sources published — and
+6. deploys to GitHub Pages.
 
-A failure is almost always step 3 or 4; the Actions log names the exact link,
+A failure is almost always step 4 or 5; the Actions log names the exact link,
 image, or page. There is no manual deploy step.
 
 > **⚠ Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**

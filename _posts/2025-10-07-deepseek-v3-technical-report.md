@@ -5,7 +5,7 @@ subtitle: "DeepSeek-V3 기술 보고서"
 date: 2024-12-27 04:03:16
 paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE-Architecture", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding", "Mixture-of-Experts", "DeepSeek"]
+tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding", "Mixture-of-Experts", "DeepSeek", "Efficient-Attention", "Quantization"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -79,11 +79,11 @@ DeepSeek-V3는 총 671B개의 파라미터를 가지며 각 토큰당 37B개의 
 | 훈련 단계     | 사전 훈련 | 컨텍스트 확장 | 사후 훈련 | 총합    |
 | ------------- | --------- | ------------- | --------- | ------- |
 | H800 GPU 시간 | 2664K     | 119K          | 5K        | 2788K   |
-| USD 비용      | $$5.328M   | $$0.238M       | $$0.01M    | $$5.576M |
+| USD 비용      | $5.328M    | $0.238M        | $0.01M     | $5.576M  |
 
 마지막으로 연구진은 알고리즘, 프레임워크, 하드웨어의 최적화된 공동 설계를 통해 달성한 DeepSeek-V3의 경제적인 훈련 비용을 다시 한 번 강조합니다. 사전 훈련 단계에서 각 1조 토큰에 대해 DeepSeek-V3를 훈련하는 데 단지 180K H800 GPU 시간만 필요했습니다. 즉, 2048개의 H800 GPU를 가진 클러스터에서 3.7일이면 충분했습니다. 결과적으로 사전 훈련 단계는 2개월 미만에 완료되었으며 2664K GPU 시간이 소요되었습니다.
 
-컨텍스트 길이 확장을 위한 119K GPU 시간과 사후 훈련을 위한 5K GPU 시간을 합하면, DeepSeek-V3는 전체 훈련에 단지 2.788M GPU 시간만 소요되었습니다. H800 GPU의 임대 가격을 시간당 \\$$2로 가정하면, 총 훈련 비용은 단지 \\$$5.576M에 불과합니다. 언급된 비용은 DeepSeek-V3의 공식 훈련만 포함하며, 아키텍처, 알고리즘, 데이터에 대한 사전 연구 및 절제 실험과 관련된 비용은 제외됩니다.
+컨텍스트 길이 확장을 위한 119K GPU 시간과 사후 훈련을 위한 5K GPU 시간을 합하면, DeepSeek-V3는 전체 훈련에 단지 2.788M GPU 시간만 소요되었습니다. H800 GPU의 임대 가격을 시간당 $2로 가정하면, 총 훈련 비용은 단지 $5.576M에 불과합니다. 언급된 비용은 DeepSeek-V3의 공식 훈련만 포함하며, 아키텍처, 알고리즘, 데이터에 대한 사전 연구 및 절제 실험과 관련된 비용은 제외됩니다.
 
 ### 주요 기여사항
 
@@ -668,9 +668,8 @@ DeepSeek-V3의 베이스 모델은 영어와 중국어가 대부분을 차지하
 
 **멀티 토큰 예측에 대한 절제 연구**
 
-| 벤치마크 (메트릭)         | # Shots | Small MoE | Small MoE | Large MoE | Large MoE |
-| ------------------------- | ------- | --------- | --------- | --------- | --------- |
-|                           |         | Baseline  | w/ MTP    | Baseline  | w/ MTP    |
+| 벤치마크 (메트릭) | # Shots | Small MoE Baseline | Small MoE w/ MTP | Large MoE Baseline | Large MoE w/ MTP |
+| --- | --- | --- | --- | --- | --- |
 | **활성화 파라미터(추론)** | -       | 2.4B      | 2.4B      | 20.9B     | 20.9B     |
 | **총 파라미터(추론)**     | -       | 15.7B     | 15.7B     | 228.7B    | 228.7B    |
 | **훈련 토큰**             | -       | 1.33T     | 1.33T     | 540B      | 540B      |
@@ -693,9 +692,8 @@ DeepSeek-V3의 베이스 모델은 영어와 중국어가 대부분을 차지하
 
 **보조 손실 없는 밸런싱 전략에 대한 절제 연구**
 
-| 벤치마크 (메트릭)    | # Shots | Small MoE      | Small MoE     | Large MoE      | Large MoE     |
-| -------------------- | ------- | -------------- | ------------- | -------------- | ------------- |
-|                      |         | Aux-Loss-Based | Aux-Loss-Free | Aux-Loss-Based | Aux-Loss-Free |
+| 벤치마크 (메트릭) | # Shots | Small MoE Aux-Loss-Based | Small MoE Aux-Loss-Free | Large MoE Aux-Loss-Based | Large MoE Aux-Loss-Free |
+| --- | --- | --- | --- | --- | --- |
 | **활성화 파라미터**  | -       | 2.4B           | 2.4B          | 20.9B          | 20.9B         |
 | **총 파라미터**      | -       | 15.7B          | 15.7B         | 228.7B         | 228.7B        |
 | **훈련 토큰**        | -       | 1.33T          | 1.33T         | 578B           | 578B          |
@@ -906,9 +904,8 @@ RewardBench에서 이들 모델의 성능을 보여주는 표에서 DeepSeek-V3�
 
 연구진은 DeepSeek-V2.5를 기반으로 DeepSeek-R1로부터의 증류 기여도를 절제 연구했습니다. 기준선은 짧은 CoT 데이터로 훈련되는 반면, 경쟁자는 위에서 설명한 전문가 체크포인트에 의해 생성된 데이터를 사용합니다.
 
-| 모델                      | LiveCodeBench-CoT | MATH-500 |
-| ------------------------- | ----------------- | -------- |
-|                           | Pass@1            | Length   | Pass@1 | Length |
+| 모델 | LiveCodeBench-CoT Pass@1 | LiveCodeBench-CoT Length | MATH-500 Pass@1 | MATH-500 Length |
+| --- | --- | --- | --- | --- |
 | DeepSeek-V2.5 Baseline    | 31.1              | 787      | 74.6   | 769    |
 | DeepSeek-V2.5 +R1 Distill | 37.4              | 783      | 83.2   | 1510   |
 
@@ -939,7 +936,7 @@ DeepSeek-V3 개발 중에 이러한 더 넓은 맥락에서 연구진은 헌법�
 
 DeepSeek-V3의 훈련은 FP8 훈련 지원과 세심한 엔지니어링 최적화로 인해 비용 효과적으로 이루어졌습니다. 특히 사후 훈련 과정에서는 DeepSeek-R1 시리즈 모델로부터 추론 능력을 증류하는 데 성공했습니다. 포괄적인 평가 결과 DeepSeek-V3는 현재 사용 가능한 가장 강력한 오픈소스 모델로 부상했으며, GPT-4o와 Claude-3.5-Sonnet과 같은 선도적인 클로즈드소스 모델과 비교할 만한 성능을 달성했습니다.
 
-강력한 성능에도 불구하고 DeepSeek-V3는 경제적인 훈련 비용을 유지했습니다. 사전 훈련, 컨텍스트 길이 확장, 사후 훈련을 포함한 전체 훈련에 단지 2.788M H800 GPU 시간만 필요했습니다. 이는 H800 GPU의 시간당 임대 가격을 $$2로 가정할 때 총 훈련 비용이 단지 $$5.576M에 불과함을 의미합니다.
+강력한 성능에도 불구하고 DeepSeek-V3는 경제적인 훈련 비용을 유지했습니다. 사전 훈련, 컨텍스트 길이 확장, 사후 훈련을 포함한 전체 훈련에 단지 2.788M H800 GPU 시간만 필요했습니다. 이는 H800 GPU의 시간당 임대 가격을 $2로 가정할 때 총 훈련 비용이 단지 $5.576M에 불과함을 의미합니다.
 
 ### 현재 한계점과 배포상의 과제
 

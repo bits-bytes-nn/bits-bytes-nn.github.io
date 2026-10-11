@@ -5,7 +5,7 @@ subtitle: "DeepSeek-R1: 강화학습을 통한 대규모 언어 모델의 추론
 date: 2025-01-22 15:19:35
 paper_author: "DeepSeek AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Reinforcement-Learning-with-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Verifiable-Rewards-Reinforcement-Learning", "Rejection-Sampling-and-Supervised-Fine-Tuning", "Iterative-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning", "Reasoning-Models", "Alignment", "DeepSeek"]
+tags: ["Large-Scale-Reinforcement-Learning-on-Base-Model", "Group-Relative-Policy-Optimization", "Reasoning-Oriented-Reinforcement-Learning", "Long-Chain-of-Thought-Cold-Start", "Distillation-of-Reasoning-Capability", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Reinforcement-Learning-with-Verifiable-Rewards", "Rejection-Sampling-Fine-Tuning", "Iterative-Reinforcement-Learning", "Unified-Paradigm-for-Reinforcement-Learning", "Reasoning-Models", "Alignment", "DeepSeek"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -164,9 +164,8 @@ DeepSeek-R1-Zero의 훈련을 위해 연구팀은 기본 모델이 지정된 지
 
 특히 주목할 만한 점은 AIME 2024에서의 평균 pass@1 점수가 초기 15.6%에서 인상적인 71.0%로 크게 증가했다는 것입니다. 이는 OpenAI-o1-0912와 비교할 만한 성능 수준에 도달한 것으로, 강화학습 알고리즘의 효과를 명확하게 보여주는 결과입니다.
 
-| 모델             | AIME 2024 | MATH-500 | GPQA   | LiveCode | CodeForces | Diamond |
-| ---------------- | --------- | -------- | ------ | -------- | ---------- | ------- |
-|                  | pass@1    | cons@64  | pass@1 | pass@1   | pass@1     | rating  |
+| 모델 | AIME 2024 pass@1 | AIME 2024 cons@64 | MATH-500 pass@1 | GPQA Diamond pass@1 | LiveCodeBench pass@1 | CodeForces rating |
+| --- | --- | --- | --- | --- | --- | --- |
 | OpenAI-o1-mini   | 63.6      | 80.0     | 90.0   | 60.0     | 53.8       | 1820    |
 | OpenAI-o1-0912   | 74.4      | 83.3     | 94.8   | 77.3     | 63.4       | 1843    |
 | DeepSeek-R1-Zero | 71.0      | 86.7     | 95.9   | 73.3     | 50.0       | 1444    |
@@ -397,9 +396,8 @@ DeepSeek-R1은 모델의 형식 지시 따르기 능력을 평가하도록 설�
 
 ## 증류된 모델 평가
 
-| 모델                          | AIME 2024 |         | MATH-500 | GPQA Diamond | LiveCode Bench | CodeForces |
-| ----------------------------- | --------- | ------- | -------- | ------------ | -------------- | ---------- |
-|                               | pass@1    | cons@64 | pass@1   | pass@1       | pass@1         | rating     |
+| 모델 | AIME 2024 pass@1 | AIME 2024 cons@64 | MATH-500 pass@1 | GPQA Diamond pass@1 | LiveCode Bench pass@1 | CodeForces rating |
+| --- | --- | --- | --- | --- | --- | --- |
 | GPT-4o-0513                   | 9.3       | 13.4    | 74.6     | 49.9         | 32.9           | 759        |
 | Claude-3.5-Sonnet-1022        | 16.0      | 26.7    | 78.3     | 65.0         | 38.9           | 717        |
 | OpenAI-o1-mini                | 63.6      | 80.0    | 90.0     | 60.0         | 53.8           | 1820       |
@@ -424,9 +422,8 @@ DeepSeek-R1은 모델의 형식 지시 따르기 능력을 평가하도록 설�
 
 DeepSeek-R1의 개발 과정에서 중요한 질문이 제기됩니다. 앞서 설명한 증류 방법을 통해 작은 모델이 인상적인 결과를 달성할 수 있음을 확인했지만, 증류 없이 논문에서 논의된 대규모 강화학습 훈련만으로도 비교할 만한 성능을 달성할 수 있을까요? 이 질문에 답하기 위해 연구팀은 수학, 코드, STEM 데이터를 사용하여 Qwen-32B-Base에 대규모 강화학습 훈련을 10,000단계 이상 수행하여 DeepSeek-R1-Zero-Qwen-32B를 개발했습니다.
 
-| 모델                         | AIME 2024 |         | MATH-500 | GPQA Diamond | LiveCodeBench |
-| ---------------------------- | --------- | ------- | -------- | ------------ | ------------- |
-|                              | pass@1    | cons@64 | pass@1   | pass@1       | pass@1        |
+| 모델 | AIME 2024 pass@1 | AIME 2024 cons@64 | MATH-500 pass@1 | GPQA Diamond pass@1 | LiveCodeBench pass@1 |
+| --- | --- | --- | --- | --- | --- |
 | QwQ-32B-Preview              | 50.0      | 60.0    | 90.6     | 54.5         | 41.9          |
 | DeepSeek-R1-Zero-Qwen-32B    | 47.0      | 60.0    | 91.6     | 55.0         | 40.2          |
 | DeepSeek-R1-Distill-Qwen-32B | 72.6      | 83.3    | 94.3     | 62.1         | 57.2          |

@@ -11,7 +11,7 @@ tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent
 cover: /assets/images/insights.jpg
 use_math: false
 lang: ko
-translation_id: claude-code-architecture-analysis
+translation_id: claude-code-source-map-leak-analysis
 ---
 
 > Anthropic이 "오픈소스"라고 부르는 것과 실제로 오픈된 것 사이에는 4,600개 파일만큼의 간극이 있었습니다.

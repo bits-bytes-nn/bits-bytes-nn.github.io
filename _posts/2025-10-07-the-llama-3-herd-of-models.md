@@ -4,7 +4,7 @@ title: "The Llama 3 Herd of Models"
 date: 2024-07-31 17:54:27
 paper_author: "Meta AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Direct-Preference-Optimization", "Scaling-Laws-for-Large-Language-Models", "Multimodal-Knowledge-Distillation", "Efficient-Long-Context-Attention-Mechanism", "Multilingual-Multimodal-Understanding", "Safety-Alignment", "Synthetic-Data-Generation-for-Mathematics", "Tool-Use-Emergence", "Rejection-Sampling-Fine-Tuning", "Multi-Stage-Post-Training-Recipe", "Llama"]
+tags: ["Direct-Preference-Optimization", "Scaling-Laws", "Multimodal-Knowledge-Distillation", "Efficient-Attention", "Multilingual-Multimodal-Understanding", "Safety-Alignment", "Synthetic-Data-Generation", "Tool-Use-Emergence", "Rejection-Sampling-Fine-Tuning", "Multi-Stage-Post-Training-Recipe", "Llama", "Alignment"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -1072,9 +1072,8 @@ Llama의 증가하는 능력을 지원하도록 설계되었으며 영어와 다
 
 Llama Guard 3를 사용할 때 언어별 위반율(VR)과 거짓 거부율(FRR)의 상대적 변화는 다음과 같습니다.
 
-| 언어       | 입력 Llama Guard |      | 출력 Llama Guard |      | 전체 Llama Guard |       |
-| ---------- | ---------------- | ---- | ---------------- | ---- | ---------------- | ----- |
-|            | VR               | FRR  | VR               | FRR  | VR               | FRR   |
+| 언어 | 입력 Llama Guard VR | 입력 Llama Guard FRR | 출력 Llama Guard VR | 출력 Llama Guard FRR | 전체 Llama Guard VR | 전체 Llama Guard FRR |
+| --- | --- | --- | --- | --- | --- | --- |
 | 영어       | -76%             | +95% | -75%             | +25% | -86%             | +102% |
 | 프랑스어   | -38%             | +27% | -45%             | +4%  | -59%             | +29%  |
 | 독일어     | -57%             | +32% | -60%             | +14% | -77%             | +37%  |
@@ -1420,9 +1419,8 @@ Llama 3 8B용 음성 모델은 512개 발화의 글로벌 배치 크기와 $$10^
 
 **안전성 평가**에서는 영어와 스페인어에 대해 2만 개의 발화, 다른 19개 언어에 대해 4천 개씩의 독성 라벨이 첨부된 다국어 오디오 기반 데이터셋인 MuTox에서 음성 모델의 안전성을 평가했습니다. 오디오가 모델에 입력으로 전달되고 일부 특수 문자를 정리한 후 출력이 독성에 대해 평가됩니다.
 
-| 언어 | Llama 3 8B |        | Llama 3 70B |        | Gemini 1.5 Pro |        |
-| ---- | ---------- | ------ | ----------- | ------ | -------------- | ------ |
-|      | AT (↓)     | LT (↑) | AT (↓)      | LT (↑) | AT (↓)         | LT (↑) |
+| 언어 | Llama 3 8B AT (↓) | Llama 3 8B LT (↑) | Llama 3 70B AT (↓) | Llama 3 70B LT (↑) | Gemini 1.5 Pro AT (↓) | Gemini 1.5 Pro LT (↑) |
+| --- | --- | --- | --- | --- | --- | --- |
 | 영어 | 0.84       | 15.09  | 0.68        | 15.46  | 1.44           | 13.42  |
 | 전체 | 2.31       | 9.89   | 2.00        | 10.29  | 2.06           | 10.94  |
 

@@ -21,7 +21,7 @@
       <ul class="social-media-list">
         <li>
           <a href="mailto:{{ site.email }}">
-            <i class="fa-regular fa-envelope"></i>
+            {% include icon.html name="envelope" %}
             <span class="username">{{ site.email }}</span>
           </a>
         </li>
@@ -30,7 +30,7 @@
           {% if social.url and social.url != "" %}
           <li>
             <a href="{{ social.url }}" title="{{ social.desc }}">
-              <i class="fa-brands fa-{{ social.icon }}"></i>
+              {% include icon.html name=social.icon %}
               <span class="username">{% if social.username %}{{ social.username }}{% else %}{{ social.name }}{% endif %}</span>
             </a>
           </li>
@@ -51,11 +51,14 @@
 
 <!-- Scripts -->
 <!-- Code is highlighted server-side by Rouge (theme in _sass/_syntax.scss); no client-side highlighter needed. -->
-<!-- GLightbox (vanilla, no jQuery) for image zoom. -->
+<!-- GLightbox (vanilla, no jQuery) for image zoom, only on pages that have an
+     image to zoom; js/main.js skips the zoom setup when it is absent. -->
+{% if content contains '<img' %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"
 	integrity="sha384-GPAzSuZc0kFvdIev6wm9zg8gnafE8tLso7rsAYQfc9hAdWCpOcpcNI5W9lWkYcsd" crossorigin="anonymous" />
 <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"
 	integrity="sha384-/+Fc1LD6ksHYZ+2MChiSfjEXBcl4q2axUWhs6/CdnfqY5aLmrPwtysVzyeP0s60b" crossorigin="anonymous"></script>
+{% endif %}
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
 

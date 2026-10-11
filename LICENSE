@@ -20,3 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+---
+
+The icon paths in _includes/icon.html are from Font Awesome Free 6.5.1
+(https://fontawesome.com), licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/).

@@ -80,14 +80,6 @@ html {
 	}
 }
 
-ol.default {
-	@extend %default-ol;
-}
-
-ul.default {
-	@extend %default-ul;
-}
-
 code {
 	background-color: $light-gray;
 	display: inline-block;
@@ -154,6 +146,48 @@ blockquote {
 
 .post-content :not(pre) > code {
 	overflow-wrap: anywhere;
+}
+
+// Links inside running text are underlined. Set apart by colour alone, they fail
+// WCAG 1.4.1 for readers who cannot tell the blue from the body gray. Lists that
+// are nothing but links (the category and tag indexes, the tag chips) and
+// zoomable images stay bare. The underline is a tint of the link colour, so it holds in dark mode too.
+.post-content :is(p, li:not(.posts-list > li, .tag-index li), td, th, dd, blockquote) a:not(.glightbox) {
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+	text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+
+	&:hover,
+	&:focus {
+		text-decoration-color: currentColor;
+	}
+}
+
+// A section heading sits closer to the text it opens than to the text before it.
+// With only the shared bottom margin, an h2 was as near the previous paragraph as
+// that paragraph was to its own neighbour, and read as one more paragraph.
+.post .post-content {
+	// Long-form reading text, one step up from the 16px UI text once the column
+	// is wide enough to keep the line count down. Tables stay at 16px: they are
+	// already the widest thing in the column.
+	@include media($tablet) {
+		font-size: 1.0625rem;
+
+		table { font-size: 1rem; }
+	}
+
+	h2 { margin-top: 2em; }
+	h3 { margin-top: 1.6em; }
+	h4, h5, h6 { margin-top: 1.4em; }
+	// A subheading straight under its parent belongs to it, so it stays close.
+	:is(h2, h3, h4, h5) + :is(h3, h4, h5, h6) { margin-top: 0.4em; }
+	> :first-child { margin-top: 0; }
+}
+
+// The category intro, set apart from the list that follows it.
+.page .post-content > .desc {
+	margin-bottom: $base-spacing;
 }
 
 // Reset the inline-`code` chip styling inside fenced blocks, so the gray inline
@@ -270,6 +304,23 @@ blockquote {
 			}
 		}
 	}
+}
+
+// Inline SVG icons (_includes/icon.html). Sized like the glyph font they
+// replace: one em tall, as wide as the drawing, sitting on the text baseline.
+.icon {
+	height: 1em;
+	overflow: visible;
+	vertical-align: -0.125em;
+	fill: currentColor;
+}
+
+// The theme toggle holds both icons; the theme picks one, so it is right at
+// first paint and needs no script.
+.theme-icon-dark { display: none; }
+[data-theme="dark"] {
+	.theme-icon-light { display: none; }
+	.theme-icon-dark { display: inline; }
 }
 
 /*
@@ -433,6 +484,16 @@ blockquote {
 		padding: 0.25em 0;
 		transition: $transition-transform;
 
+		// With 1.1em, 768px left 33px between logo and links, and none at all
+		// in the fallback font shown before the web font arrives.
+		@include media ($tablet) {
+			font-size: 1em;
+		}
+
+		@include media ($desktop) {
+			font-size: 1.1em;
+		}
+
 		&:hover {
 			transform: translateX(-3px);
 		}
@@ -455,7 +516,14 @@ blockquote {
 			transition: $transition-color;
 			position: relative;
 
+			// Tighter until $desktop: at 1.5em the links did not fit beside the logo
+			// from 768px to about 785px, iPad portrait included. The bar wrapped to
+			// two rows, 130px tall, and hid the top of every page beneath it.
 			@include media ($tablet) {
+				padding-right: 1em;
+			}
+
+			@include media ($desktop) {
 				padding-right: 1.5em;
 			}
 
@@ -475,6 +543,10 @@ blockquote {
 				border-radius: 1px;
 
 				@include media ($tablet) {
+					right: 1em;
+				}
+
+				@include media ($desktop) {
 					right: 1.5em;
 				}
 			}
@@ -511,6 +583,13 @@ blockquote {
 	.post-list {
 		padding-top: 1em !important;
 		@extend %default-ul;
+
+		// The divider between cards. A border, not an <hr>: a <ul> may only hold <li>.
+		> li + li {
+			margin-top: $base-spacing;
+			padding-top: $base-spacing;
+			border-top: $base-border;
+		}
 	}
 
 	// Home/listing card meta (index.html). Scoped to .post-list so it doesn't
@@ -542,13 +621,31 @@ blockquote {
 			padding: 0 1em;
 		}
 
+		// inline-block, so the click area and focus ring are the arrow square.
 		a.newer-posts, a.older-posts {
+			display: inline-block;
 			text-decoration: none;
 			transition: $transition-color;
 
 			&:hover {
 				color: $blue;
 			}
+		}
+
+		// A white arrow on a square of the text colour: the link blue, or the
+		// gray of the surrounding text where there is no page to go to.
+		.page-arrow {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.25em;
+			width: 2em;
+			height: 2em;
+			vertical-align: middle;
+			border-radius: $base-border-radius;
+			background-color: currentColor;
+
+			.icon { color: $white; }
 		}
 
 		// Non-link arrow at the first/last page.
@@ -563,8 +660,9 @@ blockquote {
 		background-color: $highlight-color;
 
 		.site-header {
+			// Size comes from the responsive `.has-cover .title` rule above. A fixed
+			// scale(6) here outranked it and set the site name in four lines on a phone.
 			.title {
-				font-size: modular-scale(6);
 				letter-spacing: -0.02em;
 			}
 
@@ -624,7 +722,7 @@ blockquote {
 		}
 
 		.profile {
-			max-width: 320px;
+			max-width: unquote("min(320px, 100%)"); // 320px plus the page margin overflowed a 320px screen
 			margin: auto;
 			padding-bottom: 0.5em;
 			border-radius: $base-border-radius;
@@ -645,6 +743,13 @@ blockquote {
 	// the h3 size it rendered at before that change.
 	.footer-heading {
 		font-size: modular-scale(2);
+	}
+
+	// The one link inside running text in the footer; the rest are lists of
+	// links. Same colour as the words around it, so it needs the underline.
+	.rss-subscribe a {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
 	}
 
 	a {
@@ -672,7 +777,7 @@ blockquote {
 			}
 		}
 
-		&:focus {
+		&:focus-visible {
 			outline: 2px solid $white;
 			outline-offset: 2px;
 		}
@@ -723,9 +828,9 @@ blockquote {
 
 		font-size: 0.9em;
 
-		i {
+		// One column width for every glyph, so the usernames line up.
+		.icon {
 			width: 1.25em;
-			text-align: center;
 		}
 
 		ul {

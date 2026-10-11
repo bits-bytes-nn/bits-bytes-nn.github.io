@@ -12,7 +12,7 @@ nav_order: 3
 <p class="desc"><em>{{ page.description }}</em></p>
 
 {%- comment -%} Only "Paper Reviews" posts, grouped by their secondary topic — prevents other top-level categories (e.g. Insights) from leaking in via shared subcategories {%- endcomment -%}
-{% assign review_posts = site.categories['Paper Reviews'] %}
+{% assign review_posts = site.categories['Paper Reviews'] | listed %}
 {% assign topics = "" | split: "" %}
 {% for post in review_posts %}
   {% for c in post.categories %}
@@ -35,7 +35,7 @@ nav_order: 3
       <strong>
         <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </strong>
-      <span class="post-date">- {{ post.date | date_to_long_string }}</span>
+      <span class="post-date">- {{ post.date | date: site.date_format }}</span>
     </li>
     {% endif %}
   {% endfor %}

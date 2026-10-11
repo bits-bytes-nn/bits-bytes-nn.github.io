@@ -24,7 +24,7 @@ layout: default
       <div class="post-header-info">
         <div class="post-date">
           <span class="meta-label">Published</span>
-          <time class="meta-value" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+          <time class="meta-value" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: site.date_format }}</time>
         </div>
         <div class="post-readtime">
           <span class="meta-label">Read time</span>
@@ -116,7 +116,7 @@ layout: default
           {%- endcomment -%}
           <a href="{{ share_link }}" class="social-link" target="_blank" rel="noopener"
              aria-label="Share on {{ social.name }}">
-            <i class="fa-brands fa-{{ social.icon }} fa-lg" aria-hidden="true"></i>
+            {% include icon.html name=social.icon %}
           </a>
         {% endif %}
       {% endfor %}

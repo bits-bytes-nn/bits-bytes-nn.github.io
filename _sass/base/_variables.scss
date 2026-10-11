@@ -15,7 +15,7 @@ $modular-scale-ratio: $minor-third;
 
 // Line height
 $base-line-height: 1.85;
-$heading-line-height: 1.6;
+$heading-line-height: 1.3; // was 1.6 — loose at display sizes, where a 48px title got 77px lines
 
 // Spacing
 $base-border-radius: 4px;

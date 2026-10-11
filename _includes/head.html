@@ -44,6 +44,20 @@
 {%- if page.layout == 'page' -%}
 	{%- assign html_title = page_title | append: ' | ' | append: site.title -%}
 {%- endif -%}
+{%- comment -%}
+  A paper post's <title> says what the page is, in the words a reader searches
+  with: "Mistral 7B 논문 리뷰", where the bare paper title gave "Mistral 7B".
+  `seo_title` replaces the paper title there when it is too long to survive a
+  results list (Gemini 2.5's runs to 127 characters). Social cards keep the
+  plain title.
+{%- endcomment -%}
+{%- if page.paper_author -%}
+	{%- assign html_title = page.seo_title | default: page.title -%}
+	{%- case page.categories[0] -%}
+		{%- when 'Paper Reviews' -%}{%- assign html_title = html_title | append: ' 논문 리뷰' -%}
+		{%- when 'Paper Summaries' -%}{%- assign html_title = html_title | append: ' 논문 요약' -%}
+	{%- endcase -%}
+{%- endif -%}
 {%- if page.url -%}
 	{%- assign page_full_url = page.url | prepend: site.baseurl | prepend: site.url -%}
 {%- else -%}
@@ -79,16 +93,20 @@
 	<meta name="copyright" content="&copy; {{ site.name }} {{ site.time | date: '%Y' }}" />
 	{% endif %}
 
+	<!-- The hero banner is the largest thing on the first screen, but as a CSS
+	     background the browser finds it only after the stylesheet has loaded.
+	     Fetch it with the stylesheet instead. -->
+	{%- if page.layout == 'post' -%}{%- assign hero_image = page.cover -%}{%- endif -%}
+	{%- if paginator and site.cover -%}{%- assign hero_image = site.cover -%}{%- endif -%}
+	{%- if hero_image %}
+	<link rel="preload" as="image" href="{{ hero_image | prepend: site.baseurl }}">
+	{%- endif %}
+
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<!-- Only the weights actually used: 400 body, 500/600/700 headings/labels. -->
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
-
-	<!-- External libraries -->
-	<!-- Font Awesome 6 names only, so the v4-shims stylesheet is not needed. -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-		integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 	<!-- Icons: the .ico and a 32px PNG for tabs, the 180px touch icon iOS asks
 	     for, and the manifest for Android. Browsers scale these for every other
@@ -176,12 +194,16 @@
 	</script>
 	{% endif %}
 
-	<!-- hreflang alternates for translated posts (paired by translation_id) -->
+	<!-- hreflang alternates for translated posts (paired by translation_id).
+	     x-default, for readers in neither language, is the version in the site's
+	     language: the one the listings show. -->
 	{% if page.translation_id %}
 	<link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />
+	{% if page.lang == site.lang %}<link rel="alternate" hreflang="x-default" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
 	{% for post in site.posts %}
 	  {% if post.translation_id == page.translation_id and post.url != page.url %}
 	<link rel="alternate" hreflang="{{ post.lang }}" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />
+	{% if post.lang == site.lang %}<link rel="alternate" hreflang="x-default" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
 	  {% endif %}
 	{% endfor %}
 	{% endif %}
@@ -256,9 +278,10 @@
 	  }
 	};
 	</script>
-	<!-- Pinned to an exact version with an integrity hash, like every other
-	     external asset here. A floating alias such as `mathjax@3` cannot carry an
-	     SRI hash, so the bytes it serves could change without a commit. -->
+	<!-- Pinned to an exact version with an integrity hash, like the other
+	     versioned CDN files (GLightbox, simple-jekyll-search). A floating alias
+	     such as `mathjax@3` cannot carry an SRI hash, so the bytes it serves could
+	     change without a commit. The fonts MathJax fetches later are not covered. -->
 	<script id="MathJax-script" async
 		src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"
 		integrity="sha384-AHAnt9ZhGeHIrydA1Kp1L7FN+2UosbF7RQg6C+9Is/a7kDpQ1684C2iH2VWil6r4"

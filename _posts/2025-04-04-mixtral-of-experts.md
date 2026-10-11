@@ -5,7 +5,7 @@ subtitle: "Mixtral of Experts: 전문가 혼합 모델의 새로운 지평"
 date: 2024-01-08 18:47:34
 paper_author: "Mistral AI"
 categories: ["Paper Reviews", "Language-Models"]
-tags: ["Sparse-Mixture-of-Experts", "Dynamic-Expert-Routing", "Two-Expert-Token-Processing", "Efficient-Inference-with-Reduced-Active-Parameters", "Routing-Network-Token-Selection", "Expert-Selection-Locality-Analysis", "Multilingual-Performance-Scaling", "Long-Context-Retrieval-Optimization", "Instruction-Fine-Tuning-with-Direct-Preference-Optimization", "Mixture-of-Experts"]
+tags: ["Mixture-of-Experts", "Dynamic-Expert-Routing", "Two-Expert-Token-Processing", "Efficient-Inference", "Routing-Network-Token-Selection", "Expert-Selection-Locality-Analysis", "Multilingual-Performance-Scaling", "Long-Context-Retrieval-Optimization", "Instruction-Fine-Tuning", "Direct-Preference-Optimization"]
 cover: /assets/images/language-models.jpg
 use_math: true
 ---
@@ -183,9 +183,8 @@ Mixtral 모델의 성능을 Llama 2 계열과 비교하여 비용-성능 스펙�
 
 Mixtral 모델은 사전 학습 과정에서 Mistral 7B에 비해 다국어 데이터의 비율을 크게 증가시켰습니다. 이러한 추가 용량 덕분에 Mixtral은 영어에서의 높은 정확도를 유지하면서도 다국어 벤치마크에서 우수한 성능을 보여줍니다. 특히 아래 표에서 볼 수 있듯이, Mixtral은 프랑스어, 독일어, 스페인어, 이탈리아어에서 Llama 2 70B를 크게 능가하는 성능을 보여줍니다.
 
-| 모델 | 활성 매개변수 | 프랑스어 |  | | 독일어 |  |  | 스페인어 |  |  | 이탈리아어 |  |  |
-|------|------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
-| | | Arc-c | Hellas | MMLU | Arc-c | Hellas | MMLU | Arc-c | Hellas | MMLU | Arc-c | Hellas | MMLU |
+| 모델 | 활성 매개변수 | 프랑스어 Arc-c | 프랑스어 Hellas | 프랑스어 MMLU | 독일어 Arc-c | 독일어 Hellas | 독일어 MMLU | 스페인어 Arc-c | 스페인어 Hellas | 스페인어 MMLU | 이탈리아어 Arc-c | 이탈리아어 Hellas | 이탈리아어 MMLU |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | LLaMA 1 33B | 33B | 39.3% | 68.1% | 49.9% | 41.1% | 63.3% | 48.7% | 45.7% | 69.8% | 52.3% | 42.9% | 65.4% | 49.0% |
 | LLaMA 2 70B | 70B | 49.9% | 72.5% | 64.3% | 47.3% | 68.7% | 64.2% | 50.5% | 74.5% | 66.0% | 49.4% | 70.9% | 65.1% |
 | Mixtral 8x7B | 13B | 58.2% | 77.4% | 70.9% | 54.3% | 73.0% | 71.5% | 55.4% | 77.6% | 72.5% | 52.8% | 75.1% | 70.9% |
@@ -276,9 +275,8 @@ MT-Bench에서의 높은 점수와 LMSys 평가에서의 우수한 성능은 Mix
 
 ![그림 8: 각 토큰이 첫 번째 전문가 선택으로 색상 처리된 텍스트 샘플. 전문가 선택은 특히 초기 및 최종 층에서 도메인보다는 구문과 더 일치하는 것으로 나타납니다.](https://ar5iv.labs.arxiv.org/html/2401.04088/assets/images/routing-sample.png)
 
-| | 첫 번째 선택 | | | 첫 번째 또는 두 번째 선택 | | |
-|---|---|---|---|---|---|---|
-| | 층 0 | 층 15 | 층 31 | 층 0 | 층 15 | 층 31 |
+|  | 첫 번째 선택 층 0 | 첫 번째 선택 층 15 | 첫 번째 선택 층 31 | 첫 번째 또는 두 번째 선택 층 0 | 첫 번째 또는 두 번째 선택 층 15 | 첫 번째 또는 두 번째 선택 층 31 |
+| --- | --- | --- | --- | --- | --- | --- |
 | ArXiv | 14.0% | 27.9% | 22.7% | 46.5% | 62.3% | 52.9% |
 | DM Mathematics | 14.1% | 28.4% | 19.7% | 44.9% | 67.0% | 44.5% |
 | Github | 14.9% | 28.1% | 19.7% | 49.9% | 66.9% | 49.2% |

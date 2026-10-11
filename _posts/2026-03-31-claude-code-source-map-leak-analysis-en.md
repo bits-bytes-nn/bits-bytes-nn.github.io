@@ -11,7 +11,10 @@ tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent
 cover: /assets/images/insights.jpg
 use_math: false
 lang: en
-translation_id: claude-code-architecture-analysis
+translation_id: claude-code-source-map-leak-analysis
+# Published under the slug of its first title; renamed to <ko-slug>-en.
+redirect_from:
+  - /insights/agentic-ai/2026/03/31/claude-code-architecture-analysis.html
 ---
 
 > Between what Anthropic calls "open source" and what is actually open, there was a gap of 4,600 files.
