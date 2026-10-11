@@ -8,7 +8,7 @@ ruby '>= 3.3'
 gem 'jekyll', '~> 4.3'
 # Pin to the libsass-based converter (2.x). The 3.x line switched to dart-sass,
 # which errors on the vendored Bourbon/Neat frameworks' legacy `/` division.
-gem 'jekyll-sass-converter', '~> 2.0'
+gem 'jekyll-sass-converter', '~> 3.1'
 gem 'jekyll-paginate'
 gem 'jekyll-sitemap'
 gem 'jekyll-feed'
