@@ -74,6 +74,7 @@ _sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마
                    ⚠ bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
 _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    lazy_images.rb       (<img>에 loading="lazy" 추가)
+                   image_dimensions.rb  (로컬 <img>에 width/height 부여)
                    post_description.rb  (글의 page.description 채우기)
                    related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
                    scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)

@@ -52,7 +52,7 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성, 옛 URL 리디렉션 페이지 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG의 `width`/`height`를 파일 헤더에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
