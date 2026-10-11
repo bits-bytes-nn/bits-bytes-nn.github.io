@@ -76,6 +76,7 @@ _sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
                    ⚠ bourbon/ and neat/ are vendored frameworks — don't edit
 _plugins/          reading_time.rb      (KO/EN-aware read time)
                    lazy_images.rb       (adds loading="lazy" to <img>)
+                   image_dimensions.rb  (width/height on local <img>)
                    post_description.rb  (fills page.description for posts)
                    related_posts.rb     (page.related, and the prev/next links)
                    scrollable_tables.rb (wraps wide tables so they scroll)

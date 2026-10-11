@@ -377,6 +377,10 @@ blockquote {
 
 		img {
 			max-height: 2.5em;
+			// Height is the constraint here, so the width has to follow it; the
+			// width attribute from _plugins/image_dimensions.rb would otherwise
+			// hold it at the file's 192px and stretch the logo.
+			width: auto;
 			margin-top: 0.75em;
 			padding-right: 1em;
 			transition: $transition-transform;
