@@ -149,6 +149,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // Image zoom (GLightbox reads .glightbox elements)
   if (window.GLightbox) GLightbox({ selector: '.glightbox' });
 
+  // Spoken, never shown, so in the page's language: a Korean voice reading
+  // "Table, scrollable" is unintelligible. (The visible chrome stays English.)
+  var english = document.documentElement.lang === 'en';
+  function scrollerLabel(el) {
+    if (el.tagName === 'PRE') return english ? 'Code block, scrollable' : '코드 블록, 가로 스크롤';
+    return english ? 'Table, scrollable' : '표, 가로 스크롤';
+  }
+
   // A horizontally scrolling box can only be scrolled by keyboard if it is
   // focusable — Safari and Firefox have no equivalent of Chrome's keyboard-
   // focusable scrollers. This is done here rather than in the templates because
@@ -162,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (overflows && !el.hasAttribute('tabindex')) {
         el.setAttribute('tabindex', '0');
         el.setAttribute('role', 'region');
-        el.setAttribute('aria-label', el.tagName === 'PRE' ? 'Code block, scrollable' : 'Table, scrollable');
+        el.setAttribute('aria-label', scrollerLabel(el));
       } else if (!overflows && el.getAttribute('tabindex') === '0') {
         el.removeAttribute('tabindex');
         el.removeAttribute('role');
