@@ -109,6 +109,12 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint(front: FRONT.sub('"Sliding-Window-Attention"', '"Opt-In"'))
   end
 
+  # YAML 1.1 reads a bare `on` as true, which would drop it from the list.
+  def test_spec_word_lists_are_strings
+    assert SPEC["tags"]["lowercase_words"].all?(String)
+    assert_finding(/should have on/, lint(front: FRONT.sub('"Sliding-Window-Attention"', '"Attention-On-Demand"')))
+  end
+
   def test_paper_author_is_one_string_without_et_al
     assert_equal [], lint(front: FRONT.sub('"Mistral AI"', '"Google DeepMind, Google Research, Stanford"'))
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))

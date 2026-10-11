@@ -42,11 +42,12 @@ tags:
     - Llama
     - Mixture-of-Experts
     - Multimodal-Models
+    - Parameter-Efficient-Fine-Tuning
     - Quantization
     - Reasoning-Models
     - Retrieval-Augmented-Generation
   # Lowercase inside a tag, as in a title: Leiden-Algorithm-for-Text.
-  lowercase_words: [a, an, and, as, at, by, for, from, in, of, on, or, the, to, via, vs, with]
+  lowercase_words: [a, an, and, as, at, by, for, from, in, of, "on", or, the, to, via, vs, with]
   # Retired names and the tag that replaced each. A post may not use the old one.
   aliases:
     Mixture-of-Experts-Architecture: Mixture-of-Experts
