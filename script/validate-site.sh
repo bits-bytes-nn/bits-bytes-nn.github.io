@@ -282,8 +282,7 @@ fi
 # --- translations stay out of the listings ----------------------------------
 # A translation pair is one article, so the listings show only the version in
 # the site's language (_plugins/translations.rb). A listing page that skips the
-# `listed` filter shows the English twin again; htmlproofer is blind to it, and
-# it does not crawl the paginated home pages at all.
+# `listed` filter shows the English twin again, and htmlproofer is blind to it.
 SITE_LANG=$(sed -nE 's/^lang:[[:space:]]*"?([a-z-]+)"?.*/\1/p' "$CONFIG" | head -1)
 BASE_PATH=$(sed -nE "s/^baseurl:[[:space:]]*['\"]?([^'\"[:space:]]*)['\"]?.*/\1/p" "$CONFIG" | head -1)
 listed_twins=$(ruby -e '

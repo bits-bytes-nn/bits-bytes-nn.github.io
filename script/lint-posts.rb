@@ -93,7 +93,8 @@ module PostLint
     found = []
     lines = post.body.split("\n", -1)
     fence = nil # the marker that opened the code fence we are in
-    block = nil # whether a multi-line $$ block is open
+    block = nil # the line a still-open multi-line $$ block started on
+    span = nil # the line an inline $$ span wrapped onto the next line started on
     lines.each_with_index do |line, i|
       n = post.body_line + i
       if (m = line.match(FENCE))
@@ -106,25 +107,35 @@ module PostLint
       end
       next if fence
 
-      # A display block over several lines: $$ alone on the opening and closing line.
-      if line.strip == "$$"
-        if block
+      # A display block over several lines opens on a line starting with $$ and
+      # closes on the next line with an odd number of them: `$$` alone, or
+      # `$$x = \begin{cases}` ... `\end{cases}$$`.
+      # Inside a blockquote the same rules apply to the text after the markers.
+      bare = unquote(line)
+      odd = bare.gsub(/`[^`]*`/, "").scan("$$").size.odd?
+      if span && bare.strip.empty?
+        found << "#{span}: unbalanced $$ in the paragraph"
+        span = nil
+      end
+      if block || (odd && !span && bare.lstrip.start_with?("$$"))
+        found.concat(math_findings([line.delete("$")], n))
+        if odd && block
           found << "#{n}: display $$ needs a blank line after" unless after_display?(lines[i + 1])
-        elsif i.positive? && !lines[i - 1].strip.empty?
+        elsif odd && i.positive? && !unquote(lines[i - 1]).strip.empty?
           found << "#{n}: display $$ needs a blank line before"
         end
-        block = !block
+        block = (block ? nil : n) if odd
         next
       end
-      if block
-        found.concat(math_findings([line], n))
-        next
-      end
+      # An odd line opens an inline span a later line of the paragraph closes.
+      span = (span ? nil : n) if odd
 
       found << "#{n}: H1 in the body; the layout renders the title" if line.match?(/\A# \S/)
       found.concat(math(line, n, lines, i))
       found.concat(table(lines, i, n)) if table_start?(lines, i)
     end
+    found << "#{block}: $$ block never closed" if block
+    found << "#{span}: unbalanced $$ in the paragraph" if span
     found
   end
 
@@ -166,14 +177,31 @@ module PostLint
   # line) after it, and a blank line before, or kramdown folds it into the
   # paragraph as inline math. That holds inside list items too.
   def self.after_display?(line)
-    line.nil? || line.strip.empty? || line.lstrip.start_with?("{:")
+    rest = unquote(line.to_s).strip
+    rest.empty? || rest.start_with?("{:")
+  end
+
+  # The text of a line after any blockquote markers.
+  def self.unquote(line)
+    line.sub(/\A\s*(?:>\s?)+/, "")
   end
 
   def self.math(line, n, lines, i)
-    prose = line.gsub(/`[^`]*`/, "")
+    prose = unquote(line).gsub(/`[^`]*`/, "")
     found = math_findings(prose.scan(/\$\$(.+?)\$\$/).flatten, n)
-    if prose.strip.match?(/\A\$\$.*\$\$\z/) && !prose.lstrip.start_with?("|")
-      before_ok = i.zero? || lines[i - 1].strip.empty?
+    outside = prose.gsub(/\$\$.+?\$\$/, "")
+    # `\\(` reaches MathJax as `\(` but only after Markdown has read the formula:
+    # `*` and `_` inside it turn into <em>, and the formula renders as raw TeX.
+    if outside.match?(/\\\\[(\[]/)
+      found << "#{n}: math written \\\\( or \\\\[; write $$...$$, which Markdown leaves alone"
+    end
+    # TeX next to a single `$` is math that never opened; a price is neither
+    # preceded by `}` nor followed by a command.
+    if outside.match?(/\}\$(?!\$)|(?<!\$)\$\\[a-zA-Z]/)
+      found << "#{n}: TeX next to a single `$`; write the formula as $$...$$"
+    end
+    if prose.strip.match?(/\A\$\$(?:(?!\$\$).)+\$\$\z/) && !prose.lstrip.start_with?("|")
+      before_ok = i.zero? || unquote(lines[i - 1]).strip.empty?
       unless before_ok && after_display?(lines[i + 1])
         found << "#{n}: display $$ needs a blank line before and after"
       end

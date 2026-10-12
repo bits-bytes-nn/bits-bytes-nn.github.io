@@ -27,4 +27,9 @@ class TestLegacyUrls < Minitest::Test
   def test_does_not_duplicate_a_declared_legacy_path
     assert_equal [OLD], LegacyUrls.redirect_from([OLD], OLD, NEW)
   end
+
+  def test_only_posts_published_before_the_change_had_an_old_url
+    assert LegacyUrls.legacy?("2026-07-27-ai-ready-data.md")
+    refute LegacyUrls.legacy?("2026-10-11-new-post.md")
+  end
 end

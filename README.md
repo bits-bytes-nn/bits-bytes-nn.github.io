@@ -83,6 +83,7 @@ _plugins/          reading_time.rb      (KO/EN-aware read time)
                    search_index.rb      (plain_text filter for search.json)
                    legacy_urls.rb       (redirects pre-slug post URLs)
                    translations.rb      (keeps a post's translation out of the lists)
+                   posted_date.rb       (last_modified_at from the file-name date)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
@@ -117,7 +118,7 @@ layout: post
 title: "<Post Title>"
 subtitle: "<one-line pitch>"       # optional — shown under the title in the header
 date: YYYY-MM-DD HH:MM:SS
-paper_author: "<Author>"           # the paper's org; omit for Insights/opinion posts
+paper_author: "<Org>"              # the paper's org, not people; omit for Insights/opinion posts
 seo_title: "<shorter title>"       # optional — for <title> when the paper title is too long
 description: >-                    # optional — see below
   <search-snippet, ~150 chars>
@@ -157,9 +158,9 @@ Categories are **two levels**:
   `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
   A type with no posts yet keeps its tab and renders an empty-state line: a
   missing tab reads as a section that was removed, not one still filling up.
-- `categories[1]` — the **topic**: `Language-Models`, `Multimodal-Learning`,
-  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`,
-  `Data-Architecture`, … (add new ones freely).
+- `categories[1]` — the **topic**, one of the `topics` in
+  `_data/post_conventions.yml`, which also gives its cover image if it has one. When none fits,
+  add one there first; the lint rejects any other value.
 
 Jekyll slugifies the two and combines them with the date to build the output
 path (`permalink` in `_config.yml`):
@@ -175,7 +176,8 @@ breaks inbound links and search results. Set them once and leave them.
 
 Posts first published under the old unslugified form (`/paper%20reviews/…`) keep
 working: `_plugins/legacy_urls.rb` adds that path to each post's `redirect_from`,
-and jekyll-redirect-from writes a stub there that redirects to the new URL.
+and jekyll-redirect-from writes a stub there that redirects to the new URL. Posts
+published on or after the change (2026-10-11) never had an old URL and get no stub.
 
 ### Tags: one topic tag on top of the specific ones
 
@@ -210,6 +212,19 @@ MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. Wit
 `$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
 dollar signs like `$10M` are fine — they're not math.)
 
+The lint also rejects what renders wrong:
+
+- math written `\\(…\\)` or `\\[…\\]`, or TeX next to a single `$`: Markdown
+  reads the formula first, as above.
+- `\_` inside `$$…$$`: MathJax shows the backslash-underscore literally. Write
+  `_`; escape it only inside `\text{…}`.
+- a display `$$…$$` line without a blank line before and after, in lists too:
+  kramdown folds it into the paragraph as inline math.
+- Hangul inside a `$$` span: almost always two currency `$$`s read as one span.
+
+Inside inline math, write `\lvert … \rvert` instead of a bare `|`, which a table
+reads as a cell break.
+
 ### Validate before pushing
 
 These are the gates CI runs, in the same order. Build to a throwaway
@@ -221,8 +236,7 @@ ruby script/lint-posts.rb                                   # post sources follo
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # does it build clean?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-enforce-https \
-  --ignore-urls "/^\/page\/\d+/"                            # broken links, images, anchors?
+  --allow-hash-href --no-enforce-https                      # broken links, images, anchors?
 script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings
 ```
 
@@ -236,7 +250,8 @@ script/validate-site.sh /tmp/site-verify                    # sitemap, feed, met
 > ps aux | grep '[j]ekyll serve'
 > ```
 
-`test/` unit-tests the pure logic in `_plugins/` — one file per plugin. Plain
+`test/` unit-tests the pure logic in `_plugins/` (one file per plugin) and
+`script/lint-posts.rb`. Plain
 `ruby`, not `bundle exec`: each plugin guards its Jekyll/Liquid registration
 behind `defined?` so the logic loads standalone, and minitest ships with Ruby.
 **Anything you change in `_plugins/` changes every page on the site**, so add a
@@ -251,7 +266,7 @@ pushes to it**, so the gates below block a bad merge rather than merely reportin
 one after the fact. Steps 1–5 run on both events; step 6 is skipped for pull
 requests. In order, it:
 
-1. runs **`ruby test/run_all.rb`** (the `_plugins/` unit tests),
+1. runs **`ruby test/run_all.rb`** (the `_plugins/` and lint unit tests),
 2. runs **`ruby script/lint-posts.rb`** — front matter against
    `_data/post_conventions.yml`, plus table, math and heading rules in the
    Markdown source,

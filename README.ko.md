@@ -81,6 +81,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    search_index.rb      (search.json용 plain_text 필터)
                    legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
                    translations.rb      (번역본을 글 목록에서 빼기)
+                   posted_date.rb       (파일명 날짜로 last_modified_at 채우기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -113,7 +114,7 @@ layout: post
 title: "<글 제목>"
 subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
 date: YYYY-MM-DD HH:MM:SS
-paper_author: "<저자>"             # 논문 저자(기관). Insights·의견 글이면 생략
+paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). Insights·의견 글이면 생략
 seo_title: "<짧은 제목>"            # 선택 — 논문 제목이 너무 길 때 <title>에 대신 씁니다
 description: >-                    # 선택 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
@@ -152,9 +153,9 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
   `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. 아직 글이 없는 유형도
   **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
   없어진 섹션으로 읽히기 때문입니다.
-- `categories[1]` — **주제**: `Language-Models`, `Multimodal-Learning`,
-  `Finetuning`, `Retrieval-Augmented-Generation`, `Agentic-AI`, `Data-Architecture` 등.
-  필요하면 자유롭게 추가합니다.
+- `categories[1]` — **주제**: `_data/post_conventions.yml`의 `topics` 중 하나이며, 표지
+  이미지도 거기서 정해집니다. 맞는 주제가 없으면 먼저 거기에 추가합니다. 목록에 없는 값은
+  린트가 막습니다.
 
 Jekyll은 이 둘을 슬러그로 바꾸고(`_config.yml`의 `permalink`) 날짜와 합쳐 출력 경로를
 만듭니다.
@@ -170,7 +171,8 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 
 예전 규칙으로 게시된 옛 URL(`/paper%20reviews/…`)은 계속 동작합니다.
 `_plugins/legacy_urls.rb`가 그 경로를 글의 `redirect_from`에 넣고, jekyll-redirect-from이 그
-자리에 새 URL로 보내는 페이지를 만듭니다.
+자리에 새 URL로 보내는 페이지를 만듭니다. 규칙이 바뀐 날(2026-10-11)부터 게시한 글은 옛 URL이
+없으므로 이 페이지를 만들지 않습니다.
 
 ### 태그: 세부 태그 위에 주제 태그를 하나
 
@@ -202,6 +204,19 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합니다. (`$10M` 같은 본문 속
 달러 표기는 수식이 아니니 그대로 둬도 됩니다.)
 
+린트는 렌더링이 깨지는 다음 경우도 막습니다.
+
+- `\\(…\\)`·`\\[…\\]`로 쓴 수식, 단일 `$` 옆의 TeX: 위와 같이 마크다운이 수식을 먼저
+  읽습니다.
+- `$$…$$` 안의 `\_`: MathJax가 역슬래시와 밑줄을 그대로 보여 줍니다. `_`로 쓰고,
+  `\text{…}` 안에서만 이스케이프합니다.
+- 앞뒤에 빈 줄이 없는 디스플레이 `$$…$$` 줄(목록 안 포함): kramdown이 문단에 붙여 인라인
+  수식으로 처리합니다.
+- `$$` 구간 안의 한글: 거의 언제나 통화 표기 `$$` 두 개가 한 구간으로 읽힌 것입니다.
+
+인라인 수식에서는 맨 `|` 대신 `\lvert … \rvert`를 씁니다. 표 안에서는 맨 `|`가 셀 구분자로
+읽힙니다.
+
 ### 푸시 전에 확인하세요
 
 CI가 돌리는 게이트를 같은 순서로 미리 돌립니다. `_site/`가 아니라 임시 경로로 빌드하는
@@ -213,8 +228,7 @@ ruby script/lint-posts.rb                                   # 글 원본이 규�
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # 빌드가 깨끗한가?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-enforce-https \
-  --ignore-urls "/^\/page\/\d+/"                            # 깨진 링크·이미지·앵커는 없나?
+  --allow-hash-href --no-enforce-https                      # 깨진 링크·이미지·앵커는 없나?
 script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
 ```
 
@@ -227,7 +241,7 @@ script/validate-site.sh /tmp/site-verify                    # 사이트맵·피�
 > ps aux | grep '[j]ekyll serve'
 > ```
 
-`test/`는 `_plugins/`의 순수 로직을 플러그인당 한 파일씩 단위 테스트합니다. `bundle exec`가
+`test/`는 `_plugins/`의 순수 로직(플러그인당 한 파일)과 `script/lint-posts.rb`를 단위 테스트합니다. `bundle exec`가
 아니라 plain `ruby`인 이유는, 각 플러그인이 Jekyll·Liquid 등록을 `defined?`로 감싸 로직만
 단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기 때문입니다. **`_plugins/`를 건드리면
 사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기 전에 테스트 케이스를 먼저 추가하세요.
@@ -240,7 +254,7 @@ script/validate-site.sh /tmp/site-verify                    # 사이트맵·피�
 돕니다. 그래서 아래 게이트가 잘못된 머지를 사후에 보고하는 데 그치지 않고 막습니다.
 1~5단계는 두 경우 모두, 6단계는 PR에서 건너뜁니다. 순서대로:
 
-1. **`ruby test/run_all.rb`**로 `_plugins/` 단위 테스트를 돌리고
+1. **`ruby test/run_all.rb`**로 `_plugins/`와 린트의 단위 테스트를 돌리고
 2. **`ruby script/lint-posts.rb`**로 프런트매터를 `_data/post_conventions.yml`과 대조하고,
    마크다운 원본의 표·수식·헤딩 규칙을 검사하고
 3. `JEKYLL_ENV=production`으로 사이트를 빌드하고
