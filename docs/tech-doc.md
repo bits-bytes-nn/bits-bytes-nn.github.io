@@ -242,7 +242,9 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
 약 1 MB짜리 MathJax 스크립트를 아예 내려받지 않아 가볍다.
 
 > **커스텀 매크로.** `head.html`의 MathJax `macros`에 `\llbracket`/`\rrbracket`(⟦ ⟧)와
-> `\textsc`가 정의돼 있다. 다른 매크로를 본문에서 쓰려면 먼저 여기에 등록해야 한다.
+> `\textsc`가 정의돼 있다. 다른 매크로를 본문에서 쓰려면 먼저 여기에 등록하고
+> `_data/post_conventions.yml`의 `math.defined_macros`에도 같은 이름을 넣는다(두 목록이 다르면
+> 테스트가 실패한다).
 
 ## 5. 검색 — 서버 없이 브라우저에서 도는 방식
 

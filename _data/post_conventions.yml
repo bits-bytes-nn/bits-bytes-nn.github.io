@@ -28,7 +28,13 @@ topics:
 
 # Never in front matter. jekyll-feed reads `author` as the entry's author, which
 # is the site's (see _config.yml); a paper's authors go in `paper_author`.
-forbidden_keys: [author]
+# `last_modified_at` is set from the file-name date (_plugins/posted_date.rb).
+forbidden_keys: [author, last_modified_at]
+
+math:
+  # The macros _includes/head.html defines for MathJax on top of the standard
+  # set; test/test_lint_posts.rb fails when the two lists differ.
+  defined_macros: [llbracket, rrbracket, textsc]
 
 tags:
   # Every post carries at least one: it is what _plugins/related_posts.rb joins

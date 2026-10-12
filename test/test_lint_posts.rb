@@ -134,6 +134,13 @@ class TestLintPosts < Minitest::Test
     assert_finding(/should have on/, lint(front: FRONT.sub('"Sliding-Window-Attention"', '"Attention-On-Demand"')))
   end
 
+  # scholar-lens warns on any other macro, so the list must name what head.html defines.
+  def test_spec_macros_are_the_ones_mathjax_defines
+    head = File.read(File.join(PostLint::ROOT, "_includes/head.html"))
+    defined = head[/macros: \{(.*?)\n\s*\}/m, 1].scan(/^\s*(\w+):/).flatten
+    assert_equal SPEC["math"]["defined_macros"].sort, defined.sort
+  end
+
   def test_paper_author_is_one_string_without_et_al
     assert_equal [], lint(front: FRONT.sub('"Mistral AI"', '"Google DeepMind, Google Research, Stanford"'))
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))
