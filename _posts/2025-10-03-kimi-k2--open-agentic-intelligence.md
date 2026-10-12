@@ -4,6 +4,8 @@ title: "Kimi K2: Open Agentic Intelligence"
 subtitle: "Kimi K2: 오픈 에이전틱 인텔리전스"
 date: 2025-07-28 05:35:43
 paper_author: "Moonshot AI"
+description: >-
+  Kimi K2는 활성 32B, 총 1조 매개변수의 MoE 모델로, MuonClip 옵티마이저로 15.5조 토큰을 손실 스파이크 없이 학습했고 SWE-Bench Verified에서 65.8점을 얻었습니다. 에이전틱 데이터 합성과 강화학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["MuonClip-Optimizer", "QK-Clip-Attention-Stabilization", "Agentic-Data-Synthesis", "Multi-Stage-Reinforcement-Learning-with-Self-Critique", "Mixture-of-Experts-Sparsity-Scaling-Law", "Synthetic-Data-Rephrasing-for-Token-Efficiency", "Reinforcement-Learning-with-Verifiable-Rewards", "Agentic-Intelligence-Framework", "Computational-Efficiency-in-Large-Language-Models", "Mixture-of-Experts", "Agentic-AI"]
 cover: /assets/images/language-models.jpg

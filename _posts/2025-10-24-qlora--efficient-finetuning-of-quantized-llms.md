@@ -4,6 +4,8 @@ title: "QLoRA: Efficient Finetuning of Quantized LLMs"
 subtitle: "QLoRA: 양자화된 대규모 언어 모델의 효율적인 파인튜닝"
 date: 2023-05-23 17:50:33
 paper_author: "University of Washington"
+description: >-
+  QLoRA는 4비트 NF4 양자화, Double Quantization, Paged Optimizers로 65B 모델을 단일 48GB GPU에서 파인튜닝합니다. Guanaco는 Vicuna 벤치마크에서 ChatGPT 대비 99.3%에 도달했습니다. 세 기법과 평가를 정리합니다.
 categories: ["Paper Reviews", "Finetuning"]
 tags: ["4-bit-NormalFloat-Quantization", "Double-Quantization", "Paged-Optimizers", "Low-Rank-Adaptation-of-Quantized-Models", "Frozen-Quantized-Pre-trained-Weights-with-Trainable-Adapters", "Memory-Efficient-Large-Language-Model-Fine-Tuning", "Block-wise-k-bit-Quantization", "Parameter-Efficient-Fine-Tuning-with-Quantization", "Elo-Rating-Tournament-Style-Evaluation", "Instruction-Fine-Tuning", "Parameter-Efficient-Fine-Tuning", "Quantization"]
 cover: /assets/images/finetuning.jpg

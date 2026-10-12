@@ -3,6 +3,8 @@ layout: post
 title: "From Local to Global: A Graph RAG Approach to Query-Focused Summarization"
 date: 2024-04-24 18:38:11
 paper_author: "Microsoft Research"
+description: >-
+  Graph RAG는 LLM으로 엔티티 지식 그래프와 커뮤니티 요약을 미리 만들어 전역 질문에 맵-리듀스로 답합니다. 기존 RAG보다 포괄성과 다양성에서 앞섰고, 루트 레벨 요약은 원문 요약보다 토큰을 97% 덜 씁니다. 색인 구축과 평가를 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["GraphRAG", "Query-Focused-Summarization", "Community-Based-Summarization", "Entity-and-Relationship-Extraction", "Map-Reduce-Summarization", "Modularity-Based-Retrieval", "Community-Detection", "Leiden-Algorithm-for-Text", "Multi-Level-Community-Indexing", "Global-Context-Understanding", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg

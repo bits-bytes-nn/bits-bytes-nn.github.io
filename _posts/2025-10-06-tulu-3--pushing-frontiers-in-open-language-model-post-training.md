@@ -4,6 +4,8 @@ title: "Tulu 3: Pushing Frontiers in Open Language Model Post-Training"
 subtitle: "Tülu 3: 오픈 언어 모델 사후 훈련의 새로운 지평"
 date: 2024-11-22 18:44:04
 paper_author: "Allen Institute for AI"
+description: >-
+  Tülu 3는 Llama 3.1 기반 모델에 SFT, DPO, 검증 가능한 보상 강화학습 RLVR을 차례로 적용한 공개 사후 훈련 모델로, 8B 모델이 GSM8K 87.6%, IFEval 82.4%를 기록했습니다. 데이터 구성과 평가 체계, RLVR을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Reinforcement-Learning-with-Verifiable-Rewards", "Multi-Stage-Post-Training-Recipe", "Direct-Preference-Optimization", "Persona-Driven-Data-Synthesis", "Synthetic-Data-Generation", "Prompt-Decontamination", "Open-Language-Model-Evaluation-System", "Length-Normalized-Preference-Optimization", "Asynchronous-Reinforcement-Learning-Infrastructure", "Skill-Targeted-Model-Training", "Alignment"]
 cover: /assets/images/language-models.jpg

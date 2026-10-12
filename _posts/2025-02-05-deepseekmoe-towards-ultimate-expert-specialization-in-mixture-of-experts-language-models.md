@@ -4,6 +4,8 @@ title: "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Expert
 seo_title: "DeepSeekMoE: Ultimate Expert Specialization in MoE"  # <title> only; the paper title runs past a results list
 date: 2024-01-11 17:31:42
 paper_author: "DeepSeek AI"
+description: >-
+  DeepSeekMoE는 세밀한 전문가 분할과 공유 전문가 분리로 MoE의 지식 혼재와 중복 문제를 줄입니다. 16B 모델은 LLaMA2 7B의 약 40% 계산량으로 대등한 성능을 냈고 145B까지 확장했습니다. 구조와 부하 균형 기법을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Fine-Grained-Expert-Segmentation", "Shared-Expert-Isolation", "Mixture-of-Experts", "Parameter-Efficient-Language-Model-Scaling", "Economical-Training", "Multi-Level-Load-Balancing", "Efficient-Inference", "DeepSeek"]
 cover: /assets/images/language-models.jpg

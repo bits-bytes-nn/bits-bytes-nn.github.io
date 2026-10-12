@@ -3,6 +3,8 @@ layout: post
 title: "LLaMA: Open and Efficient Foundation Language Models"
 date: 2023-02-27 17:11:15
 paper_author: "Meta AI"
+description: >-
+  LLaMA는 공개 데이터만으로 7B~65B 모델을 1.4T 토큰까지 학습해, 13B 모델이 GPT-3(175B)를 앞서고 65B 모델이 PaLM-540B와 견줄 성능을 냈습니다. 데이터 구성, 아키텍처 개선과 학습 효율화 방법을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Scaling-Laws", "Economical-Training", "Computation-Communication-Overlap", "Public-Dataset-Only-Training", "RMSNorm", "Efficient-Attention", "CommonCrawl-Quality-Filtering", "Llama"]
 cover: /assets/images/language-models.jpg

@@ -3,6 +3,8 @@ layout: post
 title: "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval"
 date: 2024-01-31 18:30:21
 paper_author: "Stanford University"
+description: >-
+  RAPTOR는 텍스트 청크를 재귀적으로 임베딩·클러스터링·요약해 여러 추상화 수준의 트리를 만들고 검색에 씁니다. GPT-4와 결합해 QuALITY에서 정확도를 절대 20% 높였습니다. 트리 구축과 축소된 트리 검색 방식을 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["Tree-Organized-Retrieval", "Hierarchical-Summarization", "Collapsed-Tree-Retrieval", "Dependency-Aware-Tree-Traversal", "Multi-Level-Abstraction-Retrieval", "Gaussian-Mixture-Model-Clustering", "Semantic-Similarity-Clustering", "Contextual-Flexibility-Retrieval", "Retrieval-Augmented-Generation"]
 cover: /assets/images/retrieval-augmented-generation.jpg
@@ -13,7 +15,7 @@ use_math: true
 대규모 언어 모델(LLMs)은 인상적인 성능을 보이고 있지만, 특정 도메인의 전문 지식 부족과 지식의 시의성 문제라는 한계에 직면해 있습니다. 기존의 검색 증강 접근방식은 텍스트를 짧은 청크로 분할하여 검색하는 방식을 사용하지만, 이는 문서의 전체적인 맥락과 계층적 의미 구조를 효과적으로 포착하지 못한다는 한계가 있습니다. 특히 복잡한 다단계 추론이 필요한 과제에서 이러한 한계가 두드러집니다. 이 연구는 이러한 문제를 해결하기 위해 문서의 계층적 의미 구조를 효과적으로 활용할 수 있는 새로운 검색 증강 방법론을 개발하고자 시작되었습니다.
 
 ### 이 연구에서 제시하는 새로운 해결 방법은 무엇입니까?
-RAPTOR(Recursive Abstraction Processing Through Tree-based Organization and Retrieval)는 텍스트의 계층적 의미 구조를 포착하고 활용하는 혁신적인 트리 기반 검색 시스템을 제시합니다. 이 시스템은 텍스트 청크를 재귀적으로 임베딩하고, 클러스터링하며, 요약하는 과정을 통해 다양한 추상화 수준의 정보를 포함하는 트리 구조를 구축합니다. 특히 의미적 유사성을 기반으로 한 클러스터링과 재귀적 요약을 통해, 문서 전체에 걸친 정보를 효과적으로 통합하고 활용할 수 있는 구조를 제공합니다.
+RAPTOR(Recursive Abstractive Processing for Tree-Organized Retrieval)는 텍스트의 계층적 의미 구조를 포착하고 활용하는 혁신적인 트리 기반 검색 시스템을 제시합니다. 이 시스템은 텍스트 청크를 재귀적으로 임베딩하고, 클러스터링하며, 요약하는 과정을 통해 다양한 추상화 수준의 정보를 포함하는 트리 구조를 구축합니다. 특히 의미적 유사성을 기반으로 한 클러스터링과 재귀적 요약을 통해, 문서 전체에 걸친 정보를 효과적으로 통합하고 활용할 수 있는 구조를 제공합니다.
 
 ### 제안된 방법은 어떻게 구현되었습니까?
 RAPTOR의 구현은 크게 트리 구축과 검색 메커니즘 두 단계로 나뉩니다. 트리 구축 단계에서는 텍스트를 100 토큰 길이의 청크로 분할한 후, SBERT를 사용하여 임베딩합니다. 이후 가우시안 혼합 모델(GMM)을 사용한 클러스터링과 GPT-3.5-turbo를 활용한 요약 생성을 통해 계층적 트리 구조를 구축합니다. 검색 단계에서는 트리 순회와 축소된 트리라는 두 가지 방식을 제공하며, 실험 결과 축소된 트리 방식이 더 우수한 성능을 보였습니다. 시스템의 확장성 분석 결과, 트리 구축 비용과 시간이 문서 길이에 대해 선형적으로 증가하는 것으로 나타났습니다.
