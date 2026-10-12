@@ -90,12 +90,31 @@ class TestLintPosts < Minitest::Test
     assert_finding(/blank line before/, lint("Intro\n$$\nx\n$$\n\nTail.\n"))
     assert_finding(/blank line after/, lint("Intro.\n\n$$\nx\n$$\nTail.\n"))
     assert_equal [], lint("Intro.\n\n$$\nx_i\n$$\n\nTail.\n")
+    # Content on the opening and closing lines, as cases environments are written.
+    assert_equal [], lint("Intro.\n\n$$y = \\begin{cases}\n1 & x > 0 \\\\\n0\n\\end{cases}$$\n\nTail.\n")
+    assert_finding(/literal underscore/, lint("Intro.\n\n$$y = \\begin{cases}\ne\\_i\n\\end{cases}$$\n\nTail.\n"))
+    assert_finding(/unbalanced/, lint("가격은 $$5입니다.\n\n다음 문단.\n"))
+    assert_equal [], lint("식 $$a +\n\\frac{1}{b}$$ 입니다.\n")
+    assert_equal [], lint("> 인용\n>\n> $$\n> a = b\n> $$\n>\n> 끝\n")
+    assert_finding(/blank line before and after/, lint("> 문장\n> $$x=1$$\n> 문장\n"))
+    assert_finding(/never closed/, lint("Intro.\n\n$$a$$ and $$b\n# Title again\n"))
+    # Two spans on a line are inline math, whatever the line starts with.
+    assert_equal [], lint("Intro\n$$x$$는 $$y$$보다 큽니다.\n")
   end
 
   def test_fences_close_only_on_their_own_marker
     assert_equal [], lint("````md\n```\n# not a heading\n```\n````\n")
     assert_equal [], lint("~~~\n```\n# not a heading\n~~~\n")
     assert_finding(/H1 in the body/, lint("```\ncode\n```\n# Title again\n"))
+  end
+
+  def test_math_outside_double_dollars
+    assert_finding(/write \$\$/, lint("별표(\\\\(*\\\\))는 \\\\(\\phi^{*}\\\\)입니다.\n"))
+    assert_finding(/write \$\$/, lint("Intro.\n\n\\\\[ y = x \\\\]\n\nTail.\n"))
+    assert_finding(/single `\$`/, lint("/\\pi_{\\text{ref}}$를 초기화합니다.\n"))
+    # A line break inside display math, a price, and code are not the defect.
+    assert_equal [], lint("Intro.\n\n$$a \\\\[4pt] b$$\n\nTail.\n")
+    assert_equal [], lint("It cost $10.2B and `\\\\(x\\\\)` is how not to write it.\n")
   end
 
   def test_text_inside_math_and_code_spans_is_left_alone

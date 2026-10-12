@@ -43,15 +43,15 @@ jobs:
       # ruby/setup-ruby avoids by fetching a prebuilt build. The native gems
       # (sassc, eventmachine) need g++/make, which the image ships as well.
       #
-      # What it did cost was `apt-get update` on every deploy: a network-bound
-      # step that stalled for 45+ minutes twice in one day on a pipeline whose
-      # other steps total under a minute. If this assumption is ever wrong the
-      # build job fails and `deploy` (needs: build) publishes nothing.
+      # What it did cost was `apt-get update` on every deploy, a network-bound
+      # step slower and less reliable than the rest of the pipeline put
+      # together. If this assumption is ever wrong the build job fails and
+      # `deploy` (needs: build) publishes nothing.
       - name: Setup Ruby
         uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1
+        # The version comes from .ruby-version (3.3+: html-proofer's
+        # async→console dependency requires Ruby >= 3.3).
         with:
-          # 3.3+: html-proofer's async→console dependency requires Ruby >= 3.3.
-          ruby-version: '3.3'
           bundler-cache: true
       - name: Unit-test the Jekyll plugins
         # Plain `ruby`, not `bundle exec`: the plugins guard their Jekyll/Liquid
@@ -80,7 +80,6 @@ jobs:
             --disable-external \
             --allow-hash-href \
             --no-enforce-https \
-            --ignore-urls "/^\/page\/\d+/" \
             --swap-urls "^${{ steps.pages.outputs.base_path }}:"
       - name: Validate discoverability (sitemap, feed, metadata)
         # Guards what htmlproofer does not look at: that the sitemap and feed

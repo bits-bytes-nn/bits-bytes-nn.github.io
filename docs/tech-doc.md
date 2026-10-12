@@ -52,7 +52,7 @@ Pages가 그대로 서빙.**
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
 | 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성, 옛 URL 리디렉션 페이지 생성 |
-| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG의 `width`/`height`를 파일 헤더에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록), `translations.rb`(번역 짝의 다른 언어 글에 `hidden`을 달아 홈·카테고리·태그 목록에서 빼기 — 글 자체와 사이트맵·피드·검색에는 그대로 남는다) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
+| 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG·SVG의 `width`/`height`를 파일 헤더나 SVG 루트 요소에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록 — 규칙이 바뀐 2026-10-11 전에 게시한 글만), `translations.rb`(번역 짝의 다른 언어 글에 `hidden`을 달아 홈·카테고리·태그 목록에서 빼기 — 글 자체와 사이트맵·피드·검색에는 그대로 남는다), `posted_date.rb`(파일명의 게시일이 `date:`보다 늦으면 `last_modified_at`으로 넣어 사이트맵 `<lastmod>`·피드 `<updated>`·JSON-LD `dateModified`가 게시일을 따르게) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
@@ -111,9 +111,8 @@ Pages가 그대로 서빙.**
 - **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights` 중 하나.
   글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가지며, 글이 없는 유형은
   빈 상태 문구를 띄운다(아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
-- **1단계 (주제)** — `Language-Models`, `Multimodal-Learning`, `Finetuning`,
-  `Retrieval-Augmented-Generation`, `Agentic-AI`, `Data-Architecture` 등. 세부 주제이며
-  필요하면 자유롭게 추가한다.
+- **1단계 (주제)** — `_data/post_conventions.yml`의 `topics` 중 하나. 주제마다 표지 이미지가
+  정해져 있고, 맞는 주제가 없으면 먼저 거기에 추가한다. 목록에 없는 값은 린트가 막는다.
 
 이 둘과 **날짜**가 합쳐져 출력 경로(=URL)가 된다:
 
@@ -227,8 +226,9 @@ kramdown은 단일 `$`를 수식으로 **취급하지 않는다**. `$x_i + y_j$`
 MathJax에는 이미 망가진 입력이 전달된다(위 그림의 빨간 경로). 예를 들어 `$a*b*c$`가
 `$a<em>b</em>c$`가 되어버린다.
 
-언더스코어를 `\_`로 하나하나 이스케이프해도 증상은 사라지지만, 그건 우회책이다. 해결은
-**`$$`를 쓰는 것** — 구간 안의 마크다운 처리를 통째로 끈다. 참고로 코드 블록 *안*의 단일
+단일 `$` 안에서 언더스코어를 `\_`로 하나하나 이스케이프해도 증상은 사라지지만, 그건
+우회책이다. 해결은 **`$$`를 쓰는 것** — 구간 안의 마크다운 처리를 통째로 끈다. `$$` 안에서는
+반대로 `\_`를 쓰면 안 된다. MathJax가 역슬래시와 밑줄을 그대로 그리므로 린트가 막는다. 참고로 코드 블록 *안*의 단일
 `$`는 verbatim(있는 그대로) 코드로 표시되므로 이 문제와 무관하다.
 
 > **통화 표기 주의.** 본문에 쓰는 달러 기호(`$1.2B`, `$250M`)는 수식이 아니므로 단일 `$`로
@@ -241,9 +241,8 @@ MathJax 설정은 `head.html`에 있고 `{% if page.use_math %}`로 감싸 **프
 `use_math: true`가 켜진 포스트에서만** 로드한다. 덕분에 수식 없는 산문 글과 일반 페이지는
 약 1 MB짜리 MathJax 스크립트를 아예 내려받지 않아 가볍다.
 
-> **커스텀 매크로.** `head.html`의 MathJax `macros`에 `\llbracket`/`\rrbracket`(⟦ ⟧),
-> `\textsc`, 그리고 `|`(→ `\vert`)가 정의돼 있다. 이 매크로를 본문에서 쓰려면 반드시 여기에
-> 먼저 등록돼 있어야 한다.
+> **커스텀 매크로.** `head.html`의 MathJax `macros`에 `\llbracket`/`\rrbracket`(⟦ ⟧)와
+> `\textsc`가 정의돼 있다. 다른 매크로를 본문에서 쓰려면 먼저 여기에 등록해야 한다.
 
 ## 5. 검색 — 서버 없이 브라우저에서 도는 방식
 
@@ -385,8 +384,8 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   프런트매터는 `_data/post_conventions.yml`과 대조한다(카테고리·표지·금지 키·통제 태그·폐기된
   태그 이름·태그 형식·번역본 파일명·논문 글의 `paper_author`). 빌드된 HTML에서는 더 보이지 않는 결함도 잡는다: 헤더와
   열 수가 어긋난 표, 2단 헤더를 펴다 생긴 하위 헤더 행, `$$` 안의 `\_`, 빈 줄 없는 디스플레이
-  수식(목록 안 포함), 본문 H1. 통화 `$$`가 연 수식은 그 사이에 한글이 있을 때만 잡는다. 검사 목록의 정본은 스크립트와 `test/test_lint_posts.rb`다.
-- **플러그인 단위 테스트** — `test/`가 `_plugins/`의 순수 로직을 플러그인당 한 파일씩
+  수식(목록 안 포함), `\\(`·`\\[`로 쓴 수식과 단일 `$` 옆의 TeX, 짝이 맞지 않는 `$$`, 본문 H1. 통화 `$$`가 연 수식은 그 사이에 한글이 있을 때만 잡는다. 검사 목록의 정본은 스크립트와 `test/test_lint_posts.rb`다.
+- **단위 테스트** — `test/`가 `_plugins/`의 순수 로직(플러그인당 한 파일)과 글 원본 린트를
   minitest로 검사한다. `ruby test/run_all.rb`로 돌리며 CI에서 빌드보다 먼저 실행된다.
   플러그인은 모든 페이지의 메타데이터를 만들기 때문에, 여기서 조용히 동작이 바뀌면 사이트
   전체 콘텐츠가 바뀐다.
@@ -424,10 +423,10 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 
 ## 9. 알려진 이슈 / 백로그
 
-- **날짜 드리프트** — 대부분 포스트의 파일명 날짜가 프런트매터 `date:`(보통 원 논문 날짜)와
-  다르다. Jekyll은 URL과 정렬에 **프런트매터 날짜**를 쓰므로 파일명 날짜는 사실상 외형일
-  뿐이다. 새 글을 추가할 때 둘을 일관되게 맞추는 게 좋다. (이미 게시된 글은 자동 수정하지
-  않는다 — 날짜를 고치면 URL이 바뀌어 외부 링크와 SEO가 깨지기 때문.)
+- **파일명 날짜와 `date:`** — 논문 글은 파일명 날짜가 게시일이고 프런트매터 `date:`가 논문
+  발행일이라 둘이 다르다. 의도한 규칙이다. Jekyll은 URL과 정렬에 `date:`를 쓰므로 논문 글은
+  발행일 순으로 정렬되고, 수정일 메타데이터는 `posted_date.rb`가 파일명 날짜로 채운다. 논문 글이 아니면 둘을 같게 둔다. 게시된 글의 `date:`를 바꾸면 URL이
+  바뀌어 외부 링크와 SEO가 깨지므로 고치지 않는다.
 - **한글 검색 라이브러리의 한계** — `simple-jekyll-search`는 형태소 분석 없는 부분문자열
   매칭이라, 띄어쓰기로 쪼개진 한글 복합어의 부분 검색에는 약하다. 전체 본문 색인으로 재현율은
   확보했지만, 더 정교한 검색이 필요해지면 Lunr 등으로 교체를 검토한다.

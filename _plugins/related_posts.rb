@@ -20,7 +20,7 @@
 #
 # That strictness depends on tags that can meet. Per-paper contribution tags
 # rarely do, so each post should also carry a controlled topic tag (the list is
-# in README) — a looser rule here is not the fix for a post with no suggestions.
+# `tags.controlled` in _data/post_conventions.yml) — a looser rule here is not the fix for a post with no suggestions.
 #
 # Jekyll's built-in site.related_posts is either "the 10 most recent posts" or
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper
@@ -97,8 +97,7 @@ module RelatedPosts
     !tid.empty? && tid == b[:translation_id].to_s
   end
 
-  # Posts without an explicit `lang` are Korean — that is the site default in
-  # _layouts/default.html.
+  # Posts without an explicit `lang` are Korean, the site's `lang` in _config.yml.
   def self.lang(post)
     l = post[:lang].to_s
     l.empty? ? "ko" : l
@@ -132,7 +131,7 @@ if defined?(Jekyll::Hooks)
     end
     by_url = docs.to_h { |d| [d.url, d] }
     # Sorted here rather than trusting the collection's order, and by id as well
-    # as date because the three translation pairs share a date exactly.
+    # as date because a translation pair shares its date exactly.
     ordered = meta.sort_by { |m| [RelatedPosts.sort_time(m), m[:id].to_s] }
 
     meta.each_with_index do |target, i|

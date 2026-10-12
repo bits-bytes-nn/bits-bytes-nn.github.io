@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 #
 # Adds width/height to <img> tags whose file lives in this repo, read from the
-# PNG or JPEG header.
+# PNG or JPEG header or the SVG root element.
 #
 # Without them the browser reserves no space for a lazy image, so the page grows
 # as each one loads: text jumps under the reader, and a jump or a focus scroll
@@ -19,7 +19,7 @@ module ImageDimensions
   # range but are not frames.
   JPEG_SOF = (0xC0..0xCF).to_a - [0xC4, 0xC8, 0xCC]
 
-  # [width, height] from the first bytes of a PNG or JPEG, or nil.
+  # [width, height] from the first bytes of a PNG, JPEG or SVG, or nil.
   def self.read(bytes)
     bytes = bytes.to_s.b
     if bytes.start_with?(PNG_SIGNATURE)
@@ -28,6 +28,8 @@ module ImageDimensions
       bytes[16, 8].unpack("NN")
     elsif bytes.start_with?("\xFF\xD8".b)
       jpeg(bytes)
+    elsif (root = bytes[/<svg\b[^>]*>/])
+      svg(root)
     end
   end
 
@@ -54,7 +56,15 @@ module ImageDimensions
     end
     nil
   end
-  private_class_method :jpeg
+
+  # Pixel width/height on the root element, else the viewBox's. A relative size
+  # ("100%") says nothing about the aspect ratio, so it falls through too.
+  def self.svg(root)
+    size = %w[width height].map { |a| root[/\s#{a}="(\d+(?:\.\d+)?)(?:px)?"/, 1] }
+    size = root[/\sviewBox="([^"]*)"/, 1].to_s.split(/[\s,]+/)[2, 2] unless size.all?
+    size&.size == 2 ? size.map { |v| v.to_f.round } : nil
+  end
+  private_class_method :jpeg, :svg
 end
 
 # Guarded so test/ can require this file without Jekyll loaded.

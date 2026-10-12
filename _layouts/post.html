@@ -105,7 +105,7 @@ layout: default
               ampersand, so a space would land inside the share URL as
               "share? text=Title &url=…".
             {%- endcomment -%}
-            {% capture params %}{% for p in social.share_params %}&{{ p.key }}={{ p.value | replace: 'URL', full_url | replace: 'TITLE', page.title | replace: 'USERNAME', social.username | cgi_escape }}{% endfor %}{% endcapture %}
+            {% capture params %}{% for p in social.share_params %}&{{ p.key }}={{ p.value | replace: 'URL', full_url | replace: 'TITLE', page.title | cgi_escape }}{% endfor %}{% endcapture %}
             {% assign share_link = share_link | append: '?' | append: params | remove_first: '&' %}
           {% endif %}
 
