@@ -83,7 +83,7 @@ $$\pi_{\text{ref}}$$로는 데이터를 생성한 SFT 모델을 쓰는 것이 �
 
 ### 요약과 분포 이동
 
-다음 그림은 TL;DR 요약에서 샘플링 온도별로 사람이 쓴 참조 요약 대비 승률을 나타냅니다. DPO는 온도가 높아져도 성능이 비교적 유지되지만, PPO는 높은 온도에서 기본 GPT-J 수준까지 떨어집니다.
+다음 그림은 TL;DR 요약에서 샘플링 온도별로 사람이 쓴 참조 요약 대비 승률을 나타냅니다. DPO도 온도가 높아지면 떨어지지만 PPO보다 훨씬 덜 떨어지고, PPO는 높은 온도에서 기본 GPT-J 수준까지 떨어집니다.
 
 ![TL;DR 요약의 샘플링 온도별 GPT-4 승률 곡선](/assets/images/direct-preference-optimization-your-language-model-is-secretly-a-reward-model-summary-3.png)
 
