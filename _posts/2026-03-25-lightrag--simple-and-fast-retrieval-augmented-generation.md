@@ -3,6 +3,8 @@ layout: post
 title: "LightRAG: Simple and Fast Retrieval-Augmented Generation"
 date: 2024-10-08 08:00:12
 paper_author: "Beijing University of Posts and Telecommunications"
+description: >-
+  LightRAG는 그래프 기반 텍스트 인덱싱과 이중 수준 검색을 결합하고 증분 업데이트로 인덱스 재구축을 없앴습니다. 검색 단계에서 GraphRAG가 약 610,000 토큰을 쓰는 반면 100 토큰 미만만 씁니다. 인덱싱과 검색 구조, 비용 비교를 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["Graph-Based-Text-Indexing", "Dual-Level-Retrieval-Paradigm", "Low-Level-Entity-Retrieval", "High-Level-Relationship-Retrieval", "Entity-and-Relationship-Extraction", "LLM-Profiling-for-Key-Value-Pair-Generation", "Incremental-Knowledge-Base-Updates", "Hybrid-Retrieval", "Multi-Hop-Subgraph-Information-Extraction", "Deduplication-for-Graph-Optimization", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg

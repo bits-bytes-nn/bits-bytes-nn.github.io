@@ -3,6 +3,8 @@ layout: post
 title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"
 date: 2023-05-29 17:57:46
 paper_author: "Stanford University"
+description: >-
+  DPO는 RLHF의 보상 모델 학습과 강화학습 루프를 이진 교차 엔트로피 손실 하나로 대체합니다. TL;DR 요약 과제에서 GPT-4 기준 승률 약 61%로 PPO의 57%를 앞섰습니다. 보상 재매개변수화 유도와 세 가지 실험을 정리합니다.
 categories: ["Paper Reviews", "Finetuning"]
 tags: ["Direct-Preference-Optimization", "Implicit-Reward-Modeling", "Bradley-Terry-Preference-Framework", "KL-Constrained-Reward-Maximization", "Binary-Cross-Entropy-Policy-Optimization", "Reward-Reparameterization", "Policy-Implicit-Reward-Function", "Closed-Form-Optimal-Policy-Extraction", "RL-Free-Preference-Learning", "Dynamic-Per-Example-Importance-Weighting", "Alignment"]
 cover: /assets/images/finetuning.jpg

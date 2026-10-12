@@ -3,6 +3,8 @@ layout: post
 title: "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models"
 date: 2024-02-05 18:55:32
 paper_author: "DeepSeek AI"
+description: >-
+  DeepSeekMath는 Common Crawl에서 1,200억 개 수학 토큰을 모으고 GRPO로 강화 학습해, 7B 모델로 MATH 정확도 51.7%를 기록했습니다. 데이터 선택 파이프라인과 비평 모델 없이 동작하는 GRPO의 원리를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["DeepSeekMath-Corpus", "Group-Relative-Policy-Optimization", "Iterative-Reinforcement-Learning", "Code-Training-Benefits-Mathematical-Reasoning", "Supervised-Fine-Tuning", "Rejection-Sampling-Fine-Tuning", "Direct-Preference-Optimization", "Reasoning-Models", "DeepSeek"]
 cover: /assets/images/language-models.jpg

@@ -4,6 +4,8 @@ title: "Gemini: A Family of Highly Capable Multimodal Models"
 subtitle: "Gemini: 고도로 능력 있는 멀티모달 모델 패밀리"
 date: 2023-12-19 02:39:27
 paper_author: "Google DeepMind"
+description: >-
+  Gemini는 이미지, 오디오, 비디오, 텍스트를 함께 다루도록 설계된 Ultra, Pro, Nano 모델군으로, Gemini Ultra는 32개 벤치마크 중 30개에서 최고 성능을 경신하고 MMLU 90.04%로 인간 전문가 수준을 넘었습니다. 구조와 평가를 정리합니다.
 categories: ["Paper Reviews", "Multimodal-Learning"]
 tags: ["Natively-Multimodal-Transformer", "Multimodal-Reasoning-with-Uncertainty-Routing", "Joint-Multimodal-Pre-Training", "Cross-Modal-Reasoning-Capabilities", "Efficient-Attention", "Multimodal-Safety-Evaluation-Framework", "Responsible-AI-Development", "Interleaved-Sequence-Processing", "Variable-Image-Resolution-Processing", "Unified-Multi-Modal-Generative-Model", "Multimodal-Models"]
 cover: /assets/images/multimodal-learning.jpg

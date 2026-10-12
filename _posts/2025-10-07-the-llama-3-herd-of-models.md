@@ -3,6 +3,8 @@ layout: post
 title: "The Llama 3 Herd of Models"
 date: 2024-07-31 17:54:27
 paper_author: "Meta AI"
+description: >-
+  Llama 3는 약 15조 토큰으로 사전 학습한 8B·70B·405B 조밀한 트랜스포머로, 128K 컨텍스트를 지원하며 405B 모델이 HumanEval 89.0%, MGSM 91.6%를 기록했습니다. 데이터 정제와 사후 학습, 멀티모달 어댑터 설계를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Direct-Preference-Optimization", "Scaling-Laws", "Multimodal-Knowledge-Distillation", "Efficient-Attention", "Multilingual-Multimodal-Understanding", "Safety-Alignment", "Synthetic-Data-Generation", "Tool-Use-Emergence", "Rejection-Sampling-Fine-Tuning", "Multi-Stage-Post-Training-Recipe", "Llama", "Alignment"]
 cover: /assets/images/language-models.jpg
@@ -33,7 +35,7 @@ Llama 3의 구현은 크게 사전 훈련, 사후 훈련, 그리고 다중 모�
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
-Llama 3의 실험 결과는 매우 인상적입니다. 405B 모델은 MMLU에서 85.2%, GSM8K에서 89.0%의 성능을 달성하여 GPT-4와 comparable한 성능을 보여주었습니다. 특히 다국어 성능(MGSM에서 91.6%)과 코드 생성 능력(HumanEval에서 89.0%)에서 뛰어난 결과를 얻었습니다.
+Llama 3의 실험 결과는 매우 인상적입니다. 405B 모델은 MMLU에서 87.3%, GSM8K에서 96.8%의 성능을 달성하여 GPT-4와 comparable한 성능을 보여주었습니다. 특히 다국어 성능(MGSM에서 91.6%)과 코드 생성 능력(HumanEval에서 89.0%)에서 뛰어난 결과를 얻었습니다.
 
 이 연구는 오픈 소스 AI 모델 개발의 새로운 가능성을 제시했습니다. 투명하고 상세한 연구 과정 공개를 통해 AI 연구 커뮤니티에 중요한 통찰을 제공했으며, 책임감 있는 AI 개발의 중요성를 강조했습니다. 특히 안전성과 윤리적 고려사항에 대한 심도 있는 분석은 향후 AI 모델 개발의 방향을 제시했습니다.
 

@@ -4,6 +4,8 @@ title: "Qwen3 Technical Report"
 subtitle: "Qwen3 기술 보고서"
 date: 2025-05-14 13:41:34
 paper_author: "Alibaba Group"
+description: >-
+  Qwen3는 사고 모드와 비사고 모드를 한 모델에 통합하고 사고 예산으로 추론 깊이를 조절하는 dense·MoE 모델군으로, 119개 언어 36조 토큰으로 사전 학습해 AIME'24 85.7점을 기록했습니다. 3단계 사전 학습과 사후 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Thinking-Budget", "Strong-to-Weak-Distillation", "Dynamic-Mode-Switching", "Mixture-of-Experts", "Fine-Grained-Expert-Segmentation", "Global-Batch-Load-Balancing-Loss", "Long-Chain-of-Thought-Cold-Start", "Reasoning-Oriented-Reinforcement-Learning", "Thinking-Mode-Fusion", "Multi-Stage-Post-Training-Recipe", "Reasoning-Models"]
 cover: /assets/images/language-models.jpg
@@ -36,7 +38,7 @@ Qwen3의 실험 결과는 매우 인상적입니다. Qwen3-235B-A22B 모델은 A
 - - -
 ## 초록
 
-Qwen3는 대규모 언어 모델 분야에서 성능, 효율성, 그리고 다국어 지원 능력을 크게 향상시킨 최신 파운데이션 모델 시리즈입니다. 이 모델 시리즈는 0.6억 개부터 2,350억 개까지의 매개변수를 가진 다양한 규모의 모델들로 구성되어 있으며, 밀집형(dense) 아키텍처와 전문가 혼합(Mixture-of-Expert, MoE) 아키텍처를 모두 포함하고 있습니다.
+Qwen3는 대규모 언어 모델 분야에서 성능, 효율성, 그리고 다국어 지원 능력을 크게 향상시킨 최신 파운데이션 모델 시리즈입니다. 이 모델 시리즈는 6억 개부터 2,350억 개까지의 매개변수를 가진 다양한 규모의 모델들로 구성되어 있으며, 밀집형(dense) 아키텍처와 전문가 혼합(Mixture-of-Expert, MoE) 아키텍처를 모두 포함하고 있습니다.
 
 Qwen3의 가장 혁신적인 특징 중 하나는 복잡한 다단계 추론을 위한 **사고 모드(thinking mode)**와 빠른 맥락 기반 응답을 위한 **비사고 모드(non-thinking mode)**를 하나의 통합된 프레임워크 안에 결합했다는 점입니다. 이는 기존에 채팅에 최적화된 모델(예: GPT-4o)과 전용 추론 모델(예: QwQ-32B) 사이를 전환해야 했던 필요성을 완전히 제거하며, 사용자 쿼리나 채팅 템플릿에 따라 동적으로 모드를 전환할 수 있게 합니다.
 
@@ -56,7 +58,7 @@ Qwen3의 가장 혁신적인 특징 중 하나는 복잡한 다단계 추론을 
 
 ### Qwen3의 핵심 혁신
 
-이 연구에서는 파운데이션 모델 패밀리인 Qwen의 최신 시리즈인 Qwen3를 소개합니다. Qwen3는 다양한 작업과 도메인에서 최첨단 성능을 달성하는 오픈 웨이트 대규모 언어 모델들의 집합입니다. 다양한 하위 애플리케이션의 요구사항을 충족하기 위해 0.6억 개부터 2,350억 개까지의 매개변수를 가진 밀집형과 전문가 혼합(MoE) 모델을 모두 공개합니다.
+이 연구에서는 파운데이션 모델 패밀리인 Qwen의 최신 시리즈인 Qwen3를 소개합니다. Qwen3는 다양한 작업과 도메인에서 최첨단 성능을 달성하는 오픈 웨이트 대규모 언어 모델들의 집합입니다. 다양한 하위 애플리케이션의 요구사항을 충족하기 위해 6억 개부터 2,350억 개까지의 매개변수를 가진 밀집형과 전문가 혼합(MoE) 모델을 모두 공개합니다.
 
 특히 플래그십 모델인 Qwen3-235B-A22B는 총 2,350억 개의 매개변수를 가지고 있으며 토큰당 220억 개의 매개변수가 활성화되는 MoE 모델입니다. 이러한 설계는 높은 성능과 효율적인 추론을 모두 보장합니다.
 

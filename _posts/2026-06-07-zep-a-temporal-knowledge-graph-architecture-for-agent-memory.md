@@ -4,6 +4,8 @@ title: "Zep: A Temporal Knowledge Graph Architecture for Agent Memory"
 subtitle: "Zep: 에이전트 메모리를 위한 시간 인식 지식 그래프 아키텍처"
 date: 2025-01-20 16:52:48
 paper_author: "Zep AI"
+description: >-
+  Zep은 시간 인식 지식 그래프 엔진 Graphiti로 사실의 유효 기간을 추적하는 에이전트 메모리 계층입니다. DMR에서 94.8%로 MemGPT의 93.4%를 앞섰고 LongMemEval에서는 응답 지연을 약 90% 줄였습니다. 그래프 구조와 검색 파이프라인을 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["Temporally-Aware-Knowledge-Graph-Engine", "Bi-Temporal-Knowledge-Graph-Modeling", "Hierarchical-Knowledge-Graph-Construction", "Dynamic-Edge-Invalidation-for-Temporal-Reasoning", "Episodic-and-Semantic-Memory-Subgraphs", "Community-Detection", "Hybrid-Retrieval", "Non-Lossy-Knowledge-Graph-Updates", "Entity-and-Relationship-Extraction", "Graph-Based-Memory-Retrieval-for-LLM-Agents", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg
@@ -24,7 +26,7 @@ Zep의 구현은 메시지, 텍스트, JSON 형태의 원시 데이터를 수집
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
-Zep은 두 개의 주요 벤치마크에서 강력한 성능을 입증했습니다. **Deep Memory Retrieval(DMR)** 과제에서는 gpt-4-turbo 기준 94.8%의 정확도로 MemGPT의 93.4%를 근소하게 앞섰으며, 더 복잡한 **LongMemEval** 벤치마크에서는 gpt-4o-mini 대비 정확도를 15.2%포인트, gpt-4o 대비 18.5%포인트 향상시켰습니다. 더욱 인상적인 것은 **응답 지연 시간을 약 90% 단축**했다는 점입니다. 평균 맥락 토큰을 115,000개에서 1,600개로 극적으로 압축하면서도 정확도를 높였으므로, 지식 그래프 검색이 방대한 대화에서 정말 필요한 정보만을 정밀하게 추출함을 의미합니다. 질문 유형별 분석에서 Zep은 **single-session-preference, multi-session, temporal-reasoning** 같은 복잡한 질문에서 가장 큰 개선을 보였으며, 특히 시간적 추론이 필요한 과제에서 두드러진 강점을 드러냈습니다. 다만 single-session-assistant 유형에서는 성능이 하락했는데, 이는 어시스턴트 측 콘텐츠가 그래프 추출 과정에서 충분히 보존되지 못했을 가능성을 시사합니다. 논문은 Zep이 정확도, 비용, 지연 시간을 균형 있게 고려하는 실용적 생산 시스템이며, 향후 미세 조정된 추출 모델, 도메인 특화 온톨로지 통합, 더 나은 메모리 벤치마크 개발 등을 통해 한층 발전할 수 있는 여지가 충분함을 강조합니다.
+Zep은 두 개의 주요 벤치마크에서 강력한 성능을 입증했습니다. **Deep Memory Retrieval(DMR)** 과제에서는 gpt-4-turbo 기준 94.8%의 정확도로 MemGPT의 93.4%를 근소하게 앞섰으며, 더 복잡한 **LongMemEval** 벤치마크에서는 정확도를 gpt-4o-mini에서 15.2%, gpt-4o에서 18.5% 높였습니다(전체 맥락 베이스라인 대비 상대 향상). 더욱 인상적인 것은 **응답 지연 시간을 약 90% 단축**했다는 점입니다. 평균 맥락 토큰을 115,000개에서 1,600개로 극적으로 압축하면서도 정확도를 높였으므로, 지식 그래프 검색이 방대한 대화에서 정말 필요한 정보만을 정밀하게 추출함을 의미합니다. 질문 유형별 분석에서 Zep은 **single-session-preference, multi-session, temporal-reasoning** 같은 복잡한 질문에서 가장 큰 개선을 보였으며, 특히 시간적 추론이 필요한 과제에서 두드러진 강점을 드러냈습니다. 다만 single-session-assistant 유형에서는 성능이 하락했는데, 이는 어시스턴트 측 콘텐츠가 그래프 추출 과정에서 충분히 보존되지 못했을 가능성을 시사합니다. 논문은 Zep이 정확도, 비용, 지연 시간을 균형 있게 고려하는 실용적 생산 시스템이며, 향후 미세 조정된 추출 모델, 도메인 특화 온톨로지 통합, 더 나은 메모리 벤치마크 개발 등을 통해 한층 발전할 수 있는 여지가 충분함을 강조합니다.
 - - -
 ## 서론
 
@@ -517,7 +519,7 @@ LongMemEval은 [Wu 등](https://arxiv.org/pdf/2410.10813v2)이 제안한 벤치�
 
 #### LongMemEval 결과
 
-Zep은 두 모델 변형 모두에서 정확도와 지연 시간 양쪽에 걸쳐 상당한 개선을 보였습니다. gpt-4o-mini에서는 베이스라인 대비 정확도가 15.2%포인트 향상되었고, gpt-4o에서는 18.5%포인트 향상되었습니다. 특히 주목할 부분은 검색을 통해 프롬프트 크기를 극적으로 줄임으로써 지연 시간까지 대폭 절감했다는 점입니다. 다음 표가 이를 종합적으로 보여줍니다.
+Zep은 두 모델 변형 모두에서 정확도와 지연 시간 양쪽에 걸쳐 상당한 개선을 보였습니다. gpt-4o-mini에서는 베이스라인 대비 정확도가 15.2%(55.4%에서 63.8%) 향상되었고, gpt-4o에서는 18.5%(60.2%에서 71.2%) 향상되었습니다. 특히 주목할 부분은 검색을 통해 프롬프트 크기를 극적으로 줄임으로써 지연 시간까지 대폭 절감했다는 점입니다. 다음 표가 이를 종합적으로 보여줍니다.
 
 | 메모리 방식 | 모델 | 점수 | 지연 시간 | 지연 IQR | 평균 맥락 토큰 |
 |---|---|---|---|---|---|

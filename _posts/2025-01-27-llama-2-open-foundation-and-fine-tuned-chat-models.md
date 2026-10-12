@@ -3,6 +3,8 @@ layout: post
 title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
 date: 2023-07-18 14:31:57
 paper_author: "Meta AI"
+description: >-
+  Llama 2는 7B~70B 규모로 2조 토큰을 사전학습하고 SFT와 RLHF, 고스트 어텐션(GAtt)으로 대화 모델 Llama 2-Chat을 만들었습니다. 350명 이상의 레드팀이 안전성을 시험했습니다. 학습 과정과 안전성 강화 방법을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Reinforcement-Learning-with-Human-Feedback", "Ghost-Attention", "Rejection-Sampling-Fine-Tuning", "Grouped-Query-Attention", "Proximal-Policy-Optimization", "Red-Teaming", "Safety-Alignment", "System-Message-for-Multi-Turn-Consistency", "Safety-Context-Distillation", "Alignment", "Llama", "Efficient-Attention"]
 cover: /assets/images/language-models.jpg

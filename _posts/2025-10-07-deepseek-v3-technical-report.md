@@ -4,6 +4,8 @@ title: "DeepSeek-V3 Technical Report"
 subtitle: "DeepSeek-V3 기술 보고서"
 date: 2024-12-27 04:03:16
 paper_author: "DeepSeek AI"
+description: >-
+  DeepSeek-V3는 총 671B, 토큰당 37B 파라미터가 활성화되는 MoE 모델로, MLA와 보조 손실 없는 부하 분산, FP8 혼합 정밀도 학습을 결합해 2.788M H800 GPU 시간만으로 학습을 마쳤습니다. 아키텍처와 학습 인프라를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Auxiliary-Loss-Free-Load-Balancing", "Multi-Token-Prediction", "Multi-Head-Latent-Attention", "DeepSeekMoE", "FP8-Mixed-Precision-Training", "Efficient-Cross-Node-All-to-All-Communication", "Node-Limited-Routing", "Computation-Communication-Overlap", "Tile-Wise-Fine-Grained-Quantization", "Speculative-Decoding", "Mixture-of-Experts", "DeepSeek", "Efficient-Attention", "Quantization"]
 cover: /assets/images/language-models.jpg

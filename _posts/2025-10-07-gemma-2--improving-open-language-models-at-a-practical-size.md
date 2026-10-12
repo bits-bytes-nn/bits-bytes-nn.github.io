@@ -4,6 +4,8 @@ title: "Gemma 2: Improving Open Language Models at a Practical Size"
 subtitle: "Gemma 2: 실용적 크기에서 오픈 언어 모델 개선"
 date: 2024-07-31 19:13:07
 paper_author: "Google DeepMind"
+description: >-
+  Gemma 2는 2B·9B 모델을 다음 토큰 예측 대신 지식 증류로 학습하고 로컬-글로벌 어텐션과 GQA를 적용해 2-3배 큰 모델과 경쟁하는 성능을 냈습니다. 증류로 2B 평균 점수가 7.4점 오른 실험과 아키텍처를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Knowledge-Distillation", "Interleaved-Local-Global-Attention", "Grouped-Query-Attention", "Logit-Soft-Capping", "RMSNorm", "Multi-Stage-Post-Training-Recipe", "Sliding-Window-Attention", "Instruction-Fine-Tuning", "Model-Merging-through-Weight-Averaging", "Responsible-AI-Development", "Efficient-Attention", "Alignment"]
 cover: /assets/images/language-models.jpg
@@ -24,13 +26,13 @@ Gemma 2의 가장 혁신적인 접근법은 지식 증류 방법론입니다. �
 
 ### 제안된 방법은 어떻게 구현되었습니까?
 
-Gemma 2는 20억 개에서 270억 개의 매개변수를 가진 세 가지 모델 크기(2B, 9B, 27B)로 구현되었습니다. 각 모델은 [Vaswani et al.의 Transformer 논문](https://arxiv.org/pdf/1706.03762)에 기반한 디코더 전용 트랜스포머 아키텍처를 사용하며, 회전 위치 임베딩(RoPE)과 GeGLU 활성화 함수 등 최신 기법들을 통합했습니다. 특히 2B와 9B 모델은 7B 모델을 교사로 사용하여 지식 증류 방식으로 훈련되었으며, 이는 [Chinchilla 논문](https://arxiv.org/pdf/2203.15556)의 계산 최적 이론이 예측하는 것보다 50배 이상 많은 토큰으로 훈련되었습니다.
+Gemma 2는 20억 개에서 270억 개의 매개변수를 가진 세 가지 모델 크기(2B, 9B, 27B)로 구현되었습니다. 각 모델은 [Vaswani et al.의 Transformer 논문](https://arxiv.org/pdf/1706.03762)에 기반한 디코더 전용 트랜스포머 아키텍처를 사용하며, 회전 위치 임베딩(RoPE)과 GeGLU 활성화 함수 등 최신 기법들을 통합했습니다. 특히 2B와 9B 모델은 더 큰 모델을 교사로 사용하여 지식 증류 방식으로 훈련되었으며, 이는 [Chinchilla 논문](https://arxiv.org/pdf/2203.15556)의 계산 최적 이론이 예측하는 것보다 50배 이상 많은 토큰으로 훈련되었습니다.
 
 훈련 인프라는 TPUv4, TPUv5e, TPUv5p를 활용했으며, 각 모델 크기에 따라 다른 칩 구성과 데이터 복제 전략을 사용했습니다. 2B 모델은 TPUv5e의 512개 칩, 9B 모델은 TPUv4의 4,096개 칩, 27B 모델은 TPUv5p의 6,144개 칩으로 훈련되었습니다. 옵티마이저 상태는 ZeRO-3와 유사한 기술을 사용하여 샤딩되었으며, JAX와 Pathways 프레임워크를 활용하여 효율적인 분산 훈련을 수행했습니다.
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
-Gemma 2의 연구 결과는 소규모 언어 모델의 성능 향상에 대한 새로운 패러다임을 제시합니다. 지식 증류를 통해 2B 모델의 평균 성능을 처음부터 훈련한 모델 대비 7.4% 향상시켰으며, 심지어 2-3배 더 큰 모델들과도 경쟁력 있는 성능을 달성했습니다. 이는 단순히 모델 크기를 키우거나 훈련 데이터를 늘리는 대신, 훈련 과정에서 정보의 질을 개선하는 것이 더 효과적일 수 있음을 보여줍니다.
+Gemma 2의 연구 결과는 소규모 언어 모델의 성능 향상에 대한 새로운 패러다임을 제시합니다. 지식 증류를 통해 2B 모델의 평균 성능을 처음부터 훈련한 모델 대비 7.4점 향상시켰으며, 심지어 2-3배 더 큰 모델들과도 경쟁력 있는 성능을 달성했습니다. 이는 단순히 모델 크기를 키우거나 훈련 데이터를 늘리는 대신, 훈련 과정에서 정보의 질을 개선하는 것이 더 효과적일 수 있음을 보여줍니다.
 
 더불어 암송률과 개인 데이터 방출률에서도 획기적인 개선을 보였습니다. 암송률은 0.1% 미만, 개인 데이터 방출률은 0.00026%로 측정되어 프라이버시 보호 측면에서 중요한 진전을 나타냈습니다. 이러한 결과는 오픈 소스 언어 모델의 접근성을 높이면서도 안전성과 윤리적 고려사항을 동시에 해결할 수 있는 가능성을 보여줍니다. 특히 Responsible Generative AI Toolkit과 같은 추가 도구들을 통해 AI 기술의 긍정적인 사회적 영향을 확대할 수 있는 잠재력을 제시했습니다.
 - - -
