@@ -28,6 +28,12 @@ class TestImageDimensions < Minitest::Test
     assert_equal [1920, 600], ImageDimensions.read(jpeg(1920, 600))
   end
 
+  def test_reads_an_svg_root_size_or_its_view_box
+    assert_equal [860, 430], ImageDimensions.read(%(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="860" height="430"><path stroke-width="2"/>))
+    assert_equal [840, 440], ImageDimensions.read(%(<?xml version="1.0"?>\n<svg width="100%" viewBox="0 0 840 440">))
+    assert_nil ImageDimensions.read(%(<svg width="100%">))
+  end
+
   def test_reads_a_progressive_jpeg
     assert_equal [800, 450], ImageDimensions.read(jpeg(800, 450, sof: 0xC2))
   end

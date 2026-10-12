@@ -30,18 +30,17 @@ module PostDescription
   # Block-level markdown that is never prose: headings, blockquotes, list items,
   # tables, fences, raw HTML, and reference definitions.
   #
-  # `---`/`===` are deliberately absent. In Markdown a line of them *underlines*
-  # the preceding line into a heading, so treating them as a skip would make the
-  # heading above them the description. Leaving them out means such a line just
-  # joins the paragraph and gets stripped later, and a thematic-break `---` is
-  # already preceded by a blank line.
-  #
   # The ordered-list alternative is capped at two digits: `\d+[.)]\s` also matched
   # a Korean date opening ("2024. 5. 14. 공개된 …"), silently discarding the first
   # paragraph of any post written that way.
   # `{:` is a kramdown attribute list (`{: .notice}`), which styles the block
   # next to it and is not text.
   SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:|\{:)/
+
+  # A line of `-` or `=` under text makes that text a (setext) heading; on its
+  # own, `---`/`***`/`___` is a rule. Neither is prose.
+  UNDERLINE = /\A(?:=+|-+)\z/
+  RULE = /\A(?:[-*_]\s*){3,}\z/
 
   # A paragraph that is emphasised *end to end* is a note or caption on this blog
   # (the "*공개(Disclosure): ...*" preamble), not a summary of the post.
@@ -97,6 +96,13 @@ module PostDescription
           next
         end
         next if in_fence
+
+        if lead.match?(UNDERLINE) && !paragraph.empty?
+          paragraph = []
+          next
+        end
+        # A rule, or an indented code block (four spaces opening a paragraph).
+        next if lead.match?(RULE) || (paragraph.empty? && line.match?(/\A(?: {4}|\t)/))
 
         if line.empty?
           candidate = accept(paragraph)

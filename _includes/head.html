@@ -20,7 +20,7 @@
 	{%- assign social_image = site.protocols.fb_image | prepend: site.baseurl | prepend: site.url -%}
 {%- endif -%}
 
-{%- assign page_lang = page.lang | default: 'ko' -%}
+{%- assign page_lang = page.lang | default: site.lang -%}
 {%- if page_lang == 'en' -%}
 	{%- assign og_locale = 'en_US' -%}
 {%- else -%}
@@ -50,8 +50,9 @@
   `seo_title` replaces the paper title there when it is too long to survive a
   results list (Gemini 2.5's runs to 127 characters). Social cards keep the
   plain title.
+  The suffix is Korean, so only posts in the site's language get it.
 {%- endcomment -%}
-{%- if page.paper_author -%}
+{%- if page.paper_author and page_lang == site.lang -%}
 	{%- assign html_title = page.seo_title | default: page.title -%}
 	{%- case page.categories[0] -%}
 		{%- when 'Paper Reviews' -%}{%- assign html_title = html_title | append: ' 논문 리뷰' -%}
@@ -132,13 +133,13 @@
 	{% endunless %}
 	{% if page.layout == 'post' %}
 	<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
-	{% for cat in page.categories %}<meta property="article:section" content="{{ cat }}" />
+	{% if page.last_modified_at %}<meta property="article:modified_time" content="{{ page.last_modified_at | date_to_xmlschema }}" />
+	{% endif %}	{% for cat in page.categories %}<meta property="article:section" content="{{ cat }}" />
 	{% endfor %}{% for tag in page.tags %}<meta property="article:tag" content="{{ tag | replace: '-', ' ' }}" />
 	{% endfor %}{% endif %}
 	{% endif %}
 
 	<!-- Twitter: card tags -->
-	{% if site.protocols.twitter_image %}
 	<!-- Every image used here (page covers and the site default) is a wide
 	     banner, so the large card is the right form; `summary` cropped them all
 	     into a thumbnail. -->
@@ -148,7 +149,6 @@
 	<meta name="twitter:image" content="{{ social_image }}" />
 	<meta name="twitter:image:alt" content="{{ page_title | escape }}" />
 	<meta name="twitter:url" content="{{ page_full_url }}" />
-	{% endif %}
 
 	<!-- Site styles -->
 	<link rel="stylesheet" href="{{ '/css/main.css' | prepend: site.baseurl }}">
@@ -171,7 +171,7 @@
 	  "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ page_full_url }}" },
 	  "inLanguage": "{{ page_lang }}",
 	  "datePublished": "{{ page.date | date_to_xmlschema }}",
-	  "dateModified": "{{ page.date | date_to_xmlschema }}",
+	  "dateModified": "{{ page.last_modified_at | default: page.date | date_to_xmlschema }}",
 	  "description": {{ page_description | jsonify }},
 	  "image": "{{ social_image }}",
 	  "author": { "@type": "Person", "name": {{ site.name | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
@@ -221,7 +221,6 @@
 	    displayMath: [['$$', '$$'], ['\\[', '\\]']],
 	    processEscapes: true,
 	    macros: {
-	      '|': '\\vert',
 	      llbracket: '[\\![',
 	      rrbracket: ']\\!]',
 	      textsc: ['\\mathrm{#1}', 1]

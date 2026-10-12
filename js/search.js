@@ -87,10 +87,10 @@
     var start = Math.max(0, firstMatch[0] - LEAD_CHARS);
     var end = Math.min(text.length, start + WINDOW_CHARS);
 
-    // Prefer a word boundary, but only if one is within SNAP_CHARS. Korean prose
-    // has no inter-word spaces, so an unbounded search for one would run past the
-    // match and swallow the window; the cap makes it degrade to a clean character
-    // cut. The extra guards stop a snap from hiding the match it exists to show.
+    // Prefer a word boundary, but only if one is within SNAP_CHARS. A long run
+    // without spaces (a URL, a formula, a CJK passage) would otherwise send the
+    // search past the match and swallow the window; the cap makes it degrade to
+    // a clean character cut. The extra guards stop a snap from hiding the match it exists to show.
     if (start > 0) {
       var next = text.indexOf(' ', start);
       if (next !== -1 && next - start <= SNAP_CHARS && next < firstMatch[0]) {

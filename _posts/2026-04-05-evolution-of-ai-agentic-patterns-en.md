@@ -174,7 +174,7 @@ Growth was the fastest in SaaS history. By 2025: **\$1.2B ARR**, **\$29.3B valua
 
 Cursor's success triggered a Cambrian explosion of AI coding tools.
 
-**Devin (Cognition Labs, 2024.03).** Arrived with the title "first AI software engineer." Claimed to build and deploy apps end-to-end. The promo video showed it completing Upwork freelancer tasks, but YouTuber Carl Brown analyzed it and revealed key claims were overstated. Independent testing by Answer.AI researchers: **3 out of 20 tasks succeeded**. Yet Cognition acquired Windsurf for \$250M in July 2025 and reached a **\\$10.2B valuation** by September. The gap between hype and substance was a defining feature of this era.
+**Devin (Cognition Labs, 2024.03).** Arrived with the title "first AI software engineer." Claimed to build and deploy apps end-to-end. The promo video showed it completing Upwork freelancer tasks, but YouTuber Carl Brown analyzed it and revealed key claims were overstated. Independent testing by Answer.AI researchers: **3 out of 20 tasks succeeded**. Yet Cognition acquired Windsurf for \$250M in July 2025 and reached a **\$10.2B valuation** by September. The gap between hype and substance was a defining feature of this era.
 
 **Windsurf (formerly Codeium).** Started as an AI autocomplete extension, rebranded as a full AI IDE in late 2024. Its agentic assistant "Cascade" was the differentiator. Hit \$82M ARR, but after the CEO was recruited to Google via a \$2.4B licensing deal, it was acquired by Cognition.
 

@@ -10,6 +10,14 @@ require "minitest/autorun"
 require_relative "../_plugins/post_description"
 
 class TestDerive < Minitest::Test
+  # Setext headings, rules and indented code are block syntax, not prose.
+  def test_skips_setext_headings_rules_and_indented_code
+    assert_equal "Body.", PostDescription.derive("Title line\n===\n\nBody.")
+    assert_equal "Body.", PostDescription.derive("---\n\nBody.")
+    assert_equal "Body.", PostDescription.derive("***\n\nBody.")
+    assert_equal "Body.", PostDescription.derive("    def code(): pass\n\nBody.")
+  end
+
   # The shape every paper post on this blog opens with. The bug this module
   # exists to fix: Jekyll's excerpt stopped at the two headings, so all 28 paper
   # posts shared one description.

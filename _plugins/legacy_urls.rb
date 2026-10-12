@@ -9,6 +9,13 @@
 # writes a stub there that redirects to the new URL and names it as canonical.
 module LegacyUrls
   TEMPLATE = "/:categories/:year/:month/:day/:title:output_ext"
+  # The permalink changed on this day; a post whose file name dates from it on
+  # was never published under the old URL, so it gets no stub.
+  SLUGGED_ON = "2026-10-11"
+
+  def self.legacy?(basename)
+    basename < SLUGGED_ON
+  end
 
   # `legacy` and `current` are unescaped paths. Returns the post's redirect_from
   # list with `legacy` added when it differs from `current`; entries the post
@@ -26,6 +33,8 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register :site, :post_read do |site|
     site.posts.docs.each do |post|
+      next unless LegacyUrls.legacy?(File.basename(post.path))
+
       legacy = Jekyll::URL.new(template: LegacyUrls::TEMPLATE, placeholders: post.url_placeholders).to_s
       post.data["redirect_from"] = LegacyUrls.redirect_from(
         post.data["redirect_from"],

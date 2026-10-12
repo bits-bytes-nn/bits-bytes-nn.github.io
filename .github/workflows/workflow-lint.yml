@@ -38,3 +38,5 @@ jobs:
         run: |
           command -v shellcheck >/dev/null
           "$RUNNER_TEMP/actionlint" -color
+      - name: Check the repo's shell scripts
+        run: shellcheck script/*.sh assets/images/*.sh
