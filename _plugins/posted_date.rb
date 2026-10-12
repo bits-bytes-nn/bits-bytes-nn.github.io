@@ -8,7 +8,8 @@
 # Left alone, the sitemap's <lastmod>, the feed's <updated> and the JSON-LD
 # dateModified all fell back to `date:`, telling crawlers a post written this
 # year had not changed since the paper came out. jekyll-sitemap and jekyll-feed
-# already read `last_modified_at`; head.html reads it too.
+# already read `last_modified_at`; head.html reads it too. Posts never set it
+# themselves (forbidden_keys in _data/post_conventions.yml).
 require "date"
 
 module PostedDate
@@ -26,8 +27,6 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register :site, :post_read do |site|
     site.posts.docs.each do |post|
-      next if post.data["last_modified_at"]
-
       modified = PostedDate.last_modified(File.basename(post.path), post.date)
       post.data["last_modified_at"] = modified if modified
     end
