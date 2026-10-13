@@ -639,4 +639,4 @@ $$ GC_{GRPO}(q,o,t,\pi_{\theta_{rm}}) = \hat{A}_{i,t}+\beta\left(\frac{\pi_{ref}
 
 - - -
 ### References
-* [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models](http://arxiv.org/pdf/2402.03300v3)
+* [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models](https://arxiv.org/pdf/2402.03300v3)

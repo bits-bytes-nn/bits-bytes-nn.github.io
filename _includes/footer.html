@@ -51,9 +51,9 @@
 
 <!-- Scripts -->
 <!-- Code is highlighted server-side by Rouge (theme in _sass/_syntax.scss); no client-side highlighter needed. -->
-<!-- GLightbox (vanilla, no jQuery) for image zoom, only on pages that have an
+<!-- GLightbox (vanilla, no jQuery) for image zoom, only on posts that have an
      image to zoom; js/main.js skips the zoom setup when it is absent. -->
-{% if content contains '<img' %}
+{% if page.layout == 'post' and content contains '<img' %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"
 	integrity="sha384-GPAzSuZc0kFvdIev6wm9zg8gnafE8tLso7rsAYQfc9hAdWCpOcpcNI5W9lWkYcsd" crossorigin="anonymous" />
 <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"

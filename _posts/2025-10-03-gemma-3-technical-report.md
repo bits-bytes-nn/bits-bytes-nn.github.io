@@ -4,7 +4,7 @@ title: "Gemma 3 Technical Report"
 date: 2025-03-25 15:52:34
 paper_author: "Google DeepMind"
 description: >-
-  Gemma 3는 로컬 어텐션 5개마다 글로벌 어텐션 1개를 두어 128K 컨텍스트의 메모리 부담을 줄였고, Chatbot Arena에서 Elo 1,338점으로 전체 9위에 올랐습니다. 멀티모달 처리와 지식 증류 기반 학습 방법을 정리합니다.
+  Gemma 3는 로컬 어텐션 5개마다 글로벌 어텐션 1개를 두어 128K 컨텍스트의 메모리 부담을 줄였고, 27B 모델은 Chatbot Arena에서 Elo 1,338점으로 공동 9위에 올랐습니다. 멀티모달 처리와 지식 증류 기반 학습 방법을 정리합니다.
 categories: ["Paper Reviews", "Multimodal-Learning"]
 tags: ["Interleaved-Local-Global-Attention", "Long-Context-Adaptation", "Pan-and-Scan-Image-Processing", "Vision-Encoder-Token-Condensation", "Multimodal-Knowledge-Distillation", "RoPE-Positional-Embedding-Extension", "Grouped-Query-Attention", "Quantization-Aware-Training", "Sliding-Window-Attention", "Efficient-Attention", "Multimodal-Models", "Quantization"]
 cover: /assets/images/multimodal-learning.jpg
@@ -31,7 +31,7 @@ Gemma 3의 구현은 지식 증류와 혁신적인 후훈련 레시피를 중심
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
-Gemma 3의 성과는 AI 기술의 실용성과 접근성 측면에서 매우 중요한 의미를 갖습니다. LMSYS Chatbot Arena에서 1,338점의 Elo 점수를 기록하며 전체 순위 9위에 올랐고, 405B 매개변수를 가진 LLaMA 3.1 모델을 능가하는 성능을 보였습니다. 특히 27B 모델이 Gemini-1.5-Pro와 비교 가능한 수준의 성능을 달성한 것은 매개변수 효율성 측면에서 획기적인 성과입니다.
+Gemma 3의 성과는 AI 기술의 실용성과 접근성 측면에서 매우 중요한 의미를 갖습니다. 27B 지시 조정 모델은 LMSYS Chatbot Arena에서 1,338점의 Elo 점수를 기록하며 공동 9위(상위 10위권)에 올랐고, 405B 매개변수를 가진 LLaMA 3.1 모델을 능가하는 성능을 보였습니다. 특히 27B 모델이 Gemini-1.5-Pro와 비교 가능한 수준의 성능을 달성한 것은 매개변수 효율성 측면에서 획기적인 성과입니다.
 
 더욱 주목할 만한 점은 모델의 안전성과 프라이버시 보호 측면입니다. 기존 모델들과 비교하여 현저히 낮은 기억화 비율을 보였으며, 기억화된 출력에서 개인정보가 전혀 관찰되지 않았습니다. 이는 오픈 소스 모델의 안전한 배포 가능성을 크게 높이는 중요한 성과입니다. 또한 ShieldGemma 2와 같은 안전 분류기 개발을 통해 AI 기술의 책임감 있는 활용 가능성을 보여주었습니다.
 - - -
@@ -399,7 +399,7 @@ $$P(m \text{ beats } m') = \frac{e^{\xi_m}}{e^{\xi_m} + e^{\xi_{m'}}}$$
 
 여기서 $$\xi_m$$과 $$\xi_{m'}$$는 각각 모델 $$m$$과 $$m'$$의 Bradley-Terry 계수입니다. 이 모델은 인간 평가자들의 선호도 데이터를 바탕으로 최대우도추정을 통해 각 모델의 상대적 성능을 정량화합니다.
 
-Chatbot Arena의 평가 결과를 보면, **Gemma 3 27B IT 모델은 1338점의 Elo 점수**를 달성하여 전체 순위에서 9위를 기록했습니다. 이는 매우 인상적인 결과로, 다음과 같은 중요한 의미를 갖습니다.
+Chatbot Arena의 평가 결과를 보면, **Gemma 3 27B IT 모델은 1338점의 Elo 점수**를 달성하여 공동 9위를 기록했습니다. 이는 매우 인상적인 결과로, 다음과 같은 중요한 의미를 갖습니다.
 
 **오픈 모델 중 최상위 성능**: Gemma 3 27B IT는 DeepSeek-V3 (1318점), Meta-Llama-3.1-405B-Instruct (1269점), Qwen2.5-72B-Instruct (1257점)와 같은 훨씬 큰 규모의 오픈 모델들을 능가했습니다. 특히 405B 매개변수를 가진 LLaMA 3.1 모델보다 높은 점수를 기록한 것은 Gemma 3의 효율성을 보여주는 중요한 지표입니다.
 
@@ -412,7 +412,7 @@ Chatbot Arena의 평가 결과를 보면, **Gemma 3 27B IT 모델은 1338점의 
 | 순위 | 모델                      | Elo 점수 | 95% 신뢰구간 | 오픈   | 타입      | 매개변수 |
 | ---- | ------------------------- | -------- | ------------ | ------ | --------- | -------- |
 | 1    | Grok-3-Preview            | 1412     | +8/-10       | -      | -         | -        |
-| 2    | GPT-4.5-Preview           | 1411     | +11/-11      | -      | -         | -        |
+| 1    | GPT-4.5-Preview           | 1411     | +11/-11      | -      | -         | -        |
 | 3    | Gemini-2.0-Flash-Thinking | 1384     | +6/-5        | -      | -         | -        |
 | 6    | DeepSeek-R1               | 1363     | +8/-6        | 예     | MoE       | 671B/37B |
 | 9    | **Gemma-3-27B-IT**        | **1338** | **+8/-9**    | **예** | **Dense** | **27B**  |
@@ -669,7 +669,7 @@ Gemma 3 모델들이 **표준 소비자급 하드웨어에서 실행되도록 �
 
 ### 성능 평가와 벤치마크 결과
 
-LMSYS Chatbot Arena에서의 성과는 Gemma 3의 실질적 성능을 입증하는 중요한 지표입니다. **Gemma 3 27B IT 모델의 1338점 Elo 점수**는 전체 순위 9위에 해당하며, 405B 매개변수를 가진 LLaMA 3.1 모델(1257점)을 능가하는 결과입니다. 이는 매개변수 효율성 측면에서 탁월한 성능을 보여주는 것으로, 모델 크기 대비 성능 최적화의 새로운 기준을 제시합니다.
+LMSYS Chatbot Arena에서의 성과는 Gemma 3의 실질적 성능을 입증하는 중요한 지표입니다. **Gemma 3 27B IT 모델의 1338점 Elo 점수**는 공동 9위에 해당하며, 405B 매개변수를 가진 LLaMA 3.1 모델(1269점)을 능가하는 결과입니다. 이는 매개변수 효율성 측면에서 탁월한 성능을 보여주는 것으로, 모델 크기 대비 성능 최적화의 새로운 기준을 제시합니다.
 
 또한 다양한 표준 벤치마크에서의 일관된 성능 향상은 Gemma 3가 특정 작업에 특화된 것이 아니라 범용적인 능력 향상을 달성했음을 보여줍니다. 수학, 코딩, 추론, 다국어 능력 등 모든 영역에서의 개선은 종합적인 AI 시스템으로서의 가치를 입증합니다.
 
@@ -841,4 +841,4 @@ Gemma 3 모델들의 다국어 능력 평가 결과는 다음과 같습니다.
 이러한 상세한 평가 결과들은 Gemma 3 모델들이 다양한 영역에서 일관된 성능 향상을 달성했음을 보여주며, 특히 수학, 코딩, 다국어 능력에서 두드러진 개선을 나타냅니다.
 - - -
 ### References
-* [Gemma 3 Technical Report](http://arxiv.org/pdf/2503.19786v1)
+* [Gemma 3 Technical Report](https://arxiv.org/pdf/2503.19786v1)

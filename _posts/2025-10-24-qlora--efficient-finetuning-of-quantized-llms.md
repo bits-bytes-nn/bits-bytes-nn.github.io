@@ -631,4 +631,4 @@ QLoRA는 사용자가 자신의 데이터와 모델을 소유하고 관리할 �
 전반적으로 QLoRA가 고품질 LLM의 파인튜닝을 훨씬 더 광범위하고 쉽게 접근할 수 있게 만들어 광범위하게 긍정적인 영향을 미칠 것이라고 믿습니다. 이는 AI 기술의 민주화라는 더 큰 목표에 기여하며, 더 많은 사람들이 최신 언어 모델 기술을 활용하여 혁신적인 응용을 개발할 수 있게 합니다. 동시에 이러한 기술의 책임 있는 사용을 보장하기 위한 지속적인 연구와 커뮤니티의 노력이 필요합니다.
 - - -
 ### References
-* [QLoRA: Efficient Finetuning of Quantized LLMs](http://arxiv.org/pdf/2305.14314v1)
+* [QLoRA: Efficient Finetuning of Quantized LLMs](https://arxiv.org/pdf/2305.14314v1)

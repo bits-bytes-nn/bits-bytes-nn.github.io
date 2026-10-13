@@ -72,20 +72,21 @@ jobs:
           JEKYLL_ENV: production
       - name: Validate HTML, internal links, and images
         # Catches broken internal links/anchors and missing images before deploy.
-        # External links are skipped (slow, flaky); hash-only hrefs are allowed.
+        # External links are skipped (slow, flaky) but must be https; hash-only
+        # hrefs are allowed.
         # --swap-urls strips the Pages base_path so absolute /baseurl/... links
         # resolve against _site/ regardless of what base_path the build used.
         run: |
           bundle exec htmlproofer ./_site \
             --disable-external \
             --allow-hash-href \
-            --no-enforce-https \
             --swap-urls "^${{ steps.pages.outputs.base_path }}:"
       - name: Validate discoverability (sitemap, feed, metadata)
         # Guards what htmlproofer does not look at: that the sitemap and feed
-        # parse, that every page carries a description and a canonical, and that
-        # no two pages share a description or title. Each check maps to a defect
-        # this site actually shipped.
+        # parse, that every page carries a description and a canonical, that no
+        # two pages share a description or title, and that each plugin hook left
+        # its mark on the posts (script/check-plugin-output.rb). Each check maps
+        # to a defect this site actually shipped.
         run: script/validate-site.sh ./_site
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.

@@ -49,7 +49,7 @@ bundle exec jekyll serve
 `_posts/`, `_sass/`, `_includes/` 아래 파일을 고치고 저장한 뒤 새로고침하면
 대부분 바로 반영됩니다. 단, `_config.yml`을 바꿨을 때는 서버를 다시 시작해야 합니다.
 
-**4. 최종 결과물이 필요하면 프로덕션 빌드를 합니다** (CI가 하는 것과 동일).
+**4. 최종 결과물이 필요하면 빌드합니다** (CI 옵션은 `.github/workflows/jekyll.yml`, 로컬 검사는 "푸시 전에 확인하세요" 참고).
 
 ```bash
 bundle exec jekyll build   # 결과물은 _site/ 에 생성
@@ -81,7 +81,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    search_index.rb      (search.json용 plain_text 필터)
                    legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
                    translations.rb      (번역본을 글 목록에서 빼기)
-                   posted_date.rb       (파일명 날짜로 last_modified_at 채우기)
+                   posted_date.rb       (파일명 날짜가 더 늦으면 last_modified_at 채우기)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -91,9 +91,12 @@ search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
 test/              _plugins/ 로직의 minitest 단위 테스트
 script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
                    validate-site.sh (빌드 후 검색 노출 검사)
+                   check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
+                   validate-site.sh가 실행)
 _data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
                    유일한 정본. scholar-lens도 읽음)
 .github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
+                   workflow-lint.yml: actionlint와 shellcheck
 ```
 
 **최상위 페이지:** `index.html`(홈), 네 개의 섹션 페이지인 `paper-reviews.md`·
@@ -116,14 +119,15 @@ subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). Insights·의견 글이면 생략
 seo_title: "<짧은 제목>"            # 선택 — 논문 제목이 너무 길 때 <title>에 대신 씁니다
-description: >-                    # 선택 — 아래 설명 참고
+description: >-                    # 선택, 평문 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
 categories: ["<유형>", "<주제>"]
 tags: ["<태그-1>", "<태그-2>"]
-cover: /assets/images/<topic>.(jpg|png)
+cover: /assets/images/<topic>.(jpg|png)   # Insights는 insights.jpg
 use_math: true                     # 수식이 있을 때만 (MathJax를 불러옵니다)
 lang: ko                           # translation_id를 쓰면 필수(ko | en)…
 translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다.
+                                   #    두 글 모두에 씁니다(린트가 짝을 확인).
                                    #    목록에는 한국어 글만 나옵니다
 ---
 ```
@@ -143,7 +147,15 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 고지로 시작하는 글 — 즉 대부분의 Insights 글 — 은 직접 쓰는 편이 낫습니다.
 
 설명문은 **사이트 전체에서 중복되면 안 됩니다.** 두 페이지가 같은 설명문을 쓰면 CI가
-빌드를 실패시킵니다.
+빌드를 실패시킵니다. 설명문은 평문으로 나가므로 `$$`, `*강조*`, 백틱, 링크, 태그를 쓰면
+린트가 막습니다.
+
+### 날짜, 파일명, Liquid
+
+파일명은 게시일(`YYYY-MM-DD-`)로 시작합니다. `date:`는 그보다 이를 수(논문 발행일)는 있어도
+늦을 수는 없습니다. Jekyll은 모든 글을 먼저 Liquid로 렌더하므로, 코드 블록의 `{{ … }}`나
+`{% … %}`(프롬프트 템플릿, GitHub Actions의 `${{ … }}`)는 빈칸이 되거나 빌드를 멈춥니다.
+`{% raw %}…{% endraw %}`로 감쌉니다. 세 가지 모두 린트가 확인합니다.
 
 ### 카테고리가 URL을 결정합니다
 
@@ -154,7 +166,7 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
   **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
   없어진 섹션으로 읽히기 때문입니다.
 - `categories[1]` — **주제**: `_data/post_conventions.yml`의 `topics` 중 하나이며, 표지
-  이미지도 거기서 정해집니다. 맞는 주제가 없으면 먼저 거기에 추가합니다. 목록에 없는 값은
+  이미지도 거기서 정해집니다(Insights 글은 유형의 `insights.jpg`를 씁니다). 맞는 주제가 없으면 먼저 거기에 추가합니다. 목록에 없는 값은
   린트가 막습니다.
 
 Jekyll은 이 둘을 슬러그로 바꾸고(`_config.yml`의 `permalink`) 날짜와 합쳐 출력 경로를
@@ -208,14 +220,22 @@ kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합
 
 - `\\(…\\)`·`\\[…\\]`로 쓴 수식, 단일 `$` 옆의 TeX: 위와 같이 마크다운이 수식을 먼저
   읽습니다.
-- `$$…$$` 안의 `\_`: MathJax가 역슬래시와 밑줄을 그대로 보여 줍니다. `_`로 쓰고,
+- `$$…$$` 안의 `\_`: MathJax가 아래첨자가 아닌 밑줄 문자를 그대로 그립니다. `_`로 쓰고,
   `\text{…}` 안에서만 이스케이프합니다.
 - 앞뒤에 빈 줄이 없는 디스플레이 `$$…$$` 줄(목록 안 포함): kramdown이 문단에 붙여 인라인
   수식으로 처리합니다.
 - `$$` 구간 안의 한글: 거의 언제나 통화 표기 `$$` 두 개가 한 구간으로 읽힌 것입니다.
+- `use_math: true` 없이 쓴 `$$` 수식: MathJax가 로드되지 않아 TeX가 글자로 보입니다.
+- HTML이 아닌 `<이름>`, `<s>`·`<input>`, 또는 속성 없는 `<img>`(모델의 특수 토큰): kramdown이 그대로
+  넘기고 브라우저가 지웁니다. `코드`로 씁니다.
+- 마커 뒤에 언어 말고 다른 것이 붙은 코드 펜스(```` ```python title="a" ````)나 닫히지 않은
+  펜스: kramdown이 펜스로 읽지 않습니다.
+- 글마다 대소문자를 다르게 쓴 태그(`Grouped-Query-…`와 `Grouped-query-…`).
+- 표 행의 `$$` 안에 있는 `|`: kramdown이 거기서 셀을 나누고, `\|`는 `|`로 바꿉니다(노름이
+  절댓값이 됩니다). `\lVert … \rVert`를 씁니다.
 
-인라인 수식에서는 맨 `|` 대신 `\lvert … \rvert`를 씁니다. 표 안에서는 맨 `|`가 셀 구분자로
-읽힙니다.
+인라인 수식에서는 맨 `|` 대신 `\lvert … \rvert`(또는 `\mid`)를, 노름에는 `\lVert … \rVert`를 씁니다. 린트는 표 안에서만
+잡습니다.
 
 ### 푸시 전에 확인하세요
 
@@ -228,8 +248,9 @@ ruby script/lint-posts.rb                                   # 글 원본이 규�
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # 빌드가 깨끗한가?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-enforce-https                      # 깨진 링크·이미지·앵커는 없나?
+  --allow-hash-href                                         # 깨진 링크·이미지·앵커, http:// 링크는 없나?
 script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
+shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml이 PR과 main에서 실행
 ```
 
 > **검사 결과가 말이 안 되면 먼저 떠 있는 `jekyll serve`를 찾으세요.** 파일을 감시하며
@@ -259,12 +280,8 @@ script/validate-site.sh /tmp/site-verify                    # 사이트맵·피�
    마크다운 원본의 표·수식·헤딩 규칙을 검사하고
 3. `JEKYLL_ENV=production`으로 사이트를 빌드하고
 4. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
-5. **`script/validate-site.sh`**로 사이트맵·피드가 byte 0에서 파싱되는지, 사이트맵 URL이
-   설정된 `url` 아래인지, 빌드 타임존이 고정됐는지, `robots.txt`가 막지 않고 사이트맵을 가리키는지, 렌더된
-   페이지가 1개 이상인지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든
-   페이지에 설명문·canonical이 있는지, 설명문이 자기 제목보다 긴지, 설명문·제목이
-   중복되지 않는지, 목록 페이지에 번역본이 원본과 함께 나오지 않는지, 저작 원본이
-   배포되지 않았는지를 검사한 뒤
+5. **`script/validate-site.sh`**로 htmlproofer가 보지 않는 빌드 후 검사(사이트맵, 피드,
+   메타데이터, 헤딩, 리디렉션, 플러그인 결과)를 돌린 뒤 — 항목은 스크립트에 있습니다
 6. GitHub Pages에 배포합니다.
 
 실패하면 대개 4·5단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로

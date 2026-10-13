@@ -159,6 +159,13 @@ class TestAdjacent < Minitest::Test
     assert_equal "/new", newer[:id]
   end
 
+  def test_the_nearest_older_post_not_the_oldest
+    a = post("/a", date: "2023-01-01")
+    b = post("/b", date: "2024-01-01")
+    c = post("/c", date: "2025-01-01")
+    assert_equal "/b", RelatedPosts.adjacent(c, ordered(a, b, c))[0][:id]
+  end
+
   def test_nil_at_each_end_of_the_archive
     old = post("/old", date: "2024-01-01")
     new = post("/new", date: "2026-01-01")
@@ -167,7 +174,7 @@ class TestAdjacent < Minitest::Test
     assert_nil RelatedPosts.adjacent(new, list)[1]
   end
 
-  # The live defect: all three translation pairs share a date exactly, so
+  # The live defect: all three translation pairs shared a date exactly, so
   # Jekyll's page.previous pointed the newest Korean post at its own English
   # version.
   def test_skips_the_translation_twin_even_on_an_identical_date
@@ -218,7 +225,9 @@ class TestAdjacent < Minitest::Test
 end
 
 class TestTheActualHarnessCluster < Minitest::Test
-  # The real front matter of the five Insights/Agentic-AI posts.
+  # The Insights/Agentic-AI posts' front matter as of the harness posts, cut to
+  # the fields ranking reads. A snapshot, not the current _posts: it pins the
+  # ranking rules on a realistic cluster.
   #
   # These five used to share nothing at all: the Claude Code teardown said
   # "Agentic-Architecture", the harness chronicle said "Agentic-Patterns", and

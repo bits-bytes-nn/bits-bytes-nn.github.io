@@ -4,7 +4,7 @@ title: "From Local to Global: A Graph RAG Approach to Query-Focused Summarizatio
 date: 2024-04-24 18:38:11
 paper_author: "Microsoft Research"
 description: >-
-  Graph RAG는 LLM으로 엔티티 지식 그래프와 커뮤니티 요약을 미리 만들어 전역 질문에 맵-리듀스로 답합니다. 기존 RAG보다 포괄성과 다양성에서 앞섰고, 루트 레벨 요약은 원문 요약보다 토큰을 97% 덜 씁니다. 색인 구축과 평가를 정리합니다.
+  Graph RAG는 LLM으로 엔티티 지식 그래프와 커뮤니티 요약을 미리 만들어 전역 질문에 맵-리듀스로 답합니다. 기존 RAG보다 포괄성과 다양성에서 앞섰고, 루트 레벨 요약은 원문 요약보다 토큰을 97% 이상 덜 씁니다. 색인 구축과 평가를 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]
 tags: ["GraphRAG", "Query-Focused-Summarization", "Community-Based-Summarization", "Entity-and-Relationship-Extraction", "Map-Reduce-Summarization", "Modularity-Based-Retrieval", "Community-Detection", "Leiden-Algorithm-for-Text", "Multi-Level-Community-Indexing", "Global-Context-Understanding", "Retrieval-Augmented-Generation", "Knowledge-Graph"]
 cover: /assets/images/retrieval-augmented-generation.jpg
@@ -21,7 +21,7 @@ use_math: true
 구현은 크게 네 단계로 이루어집니다. 먼저 소스 문서를 의미 있는 청크로 분할하고, LLM을 사용하여 엔티티와 관계를 추출합니다. 다음으로 Leiden 알고리즘을 사용하여 그래프의 커뮤니티 구조를 탐지하고, 각 커뮤니티에 대한 요약을 생성합니다. 마지막으로 사용자 쿼리가 주어지면 관련 커뮤니티 요약들을 활용하여 맵-리듀스 방식으로 최종 답변을 생성합니다. 실험은 약 100만 토큰 규모의 두 데이터셋(팟캐스트 전사본과 뉴스 기사)에서 수행되었으며, 다양한 커뮤니티 레벨과 컨텍스트 윈도우 크기에 대한 철저한 평가가 이루어졌습니다.
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
-실험 결과는 그래프 RAG가 기존 RAG 시스템과 비교하여 답변의 포괄성(72-83%)과 다양성(62-82%) 측면에서 상당한 개선을 달성했음을 보여줍니다. 특히 주목할 만한 점은 효율성입니다. 루트 레벨 커뮤니티 요약은 소스 텍스트 요약보다 97% 더 적은 토큰을 사용하면서도 경쟁력 있는 성능을 유지했습니다. 이는 대규모 문서 컬렉션에 대한 의미 파악과 전역적 이해를 위한 실용적인 솔루션의 가능성을 제시합니다. 또한 오픈소스로 공개될 예정인 이 구현은 향후 그래프 기반 RAG 시스템의 발전을 위한 중요한 기반이 될 것으로 기대됩니다.
+실험 결과는 그래프 RAG가 기존 RAG 시스템과 비교하여 답변의 포괄성(72-83%)과 다양성(62-82%) 측면에서 상당한 개선을 달성했음을 보여줍니다. 특히 주목할 만한 점은 효율성입니다. 루트 레벨 커뮤니티 요약은 소스 텍스트 요약보다 97% 이상 적은 토큰을 사용하면서도 경쟁력 있는 성능을 유지했습니다. 이는 대규모 문서 컬렉션에 대한 의미 파악과 전역적 이해를 위한 실용적인 솔루션의 가능성을 제시합니다. 또한 오픈소스로 공개될 예정인 이 구현은 향후 그래프 기반 RAG 시스템의 발전을 위한 중요한 기반이 될 것으로 기대됩니다.
 - - -
 ## 로컬에서 글로벌로: 쿼리 중심 요약을 위한 그래프 RAG 접근법
 
@@ -478,4 +478,4 @@ LLM과 RAG와 관련된 그래프 활용은 여러 방향으로 발전하고 있
 
 - - -
 ### References
-* [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](http://arxiv.org/pdf/2404.16130v1)
+* [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](https://arxiv.org/pdf/2404.16130v1)

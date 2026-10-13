@@ -343,4 +343,4 @@ MoE 아키텍처와 학습 전략에 대한 연구 외에도, 최근에는 기�
 
 - - -
 ### References
-* [DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models](http://arxiv.org/pdf/2401.06066v1)
+* [DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models](https://arxiv.org/pdf/2401.06066v1)

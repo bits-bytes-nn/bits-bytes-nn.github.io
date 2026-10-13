@@ -765,4 +765,4 @@ DPO 대 PPO-0 비교의 150개 무작위 샘플과 PPO-1 대 PPO-0 비교의 100
 이러한 결과는 GPT-4가 인간 평가의 신뢰할 수 있는 대리 지표로 사용될 수 있음을 검증하지만, 프롬프트 설계가 평가 결과에 영향을 미칠 수 있음을 보여줍니다. Concise 프롬프트가 인간 판단과 더 잘 일치하는 경향이 있어, 이후 분석에서는 이 프롬프트를 사용했습니다.
 - - -
 ### References
-* [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](http://arxiv.org/pdf/2305.18290v3)
+* [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/pdf/2305.18290v3)

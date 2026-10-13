@@ -1190,4 +1190,4 @@ Tülu 3의 공개는 언어 모델 연구 분야에 장기적인 영향을 미�
 Tülu 3는 오픈소스 언어 모델 연구의 새로운 표준을 제시하며, 폐쇄형 모델과의 성능 격차를 해소하는 동시에 완전한 투명성을 달성한 중요한 이정표입니다. 이 프로젝트가 제공하는 자원들과 방법론들은 향후 언어 모델 연구의 발전에 지속적으로 기여할 것으로 기대됩니다.
 - - -
 #### References
-* [Tulu 3: Pushing Frontiers in Open Language Model Post-Training](http://arxiv.org/pdf/2411.15124v5)
+* [Tulu 3: Pushing Frontiers in Open Language Model Post-Training](https://arxiv.org/pdf/2411.15124v5)

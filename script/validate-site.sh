@@ -34,6 +34,7 @@ if [ ! -d "$SITE" ]; then
   echo "no such directory: $SITE" >&2
   exit 1
 fi
+SITE=$(cd "$SITE" && pwd) # the plugin-output check runs from $ROOT
 
 if [ ! -f "$CONFIG" ]; then
   echo "no _config.yml at $CONFIG" >&2
@@ -99,8 +100,10 @@ fi
 # jekyll-feed takes each entry's <author> from the post's `author`, falling back
 # to the site's. Paper posts name the paper's organisation in `paper_author`; one
 # that says `author:` instead credits that organisation with this blog's post.
-SITE_AUTHOR=$(sed -nE 's/^author:[[:space:]]*"?([^"]*[^"[:space:]])"?[[:space:]]*$/\1/p' "$CONFIG" | head -1)
-if [ -f "$SITE/feed.xml" ]; then
+SITE_AUTHOR=$(ruby -ryaml -e 'print YAML.safe_load_file(ARGV[0])["author"]' "$CONFIG")
+if [ -z "$SITE_AUTHOR" ]; then
+  fail "_config.yml sets no author:, so every feed entry ships an empty <author>"
+elif [ -f "$SITE/feed.xml" ]; then
   others=$(grep -oE '<author><name>[^<]*' "$SITE/feed.xml" | sed 's/<author><name>//' |
     grep -vxF "$SITE_AUTHOR" | sort -u || true)
   if [ -n "$others" ]; then
@@ -149,7 +152,9 @@ dangling=""
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   to=$(grep -m1 -oE 'http-equiv="refresh" content="0; url=[^"]+"' "$f" | sed -E 's/.*url=//; s/"$//')
-  rel=$(ruby -ruri -e 'print URI.decode_uri_component(URI(ARGV[0]).path.delete_prefix("/"))' "$to")
+  case "$to" in "$BASE_URL"/*|/*) ;; *) continue ;; esac # redirect_to another site
+  # Served as Jekyll writes it: a directory URL from index.html, a bare one from .html.
+  rel=$(ruby -ruri -e 'p = URI.decode_uri_component(URI(ARGV[0]).path.delete_prefix("/")); print(p.end_with?("/") || p.empty? ? "#{p}index.html" : File.extname(p).empty? ? "#{p}.html" : p)' "$to")
   [ -f "$SITE/$rel" ] || dangling="$dangling$f -> $to"$'\n'
 done <<< "$redirects"
 if [ -n "$dangling" ]; then
@@ -157,6 +162,18 @@ if [ -n "$dangling" ]; then
   printf '%s' "$dangling" | sed 's/^/          /' >&2
 else
   pass "$(printf '%s\n' "$redirects" | grep -c .) redirect stub(s), every target exists"
+fi
+
+# --- plugin hooks ------------------------------------------------------------
+# What each _plugins/ hook adds to a post, checked against Jekyll's own reading
+# of the posts; the script says which hook and why.
+if hooks=$(cd "$ROOT" && bundle exec ruby script/check-plugin-output.rb "$SITE"); then
+  pass "every post carries what the plugin hooks add, and the feed has room for all"
+elif [ -n "$hooks" ]; then
+  fail "plugin output missing:"
+  printf '%s\n' "$hooks" | sed 's/^/          /' >&2
+else
+  fail "the plugin-output check could not run (error above)"
 fi
 
 # --- rendered pages ----------------------------------------------------------
@@ -210,6 +227,7 @@ fi
 
 # A heading outline that jumps h2 -> h4 breaks screen-reader navigation. The usual
 # cause is a "### TL;DR" above the "##" sections it precedes.
+skips_ok=1
 skips=$(ruby -e '
   files = STDIN.read.split("\n").reject(&:empty?)
   tag = /<[^>]+>/
@@ -223,8 +241,10 @@ skips=$(ruby -e '
       prev = lvl
     end
   end
-' <<< "$pages")
-if [ -n "$skips" ]; then
+' <<< "$pages") || skips_ok=0
+if [ "$skips_ok" -eq 0 ]; then
+  fail "the heading-outline check could not run (error above)"
+elif [ -n "$skips" ]; then
   fail "heading outlines that skip a level:"
   printf '%s\n' "$skips" | sed 's/^/          /' >&2
 else
@@ -285,27 +305,40 @@ fi
 # `listed` filter shows the English twin again, and htmlproofer is blind to it.
 SITE_LANG=$(sed -nE 's/^lang:[[:space:]]*"?([a-z-]+)"?.*/\1/p' "$CONFIG" | head -1)
 BASE_PATH=$(sed -nE "s/^baseurl:[[:space:]]*['\"]?([^'\"[:space:]]*)['\"]?.*/\1/p" "$CONFIG" | head -1)
-listed_twins=$(ruby -e '
+# Pages that show the language switcher, i.e. built translations.
+TRANSLATED=$(grep -rl --include='*.html' 'class="language-switcher"' "$SITE" | grep -c .)
+twins_ok=1
+listed_twins=$(TRANSLATED="$TRANSLATED" ruby -e '
   site, site_lang, base, base_path = ARGV
   hreflang = /<link rel="alternate" hreflang="#{Regexp.escape(site_lang)}"/
   twins = Dir.glob("#{site}/**/*.html").filter_map do |f|
-    html = File.read(f)
+    html = File.read(f, encoding: "UTF-8")
     lang = html[/<html lang="([^"]+)"/, 1]
     f.delete_prefix(site) if lang && lang != site_lang && html.match?(hreflang)
   end
-  listings = Dir.glob(["#{site}/index.html", "#{site}/page/*/index.html", "#{site}/*/index.html"])
+  # No twin found while translations exist means the hreflang links are gone,
+  # and the scan below would pass checking nothing.
+  puts "no page carries hreflang=\"#{site_lang}\" though posts are translated" if twins.empty? && ENV["TRANSLATED"].to_i.positive?
+  # Every rendered page but the posts themselves, whose previous/next links may
+  # name a twin, and redirect stubs.
+  listings = Dir.glob("#{site}/**/*.html").reject do |f|
+    html = File.read(f, encoding: "UTF-8")
+    !html.include?("<!DOCTYPE html>") || html.include?(%(property="og:type" content="article")) || html.include?(%(http-equiv="refresh"))
+  end
   listings.each do |f|
-    html = File.read(f)
+    html = File.read(f, encoding: "UTF-8")
     twins.each do |t|
       hrefs = [t, "#{base_path}#{t}", "#{base}#{base_path}#{t}"].map { |u| %(href="#{u}") }
       puts "#{f.delete_prefix(site)} -> #{t}" if hrefs.any? { |h| html.include?(h) }
     end
   end
-' "$SITE" "$SITE_LANG" "$BASE_URL" "$BASE_PATH")
+' "$SITE" "$SITE_LANG" "$BASE_URL" "$BASE_PATH") || twins_ok=0
 if [ -z "$SITE_LANG" ]; then
   fail "could not read 'lang:' from $CONFIG"
+elif [ "$twins_ok" -eq 0 ]; then
+  fail "the translation-listing check could not run (error above)"
 elif [ -n "$listed_twins" ]; then
-  fail "listing pages that link a translation besides its original:"
+  fail "listing pages that link a translation besides its original, or no hreflang at all:"
   printf '%s\n' "$listed_twins" | sed 's/^/          /' >&2
 else
   pass "listing pages show each translated article once"

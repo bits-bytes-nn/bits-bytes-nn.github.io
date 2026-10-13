@@ -4,7 +4,7 @@ title: "Writing Context Into Your Data — AI-Ready Data, Semantic Layers, Knowl
 description: >-
   "AI-ready data" isn't clean data — it's context written in machine-executable
   form. Why the same schema takes text-to-SQL accuracy from 16.7% to 54.2%.
-date: 2026-07-27 12:00:00
+date: 2026-07-27 11:59:59
 categories: ["Insights", "Data-Architecture"]
 tags: ["AI-Ready-Data", "Semantic-Layer", "Knowledge-Graph", "Ontology", "GraphRAG", "Agentic-AI", "Model-Context-Protocol", "Data-Governance"]
 cover: /assets/images/insights.jpg

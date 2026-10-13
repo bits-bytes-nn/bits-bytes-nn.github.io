@@ -21,7 +21,6 @@ $heading-line-height: 1.3; // was 1.6 — loose at display sizes, where a 48px t
 $base-border-radius: 4px;
 $base-spacing: $base-line-height * $em-base;
 $small-spacing: $base-spacing / 2;
-$base-z-index: 0;
 
 // Colors
 $dark-gray: #333;
@@ -30,10 +29,8 @@ $light-gray: #ddd;
 $white: #fff;
 // Brand colors. The blog's identity is space exploration (astronaut logo, James
 // Webb nebula cover), so the accent is a deeper "cosmic blue" than the old
-// generic #2980b9, with a cosmic-purple secondary for hover/highlight accents.
+// generic #2980b9.
 $blue:   #1c5d99;			// Cosmic blue — primary accent (link-on-white 6.83:1)
-$purple: #6a4c93;			// Cosmic purple — secondary accent (6.85:1)
-$red:    #c0392b;			// Pomegranate — error/warning accents
 
 // Theme Colors
 $base-background-color: $white;
@@ -55,8 +52,6 @@ $transition-color: color 0.3s ease;
 $transition-all: all 0.3s ease;
 
 // Shadows
-$shadow-light: 0 2px 4px rgba($dark-gray, 0.1);
-$shadow-medium: 0 3px 6px rgba($dark-gray, 0.15);
 $shadow-image-hover: 0 4px 20px rgba(#000, 0.15);
 
 // Forms

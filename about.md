@@ -12,7 +12,7 @@ main_nav: true
 nav_order: 1
 ---
 
-![Jonas Kim]({{ site.baseurl }}/assets/my-profile.png){:.profile}
+![Jonas Kim]({{ site.baseurl }}/assets/my-profile.png){:.profile loading="eager"}
 
 ## Hello, I'm Jonas Kim
 

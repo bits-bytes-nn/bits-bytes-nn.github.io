@@ -33,6 +33,11 @@ module ImageDimensions
     end
   end
 
+  # The repo file a root-relative src names.
+  def self.source_file(src, source, baseurl)
+    File.join(source, src.delete_prefix(baseurl.to_s))
+  end
+
   # `lookup` maps a src path to its bytes, or nil when there is no such file.
   def self.apply(html, &lookup)
     html.to_s.gsub(SIZELESS_IMG) do |tag|
@@ -74,9 +79,9 @@ if defined?(Jekyll::Hooks)
 
     site = doc.site
     doc.output = ImageDimensions.apply(doc.output) do |src|
-      path = File.join(site.source, src.delete_prefix(site.baseurl.to_s))
-      # A header is all `read` needs; JPEG SOF can sit past APP segments.
-      File.file?(path) ? File.binread(path, 64 * 1024) : nil
+      path = ImageDimensions.source_file(src, site.source, site.baseurl)
+      # The whole file: a JPEG frame header can sit past large EXIF/XMP segments.
+      File.file?(path) ? File.binread(path) : nil
     end
   end
 end

@@ -32,6 +32,7 @@ class TestImageDimensions < Minitest::Test
     assert_equal [860, 430], ImageDimensions.read(%(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="860" height="430"><path stroke-width="2"/>))
     assert_equal [840, 440], ImageDimensions.read(%(<?xml version="1.0"?>\n<svg width="100%" viewBox="0 0 840 440">))
     assert_nil ImageDimensions.read(%(<svg width="100%">))
+    assert_equal [841, 440], ImageDimensions.read(%(<svg viewBox="0 0 840.6 440.2">))
   end
 
   def test_reads_a_progressive_jpeg

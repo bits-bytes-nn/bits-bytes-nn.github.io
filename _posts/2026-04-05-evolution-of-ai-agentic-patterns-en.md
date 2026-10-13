@@ -5,7 +5,7 @@ subtitle: "Engineering Rigor Doesn't Disappear — It Relocates. Four Years of A
 description: >-
   Engineering rigor never disappeared — it relocated. Four years, three paradigm
   shifts from prompts to context to harnesses, traced by why each era failed.
-date: 2026-04-05 12:00:00
+date: 2026-04-05 11:59:59
 categories: ["Insights", "Agentic-AI"]
 tags: ["Prompt-Engineering", "Context-Engineering", "Harness-Engineering", "Agentic-Patterns", "LLM-Architecture", "Vibe-Coding", "Agentic-AI"]
 cover: /assets/images/insights.jpg
@@ -42,7 +42,7 @@ This post has one thesis: **Engineering rigor never disappeared. It relocated.**
 
 Each relocation was triggered by the previous era's failure. Let's trace that arc.
 
-<a href="/assets/images/three-era-timeline.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: AI 에이전틱 패턴의 진화 타임라인">
+<a href="/assets/images/three-era-timeline.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: Evolution timeline of AI agentic patterns">
   <img src="/assets/images/three-era-timeline.svg" alt="Evolution timeline of AI agentic patterns — Prompt → Context → Harness Engineering" />
 </a>
 
@@ -285,7 +285,7 @@ The metric they called "the single most important metric" for production agents 
 
 Here's how KV-cache works. When you send a prompt to an LLM API, the model computes attention Keys and Values for each token. This computation is expensive. But if the **prefix** of the current request matches the previous request, that portion can reuse cached results — no recomputation needed. On Claude Sonnet, a cache hit reduces cost by **10x**. The difference between an agent re-computing the system prompt across 30 turns versus leveraging the cache is enormous.
 
-<a href="/assets/images/kv-cache-mechanism.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: KV-cache 작동 원리 — 안정 접두어가 비용을 결정한다">
+<a href="/assets/images/kv-cache-mechanism.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: How KV-cache works — the stable prefix determines cost">
   <img src="/assets/images/kv-cache-mechanism.svg" alt="How KV-cache works — the stable prefix determines cost" />
 </a>
 

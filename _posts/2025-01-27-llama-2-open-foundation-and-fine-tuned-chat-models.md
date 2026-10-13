@@ -524,5 +524,5 @@ AI 모델을 사용하는 모든 사람이 선의를 가지고 있는 것은 아
 
 - - -
 ### References
-* [Llama 2: Open Foundation and Fine-Tuned Chat Models](http://arxiv.org/pdf/2307.09288v2)
+* [Llama 2: Open Foundation and Fine-Tuned Chat Models](https://arxiv.org/pdf/2307.09288v2)
 * [Llama Models (GitHub)](https://github.com/meta-llama/llama-models)

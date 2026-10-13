@@ -5,7 +5,7 @@ subtitle: "Claude Code Exposed: Anatomy of an Agentic AI Through an npm Source M
 description: >-
   An npm source map leak exposed all 4,600+ files of Claude Code's core engine.
   Its 8-layer security and 4-tier message compaction, read as architecture.
-date: 2026-03-31 12:00:01
+date: 2026-03-31 11:59:59
 categories: ["Insights", "Agentic-AI"]
 tags: ["Claude-Code", "Agentic-Architecture", "Context-Compaction", "Multi-Agent-Orchestration", "Security-Architecture", "Agentic-AI"]
 cover: /assets/images/insights.jpg
