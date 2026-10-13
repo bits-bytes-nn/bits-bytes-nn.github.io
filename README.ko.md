@@ -85,6 +85,7 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
+                   citations.js(논문 글의 인용 수, Semantic Scholar에서)
 assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(플랫)
 assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
 search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
@@ -99,8 +100,8 @@ _data/             post_conventions.yml (카테고리·표지·통제 태그·�
                    workflow-lint.yml: actionlint와 shellcheck
 ```
 
-**최상위 페이지:** `index.html`(홈), 네 개의 섹션 페이지인 `paper-reviews.md`·
-`paper-summaries.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
+**최상위 페이지:** `index.html`(홈), 다섯 개의 섹션 페이지인 `paper-reviews.md`·
+`paper-summaries.md`·`paper-surveys.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
 `tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`feed.xml`·`robots.txt`는
 플러그인이 생성하며 원본 파일이 없습니다.
 
@@ -118,6 +119,7 @@ title: "<글 제목>"
 subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). 논문 글에만
+paper_doi: "10.48550/arXiv.<id>"   # 선택, 논문 글에만 — 메타 패널의 인용 수
 seo_title: "<짧은 제목>"            # 선택 — 논문 제목이 너무 길 때 <title>에 대신 씁니다
 description: >-                    # 선택, 평문 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
@@ -154,8 +156,8 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 
 카테고리는 **두 단계**입니다.
 
-- `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Tech Guides`,
-  `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. 아직 글이 없는 유형도
+- `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Paper Surveys`,
+  `Tech Guides`, `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. 아직 글이 없는 유형도
   **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
   없어진 섹션으로 읽히기 때문입니다.
 - `categories[1]` — **주제**: `_data/post_conventions.yml`의 `topics` 중 하나이며, 표지

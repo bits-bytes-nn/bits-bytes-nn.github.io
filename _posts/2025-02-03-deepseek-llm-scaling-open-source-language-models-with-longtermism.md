@@ -3,6 +3,7 @@ layout: post
 title: "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"
 date: 2024-01-05 18:59:13
 paper_author: "DeepSeek AI"
+paper_doi: "10.48550/arXiv.2401.02954"
 description: >-
   DeepSeek LLM은 비임베딩 FLOPs/토큰으로 모델 규모를 나타내 스케일링 법칙을 다시 세우고 2조 토큰으로 7B·67B 모델을 학습했습니다. 67B는 코드·수학·추론에서 LLaMA-2 70B를 앞섰습니다. 스케일링 분석과 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

@@ -4,6 +4,7 @@ title: "DeepSeek-Coder: When the Large Language Model Meets Programming - The Ri
 seo_title: "DeepSeek-Coder: The Rise of Code Intelligence"  # <title> only; the paper title runs past a results list
 date: 2024-01-25 14:17:53
 paper_author: "DeepSeek AI"
+paper_doi: "10.48550/arXiv.2401.14196"
 description: >-
   DeepSeek-Coder는 87개 프로그래밍 언어의 2조 토큰을 저장소 단위로 구성하고 FIM과 16K 컨텍스트로 1.3B~33B 코드 모델을 학습했습니다. Instruct 33B는 대부분의 벤치마크에서 GPT-3.5 Turbo를 앞섰습니다. 데이터 구축과 학습 전략을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

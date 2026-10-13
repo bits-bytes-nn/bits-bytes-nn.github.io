@@ -96,10 +96,11 @@
   }
 
   .page-content .post {
-    .post-date, .post-categories, .post-tags, .post-readtime { color: $fg-muted; }
+    .post-date, .post-categories, .post-tags, .post-readtime, .post-citations { color: $fg-muted; }
     .post-meta { border-color: $border; border-left-color: $link; }
     .post-tags { border-top-color: $border; }
     .meta-value { color: $fg; }
+    a.meta-value { text-decoration-color: $fg-muted; &:hover { color: $link; text-decoration-color: currentColor; } }
     .meta-label { color: $fg-muted; }
   }
 

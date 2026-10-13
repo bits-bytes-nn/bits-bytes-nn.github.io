@@ -4,6 +4,7 @@ title: "Mixtral of Experts"
 subtitle: "Mixtral of Experts: 전문가 혼합 모델의 새로운 지평"
 date: 2024-01-08 18:47:34
 paper_author: "Mistral AI"
+paper_doi: "10.48550/arXiv.2401.04088"
 description: >-
   Mixtral 8x7B는 층마다 8개 전문가 중 2개를 고르는 희소 전문가 혼합 모델로, 총 47B 중 13B만 활성화하고도 대부분의 벤치마크에서 Llama 2 70B·GPT-3.5와 같거나 앞섭니다. 라우팅 구조와 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

@@ -151,7 +151,7 @@
     align-items: baseline;
   }
 
-  .post-date, .post-readtime, .post-categories, .post-tags {
+  .post-date, .post-readtime, .post-citations, .post-categories, .post-tags {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -173,6 +173,17 @@
     font-size: 0.95rem;
     color: $dark-gray;
     white-space: nowrap;
+  }
+
+  // Its `display: flex` above would otherwise override the attribute.
+  .post-citations[hidden] { display: none; }
+
+  // A link, but set like the values beside it.
+  a.meta-value {
+    text-decoration: underline;
+    text-decoration-color: $medium-gray;
+    text-underline-offset: 0.2em;
+    &:hover { color: $action-color; text-decoration-color: currentColor; }
   }
 
   // Shared chip shape; category vs tag differ in fill so the two metadata

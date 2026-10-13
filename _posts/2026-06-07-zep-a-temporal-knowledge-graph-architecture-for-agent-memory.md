@@ -4,6 +4,7 @@ title: "Zep: A Temporal Knowledge Graph Architecture for Agent Memory"
 subtitle: "Zep: 에이전트 메모리를 위한 시간 인식 지식 그래프 아키텍처"
 date: 2025-01-20 16:52:48
 paper_author: "Zep AI"
+paper_doi: "10.48550/arXiv.2501.13956"
 description: >-
   Zep은 시간 인식 지식 그래프 엔진 Graphiti로 사실의 유효 기간을 추적하는 에이전트 메모리 계층입니다. DMR에서 94.8%로 MemGPT의 93.4%를 앞섰고 LongMemEval에서는 응답 지연을 약 90% 줄였습니다. 그래프 구조와 검색 파이프라인을 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]

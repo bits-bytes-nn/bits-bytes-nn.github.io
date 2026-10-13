@@ -4,6 +4,7 @@ title: "Qwen3 Technical Report"
 subtitle: "Qwen3 기술 보고서"
 date: 2025-05-14 13:41:34
 paper_author: "Alibaba Group"
+paper_doi: "10.48550/arXiv.2505.09388"
 description: >-
   Qwen3는 사고 모드와 비사고 모드를 한 모델에 통합하고 사고 예산으로 추론 깊이를 조절하는 dense·MoE 모델군으로, 119개 언어 36조 토큰으로 사전 학습해 AIME'24 85.7점을 기록했습니다. 3단계 사전 학습과 사후 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

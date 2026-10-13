@@ -127,6 +127,13 @@ module PostLint
       unless author.is_a?(String) && !author.strip.empty? && !author.match?(/et al/i)
         found << "1: paper_author must name the paper's organisation, got #{author.inspect}"
       end
+      # js/citations.js puts it in the request path as is, so a URL, a `doi:`
+      # prefix, or a `?` or `#` in it finds nothing there.
+      if data.key?("paper_doi") && !data["paper_doi"].to_s.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})
+        found << "1: paper_doi is a bare DOI (10.<registrant>/<suffix>), got #{data["paper_doi"].inspect}"
+      end
+    elsif data.key?("paper_doi")
+      found << "1: paper_doi is for #{spec["types"].select { |_, t| t["paper"] }.keys.join(" and ")} posts"
     end
 
     cover = spec["types"][type]["cover"] || spec["topics"][topic]

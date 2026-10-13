@@ -3,6 +3,7 @@ layout: post
 title: "The Llama 3 Herd of Models"
 date: 2024-07-31 17:54:27
 paper_author: "Meta AI"
+paper_doi: "10.48550/arXiv.2407.21783"
 description: >-
   Llama 3는 약 15조 토큰으로 사전 학습한 8B·70B·405B 조밀한 트랜스포머로, 128K 컨텍스트를 지원하며 405B 모델이 HumanEval 89.0%, MGSM 91.6%를 기록했습니다. 데이터 정제와 사후 학습, 멀티모달 어댑터 설계를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

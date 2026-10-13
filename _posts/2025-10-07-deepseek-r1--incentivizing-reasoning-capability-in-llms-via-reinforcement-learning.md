@@ -4,6 +4,7 @@ title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcemen
 subtitle: "DeepSeek-R1: 강화학습을 통한 대규모 언어 모델의 추론 능력 향상"
 date: 2025-01-22 15:19:35
 paper_author: "DeepSeek AI"
+paper_doi: "10.48550/arXiv.2501.12948"
 description: >-
   DeepSeek-R1-Zero는 SFT 없이 강화학습만으로 AIME 2024 pass@1을 15.6%에서 71.0%로 끌어올렸고, DeepSeek-R1은 콜드 스타트 데이터와 다단계 학습으로 OpenAI-o1-1217 수준에 이르렀습니다. 학습 과정과 증류 결과를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

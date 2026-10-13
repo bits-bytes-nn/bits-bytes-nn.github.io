@@ -3,6 +3,7 @@ layout: post
 title: "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval"
 date: 2024-01-31 18:30:21
 paper_author: "Stanford University"
+paper_doi: "10.48550/arXiv.2401.18059"
 description: >-
   RAPTOR는 텍스트 청크를 재귀적으로 임베딩·클러스터링·요약해 여러 추상화 수준의 트리를 만들고 검색에 씁니다. GPT-4와 결합해 QuALITY에서 기존 최고 정확도를 20%포인트 높였습니다. 트리 구축과 축소된 트리 검색 방식을 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]

@@ -9,11 +9,16 @@
 # of repeating the lists.
 
 # categories[0]. `paper`: the post reviews one paper, so it names the paper's
-# organisation in `paper_author`. `cover`: the image every post of the type uses;
-# without one, the topic's image below.
+# organisation in `paper_author`, and may give the paper's DOI in `paper_doi`
+# (10.48550/arXiv.<id> when the paper is on arXiv, else the venue's DOI)
+# for the citation count in the post's meta panel; no other type may set it.
+# Paper Surveys walk one topic through several papers in the order they came
+# out, so no single paper's keys apply. `cover`: the image every post of the
+# type uses; without one, the topic's image below.
 types:
   Paper Reviews: { paper: true }
   Paper Summaries: { paper: true }
+  Paper Surveys: {}
   Tech Guides: {}
   Insights: { cover: /assets/images/insights.jpg }
 

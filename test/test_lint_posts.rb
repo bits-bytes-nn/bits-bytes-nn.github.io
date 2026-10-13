@@ -269,5 +269,16 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint(front: FRONT.sub('"Mistral AI"', '"Google DeepMind, Google Research, Stanford"'))
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))
   end
+
+  def test_paper_doi_is_a_bare_doi_on_paper_posts_only
+    with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
+    assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))
+    assert_equal [], lint(front: with_doi.call('"10.18653/v1/2024.acl-long.1"'))
+    ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"'].each do |doi|
+      assert_finding(/paper_doi is a bare DOI/, lint(front: with_doi.call(doi)))
+    end
+    guide = with_doi.call('"10.48550/arXiv.2310.06825"').sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"')
+    assert_finding(/paper_doi is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
+  end
 end
 
