@@ -39,6 +39,13 @@ class TestLintPosts < Minitest::Test
     assert_finding(/paper_author must name/, lint(front: FRONT.sub('"Mistral AI"', '"Rasmussen et al."')))
   end
 
+  def test_an_insights_post_takes_the_type_cover
+    # Language-Models has its own image; the type's still wins.
+    front = FRONT.sub('"Paper Reviews", "Language-Models"', '"Insights", "Language-Models"').sub("paper_author: \"Mistral AI\"\n", "")
+    assert_equal [], lint(front: front.sub("language-models.jpg", "insights.jpg"))
+    assert_finding(/cover for Insights/, lint(front: front))
+  end
+
   def test_a_topic_without_an_image_takes_any_existing_one
     front = FRONT.sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"').sub("paper_author: \"Mistral AI\"\n", "")
     assert_equal [], lint(front: front.sub("language-models.jpg", "insights.jpg"))
@@ -138,7 +145,8 @@ class TestLintPosts < Minitest::Test
     assert_finding(/<img> is read as HTML/, lint("이미지 자리에 <img> 토큰이 들어갑니다.\n"))
     assert_equal [], lint("<svg width=\"10\"><rect width=\"1\"/><path d=\"M0\"/></svg>\n")
     assert_equal [], lint("<center><svg width=\"1\"></svg></center> <script src=\"https://gist.github.com/x.js\"></script>\n")
-    assert_equal [], lint("For $$i<j \\le n$$ and x<y z we sum.\n")
+    # Math is stripped first: <y> inside $$...$$ is TeX, not a tag.
+    assert_equal [], lint("For $$x<y>z$$ and x<y z we sum.\n")
     assert_equal [], lint("답변은 `<think>` 또는 \\<think\\> 태그, <br> 줄바꿈, <https://a.b> 링크.\n")
   end
 
@@ -172,6 +180,7 @@ class TestLintPosts < Minitest::Test
     # YAML reads a bare 2024 as an Integer; it is checked as text, not a crash.
     assert_equal [], lint(front: FRONT.sub('"Sliding-Window-Attention"', '2024'))
     assert_equal [], lint(front: FRONT.sub('"Sliding-Window-Attention"', '"Opt-In"'))
+    assert_equal [], lint(front: FRONT.sub('"Sliding-Window-Attention"', '"Leiden-Algorithm-for-Text"'))
   end
 
   # YAML 1.1 reads a bare `on` as true, which would drop it from the list.

@@ -296,7 +296,7 @@
     font-size: 0.75rem;
     font-family: $base-font-family;
     color: #c9d1d9;
-    background: rgba(#fff, 0.1);
+    background: mix(#fff, #272822, 10%); // opaque, over the code block's Monokai
     border: 1px solid rgba(#fff, 0.15);
     border-radius: $base-border-radius;
     cursor: pointer;
@@ -306,10 +306,13 @@
 
   .highlight:hover .code-copy,
   .code-copy:focus { opacity: 1; }
-  .code-copy:hover { background: rgba(#fff, 0.2); }
+  .code-copy:hover { background: mix(#fff, #272822, 20%); }
   // Code blocks are dark in both themes, so the ring needs the light blue here;
   // the site's $action-color ring is 2.18:1 on them.
   .code-copy:focus-visible { outline-color: #58a6ff; }
+
+  // It is opaque, so the code starts below it rather than under it.
+  .highlight:has(.code-copy) pre { padding-top: 2.6em; }
 
   // No hover on touch screens, so the button would never appear.
   @media (hover: none) {
@@ -420,10 +423,46 @@
   padding: 0;
 }
 
-// On a phone GLightbox lays the caption over the figure's foot on a fading
-// gradient; over a white figure the white text fell to 1.5:1.
-body.glightbox-mobile .glightbox-container .gslide-description {
-  background: rgba(0, 0, 0, 0.85);
+// On a phone GLightbox lays the caption over the figure's foot, where it hid
+// the bottom of a heatmap or a diagram's last row. Stack it below instead:
+// the figure takes the room the caption leaves.
+body.glightbox-mobile .glightbox-container {
+  .gslide,
+  .gslide-inner-content {
+    height: 100%;
+  }
+
+  .ginner-container {
+    height: 100%;
+    padding-top: 56px; // clear of the close button
+    box-sizing: border-box;
+    display: grid;
+    // Figure and caption centre together, the figure shrinking first.
+    grid-template-rows: minmax(0, max-content) auto;
+    align-content: center;
+  }
+
+  .gslide-media {
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gslide-image img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+  }
+
+  .gslide-description {
+    position: relative;
+    bottom: auto;
+    background: #000;
+    padding-bottom: 19px; // in place of GLightbox's mobile 50px; matches its top
+  }
 }
 
 // Opaque, but a disabled arrow (first or last slide) keeps GLightbox's dimming.

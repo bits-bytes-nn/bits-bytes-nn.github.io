@@ -36,6 +36,15 @@
     color: #e6edf3;
   }
 
+  // Inline code only: inside a highlighted block that background painted a band
+  // behind every line, over the block's own background.
+  .highlight code,
+  .highlighter-rouge pre code,
+  .post-content pre:not(.highlight) code {
+    background: none;
+    color: inherit;
+  }
+
   blockquote {
     color: $fg-muted;
     border-left-color: $border;
@@ -132,14 +141,6 @@
     &:hover { border-color: $link; }
     .post-nav-dir { color: $fg-muted; }
     .post-nav-title { color: $fg; }
-  }
-
-  // Code copy button
-  .code-copy {
-    background: rgba($fg, 0.1);
-    color: $fg;
-    border-color: $border;
-    &:hover { background: rgba($fg, 0.2); }
   }
 
   // Theme toggle button
