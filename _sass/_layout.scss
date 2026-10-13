@@ -558,13 +558,15 @@ blockquote {
 
 			// Tighter until $desktop: at 1.5em the links did not fit beside the logo
 			// from 768px to about 785px, iPad portrait included. The bar wrapped to
-			// two rows, 130px tall, and hid the top of every page beneath it.
+			// two rows, 130px tall, and hid the top of every page beneath it. 1.1em
+			// above it: seven tabs at 1.5em wrapped in the fallback font, before the
+			// web font arrives.
 			@include media ($tablet) {
 				padding-right: 1em;
 			}
 
 			@include media ($desktop) {
-				padding-right: 1.5em;
+				padding-right: 1.1em;
 			}
 
 			&.active {
@@ -587,7 +589,7 @@ blockquote {
 				}
 
 				@include media ($desktop) {
-					right: 1.5em;
+					right: 1.1em;
 				}
 			}
 		}

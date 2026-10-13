@@ -6,7 +6,7 @@ description: >-
   Full-text search across every post on this blog — by title, body, category,
   or tag.
 main_nav: true
-nav_order: 6
+nav_order: 7
 stylesheet: /css/search.css
 # An empty shell until JavaScript runs, so there is nothing here for a search
 # engine to index.

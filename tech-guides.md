@@ -8,7 +8,7 @@ description: >-
   and platforms I work with.
 # Stays in the nav even with no posts yet — see paper-summaries.md.
 main_nav: true
-nav_order: 4
+nav_order: 5
 ---
 
 {%- comment -%} No heading here — see insights.md. {%- endcomment -%}

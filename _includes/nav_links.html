@@ -1,6 +1,11 @@
+{%- comment -%}
+  `nav_title`: a shorter tab name than the page's title. The bar is 48em wide,
+  and three tabs that each began with "Paper" wrapped it to two rows. The
+  footer's site map has the room, so it passes full=true for the titles.
+{%- endcomment -%}
 {% assign nav_pages = site.pages | where: "main_nav", true | sort: "nav_order" %}
 {% for page in nav_pages %}
 <li class="nav-link">
-	<a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+	<a href="{{ page.url | prepend: site.baseurl }}">{% if include.full %}{{ page.title }}{% else %}{{ page.nav_title | default: page.title }}{% endif %}</a>
 </li>
 {% endfor %}
