@@ -39,6 +39,12 @@ class TestLintPosts < Minitest::Test
     assert_finding(/paper_author must name/, lint(front: FRONT.sub('"Mistral AI"', '"Rasmussen et al."')))
   end
 
+  def test_a_topic_without_an_image_takes_any_existing_one
+    front = FRONT.sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"').sub("paper_author: \"Mistral AI\"\n", "")
+    assert_equal [], lint(front: front.sub("language-models.jpg", "insights.jpg"))
+    assert_finding(/does not exist/, lint(front: front.sub("language-models.jpg", "nope.jpg")))
+  end
+
   def test_rejects_an_unknown_topic_and_a_wrong_cover
     assert_finding(/categories must be/, lint(front: FRONT.sub("Language-Models", "Training-&-Inference-Optimization")))
     assert_finding(/cover for Paper Reviews/, lint(front: FRONT.sub("language-models.jpg", "default.jpg")))
@@ -63,6 +69,7 @@ class TestLintPosts < Minitest::Test
   def test_math_escapes_currency_and_display_spacing
     assert_finding(/literal underscore/, lint("$$ e\\_i \\in \\mathcal{E}\\_e $$ text\n"))
     assert_equal [], lint("$$\\text{patch\\_embedding} = W x$$ text\n")
+    assert_equal [], lint("$$\\mathrm{top\\_k} = 40$$ text\n")
     assert_finding(/Korean inside/, lint("가격을 $$2로 가정할 때 총 비용이 $$5.576M입니다.\n"))
     assert_finding(/blank line before and after/, lint("Intro\n$$y = mx$$\n"))
   end
@@ -74,6 +81,11 @@ class TestLintPosts < Minitest::Test
     assert_finding(/second header row/, found)
     assert_finding(/row has 5 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 | 4 |\n"))
     assert_finding(/row has 4 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 |\n"))
+  end
+
+  # A blank first cell over numbers is a data row (a sub-row of the one above).
+  def test_a_numeric_row_with_a_blank_first_cell_is_data
+    assert_equal [], lint("| 모델 | A |\n|---|---|\n| | 85.2 |\n")
   end
 
   def test_pipes_inside_code_and_math_are_not_cell_breaks
@@ -199,6 +211,17 @@ class TestLintPosts < Minitest::Test
     other_ko = PostLint.parse("_posts/2026-02-01-y.md", "---\n#{FRONT}translation_id: x\nlang: ko\n---\nText.\n")
     assert_match(/one post in each of ko, en/, PostLint.pairs([ko, other_ko], SPEC)[ko.path].first)
     assert_match(/must set translation_id/, PostLint.pairs([ko, bare_en], SPEC)[bare_en.path].first)
+  end
+
+  def test_a_lightbox_link_opens_its_image
+    assert_finding(/not its image/, lint(%(<a href="https://arxiv.org/abs/1" class="glightbox">\n<img src="/assets/images/a.png" alt="a" />\n</a>\n)))
+    assert_equal [], lint(%(<a href="/assets/images/a.png" class="glightbox">\n<img src="/assets/images/a.png" alt="a" />\n</a>\n))
+    assert_finding(/not its image/, lint(%(<a class='glightbox wide' href='https://a.b/page'><img src='/assets/images/a.png' alt='a'></a>\n)))
+    assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox" data-glightbox="title: A -> B"><img src="/x.png" alt="a > b"></a>\n)))
+    # After a fence the finding still names its own line.
+    found = lint(%(```\nx\n```\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n))
+    assert_match(/\A13: /, found.first)
+    assert_equal [], lint(%(```html\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n```\n))
   end
 
   def test_liquid_in_the_body_needs_raw

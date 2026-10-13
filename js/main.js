@@ -147,20 +147,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Image zoom (GLightbox reads .glightbox elements). On close, focus returns to
   // the image that opened it, so a screen reader keeps its place.
+  var english = document.documentElement.lang.indexOf('en') === 0;
+
   if (window.GLightbox) {
     var opener = null;
+    // `focused` is the class GLightbox's own Tab trap looks for; without it
+    // Tab leaves the dialog.
+    var focusClose = function () {
+      var close = document.querySelector('.glightbox-container .gclose');
+      if (close) { close.focus(); close.classList.add('focused'); }
+    };
     document.addEventListener('click', function (e) {
       var link = e.target.closest && e.target.closest('.glightbox');
       if (link) opener = link; // not the lightbox's own close button
     }, true);
-    GLightbox({ selector: '.glightbox' }).on('close', function () {
+    // Below 769px GLightbox moves the arrows off-screen (swipe instead) but its
+    // Tab trap still cycles them; take them out of it there, put them back above.
+    var narrow = window.matchMedia('(max-width: 768px)');
+    var syncArrows = function () {
+      document.querySelectorAll('.glightbox-container .gprev, .glightbox-container .gnext').forEach(function (btn) {
+        if (!btn.hasAttribute('data-order')) btn.setAttribute('data-order', btn.getAttribute('data-taborder') || '');
+        if (narrow.matches) {
+          btn.removeAttribute('data-taborder');
+          btn.setAttribute('tabindex', '-1');
+          if (document.activeElement === btn) { // it just went off-screen
+            btn.classList.remove('focused');
+            focusClose();
+          }
+        } else {
+          btn.setAttribute('data-taborder', btn.getAttribute('data-order'));
+          btn.removeAttribute('tabindex');
+        }
+      });
+    };
+    var lightbox = GLightbox({ selector: '.glightbox' }); // .on() does not chain
+    lightbox.on('open', function () {
+      // A dialog: focus moves into it, and the page behind is inert to readers.
+      var box = document.querySelector('.glightbox-container');
+      if (box) {
+        box.setAttribute('aria-modal', 'true');
+        box.setAttribute('aria-label', english ? 'Image viewer' : '이미지 보기');
+      }
+      focusClose();
+      syncArrows();
+      narrow.addEventListener('change', syncArrows); // a tablet turning
+    });
+    lightbox.on('close', function () {
+      narrow.removeEventListener('change', syncArrows);
       if (opener) opener.focus();
     });
   }
 
   // Spoken, never shown, so in the page's language: a Korean voice reading
   // "Table, scrollable" is unintelligible. (The visible chrome stays English.)
-  var english = document.documentElement.lang.indexOf('en') === 0;
   function scrollerLabel(el) {
     if (el.tagName === 'PRE') return english ? 'Code block, scrollable' : '코드 블록, 가로 스크롤';
     return english ? 'Table, scrollable' : '표, 가로 스크롤';

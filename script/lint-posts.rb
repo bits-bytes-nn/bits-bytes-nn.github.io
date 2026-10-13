@@ -30,9 +30,35 @@ module PostLint
     Post.new(path, data, parts[2], parts[1].count("\n") + 3)
   end
 
+  # The file name after its date: what the permalink and translation_id use.
+  def self.slug(post)
+    File.basename(post.path, ".md").sub(/\A\d{4}-\d{2}-\d{2}-/, "")
+  end
+
   # Returns findings as "line: message" strings; empty when the post passes.
   def self.check(post, spec)
-    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + liquid(post)
+    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + liquid(post) + lightbox(post)
+  end
+
+  # A hand-written zoomable figure opens its href in the lightbox. A page there
+  # (the figure's source article) loads in an iframe the site refuses: an empty
+  # or endless box. 16 figures in the AI-ready-data pair shipped that way.
+  # Attribute values may hold `>` (a caption "A -> B"), so runs skip quoted text.
+  ATTRS = %q{(?:[^>"']|"[^"]*"|'[^']*')*}
+  LIGHTBOX = %r{<a\b#{ATTRS}\bclass=["'][^"']*\bglightbox\b[^"']*["']#{ATTRS}>\s*<img\b#{ATTRS}>}mi
+
+  def self.lightbox(post)
+    # Fenced code keeps its line count, so an example there is neither read nor
+    # shifts the line numbers after it.
+    body = post.body.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*/m) { |code| "\n" * code.count("\n") }
+    body.to_enum(:scan, LIGHTBOX).filter_map do
+      m = Regexp.last_match
+      href = m[0][/\shref=["']([^"']+)/i, 1]
+      src = m[0][/<img\b[^>]*\ssrc=["']([^"']+)/i, 1]
+      next unless href && src && href != src
+
+      "#{post.body_line + body[0, m.begin(0)].count("\n")}: a glightbox link opens #{href}, not its image; set href to #{src}"
+    end
   end
 
   # Jekyll renders a post as Liquid first, so a prompt template's {{ question }}
@@ -60,9 +86,8 @@ module PostLint
   # article and shows no language switcher.
   def self.pairs(posts, spec)
     found = Hash.new { |h, k| h[k] = [] }
-    slug = ->(post) { File.basename(post.path, ".md").sub(/\A\d{4}-\d{2}-\d{2}-/, "") }
     posts.each do |post|
-      found[post.path] << "1: an -en post must set translation_id" if slug.call(post).end_with?("-en") && !post.data["translation_id"]
+      found[post.path] << "1: an -en post must set translation_id" if slug(post).end_with?("-en") && !post.data["translation_id"]
     end
     posts.select { |p| p.data["translation_id"] }.group_by { |p| p.data["translation_id"].to_s }.each do |id, group|
       next if group.map { |p| p.data["lang"].to_s }.sort == spec["languages"].sort
@@ -142,9 +167,8 @@ module PostLint
     langs = spec["languages"]
     return ["1: a post with translation_id must set lang (#{langs.join(" or ")})"] unless langs.include?(post.data["lang"])
 
-    slug = File.basename(post.path, ".md").sub(/\A\d{4}-\d{2}-\d{2}-/, "")
     expected = post.data["lang"] == "en" ? "#{id}-en" : id
-    slug == expected ? [] : ["1: a post with translation_id #{id} is named #{expected}.md (after the date), not #{slug}.md"]
+    slug(post) == expected ? [] : ["1: a post with translation_id #{id} is named #{expected}.md (after the date), not #{slug(post)}.md"]
   end
 
   FENCE = /\A\s*(`{3,}|~{3,})/
@@ -354,7 +378,11 @@ if $PROGRAM_NAME == __FILE__
   spec = PostLint.spec
   # Every file Jekyll might read as a post, subfolders included; any but .md is
   # a finding, so a post cannot dodge the lint by its extension.
-  paths = ARGV.empty? ? Dir[File.join(PostLint::ROOT, "_posts/**/*")].select { |f| File.file?(f) }.sort : ARGV
+  # What Jekyll skips (EntryFilter#special? and #backup?): a path or file name
+  # starting with . _ # or ~ (a stray _posts/_site/ build), or ending in ~.
+  posts_dir = File.join(PostLint::ROOT, "_posts")
+  skipped = ->(f) { f.end_with?("~") || [f.delete_prefix("#{posts_dir}/"), File.basename(f)].any? { |p| p.match?(/\A[._#~]/) } }
+  paths = ARGV.empty? ? Dir[File.join(posts_dir, "**/*")].select { |f| File.file?(f) && !skipped.call(f) }.sort : ARGV
   abort "no posts found under #{PostLint::ROOT}/_posts" if paths.empty?
   parsed = {}
   findings_by_path = paths.to_h do |path|

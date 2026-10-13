@@ -135,8 +135,8 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 > URL과 다르면 그 경로를 글의 `redirect_from`에 넣고, `jekyll-redirect-from`이 그 자리에 새
 > URL로 보내는 페이지(즉시 meta refresh, 새 URL을 canonical로 지정)를 만든다. GitHub Pages는
 > 301을 보낼 수 없어서 쓰는 방식이며, Google은 이를 영구 이동으로 처리한다.
-> `validate-site.sh`가 모든 리디렉션의 목적지가 빌드에 있는지와 사이트맵에 공백 URL이 없는지를
-> 검사한다.
+> `script/check-plugin-output.rb`가 옛 URL마다 이 페이지가 있는지를, `validate-site.sh`가
+> 사이트맵에 공백 URL이 없는지를 검사한다.
 
 ### 내비게이션은 코드가 아니라 데이터가 만든다
 

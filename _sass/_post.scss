@@ -396,3 +396,37 @@
     }
   }
 }
+
+// The lightbox (GLightbox's sheet loads after this one). A figure with a
+// transparent background gets the white paper it was drawn on here too; the
+// focus ring is the site's light blue on the black overlay (GLightbox's
+// #0f3d81 reaches 1.8:1); the buttons are opaque over a wide white figure and
+// drop the padding every <button> gets (base/_buttons.scss), which squashed
+// the close icon to 18×5px.
+.glightbox-container .gslide-image img {
+  background-color: #fff;
+}
+
+// On a black band, so the ring holds 3:1 over a white figure too.
+.glightbox-container .gbtn.focused,
+.glightbox-container .gbtn:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px #000;
+}
+
+.glightbox-container.glightbox-clean .gbtn {
+  background-color: #000;
+  padding: 0;
+}
+
+// On a phone GLightbox lays the caption over the figure's foot on a fading
+// gradient; over a white figure the white text fell to 1.5:1.
+body.glightbox-mobile .glightbox-container .gslide-description {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+// Opaque, but a disabled arrow (first or last slide) keeps GLightbox's dimming.
+.glightbox-container.glightbox-clean .gbtn:not(.disabled) {
+  opacity: 1;
+}

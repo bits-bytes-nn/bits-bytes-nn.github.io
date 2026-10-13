@@ -14,8 +14,10 @@ class TestPlainText < Minitest::Test
     assert_equal "본문입니다", SearchIndex.plain_text("<p>본문입니다</p>")
   end
 
+  # A `>` inside the comment ends the generic tag pass early; only the comment
+  # pass removes all of it.
   def test_drops_html_comments
-    assert_equal "앞 뒤", SearchIndex.plain_text("<p>앞 <!-- 메모 --> 뒤</p>")
+    assert_equal "앞 뒤", SearchIndex.plain_text("<p>앞 <!-- x > y --> 뒤</p>")
   end
 
   # The reason this filter exists at all: `strip_html` left entities encoded and
@@ -51,10 +53,6 @@ class TestPlainText < Minitest::Test
   def test_drops_script_and_style_content_entirely
     assert_equal "본문", SearchIndex.plain_text("<script>var x = 1;</script><p>본문</p>")
     assert_equal "본문", SearchIndex.plain_text("<style>.a{color:red}</style><p>본문</p>")
-  end
-
-  def test_drops_comments
-    assert_equal "본문", SearchIndex.plain_text("<!-- 숨김 --><p>본문</p>")
   end
 
   def test_collapses_all_whitespace_including_newlines

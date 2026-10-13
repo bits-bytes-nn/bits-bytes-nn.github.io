@@ -5,7 +5,8 @@
 # htmlproofer validates links, images and HTML structure. It says nothing about
 # whether the site is *discoverable*: whether the sitemap and feed parse, whether
 # every page carries a usable description, or whether those descriptions are
-# distinct. Each check below corresponds to a defect this repo actually shipped.
+# distinct. Each check below guards a defect this repo shipped, or one that
+# ships with every other gate green.
 #
 # Usage: script/validate-site.sh [site_dir]   (default: _site)
 
@@ -124,8 +125,6 @@ if [ ! -f "$SITE/robots.txt" ]; then
 else
   if grep -qE '^[[:space:]]*Disallow:[[:space:]]*/[[:space:]]*$' "$SITE/robots.txt"; then
     fail "robots.txt disallows the whole site"
-  else
-    pass "robots.txt does not block crawling"
   fi
   if grep -qxF "Sitemap: $BASE_URL/sitemap.xml" "$SITE/robots.txt"; then
     pass "robots.txt points at $BASE_URL/sitemap.xml"

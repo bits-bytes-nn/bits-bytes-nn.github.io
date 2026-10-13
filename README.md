@@ -237,6 +237,8 @@ rules easiest to trip, each a page that renders wrong with every other gate gree
   a display `$$` line without blank lines around it.
 - a code fence with more than a language after the marker, or one never closed.
 - a file name that does not start with the posting day, or a `date:` after it.
+- a hand-written `<a class="glightbox">` whose `href` is not its image's `src`: the
+  lightbox loads the page in an iframe the site refuses. Credit the source in the caption.
 - an ar5iv link: ar5iv now answers a lost figure with a placeholder image and
   HTTP 200. Use `arxiv.org/html/<id>v1/…`, or copy the figure into `assets/images/`.
 
