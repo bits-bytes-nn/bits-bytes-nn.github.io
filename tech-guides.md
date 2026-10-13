@@ -1,4 +1,5 @@
 ---
+lang: en
 layout: page
 title: Tech Guides
 permalink: /tech-guides/

@@ -50,8 +50,8 @@ bundle exec jekyll serve
 Edit a file under `_posts/`, `_sass/`, or `_includes/`, save, and refresh — most
 changes appear immediately. (Changes to `_config.yml` need a server restart.)
 
-**4. Build for production** (what CI does) when you want the final output in
-`_site/`:
+**4. Build** when you want the final output in `_site/` (CI's flags are in
+`.github/workflows/jekyll.yml`; "Validate before pushing" has the local gates):
 
 ```bash
 bundle exec jekyll build
@@ -83,7 +83,7 @@ _plugins/          reading_time.rb      (KO/EN-aware read time)
                    search_index.rb      (plain_text filter for search.json)
                    legacy_urls.rb       (redirects pre-slug post URLs)
                    translations.rb      (keeps a post's translation out of the lists)
-                   posted_date.rb       (last_modified_at from the file-name date)
+                   posted_date.rb       (last_modified_at from a later file-name date)
 css/               main.scss (Sass entry point) · search.css (search page only)
 js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
                    search.js (drives the search box)
@@ -93,9 +93,12 @@ search.json        Full-text search index (consumed by simple-jekyll-search)
 test/              minitest unit tests for the _plugins/ logic
 script/            lint-posts.rb (post sources vs the conventions, before the build)
                    validate-site.sh (post-build discoverability checks)
+                   check-plugin-output.rb (each plugin hook's mark on the posts;
+                   run by validate-site.sh)
 _data/             post_conventions.yml (categories, covers, controlled and
                    retired tags — the one copy, also read by scholar-lens)
 .github/workflows/ CI: tests → lint → build → html-proofer → validate-site; deploys on push to main
+                   workflow-lint.yml: actionlint and shellcheck
 ```
 
 **Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
@@ -120,14 +123,15 @@ subtitle: "<one-line pitch>"       # optional — shown under the title in the h
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<Org>"              # the paper's org, not people; omit for Insights/opinion posts
 seo_title: "<shorter title>"       # optional — for <title> when the paper title is too long
-description: >-                    # optional — see below
+description: >-                    # optional, plain text — see below
   <search-snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
 tags: ["<Tag-1>", "<Tag-2>"]
-cover: /assets/images/<topic>.(jpg|png)
+cover: /assets/images/<topic>.(jpg|png)   # Insights: insights.jpg
 use_math: true                     # ONLY if the post has equations (loads MathJax)
 lang: ko                           # required with translation_id (ko | en)…
 translation_id: <shared-slug>      # …links a Korean post to its -en twin;
+                                   #    set on both (the lint checks the pair);
                                    #    only the Korean one is listed
 ---
 ```
@@ -148,7 +152,16 @@ enough. Write it by hand when the first paragraph opens on a pull quote or a
 disclosure note — that is, on most Insights posts.
 
 Descriptions must be **unique across the site**; CI fails the build if two pages
-share one.
+share one. They ship as plain text, so the lint rejects `$$`, `*emphasis*`,
+backticks, links and tags in them.
+
+### Dates, file names and Liquid
+
+The file name starts with the posting day (`YYYY-MM-DD-`); `date:` may be earlier
+(a paper's date) but not later. Jekyll renders every post as Liquid first, so a
+`{{ … }}` or `{% … %}` in a code block (a prompt template, a GitHub Actions
+`${{ … }}`) renders as nothing, or stops the build: wrap it in `{% raw %}…{% endraw %}`. The lint
+checks all three.
 
 ### Categories drive the URL
 
@@ -159,7 +172,8 @@ Categories are **two levels**:
   A type with no posts yet keeps its tab and renders an empty-state line: a
   missing tab reads as a section that was removed, not one still filling up.
 - `categories[1]` — the **topic**, one of the `topics` in
-  `_data/post_conventions.yml`, which also gives its cover image if it has one. When none fits,
+  `_data/post_conventions.yml`, which also gives its cover image if it has one (Insights
+  posts use the type's `insights.jpg` instead). When none fits,
   add one there first; the lint rejects any other value.
 
 Jekyll slugifies the two and combines them with the date to build the output
@@ -216,14 +230,24 @@ The lint also rejects what renders wrong:
 
 - math written `\\(…\\)` or `\\[…\\]`, or TeX next to a single `$`: Markdown
   reads the formula first, as above.
-- `\_` inside `$$…$$`: MathJax shows the backslash-underscore literally. Write
+- `\_` inside `$$…$$`: MathJax renders a literal underscore, not a subscript. Write
   `_`; escape it only inside `\text{…}`.
 - a display `$$…$$` line without a blank line before and after, in lists too:
   kramdown folds it into the paragraph as inline math.
 - Hangul inside a `$$` span: almost always two currency `$$`s read as one span.
+- `$$` math in a post without `use_math: true`: MathJax never loads, so the TeX
+  shows as text.
+- a `<name>` that is not HTML, `<s>`/`<input>`, or a bare `<img>` (a model's special token):
+  kramdown passes it through and the browser drops it. Write it in `code`.
+- a code fence with more than a language after the marker (```` ```python title="a" ````),
+  or one never closed: kramdown does not read it as a fence.
+- a tag spelled two ways across posts (`Grouped-Query-…` and `Grouped-query-…`).
+- a `|` inside `$$` in a table row: kramdown splits the cell there, and turns
+  `\|` into `|` (a norm into an absolute value). Write `\lVert … \rVert`.
 
-Inside inline math, write `\lvert … \rvert` instead of a bare `|`, which a table
-reads as a cell break.
+Inside inline math, write `\lvert … \rvert` (or `\mid`) instead of a bare `|`, and
+`\lVert … \rVert` for a norm;
+the lint catches it only in tables.
 
 ### Validate before pushing
 
@@ -236,8 +260,9 @@ ruby script/lint-posts.rb                                   # post sources follo
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # does it build clean?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-enforce-https                      # broken links, images, anchors?
+  --allow-hash-href                                         # broken links, images, anchors, http://?
 script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings
+shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml, on PRs and main
 ```
 
 > **If a check reports something impossible, look for a running `jekyll serve`
@@ -272,13 +297,9 @@ requests. In order, it:
    Markdown source,
 3. builds the site with `JEKYLL_ENV=production`,
 4. runs **html-proofer** over `_site/` (internal links, images, anchors),
-5. runs **`script/validate-site.sh`** — sitemap/feed parse at byte 0, every
-   sitemap URL under the configured `url`, a pinned build timezone, `robots.txt`
-   not blocking and naming the sitemap, at least one rendered page, exactly one `h1` per page, no
-   heading-level skips, a description and a canonical on every page, every
-   description longer than its own title, no duplicate description or title, no
-   listing page showing a translation beside its original, and no authoring
-   sources published — and
+5. runs **`script/validate-site.sh`** — the post-build checks htmlproofer does
+   not cover (sitemap, feed, metadata, headings, redirects, plugin output); the
+   script lists them — and
 6. deploys to GitHub Pages.
 
 A failure is almost always step 4 or 5; the Actions log names the exact link,

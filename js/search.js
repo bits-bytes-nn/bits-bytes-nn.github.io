@@ -171,7 +171,7 @@
     json: searchInput.getAttribute('data-index'),
     searchResultTemplate:
       '<div class="search-result">' +
-        '<h3><a href="{url}">{title}</a></h3>' +
+        '<h2><a href="{url}">{title}</a></h2>' +
         '<p class="result-meta"><span class="post-date">{date}</span>' +
         '<span class="post-category">{category}</span></p>' +
         '<p class="result-snippet">{content}</p>' +

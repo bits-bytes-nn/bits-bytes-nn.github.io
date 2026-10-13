@@ -156,9 +156,47 @@ class TestDerive < Minitest::Test
     assert_equal "text-to-SQL 정확도는 16.7%였습니다.", PostDescription.derive(md)
   end
 
-  def test_strips_math
-    md = "비용은 $$O(n^2)$$이고 \\(k\\)에 비례합니다.\n"
-    assert_equal "비용은 이고 에 비례합니다.", PostDescription.derive(md)
+  # Math that reads as text stays: dropping it left "비용은 이고". TeX commands,
+  # and characters later passes would take for markup, still go; a post whose
+  # first paragraph leans on them needs a hand-written description.
+  def test_keeps_inline_math_that_reads_as_text
+    md = "비용은 $$O(n^2)$$이고 $$k$$에 비례합니다.\n"
+    assert_equal "비용은 O(n^2)이고 k에 비례합니다.", PostDescription.derive(md)
+    assert_equal "손실은 로 정의됩니다.", PostDescription.derive("손실은 $$\\mathcal{L}$$로 정의됩니다.\n")
+    assert_equal "비교 이고 입니다.", PostDescription.derive("비교 $$p<q$$이고 $$r>s$$입니다.\n")
+  end
+
+  def test_comments_are_not_prose
+    md = "<!--\nTODO: 서론을 다시 쓸 것\n-->\n\n{::comment}\n메모\n{:/comment}\n\n본문입니다.\n"
+    assert_equal "본문입니다.", PostDescription.derive(md)
+    assert_equal "템플릿은 {{ q }} 자리입니다.", PostDescription.derive("템플릿은 {% raw %}{{ q }}{% endraw %} 자리입니다.\n")
+  end
+
+  def test_code_spans_keep_their_text
+    assert_equal "추론은 <think> 안에, a\\*b는 그대로.", PostDescription.derive("추론은 `<think>` 안에, `a\\*b`는 그대로.\n")
+  end
+
+  def test_backslash_escapes_are_text
+    assert_equal "추론은 <think> 태그 안, 비용은 $2, 이름은 a_b입니다.", PostDescription.derive("추론은 \\<think\\> 태그 안, 비용은 \\$2, 이름은 a\\_b입니다.\n")
+  end
+
+  # `\d+[.)]\s` read a Korean date opening as an ordered list and dropped it.
+  def test_a_korean_date_opening_is_prose
+    assert_equal "2024. 5. 14. 공개된 모델입니다.", PostDescription.derive("2024. 5. 14. 공개된 모델입니다.\n")
+  end
+
+  def test_a_line_break_tag_is_a_space
+    assert_equal "첫 줄 둘째 줄", PostDescription.derive("첫 줄<br>둘째 줄\n")
+  end
+
+  def test_a_paragraph_may_open_with_inline_html
+    md = "<strong>핵심</strong>은 데이터 품질입니다.\n\n둘째 문단.\n"
+    assert_equal "핵심은 데이터 품질입니다.", PostDescription.derive(md)
+    assert_equal "본문.", PostDescription.derive("<div class=\"note\">공지</div>\n\n본문.\n")
+    assert_equal "본문.", PostDescription.derive("<strong>핵심</strong>\n\n본문.\n")
+    assert_equal "핵심은 품질이고 결론도 품질", PostDescription.derive("<strong>핵심</strong>은 품질이고 결론도 <strong>품질</strong>\n")
+    assert_equal "본문.", PostDescription.derive("<small>그림 1: 구조</small>\n\n본문.\n")
+    assert_equal "본문.", PostDescription.derive("<em>공개: 저자는 <a href=\"https://aws.amazon.com\">AWS</a> 직원입니다.</em>\n\n본문.\n")
   end
 
   def test_joins_a_multiline_paragraph_with_spaces

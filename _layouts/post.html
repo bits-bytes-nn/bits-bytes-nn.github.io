@@ -18,8 +18,6 @@ layout: default
   </div>
 
   <div class="wrapper">
-    {% unless page.cover %} {% include page_divider.html %} {% endunless %}
-
     <section class="post-meta">
       <div class="post-header-info">
         <div class="post-date">
@@ -69,8 +67,8 @@ layout: default
     {%- comment -%}
       adjacent_older / adjacent_newer come from _plugins/related_posts.rb, not
       Jekyll's page.previous / page.next. The built-ins walk raw date order, and
-      every translation pair here shares a date — so "← Previous" on the newest
-      Korean post was that same article in English.
+      a translation pair sits a second apart, English first — so "← Previous" on a
+      Korean post would be that same article in English.
     {%- endcomment -%}
     {% if page.adjacent_older or page.adjacent_newer %}
     <nav class="post-nav" aria-label="Adjacent posts">

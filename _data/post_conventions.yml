@@ -1,8 +1,9 @@
 # Post conventions, as data.
 #
-# The one list of the values a post's front matter may use. script/lint-posts.rb
-# checks every post in _posts against it, in CI before the build, and
-# scholar-lens reads this same file before it opens a pull request here, so a
+# The one list of the values a post's front matter may use, and of the MathJax
+# macros head.html defines (math, below). script/lint-posts.rb checks every
+# post's front matter against it, in CI before the build, and scholar-lens
+# reads this same file before it opens a pull request here, so a
 # generated post and a hand-written one answer to the same rules. The prose
 # conventions (README.md "Writing a post", docs/tech-doc.md) point here instead
 # of repeating the lists.
@@ -28,8 +29,13 @@ topics:
 
 # Never in front matter. jekyll-feed reads `author` as the entry's author, which
 # is the site's (see _config.yml); a paper's authors go in `paper_author`.
-# `last_modified_at` is set from the file-name date (_plugins/posted_date.rb).
+# `last_modified_at` comes from a file-name date later than `date:`
+# (_plugins/posted_date.rb).
 forbidden_keys: [author, last_modified_at]
+
+# `lang` values. A translation is one post in each, sharing a translation_id;
+# the language switcher (_includes/language_switcher.html) knows these two.
+languages: [ko, en]
 
 math:
   # The macros _includes/head.html defines for MathJax on top of the standard

@@ -59,16 +59,17 @@
   border-bottom: none;
 }
 
-.search-result h3 {
+.search-result h2 {
+  font-size: 1.44em; /* the h3 size it had before it became an h2 */
   margin: 0 0 0.5em;
 }
 
-.search-result h3 a {
+.search-result h2 a {
   color: #333;
   text-decoration: none;
 }
 
-.search-result h3 a:hover {
+.search-result h2 a:hover {
   color: #2980b9;
 }
 

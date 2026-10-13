@@ -9,8 +9,8 @@
 # Both answers obey the same two eligibility rules (`eligible?`), which is why
 # they live together: never point a reader at this post's own translation, and
 # never cross languages. Jekyll's built-in `page.previous`/`page.next` know
-# neither rule, and a translation pair shares a date — so a Korean post's
-# "← Previous" would be its own English version.
+# neither rule, and a translation pair sits a second apart, English first — so
+# a Korean post's "← Previous" would be its own English version.
 #
 # A shared topic tag is required. Sharing only a category is not a reading
 # recommendation: a broad subcategory like "Paper Reviews / Language-Models"
@@ -131,7 +131,7 @@ if defined?(Jekyll::Hooks)
     end
     by_url = docs.to_h { |d| [d.url, d] }
     # Sorted here rather than trusting the collection's order, and by id as well
-    # as date because a translation pair shares its date exactly.
+    # as date so posts with the same timestamp keep one order on every build.
     ordered = meta.sort_by { |m| [RelatedPosts.sort_time(m), m[:id].to_s] }
 
     meta.each_with_index do |target, i|

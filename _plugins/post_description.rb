@@ -28,14 +28,15 @@ module PostDescription
   MIN_BOUNDARY_FRACTION = 0.6
 
   # Block-level markdown that is never prose: headings, blockquotes, list items,
-  # tables, fences, raw HTML, and reference definitions.
+  # tables, fences, block-level raw HTML (a paragraph may open with <strong>),
+  # and reference definitions.
   #
   # The ordered-list alternative is capped at two digits: `\d+[.)]\s` also matched
   # a Korean date opening ("2024. 5. 14. 공개된 …"), silently discarding the first
   # paragraph of any post written that way.
   # `{:` is a kramdown attribute list (`{: .notice}`), which styles the block
   # next to it and is not text.
-  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<|\[\^?[^\]]+\]:|\{:)/
+  SKIP_LINE = /\A(?:\#{1,6}\s|>|[-*+]\s|\d{1,2}[.)]\s|\||```|~~~|<(?!(?:abbr|b|code|em|i|q|strong)\b)|\[\^?[^\]]+\]:|\{:)/
 
   # A line of `-` or `=` under text makes that text a (setext) heading; on its
   # own, `---`/`***`/`___` is a rule. Neither is prose.
@@ -49,11 +50,15 @@ module PostDescription
   # one emphasis really spans the paragraph — not on prose that merely begins and
   # ends with emphasis ("**핵심**은 데이터입니다. 그래서 **중요합니다**"). Only the
   # delimiter that opened is excluded, so a note naming `snake_case` still counts.
-  WHOLLY_EMPHASISED = /\A(?:(\*{1,2})[^*]+\1|(_{1,2})[^_]+\2)\z/m
+  WHOLLY_EMPHASISED = %r{\A(?:(\*{1,2})[^*]+\1|(_{1,2})[^_]+\2|<(strong|b|em|i)>(?:(?!</\3>).)+</\3>)\z}m
+
+  # Comments are notes to the author; their inner lines read as prose. Raw tags
+  # are Liquid, which this hook runs before.
+  COMMENTS = %r{<!--.*?-->|\{::comment\}.*?\{:/comment\}|\{%-?\s*(?:end)?raw\s*-?%\}}m
 
   class << self
     def derive(markdown, limit = LIMIT)
-      para = first_prose_paragraph(markdown.to_s)
+      para = first_prose_paragraph(markdown.to_s.gsub(COMMENTS, ""))
       return "" if para.nil?
 
       truncate(strip_inline(para), limit)
@@ -134,7 +139,7 @@ module PostDescription
     # summary of the post.
     def accept(lines)
       candidate = lines.join(" ").strip
-      return nil if strip_inline(candidate).empty?
+      return nil if strip_inline(candidate.gsub(/\$\$.*?\$\$/m, " ")).strip.empty?
       return nil if candidate.match?(WHOLLY_EMPHASISED)
 
       candidate
@@ -142,9 +147,13 @@ module PostDescription
 
     def strip_inline(text)
       out = text.dup
-      out.gsub!(/\$\$.*?\$\$/m, " ")             # display math
-      out.gsub!(/\\\((.*?)\\\)/m, " ")           # inline math
-      out.gsub!(/`([^`]*)`/, '\1')               # code spans
+      # Math stays when it reads as text ("O(n^2)"). A TeX command would not,
+      # nor would a brace group, and `*`, `_`, `<` or `>` would be taken for
+      # markup below.
+      out.gsub!(/\$\$(.*?)\$\$/m) { Regexp.last_match(1).match?(/[\\*_<>{}]/) ? " " : Regexp.last_match(1) }
+      # Code spans and backslash escapes are text: hide them from the passes below.
+      hide = ->(text) { text.gsub(/[\\`*_{}\[\]()#+\-.!<>$|~]/) { |c| (0xE000 + c.ord).chr(Encoding::UTF_8) } }
+      out.gsub!(/`([^`]*)`/) { hide.call(Regexp.last_match(1)) }
       out.gsub!(/!\[[^\]]*\]\([^)]*\)/, " ")     # images
       out.gsub!(/\[([^\]]*)\]\([^)]*\)/, '\1')   # links -> link text
       out.gsub!(/\[\^[^\]]+\]/, "")              # footnote references
@@ -152,6 +161,7 @@ module PostDescription
       # directly to the emphasised word, so "<em>16.7%</em>였습니다" must not
       # become "16.7% 였습니다".
       out.gsub!(%r{<br\s*/?>}i, " ")
+      out.gsub!(/\\([\\`*_{}\[\]()#+\-.!<>$|~])/) { hide.call(Regexp.last_match(1)) }
       out.gsub!(/<[^>]+>/, "")                   # inline HTML
       out.gsub!(/(\*\*|__)(.*?)\1/m, '\2')       # bold
       out.gsub!(/\*(?=\S)(.*?)(?<=\S)\*/m, '\1')    # italic
@@ -160,6 +170,7 @@ module PostDescription
       # not have one: Korean attaches particles directly ("*강조*된").
       out.gsub!(/(?<![[:alnum:]])_(?=\S)(.*?)(?<=\S)_(?![[:alnum:]])/m, '\1')
       out.gsub!(/~~(.*?)~~/m, '\1')              # strikethrough
+      out.gsub!(/[\uE000-\uE07F]/) { |c| (c.ord - 0xE000).chr }
       out.gsub(/\s+/, " ").strip
     end
   end

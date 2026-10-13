@@ -6,7 +6,7 @@ plugins:
 
 feed:
   excerpt_only: true
-  posts_limit: 50  # comfortably above the post count; excerpts only, so the feed stays small
+  posts_limit: 50  # above the post count (script/check-plugin-output.rb checks); excerpts only, so the feed stays small
 
 # NOTE: the Google/Naver site-verification HTML files are intentionally NOT
 # excluded — they must be served at the site root, or Search Console / Naver
@@ -55,6 +55,10 @@ url: https://bits-bytes-nn.github.io
 # afternoon-dated posts onto the next day and 404 their live URLs. Pinned to UTC
 # because every published URL was built that way.
 timezone: UTC
+# Build posts dated later than the build. Posts here are dated 12:00 on their
+# day (21:00 KST), so a same-day merge in the Korean morning would deploy
+# without the post, and nothing rebuilds the site later. Nothing is scheduled.
+future: true
 # Slugified, so "Paper Reviews" becomes paper-reviews/ rather than the
 # space-escaped paper%20reviews/ that plain `:categories` produces. Posts first
 # published under the old form redirect from it — see _plugins/legacy_urls.rb.
@@ -68,6 +72,12 @@ logo: /assets/my_logo.png
 # which are not published either.
 sass:
   sourcemap: never
+
+# An unknown filter is an error, not a silent pass-through: without this a
+# plugin filter that fails to register renders its input (a whole post body
+# under "Read time") and every gate stays green.
+liquid:
+  strict_filters: true
 
 markdown: kramdown
 kramdown:

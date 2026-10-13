@@ -14,6 +14,10 @@ class TestPlainText < Minitest::Test
     assert_equal "본문입니다", SearchIndex.plain_text("<p>본문입니다</p>")
   end
 
+  def test_drops_html_comments
+    assert_equal "앞 뒤", SearchIndex.plain_text("<p>앞 <!-- 메모 --> 뒤</p>")
+  end
+
   # The reason this filter exists at all: `strip_html` left entities encoded and
   # the search page printed "음료 &gt; 탄산음료" to the reader.
   def test_decodes_html_entities

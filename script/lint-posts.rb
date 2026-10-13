@@ -6,22 +6,27 @@
 # currency sign read as math is just math. Each check below is a defect that
 # shipped in a post here.
 #
-# Usage: ruby script/lint-posts.rb [post.md ...]   (default: every _posts/*.md)
+# Usage: ruby script/lint-posts.rb [post.md ...]   (default: every file under _posts/)
 # Exits 1 when any post breaks a rule.
 
 require "yaml"
 require "date"
+require "time"
+require "set"
 
 module PostLint
   ROOT = File.expand_path("..", __dir__)
+  # Dates without an offset are read in the zone the site builds in, as Jekyll does.
+  ENV["TZ"] = YAML.safe_load_file(File.join(ROOT, "_config.yml"))["timezone"] || "UTC"
 
   # One parsed post: front matter, body, and the line the body starts on, so
   # findings point at the source line.
   Post = Struct.new(:path, :data, :body, :body_line)
 
   def self.parse(path, text = File.read(path))
-    parts = text.split(/^---\s*$\n?/, 3)
-    raise ArgumentError, "#{path}: no front matter" unless parts.size == 3 && parts[0].strip.empty?
+    parts = text.delete_prefix("\uFEFF").split(/^---[ \t]*\r?$\n?/, 3) # Jekyll reads bom|utf-8
+    # Jekyll reads front matter only when `---` is the first line.
+    raise ArgumentError, "#{path}: no front matter" unless parts.size == 3 && parts[0].empty?
 
     data = YAML.safe_load(parts[1], permitted_classes: [Date, Time]) || {}
     Post.new(path, data, parts[2], parts[1].count("\n") + 3)
@@ -29,12 +34,72 @@ module PostLint
 
   # Returns findings as "line: message" strings; empty when the post passes.
   def self.check(post, spec)
-    front_matter(post, spec) + tags(post, spec) + translation(post) + body(post)
+    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + use_math(post) + liquid(post)
+  end
+
+  # Jekyll renders a post as Liquid first, so a prompt template's {{ question }}
+  # in a code block renders as nothing. The Kimi K2 post shipped that way.
+  def self.liquid(post)
+    return [] if post.data["render_with_liquid"] == false
+
+    raw = false
+    post.body.split("\n", -1).each_with_index.filter_map do |line, i|
+      # Token by token: a line may close a raw span and open a bare tag.
+      hit = false
+      line.split(/(\{%-?\s*(?:end)?raw\s*-?%\})/).each do |part|
+        if (tag = part[/\A\{%-?\s*((?:end)?raw)\s*-?%\}\z/, 1])
+          raw = tag == "raw"
+        elsif !raw && part.match?(/\{\{|\{%/)
+          hit = true
+        end
+      end
+      "#{post.body_line + i}: Liquid tag in the body; unless meant as Liquid, wrap it in {% raw %} ... {% endraw %}" if hit
+    end
+  end
+
+  # MathJax loads only on posts that ask for it; without it $$...$$ ships as TeX.
+  def self.use_math(post)
+    # Code spans line by line, as body() does: one odd backtick must not pair
+    # with another paragraphs later and hide the math between them.
+    prose = post.body.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1/m, "").gsub(/(`+)[^\n]*?\1/, "")
+    prose.include?("$$") && post.data["use_math"] != true ? ["1: the post has $$ math but no use_math: true"] : []
+  end
+
+  # Across posts: a translation is a pair, one `<slug>.md` and one `<slug>-en.md`
+  # with translation_id <slug>. Half a pair lists the English post as its own
+  # article and shows no language switcher.
+  def self.pairs(posts, spec)
+    found = Hash.new { |h, k| h[k] = [] }
+    slug = ->(post) { File.basename(post.path, ".md").sub(/\A\d{4}-\d{2}-\d{2}-/, "") }
+    posts.each do |post|
+      found[post.path] << "1: an -en post must set translation_id" if slug.call(post).end_with?("-en") && !post.data["translation_id"]
+    end
+    posts.select { |p| p.data["translation_id"] }.group_by { |p| p.data["translation_id"].to_s }.each do |id, group|
+      next if group.map { |p| p.data["lang"].to_s }.sort == spec["languages"].sort
+
+      group.each { |post| found[post.path] << "1: translation_id #{id} is not on one post in each of #{spec["languages"].join(", ")}" }
+    end
+    found
   end
 
   def self.front_matter(post, spec)
     data = post.data
     found = (spec["forbidden_keys"] & data.keys).map { |k| "1: front matter key `#{k}` is not allowed" }
+    # It ships as plain text (meta, feed, home card); markup would show literally.
+    if data["description"].to_s.match?(/\$\$|\*\S[^*]*\*|`|\]\(|<[a-zA-Z\/]|\{[{%]/)
+      found << "1: description is plain text; no $$, *emphasis*, backticks, links or tags"
+    end
+
+    # Jekyll drops a file without the date prefix, and builds a `date:` past the
+    # file's day into a permanent URL. The file-name date is the posting day.
+    if (posted = File.basename(post.path)[/\A(\d{4}-\d{2}-\d{2})-/, 1])
+      # Jekyll reads a quoted date too, and builds in UTC (_config.yml).
+      date = data["date"].is_a?(String) ? (Time.parse(data["date"]) rescue nil) : data["date"]
+      day = date.respond_to?(:to_time) && date.to_time.utc.to_date
+      found << "1: date: #{day} (UTC) is after the file name's #{posted}" if day && day > Date.parse(posted)
+    else
+      found << "1: the file name starts with YYYY-MM-DD-, or Jekyll skips the post"
+    end
 
     type, topic = Array(data["categories"])
     unless Array(data["categories"]).size == 2 && spec["types"].key?(type) && spec["topics"].key?(topic)
@@ -75,12 +140,31 @@ module PostLint
     found
   end
 
+  # Tags that differ only in case are one tag to related_posts.rb but two
+  # sections, with one id, on the tags page.
+  def self.tag_cases(posts, spec)
+    found = Hash.new { |h, k| h[k] = [] }
+    spellings = (spec["tags"]["controlled"].map { |t| [t, nil] } +
+                 posts.flat_map { |p| Array(p.data["tags"]).map { |t| [t.to_s, p] } }).group_by { |t, _| t.downcase }
+    spellings.each_value do |uses|
+      forms = uses.map(&:first).uniq
+      next if forms.size == 1
+
+      uses.each { |tag, post| found[post.path] << "1: tag #{tag} is also written #{(forms - [tag]).join(", ")}" if post }
+    end
+    found
+  end
+
   # A translation lives at <original-slug>-en.md and both posts use that slug as
   # their translation_id. The pairing itself runs on the id alone (the language
   # switcher, _plugins/translations.rb); the file names keep a pair findable.
-  def self.translation(post)
+  def self.translation(post, spec)
     id = post.data["translation_id"].to_s
     return [] if id.empty?
+    # The switcher and hreflang read `lang` as written, and the switcher knows
+    # only these two; without it a Korean post links to itself as "English".
+    langs = spec["languages"]
+    return ["1: a post with translation_id must set lang (#{langs.join(" or ")})"] unless langs.include?(post.data["lang"])
 
     slug = File.basename(post.path, ".md").sub(/\A\d{4}-\d{2}-\d{2}-/, "")
     expected = post.data["lang"] == "en" ? "#{id}-en" : id
@@ -89,10 +173,26 @@ module PostLint
 
   FENCE = /\A\s*(`{3,}|~{3,})/
 
+  # kramdown passes any <name> through as an element, and the browser drops a
+  # tag it does not know: "<think> </think>" vanished from a prompt template in
+  # the DeepSeek-R1 post. A prompt token named like a form element (<input>,
+  # <output>, <template>) or <s> fares no better, so this is the HTML a post
+  # writes, not all of HTML.
+  HTML_ELEMENTS = %w[
+    a abbr audio b blockquote br caption center cite code col colgroup dd del details
+    div dl dt em figcaption figure h1 h2 h3 h4 h5 h6 hr i iframe img ins kbd li mark
+    ol p picture pre script section small source span strong sub summary sup svg
+    table tbody td tfoot th thead tr ul video wbr
+    circle defs g line path polygon polyline rect text tspan use
+  ].to_set # the last row: an inline <svg>'s children
+  # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
+  NEEDS_ATTRIBUTES = %w[a audio iframe img script source video].to_set
+
   def self.body(post)
     found = []
     lines = post.body.split("\n", -1)
     fence = nil # the marker that opened the code fence we are in
+    fence_line = nil
     block = nil # the line a still-open multi-line $$ block started on
     span = nil # the line an inline $$ span wrapped onto the next line started on
     lines.each_with_index do |line, i|
@@ -100,6 +200,10 @@ module PostLint
       if (m = line.match(FENCE))
         if fence.nil?
           fence = m[1]
+          fence_line = n
+          # kramdown's GFM fence takes one word after the marker; with more it
+          # renders the whole block as inline code.
+          found << "#{n}: code fence info has a space; write just the language" if line.strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
         elsif line.strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
           fence = nil
         end
@@ -131,16 +235,23 @@ module PostLint
       span = (span ? nil : n) if odd
 
       found << "#{n}: H1 in the body; the layout renders the title" if line.match?(/\A# \S/)
+      # A whole tag, outside code and math: `i<j` and `$$a<b$$` are text.
+      text = unquote(line).gsub(/`[^`]*`/, "").gsub(/\$\$.*?\$\$/, "")
+      tags = text.scan(%r{(?<!\\)<(/?)([a-zA-Z][\w-]*)(\s[^<>]*)?/?>})
+      if (tag = tags.find { |close, name, attrs| !HTML_ELEMENTS.include?(name.downcase) || (close.empty? && attrs.to_s.strip.empty? && NEEDS_ATTRIBUTES.include?(name.downcase)) }&.[](1))
+        found << "#{n}: <#{tag}> is read as HTML, so it does not show as text; write it in `code` or as \\<#{tag}\\>"
+      end
       found.concat(math(line, n, lines, i))
       found.concat(table(lines, i, n)) if table_start?(lines, i)
     end
     found << "#{block}: $$ block never closed" if block
+    found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)" if fence
     found << "#{span}: unbalanced $$ in the paragraph" if span
     found
   end
 
   # Brace groups whose content is text, not math: escapes and Korean belong there.
-  TEXT_GROUP = /\\(?:text\w*|mathrm|operatorname)\{/
+  TEXT_GROUP = /\\(?:text\w*|mathrm|mathtt|operatorname)\{/
 
   def self.without_text_groups(math)
     out = +""
@@ -232,6 +343,12 @@ module PostLint
     if first && first[0].empty? && first.none? { |c| c.match?(/\A[-+]?[\d.,]+%?\z/) }
       found << "#{n + 2}: table row under the header is a second header row; merge it into the header"
     end
+    ([lines[i]] + rows).each_with_index do |row, k|
+      # kramdown splits the cell at |, and turns \| into | (a norm into an absolute value).
+      next unless row.gsub(/`[^`]*`/, "").scan(/\$\$(.*?)\$\$/).flatten.any? { |m| m.include?("|") }
+
+      found << "#{k.zero? ? n : n + 1 + k}: a | inside $$ in a table breaks it; write \\mid, \\lvert...\\rvert or \\lVert...\\rVert"
+    end
     rows.each_with_index do |row, k|
       count = cells(row).size
       found << "#{n + 2 + k}: table row has #{count} cells, the header #{header.size}" if count > header.size
@@ -246,15 +363,32 @@ end
 
 if $PROGRAM_NAME == __FILE__
   spec = PostLint.spec
-  paths = ARGV.empty? ? Dir[File.join(PostLint::ROOT, "_posts/*.md")].sort : ARGV
-  failed = 0
-  paths.each do |path|
+  # Every file Jekyll might read as a post, subfolders included; any but .md is
+  # a finding, so a post cannot dodge the lint by its extension.
+  paths = ARGV.empty? ? Dir[File.join(PostLint::ROOT, "_posts/**/*")].select { |f| File.file?(f) }.sort : ARGV
+  abort "no posts found under #{PostLint::ROOT}/_posts" if paths.empty?
+  parsed = {}
+  findings_by_path = paths.to_h do |path|
     findings =
       begin
-        PostLint.check(PostLint.parse(path), spec)
+        if File.extname(path) == ".md"
+          post = parsed[path] = PostLint.parse(path)
+          PostLint.check(post, spec)
+        else
+          ["1: a post is a .md file"]
+        end
       rescue StandardError, Psych::Exception => e
         ["1: could not be checked: #{e.message}"]
       end
+    [path, findings]
+  end
+  # Pairs need every post; a run on named files checks those files alone.
+  if ARGV.empty?
+    PostLint.pairs(parsed.values, spec).each { |path, f| findings_by_path[path].concat(f) }
+    PostLint.tag_cases(parsed.values, spec).each { |path, f| findings_by_path[path].concat(f.uniq) }
+  end
+  failed = 0
+  findings_by_path.each do |path, findings|
     next if findings.empty?
 
     failed += 1
