@@ -41,3 +41,7 @@ _site
 .idea/
 .run/
 _posts_bak/
+
+# Editor and toolchain leftovers
+node_modules/
+.vscode/

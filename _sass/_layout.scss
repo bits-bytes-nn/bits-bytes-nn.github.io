@@ -123,9 +123,13 @@ blockquote {
 // Rouge code blocks (.highlight wraps <pre><code>); theme colors live in _syntax.scss
 .highlight pre,
 .highlighter-rouge .highlight {
-	font-size: 0.9em; // ~14.4px on 16px body — was modular-scale(-1) (13.3px), too small
 	line-height: 1.6;
 	border-radius: $base-border-radius;
+}
+
+// On the <pre> only: set on its wrapper too, the two 0.9em compounded to 0.81em.
+.highlight pre {
+	font-size: 0.9em; // ~14.4px on 16px body — was modular-scale(-1) (13.3px), too small
 }
 
 .highlight pre.highlight {
@@ -210,10 +214,23 @@ blockquote {
 	margin-bottom: $base-spacing;
 }
 
+// A fence in a language Rouge does not know (```cedar) is a bare <pre><code>:
+// give it the same dark panel as a highlighted block.
+.post-content pre:not(.highlight) {
+	background: #272822;
+	color: #f8f8f2;
+	padding: 1em 1.2em;
+	border-radius: $base-border-radius;
+	overflow-x: auto;
+	font-size: 0.9em;
+	line-height: 1.6;
+}
+
 // Reset the inline-`code` chip styling inside fenced blocks, so the gray inline
 // background/padding doesn't paint over Rouge's dark code-block theme.
 .highlight code,
-.highlighter-rouge pre code {
+.highlighter-rouge pre code,
+.post-content pre:not(.highlight) code {
 	display: inline;
 	background: none;
 	padding: 0;
@@ -916,5 +933,38 @@ blockquote {
 	html {
 		color-scheme: light;
 		background: #fff !important;
+	}
+
+	// Paper has no horizontal scroll: wrap code and shrink wide tables to fit, and
+	// shrink display math (a very wide equation can still clip). The cover's
+	// padding goes with the cover.
+	.post-content pre,
+	.post-content pre code {
+		white-space: pre-wrap !important;
+		overflow-wrap: anywhere;
+		overflow: visible !important;
+	}
+
+	.post-content .table-container table {
+		font-size: 0.75em;
+	}
+
+	// No copy button on paper, so none of the room kept for it.
+	.post-content .highlight pre {
+		padding-top: 1em !important;
+	}
+
+	.post-content .table-container th,
+	.post-content .table-container td {
+		word-break: normal;
+		overflow-wrap: anywhere;
+	}
+
+	.post-content mjx-container[display="true"] {
+		font-size: 80% !important;
+	}
+
+	.post-header-container .scrim.has-cover {
+		padding: 1em !important;
 	}
 }

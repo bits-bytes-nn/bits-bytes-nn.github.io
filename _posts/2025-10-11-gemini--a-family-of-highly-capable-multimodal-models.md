@@ -1493,7 +1493,7 @@ plt.show()
 
 #### 비디오 이해 및 추론
 
-![축구 페널티킥 장면](/assets/2025-10-11-gemini--a-family-of-highly-capable-multimodal-models/28.png)
+![축구 페널티킥 장면](/assets/2025-10-11-gemini--a-family-of-highly-capable-multimodal-models/28.jpg)
 
 비디오 이해 및 추론 예시에서 모델은 축구 페널티킥 비디오를 분석하고 기술 향상을 위한 권장사항을 제공했습니다. 여기서는 시각화 목적으로만 이미지가 제공되었지만, 실제로는 비디오가 텍스트 프롬프트와 함께 모델에 입력되었습니다.
 

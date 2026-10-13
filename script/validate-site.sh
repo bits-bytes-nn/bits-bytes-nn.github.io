@@ -159,6 +159,10 @@ else
   pass "$page_count rendered pages found"
 fi
 
+# Characters, not bytes, whatever the caller's locale (C.UTF-8 is on macOS and
+# the Ubuntu runners alike).
+chars() { local LC_ALL=C.UTF-8; printf %s "${#1}"; }
+
 extract_meta() { # file, meta-name
   grep -m1 -oE "<meta name=\"$2\" content=\"[^\"]*\"" "$1" 2>/dev/null |
     sed -E "s/.*content=\"//; s/\"$//"
@@ -178,8 +182,8 @@ while IFS= read -r f; do
   h1=$(grep -oE '<h1[^>]*>' "$f" | grep -c .)
   [ "$h1" = "1" ] || bad_h1="$bad_h1$h1  $f"$'\n'
   t=$(grep -m1 -oE '<title>[^<]*</title>' "$f" | sed -E 's|</?title>||g')
-  if [ -n "$d" ] && [ "${#d}" -le "${#t}" ]; then
-    short_desc="$short_desc${#d} vs ${#t}  $f"$'\n'"          title: $t"$'\n'"          desc : $d"$'\n'
+  if [ -n "$d" ] && [ "$(chars "$d")" -le "$(chars "$t")" ]; then
+    short_desc="$short_desc$(chars "$d") vs $(chars "$t")  $f"$'\n'"          title: $t"$'\n'"          desc : $d"$'\n'
   fi
   descs="$descs$d"$'\n'
   titles="$titles<title>$t</title>"$'\n'
