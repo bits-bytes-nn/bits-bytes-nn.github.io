@@ -54,7 +54,7 @@ DeepSeekMath-RL 7B는 경쟁 수준의 MATH 벤치마크에서 51.7%의 정확�
 
 DeepSeekMath의 수학적 추론 능력은 두 가지 핵심 요소에 기인합니다. 첫째, 세심하게 설계된 데이터 선택 파이프라인을 통해 공개적으로 사용 가능한 웹 데이터의 잠재력을 활용합니다. 둘째, 근접 정책 최적화(Proximal Policy Optimization, PPO)의 변형인 그룹 상대 정책 최적화(Group Relative Policy Optimization, GRPO)를 도입하여 수학적 추론 능력을 향상시키는 동시에 PPO의 메모리 사용량을 최적화합니다.
 
-![MATH 벤치마크에서 오픈소스 모델의 Top1 정확도](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/figures/Math.png)
+![MATH 벤치마크에서 오픈소스 모델의 Top1 정확도](https://arxiv.org/html/2402.03300v1/figures/Math.png)
 
 그림 1: 외부 도구와 투표 기법을 사용하지 않고 경쟁 수준의 MATH 벤치마크(Hendrycks 등, 2021)에서 오픈소스 모델의 Top1 정확도.
 
@@ -122,7 +122,7 @@ DeepSeekMath-Base는 DeepSeek-Coder-Base-v1.5 7B(Guo 등, 2024)로 초기화되�
 
 이 섹션에서는 Common Crawl에서 DeepSeekMath 코퍼스를 구축하는 과정을 설명합니다. 그림 2에서 볼 수 있듯이, 시드 코퍼스(예: 고품질의 소규모 수학 관련 데이터셋 모음)에서 시작하여 Common Crawl에서 대규모 수학 코퍼스를 체계적으로 수집하는 반복적인 파이프라인을 제시합니다. 이 접근 방식은 코딩과 같은 다른 도메인에도 적용할 수 있습니다.
 
-![Common Crawl 데이터셋에서 수학적 웹 페이지를 수집하는 반복적인 파이프라인](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/x1.png)
+![Common Crawl 데이터셋에서 수학적 웹 페이지를 수집하는 반복적인 파이프라인](https://arxiv.org/html/2402.03300v1/x1.png)
 
 그림 2: Common Crawl에서 수학적 웹 페이지를 수집하는 반복적인 파이프라인.
 
@@ -172,7 +172,7 @@ DeepSeekMath 코퍼스는 고품질이며, 다국어 수학적 콘텐츠를 포�
 
 표 1: 다양한 수학적 코퍼스에서 학습된 DeepSeek-LLM 1.3B의 성능, 퓨 샷 체인 오브 소트 프롬프팅을 사용하여 평가됨. 코퍼스 크기는 100K 어휘 크기의 토크나이저를 사용하여 계산됨.
 
-![다양한 수학적 코퍼스에서 학습된 DeepSeek-LLM 1.3B의 벤치마크 곡선](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/figures/corpus_comparisons.png)
+![다양한 수학적 코퍼스에서 학습된 DeepSeek-LLM 1.3B의 벤치마크 곡선](https://arxiv.org/html/2402.03300v1/figures/corpus_comparisons.png)
 
 그림 3: 다양한 수학적 코퍼스에서 학습된 DeepSeek-LLM 1.3B의 벤치마크 곡선.
 
@@ -337,7 +337,7 @@ $$ r_{t}=r_{\varphi}(q,o_{\leq t})-\beta\log\frac{\pi_{\theta}(o_{t}|q,o_{<t})}{
 
 여기서 $$r_{\varphi}$$는 보상 모델, $$\pi_{ref}$$는 참조 모델(일반적으로 초기 SFT 모델)이며, $$\beta$$는 KL 페널티의 계수입니다.
 
-![PPO와 GRPO의 비교](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/x2.png)
+![PPO와 GRPO의 비교](https://arxiv.org/html/2402.03300v1/x2.png)
 
 그림 4: PPO와 GRPO의 비교. GRPO는 가치 모델을 사용하지 않고 대신 그룹 점수에서 기준선을 추정하여 학습 리소스를 크게 줄입니다.
 
@@ -466,11 +466,11 @@ $$ \nabla_\theta \mathcal{J}_\mathcal{A}(\theta) = \mathbb{E}_{(q, o) \sim \math
 * 온라인 거부 샘플링 미세 조정(Online RFT): RFT와 달리, Online RFT는 SFT 모델을 사용하여 정책 모델을 초기화하고 실시간 정책 모델에서 샘플링된 증강 출력으로 미세 조정합니다.
 * PPO/GRPO: PPO/GRPO는 SFT 모델을 사용하여 정책 모델을 초기화하고 실시간 정책 모델에서 샘플링된 출력으로 강화합니다.
 
-![이 그림은 두 벤치마크에서 다양한 방법으로 추가 학습된 DeepSeekMath-Instruct 1.3B 모델의 성능을 보여줍니다. 라인 플롯은 RFT, Online RFT, GRPO+OS, GRPO+PS와 같은 다양한 메트릭의 추세와 변동을 보여주어 모델 성능에 대한 비교 분석을 가능하게 합니다.](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/x3.png)
+![이 그림은 두 벤치마크에서 다양한 방법으로 추가 학습된 DeepSeekMath-Instruct 1.3B 모델의 성능을 보여줍니다. 라인 플롯은 RFT, Online RFT, GRPO+OS, GRPO+PS와 같은 다양한 메트릭의 추세와 변동을 보여주어 모델 성능에 대한 비교 분석을 가능하게 합니다.](https://arxiv.org/html/2402.03300v1/x3.png)
 
 그림 5: 다양한 방법으로 추가 학습된 DeepSeekMath-Instruct 1.3B 모델의 두 벤치마크에서의 성능.
 
-![이 그림은 DeepSeekMath-Instruct 7B 모델을 사용한 반복적 강화 학습의 두 벤치마크에서의 성능을 보여줍니다. 주요 시각화는 학습 과정의 세 가지 다른 반복에 대한 성능 메트릭(정확도 또는 보상)을 표시하는 라인 플롯입니다. 핵심 기술적 구성 요소는 모델 성능이 연속적인 개선 단계를 통해 어떻게 발전하는지 보여주는 세 가지 반복으로, 다른 색상의 선으로 표시됩니다.](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/x4.png)
+![이 그림은 DeepSeekMath-Instruct 7B 모델을 사용한 반복적 강화 학습의 두 벤치마크에서의 성능을 보여줍니다. 주요 시각화는 학습 과정의 세 가지 다른 반복에 대한 성능 메트릭(정확도 또는 보상)을 표시하는 라인 플롯입니다. 핵심 기술적 구성 요소는 모델 성능이 연속적인 개선 단계를 통해 어떻게 발전하는지 보여주는 세 가지 반복으로, 다른 색상의 선으로 표시됩니다.](https://arxiv.org/html/2402.03300v1/x4.png)
 
 그림 6: DeepSeekMath-Instruct 7B를 사용한 반복적 강화 학습의 두 벤치마크에서의 성능.
 
@@ -490,7 +490,7 @@ $$ \nabla_\theta \mathcal{J}_\mathcal{A}(\theta) = \mathbb{E}_{(q, o) \sim \math
 
 또한 반복적 RL을 탐색하며, 실험에서는 두 라운드의 반복을 수행합니다. 그림 6에서 볼 수 있듯이, 반복적 RL은 특히 첫 번째 반복에서 성능을 크게 향상시키는 것을 알 수 있습니다.
 
-![GSM8K와 MATH에서 SFT와 RL DeepSeekMath 7B의 Maj@K와 Pass@K(온도 0.7). RL은 Pass@K가 아닌 Maj@K를 향상시키는 것으로 나타났습니다.](https://ar5iv.labs.arxiv.org//html/2402.03300/assets/x5.png)
+![GSM8K와 MATH에서 SFT와 RL DeepSeekMath 7B의 Maj@K와 Pass@K(온도 0.7). RL은 Pass@K가 아닌 Maj@K를 향상시키는 것으로 나타났습니다.](https://arxiv.org/html/2402.03300v1/x5.png)
 
 그림 7: GSM8K와 MATH에서 SFT와 RL DeepSeekMath 7B의 Maj@K와 Pass@K(온도 0.7). RL은 Pass@K가 아닌 Maj@K를 향상시키는 것으로 나타났습니다.
 

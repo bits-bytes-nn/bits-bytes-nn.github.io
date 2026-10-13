@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 #
 # Checks that the _plugins/ hooks that change a post's page left their mark,
-# and that kramdown parsed the post's block HTML.
+# that kramdown parsed the post's block HTML, that no listing shows a
+# translation beside its original, that no page repeats an id, and that the
+# feed has room for every post.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
@@ -81,11 +83,33 @@ posts.each do |post|
   # the element open over the rest of the post. A closing tag the author
   # escaped on purpose (\</div\> or &lt;/div&gt;, outside code) is text too.
   prose = html[%r{<article class="post-content">.*</article>}m].to_s.gsub(%r{<(pre|code|script)\b.*?</\1>}m, "")
-  source = post.content.gsub(/^(`{3,}|~{3,}).*?^\1/m, "").gsub(/`[^`\n]*`/, "")
+  source = post.content.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1/m, "").gsub(/(`+)[^\n]*?\1/, "")
   broken = %w[blockquote center details div figcaption figure section span summary].find do |tag|
     prose.scan("&lt;/#{tag}&gt;").size > source.scan(%r{\\</#{tag}\\?>|&lt;/#{tag}&gt;}).size
   end
   problems << "#{name}: </#{broken}> shows as text; put block HTML tags on their own lines" if broken
+end
+
+# Not a hook either: a translation pair is one article, so the listings show
+# only the original (_plugins/translations.rb). A listing that skips the
+# `listed` filter shows the English twin again. Twins come from front matter,
+# so a missing hook cannot hide them from this check.
+twins = posts.select { |p| p.data["translation_id"] && lang.call(p) != site.config["lang"] }.map(&:url)
+Dir.glob(File.join(site_dir, "**/*.html")).each do |file|
+  html = File.read(file, encoding: "UTF-8")
+  next if !html.include?("<!DOCTYPE html>") || html.include?(%(http-equiv="refresh"))
+
+  # One id per page: a tag spelled two ways (Grouped-query- / Grouped-Query-)
+  # makes two tag sections with one id, and the anchor jumps to the first.
+  ids = html.gsub(%r{<(pre|code)\b.*?</\1>}m, "").scan(/\sid="([^"]+)"/).flatten
+  if (dup = ids.tally.find { |_, count| count > 1 })
+    problems << "#{file.delete_prefix(site_dir)}: id \"#{dup[0]}\" is used #{dup[1]} times"
+  end
+  next if html.include?(%(property="og:type" content="article")) # a post's prev/next may name a twin
+
+  twins.each do |url|
+    problems << "#{file.delete_prefix(site_dir)}: lists the translation #{url}" if html.include?(%(href="#{site.baseurl}#{url}")) || html.include?(%(href="#{site.config["url"]}#{site.baseurl}#{url}"))
+  end
 end
 
 puts problems

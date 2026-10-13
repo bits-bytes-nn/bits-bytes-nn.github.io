@@ -86,7 +86,7 @@ Copilot과 ChatGPT가 실전에서 가능성을 증명하는 한편, 학계에�
 
 GSM8K(초등학교 수학) 벤치마크에서 PaLM 540B의 정확도가 17.9%에서 58.1%로 뛰었습니다. 중간 추론 과정을 "보여달라"고 요구했을 뿐인데, 산술·상식·상징적 추론 성능이 비약적으로 향상된 겁니다. 프롬프트 한 줄의 위력이 증명된 순간이었습니다.
 
-![Chain-of-Thought 프롬프팅: 일반 프롬프트(좌)와 CoT 프롬프트(우)의 차이 — Wei et al., 2022](https://ar5iv.labs.arxiv.org/html/2201.11903/assets/x1.png)
+![Chain-of-Thought 프롬프팅: 일반 프롬프트(좌)와 CoT 프롬프트(우)의 차이 — Wei et al., 2022](/assets/images/evolution-of-ai-agentic-patterns-arxiv-x1.png)
 
 **ReAct: 추론과 행동의 결합** — [Yao et al., 2022](https://arxiv.org/abs/2210.03629). 같은 해 10월, 프린스턴-Google 팀이 한 단계 더 나아갔습니다. CoT가 "생각만 하는" 패턴이었다면, ReAct는 생각(Thought)과 행동(Action)을 번갈아 수행하게 합니다. 모델이 스스로 위키피디아를 검색하고, 결과를 관찰(Observation)하고, 다시 추론하는 루프입니다.
 

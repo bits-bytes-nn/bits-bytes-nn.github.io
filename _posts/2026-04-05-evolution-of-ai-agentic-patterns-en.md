@@ -86,7 +86,7 @@ While Copilot and ChatGPT were proving the concept in the field, academia was wr
 
 On GSM8K (grade-school math), PaLM 540B's accuracy jumped from 17.9% to 58.1%. Just by asking the model to "show its work," arithmetic, commonsense, and symbolic reasoning performance leapt. The power of a single prompt line, proven.
 
-![Chain-of-Thought prompting: standard prompt (left) vs. CoT prompt (right) — Wei et al., 2022](https://ar5iv.labs.arxiv.org/html/2201.11903/assets/x1.png)
+![Chain-of-Thought prompting: standard prompt (left) vs. CoT prompt (right) — Wei et al., 2022](/assets/images/evolution-of-ai-agentic-patterns-arxiv-x1.png)
 
 **ReAct: Combining Reasoning and Acting** — [Yao et al., 2022](https://arxiv.org/abs/2210.03629). In October of the same year, a Princeton-Google team took it further. If CoT was "thinking only," ReAct alternates between Thought and Action. The model searches Wikipedia on its own, observes the result, then reasons again — a loop.
 

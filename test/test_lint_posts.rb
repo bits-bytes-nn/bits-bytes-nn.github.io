@@ -73,10 +73,16 @@ class TestLintPosts < Minitest::Test
     assert_finding(/empty cell/, found)
     assert_finding(/second header row/, found)
     assert_finding(/row has 5 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 | 4 |\n"))
+    assert_finding(/row has 4 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 |\n"))
   end
 
   def test_pipes_inside_code_and_math_are_not_cell_breaks
     assert_equal [], lint("| Flag | Tool |\n|---|---|\n| `A` \\|\\| `B` | `$$\\lvert x \\rvert$$` |\n")
+  end
+
+  def test_no_ar5iv_links
+    assert_finding(/ar5iv link/, lint("![그림](https://ar5iv.labs.arxiv.org//html/2310.06825/assets/x1.png)\n"))
+    assert_equal [], lint("![그림](https://arxiv.org/html/2401.04088v1/x1.png)\n")
   end
 
   def test_a_body_h1_outside_code
@@ -101,6 +107,8 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("Intro.\n\n$$y = \\begin{cases}\n1 & x > 0 \\\\\n0\n\\end{cases}$$\n\nTail.\n")
     assert_finding(/literal underscore/, lint("Intro.\n\n$$y = \\begin{cases}\ne\\_i\n\\end{cases}$$\n\nTail.\n"))
     assert_finding(/unbalanced/, lint("가격은 $$5입니다.\n\n다음 문단.\n"))
+    # Two stray $$ in two paragraphs do not pair up.
+    assert_equal 2, lint("가격은 $$5입니다.\n\n비용은 $$3입니다.\n").grep(/unbalanced/).size
     assert_equal [], lint("식 $$a +\n\\frac{1}{b}$$ 입니다.\n")
     assert_equal [], lint("> 인용\n>\n> $$\n> a = b\n> $$\n>\n> 끝\n")
     assert_finding(/blank line before and after/, lint("> 문장\n> $$x=1$$\n> 문장\n"))
@@ -111,6 +119,7 @@ class TestLintPosts < Minitest::Test
 
   def test_a_non_html_tag_renders_as_nothing
     assert_finding(/<think> is read as HTML/, lint("답변은 <think> 태그로 감쌉니다.\n"))
+    assert_equal [], lint("Write ``$$`` to open math, and `` `<think>` `` in prose.\n")
     assert_finding(/<s> is read as HTML/, lint("문장 앞에 <s>를 붙입니다.\n"))
     assert_finding(/<input> is read as HTML/, lint("질문은 <input>에 넣습니다.\n"))
     assert_equal [], lint("모델은 \\<think> 로 시작합니다.\n")
@@ -136,6 +145,7 @@ class TestLintPosts < Minitest::Test
     assert_finding(/write \$\$/, lint("별표(\\\\(*\\\\))는 \\\\(\\phi^{*}\\\\)입니다.\n"))
     assert_finding(/write \$\$/, lint("Intro.\n\n\\\\[ y = x \\\\]\n\nTail.\n"))
     assert_finding(/single `\$`/, lint("/\\pi_{\\text{ref}}$를 초기화합니다.\n"))
+    assert_finding(/single `\$`/, lint("정책 $\\pi$를 초기화합니다.\n"))
     # A line break inside display math, a price, and code are not the defect.
     assert_equal [], lint("Intro.\n\n$$a \\\\[4pt] b$$\n\nTail.\n")
     assert_equal [], lint("It cost $10.2B and `\\\\(x\\\\)` is how not to write it.\n")
@@ -180,13 +190,6 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("| Syntax | Example |\n|---|---|\n| `$$` | $$\\lvert x \\rvert$$ |\n")
   end
 
-  def test_a_tag_is_spelled_one_way
-    a = PostLint.parse("_posts/2026-01-01-a.md", "---\n#{FRONT}---\nText.\n")
-    b = PostLint.parse("_posts/2026-01-02-b.md", "---\n#{FRONT.sub('"Sliding-Window-Attention"', '"Sliding-window-Attention"')}---\nText.\n")
-    assert_match(/also written Sliding-Window-Attention/, PostLint.tag_cases([a, b], SPEC)[b.path].first)
-    assert_empty PostLint.tag_cases([a], SPEC)
-  end
-
   def test_a_translation_is_a_pair
     ko = PostLint.parse("_posts/2026-01-01-x.md", "---\n#{FRONT}translation_id: x\nlang: ko\n---\nText.\n")
     en = PostLint.parse("_posts/2026-01-01-x-en.md", "---\n#{FRONT}translation_id: x\nlang: en\n---\nText.\n")
@@ -209,6 +212,7 @@ class TestLintPosts < Minitest::Test
 
   def test_dates_and_file_names
     assert_finding(/after the file name/, lint(front: "#{FRONT}date: 2025-03-01 12:00:00\n"))
+    assert_finding(/after the file name/, lint(front: "#{FRONT}date: 2025-02-28\n"))
     assert_finding(/after the file name/, lint(front: "#{FRONT}date: \"2025-03-01 12:00:00\"\n"))
     assert_finding(/after the file name/, lint(front: "#{FRONT}date: 2025-02-27 20:00:00 -0800\n"))
     assert_equal [], lint(front: "#{FRONT}date: 2025-02-28 01:00:00 +0900\n")
@@ -219,6 +223,7 @@ class TestLintPosts < Minitest::Test
   def test_description_is_plain_text
     assert_finding(/plain text/, lint(front: "#{FRONT}description: \"비용은 $$O(n)$$입니다\"\n"))
     assert_finding(/plain text/, lint(front: "#{FRONT}description: \"R1은 <think> 블록을 씁니다\"\n"))
+    assert_finding(/plain text/, lint(front: "#{FRONT}description: \"*강조*된 `코드`와 [링크](https://a.b)\"\n"))
     assert_finding(/plain text/, lint(front: "#{FRONT}description: \"{{ question }} 자리\"\n"))
     assert_equal [], lint(front: "#{FRONT}description: \"Mixtral 8*7B와 C++ [1]\"\n")
   end

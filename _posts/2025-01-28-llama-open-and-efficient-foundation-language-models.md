@@ -89,7 +89,7 @@ $$\text{RoPE}(x, p)_{i,i+1} = [x_i\cos(p\theta_i) - x_{i+1}\sin(p\theta_i), x_i\
   
 여기서 $$\theta_i = 10000^{-2i/d}$$이며, $$p$$는 위치, $$d$$는 임베딩 차원입니다. 이 방식은 각 차원 쌍에 회전 변환을 적용하여 위치 정보를 인코딩합니다.
 
-![Training Loss Graph](https://ar5iv.labs.arxiv.org//html/2302.13971/assets/x1.png)
+![Training Loss Graph](/assets/images/llama-open-and-efficient-foundation-language-models-arxiv-x1.png)
 
 위 그래프는 7B, 13B, 33B, 65B 파라미터를 가진 네 가지 LLaMA 모델의 학습 손실을 보여줍니다. 33B와 65B 모델은 1.4T 토큰으로 학습되었으며, 작은 모델들은 1.0T 토큰으로 학습되었습니다. 모든 모델은 4M 토큰의 배치 크기로 학습되었습니다. 그래프에서 볼 수 있듯이, 더 큰 모델들(33B와 65B)이 더 많은 데이터로 학습되었을 때 더 작은 모델들(7B와 13B)에 비해 더 낮은 학습 손실을 달성했습니다. 이는 모델 크기와 데이터 규모가 증가할수록 성능이 향상된다는 것을 보여줍니다.
 
@@ -139,7 +139,7 @@ LLaMA 모델의 성능을 평가하기 위해 제로 샷과 퓨 샷 과제를 �
 
 Natural Questions와 TriviaQA 두 가지 클로즈 북 문답 벤치마크에서 성능을 평가했습니다. 두 벤치마크 모두에서 정확한 일치(exact match) 성능을 측정했으며, 근거 문서에 접근할 수 없는 클로즈 북 설정에서 평가를 진행했습니다. LLaMA-65B는 제로 샷과 퓨 샷 설정 모두에서 최고 수준의 성능을 달성했습니다. 더욱 중요한 점은 LLaMA-13B가 5-10배 더 작은 크기임에도 불구하고 GPT-3와 Chinchilla와 비슷한 수준의 성능을 보였다는 것입니다. 이 모델은 추론 시 단일 V100 GPU에서도 실행이 가능합니다.
 
-![성능 비교 그래프](https://ar5iv.labs.arxiv.org//html/2302.13971/assets/x2.png)
+![성능 비교 그래프](/assets/images/llama-open-and-efficient-foundation-language-models-arxiv-x2.png)
 
 위 그래프는 LLaMA의 다양한 버전(7B, 13B, 33B, 65B 파라미터)과 Chinchilla 모델의 문답 및 상식 추론 과제에서의 학습 중 성능 변화를 보여줍니다. 대체로 더 큰 모델이 더 나은 성능을 보이며, 특히 65B 파라미터 모델이 가장 우수한 결과를 달성했습니다. 이는 모델 규모가 이러한 추론 과제에서 중요한 역할을 한다는 것을 시사합니다.
 ### 독해 능력
