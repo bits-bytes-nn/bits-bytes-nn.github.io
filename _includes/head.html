@@ -83,7 +83,7 @@
 		})();
 	</script>
 
-	<title>{{ html_title }}</title>
+	<title>{{ html_title | escape }}</title>
 	<meta name="description" content="{{ page_description | escape }}" />
 	{% if site.author %}
 	<meta name="author" content="{{ site.author }}" />

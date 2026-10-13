@@ -48,7 +48,7 @@ jobs:
       # together. If this assumption is ever wrong the build job fails and
       # `deploy` (needs: build) publishes nothing.
       - name: Setup Ruby
-        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1
+        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1.328.0
         # The version comes from .ruby-version (3.3+: html-proofer's
         # async→console dependency requires Ruby >= 3.3).
         with:
@@ -89,7 +89,7 @@ jobs:
         # parse, that every page carries a description and a canonical, that no
         # two pages share a description or title, and that each plugin hook left
         # its mark on the posts (script/check-plugin-output.rb). Each check maps
-        # to a defect this site actually shipped.
+        # to a defect that shipped here or would ship silently.
         run: script/validate-site.sh ./_site
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.

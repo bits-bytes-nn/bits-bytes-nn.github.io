@@ -184,6 +184,10 @@ class TestDerive < Minitest::Test
     assert_equal "2024. 5. 14. 공개된 모델입니다.", PostDescription.derive("2024. 5. 14. 공개된 모델입니다.\n")
   end
 
+  def test_strips_strikethrough
+    assert_equal "취소된 문장입니다.", PostDescription.derive("~~취소~~된 문장입니다.\n")
+  end
+
   def test_a_line_break_tag_is_a_space
     assert_equal "첫 줄 둘째 줄", PostDescription.derive("첫 줄<br>둘째 줄\n")
   end
