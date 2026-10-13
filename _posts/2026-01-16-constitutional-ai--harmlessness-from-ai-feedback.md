@@ -4,6 +4,7 @@ title: "Constitutional AI: Harmlessness from AI Feedback"
 subtitle: "Constitutional AI: AI 피드백을 통한 무해성 구현"
 date: 2022-12-15 06:19:23
 paper_author: "Anthropic"
+paper_doi: "10.48550/arXiv.2212.08073"
 description: >-
   Constitutional AI는 유해성에 대한 인간 레이블 없이 16개 원칙으로 된 헌법만으로 무해한 어시스턴트를 훈련합니다. 자기 비평과 수정을 거친 지도 학습, AI 피드백 강화학습(RLAIF)으로 회피하지 않는 무해한 응답을 얻는 과정을 정리합니다.
 categories: ["Paper Reviews", "Finetuning"]

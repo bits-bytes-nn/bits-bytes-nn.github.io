@@ -3,6 +3,7 @@ layout: post
 title: "Gemma 3 Technical Report"
 date: 2025-03-25 15:52:34
 paper_author: "Google DeepMind"
+paper_doi: "10.48550/arXiv.2503.19786"
 description: >-
   Gemma 3는 로컬 어텐션 5개마다 글로벌 어텐션 1개를 두어 128K 컨텍스트의 메모리 부담을 줄였고, 27B 모델은 Chatbot Arena에서 Elo 1,338점으로 공동 9위에 올랐습니다. 멀티모달 처리와 지식 증류 기반 학습 방법을 정리합니다.
 categories: ["Paper Reviews", "Multimodal-Learning"]

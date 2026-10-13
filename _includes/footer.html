@@ -11,7 +11,7 @@
 
       <p><strong>Site Map</strong></p>
       <ul class="pages">
-				{% include nav_links.html %}
+				{% include nav_links.html full=true %}
       </ul>
     </div>
 
@@ -61,6 +61,7 @@
 {% endif %}
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
+{% if page.paper_doi %}<script src="{{ '/js/citations.js' | prepend: site.baseurl }}" defer></script>{% endif %}
 
 <!-- Do not write Liquid tag delimiters in these HTML comments. Liquid tokenizes
      tags inside comments too, so a tag named in prose is opened for real and the

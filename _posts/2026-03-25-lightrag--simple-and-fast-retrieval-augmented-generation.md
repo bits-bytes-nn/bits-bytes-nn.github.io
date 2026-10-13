@@ -3,6 +3,7 @@ layout: post
 title: "LightRAG: Simple and Fast Retrieval-Augmented Generation"
 date: 2024-10-08 08:00:12
 paper_author: "Beijing University of Posts and Telecommunications"
+paper_doi: "10.48550/arXiv.2410.05779"
 description: >-
   LightRAG는 그래프 기반 텍스트 인덱싱과 이중 수준 검색을 결합하고 증분 업데이트로 인덱스 재구축을 없앴습니다. 검색 단계에서 GraphRAG는 약 610,000 토큰을 쓰지만 LightRAG는 100 토큰 미만만 씁니다. 인덱싱과 검색 구조, 비용 비교를 정리합니다.
 categories: ["Paper Reviews", "Retrieval-Augmented-Generation"]

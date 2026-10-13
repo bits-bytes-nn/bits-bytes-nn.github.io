@@ -108,8 +108,8 @@ Pages가 그대로 서빙.**
 
 포스트는 프런트매터에 **2단계** 카테고리를 가진다: `categories: ["<유형>", "<주제>"]`.
 
-- **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Tech Guides`, `Insights` 중 하나.
-  글이 어느 내비 탭에 들어갈지를 정한다. 넷 다 전용 페이지와 탭을 가지며, 글이 없는 유형은
+- **0단계 (유형)** — `Paper Reviews`, `Paper Summaries`, `Paper Surveys`, `Tech Guides`,
+  `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정한다. 다섯 모두 전용 페이지와 탭을 가지며, 글이 없는 유형은
   빈 상태 문구를 띄운다(아래 "내비게이션은 코드가 아니라 데이터가 만든다" 참조).
 - **1단계 (주제)** — `_data/post_conventions.yml`의 `topics` 중 하나. 주제마다 표지 이미지가
   정해져 있고(Insights는 유형 표지 `insights.jpg`가 우선), 맞는 주제가 없으면 먼저 거기에 추가한다. 목록에 없는 값은 린트가 막는다.
@@ -142,16 +142,19 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 
 상단 메뉴는 하드코딩이 아니다. `_includes/nav_links.html`이 **프런트매터에 `main_nav: true`가
 달린 모든 페이지**를 찾아 `nav_order` 숫자 순으로 자동 나열한다. 새 탭을 넣고 싶으면 페이지
-프런트매터에 두 값을 더하면 된다. 현재 순서:
+프런트매터에 두 값을 더하면 된다. 탭 이름은 페이지 `title`이고, `nav_title`이 있으면 그것을 쓴다 —
+메뉴 폭이 48em이라 "Paper"로 시작하는 탭 셋이 두 줄로 넘쳤기 때문이다(Summaries·Reviews·Surveys).
+현재 순서:
 
 | nav_order | 페이지 | 소스 |
 |-----------|--------|------|
 | 1 | About | `about.md` |
-| 2 | Paper Summaries | `paper-summaries.md` — `site.categories['Paper Summaries']` 필터 |
-| 3 | Paper Reviews | `paper-reviews.md` — `site.categories['Paper Reviews']` 필터, 주제별 그룹화 |
-| 4 | Tech Guides | `tech-guides.md` — `site.categories['Tech Guides']` 필터 |
-| 5 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
-| 6 | Search | `search.md` |
+| 2 | Summaries | `paper-summaries.md` — `site.categories['Paper Summaries']` 필터 |
+| 3 | Reviews | `paper-reviews.md` — `site.categories['Paper Reviews']` 필터, 주제별 그룹화 |
+| 4 | Surveys | `paper-surveys.md` — `site.categories['Paper Surveys']` 필터 |
+| 5 | Tech Guides | `tech-guides.md` — `site.categories['Tech Guides']` 필터 |
+| 6 | Insights | `insights.md` — `site.categories['Insights']` 필터 |
+| 7 | Search | `search.md` |
 
 **빈 섹션도 탭을 유지한다.** 글이 없는 유형은 `_includes/category-posts.html`의 `empty`
 문구를 띄운다("Summaries are in the works…"). 편수가 0이라고 `main_nav`를 떼지 않는다 —
@@ -377,6 +380,13 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   `<author>`가 모두 `site.author`를 쓴다. 논문을 낸 기관은 `author`가 아니라 `paper_author`에
   적고 화면에 "Paper by …"로만 표시한다 — jekyll-feed가 글의 `author`를 피드 저자로 쓰기
   때문이다.
+- **인용 수** — `paper_doi`가 있는 논문 글은 메타 패널 끝에 Semantic Scholar 인용 수(Citations)를
+  보여 준다. 빌드가 아니라 브라우저에서 `js/citations.js`가 받아 오므로 정적 페이지에 숫자가 굳지
+  않는다. arXiv DOI(`10.48550/arXiv.<id>`)는 `arXiv:<id>`로, 그 밖의 DOI는 `DOI:<doi>`로
+  조회한다. 키 없는 API는 한도를 전 세계가 함께 써서 429가 잦으므로 결과를 `localStorage`에
+  하루 동안 두고, 실패하면 마지막으로 받은 값을 보여 주거나 칸을 숨긴다. 0회와 찾지 못한
+  논문(404)도 숨긴다 — 0은 Semantic Scholar가 논문의 중복 레코드에 돌려주는 값이다. OpenAlex는 프리프린트와
+  출판본을 따로 세어 인용 수가 크게 적게 나와 쓰지 않는다.
 - **검색 노출 검사** — `script/validate-site.sh`가 빌드된 사이트를 훑어 사이트맵·피드가
   파싱되는지, 페이지당 `h1`이 1개인지, 헤딩 레벨을 건너뛰지 않는지, 모든 페이지에 설명문과
   canonical이 있는지, 설명문·제목이 중복되지 않는지 등을 확인한다. **검사 목록의 정본은

@@ -4,6 +4,7 @@ title: "Gemma 2: Improving Open Language Models at a Practical Size"
 subtitle: "Gemma 2: 실용적 크기에서 오픈 언어 모델 개선"
 date: 2024-07-31 19:13:07
 paper_author: "Google DeepMind"
+paper_doi: "10.48550/arXiv.2408.00118"
 description: >-
   Gemma 2는 2B·9B 모델을 다음 토큰 예측 대신 지식 증류로 학습하고 로컬-글로벌 어텐션과 GQA를 적용해 2-3배 큰 모델과 경쟁하는 성능을 냈습니다. 증류로 2B 평균 점수가 7.4점 오른 실험과 아키텍처를 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

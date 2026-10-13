@@ -4,6 +4,7 @@ title: "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Lang
 subtitle: "DeepSeek-V2: 강력하고 경제적이며 효율적인 Mixture-of-Experts 언어 모델"
 date: 2024-05-07 15:56:43
 paper_author: "DeepSeek AI"
+paper_doi: "10.48550/arXiv.2405.04434"
 description: >-
   DeepSeek-V2는 MLA와 DeepSeekMoE를 결합한 236B 규모 MoE 모델로, 토큰당 21B만 활성화하며 DeepSeek 67B 대비 KV 캐시를 93.3% 줄이고 생성 처리량을 5.76배 높였습니다. 두 아키텍처의 설계와 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]

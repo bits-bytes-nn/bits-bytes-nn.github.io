@@ -10,6 +10,7 @@ description: >-
 # was removed, not one that is still filling up. The empty-state line below is
 # the honest signal, and the tab is what says this blog does summaries.
 main_nav: true
+nav_title: Summaries
 nav_order: 2
 ---
 

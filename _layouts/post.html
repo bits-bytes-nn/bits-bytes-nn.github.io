@@ -36,6 +36,15 @@ layout: default
           {% endfor %}
         </div>
         {% endif %}
+        {%- comment -%}
+          Hidden until js/citations.js fills it from Semantic Scholar. Last, so
+          the fields before it stay put when it appears.
+        {%- endcomment -%}
+        {% if page.paper_doi %}
+        <div class="post-citations" data-paper-doi="{{ page.paper_doi | escape }}" hidden>
+          <span class="meta-label">Citations</span>
+        </div>
+        {% endif %}
       </div>
       {% if page.tags.size > 0 %}
       <div class="post-tags">
