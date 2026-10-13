@@ -117,7 +117,7 @@ response1 = agent_core_client.InvokeAgentRuntime(
 
 Runtime은 두 개의 HTTP 엔드포인트로 외부 요청을 받습니다. `/invocations`는 에이전트 호출을 받고 JSON 응답과 **SSE**(Server-Sent Events — 서버가 한 HTTP 연결을 열어 두고 클라이언트에 이벤트를 한 방향으로 연속 스트리밍하는 표준, ChatGPT식 타이핑 효과가 이 방식) 스트리밍 모두 지원합니다. `/ping`은 헬스체크인데 단순히 `ok`를 돌려주지 않고 **`Healthy` 또는 `HealthyBusy` 두 상태**를 반환합니다. `Healthy`는 새 작업을 받을 준비가 되었다는 신호이고, `HealthyBusy`는 살아 있지만 비동기 태스크 처리 중이므로 새 호출을 받지 않겠다는 신호입니다. 후자로 바뀐 동안 로드밸런서나 프론트 프록시가 이 세션으로 새 요청을 보내지 않도록 막히므로, 긴 리서치 작업이 백그라운드에서 도는 도중 동일 세션에 중복 요청이 들어와 상태가 꼬이는 사고가 원천 차단됩니다.
 
-<a href="https://miro.medium.com/v2/resize:fit:720/format:webp/1*n4jZh_ngE87Updy4bUjHXg.png" class="glightbox" data-gallery="agentcore" data-glightbox="title: `/ping` 엔드포인트의 두 상태 — 평상시 HEALTHY, 비동기 태스크 실행 중에는 HEALTHY_BUSY로 전환 (출처: Joud W. Awad, AWS Bedrock AgentCore Deep Dive)">
+<a href="https://miro.medium.com/v2/resize:fit:720/format:webp/1*n4jZh_ngE87Updy4bUjHXg.png" class="glightbox" data-gallery="agentcore" data-glightbox="title: /ping 엔드포인트의 두 상태 — 평상시 HEALTHY, 비동기 태스크 실행 중에는 HEALTHY_BUSY로 전환 (출처: Joud W. Awad, AWS Bedrock AgentCore Deep Dive)">
   <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*n4jZh_ngE87Updy4bUjHXg.png" alt="/ping 엔드포인트가 반환하는 두 가지 상태. 위쪽은 평상시 HEALTHY, 아래쪽은 사용자가 백그라운드 태스크를 시작한 직후 HEALTHY_BUSY로 전환되는 상황." />
 </a>
 

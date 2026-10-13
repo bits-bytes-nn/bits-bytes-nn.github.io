@@ -32,7 +32,7 @@ MLA 구현에서는 128개의 어텐션 헤드와 128의 헤드당 차원을 설
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
 
-DeepSeek-V2의 성과는 대규모 언어 모델 분야에 중요한 이정표를 제시합니다. 단 21B개의 활성화된 파라미터로 오픈소스 모델 중 최고 수준의 성능을 달성했으며, 동시에 DeepSeek 67B 대비 42.5%의 훈련 비용 절감, 93.3%의 KV 캐시 감소, 5.76배의 생성 처리량 향상을 이루어냈습니다. AlpacaEval 2.0에서 38.9의 길이 제어 승률, MT-Bench에서 8.97의 점수를 기록하며 개방형 대화 벤치마크에서도 탁월한 성능을 보여주었습니다.
+DeepSeek-V2의 성과는 대규모 언어 모델 분야에 중요한 이정표를 제시합니다. 단 21B개의 활성화된 파라미터로 오픈소스 모델 중 최고 수준의 성능을 달성했으며, 동시에 DeepSeek 67B 대비 42.5%의 훈련 비용 절감, 93.3%의 KV 캐시 감소, 5.76배의 생성 처리량 향상을 이루어냈습니다. DeepSeek-V2 Chat (RL)은 AlpacaEval 2.0에서 38.9의 길이 제어 승률, MT-Bench에서 8.97의 점수를 기록하며 개방형 대화 벤치마크에서도 탁월한 성능을 보여주었습니다.
 
 이 연구는 단순한 기술적 혁신을 넘어 AI 기술의 실용적 배포와 접근성 향상에 중요한 기여를 합니다. MLA와 DeepSeekMoE 아키텍처는 대규모 언어 모델의 계산 효율성과 성능 사이의 트레이드오프를 근본적으로 재정의했으며, 오픈소스 AI 생태계의 발전에 새로운 방향을 제시했습니다. 특히 중국어와 영어를 동시에 지원하는 고성능 이중 언어 모델을 개발함으로써 글로벌 AI 연구에 의미 있는 진전을 이루었습니다.
 - - -
@@ -795,4 +795,4 @@ $$\mathbf{u}_t = W^O[\mathbf{o}_{t,1}; \mathbf{o}_{t,2}; ...; \mathbf{o}_{t,n_h}
 이러한 수식들은 MLA가 어떻게 효율적인 추론을 달성하면서도 강력한 성능을 유지하는지를 보여주는 핵심적인 수학적 기반을 제공합니다.
 - - -
 ### References
-* [DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model](http://arxiv.org/pdf/2405.04434v5)
+* [DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model](https://arxiv.org/pdf/2405.04434v5)

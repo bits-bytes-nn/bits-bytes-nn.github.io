@@ -1572,4 +1572,4 @@ Llama 3의 개발 경험은 파운데이션 모델 분야에서 여전히 상당
 Llama 3의 성공적인 개발과 공개는 오픈 소스 AI 모델의 가능성을 보여주는 중요한 이정표가 되었으며, 향후 더욱 강력하고 안전한 AI 시스템 개발을 위한 기반을 마련했습니다. 연구진의 경험과 통찰은 AI 연구의 미래 방향을 제시하는 귀중한 자료가 될 것입니다.
 - - -
 #### References
-* [The Llama 3 Herd of Models](http://arxiv.org/pdf/2407.21783v3)
+* [The Llama 3 Herd of Models](https://arxiv.org/pdf/2407.21783v3)

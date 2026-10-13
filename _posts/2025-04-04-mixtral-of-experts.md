@@ -5,7 +5,7 @@ subtitle: "Mixtral of Experts: 전문가 혼합 모델의 새로운 지평"
 date: 2024-01-08 18:47:34
 paper_author: "Mistral AI"
 description: >-
-  Mixtral 8x7B는 층마다 8개 전문가 중 2개를 고르는 희소 전문가 혼합 모델로, 총 47B 중 13B만 활성화하고도 대부분의 벤치마크에서 Llama 2 70B와 GPT-3.5에 맞먹습니다. 라우팅 구조와 학습 과정을 정리합니다.
+  Mixtral 8x7B는 층마다 8개 전문가 중 2개를 고르는 희소 전문가 혼합 모델로, 총 47B 중 13B만 활성화하고도 대부분의 벤치마크에서 Llama 2 70B·GPT-3.5와 같거나 앞섭니다. 라우팅 구조와 학습 과정을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Mixture-of-Experts", "Dynamic-Expert-Routing", "Two-Expert-Token-Processing", "Efficient-Inference", "Routing-Network-Token-Selection", "Expert-Selection-Locality-Analysis", "Multilingual-Performance-Scaling", "Long-Context-Retrieval-Optimization", "Instruction-Fine-Tuning", "Direct-Preference-Optimization"]
 cover: /assets/images/language-models.jpg
@@ -340,5 +340,5 @@ Mixtral의 성공은 희소 전문가 혼합 모델이 대규모 언어 모델 �
 
 - - -
 ### References
-* [Mixtral of Experts](http://arxiv.org/pdf/2401.04088v1)
+* [Mixtral of Experts](https://arxiv.org/pdf/2401.04088v1)
 * [Mistral Inference (GitHub)](https://github.com/mistralai/mistral-inference)

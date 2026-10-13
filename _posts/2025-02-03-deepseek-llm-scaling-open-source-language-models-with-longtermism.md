@@ -279,5 +279,5 @@ DeepSeek LLM의 안전성 평가를 위해 다양한 분야의 전문가 20명�
 
 - - -
 ### References
-* [DeepSeek LLM: Scaling Open-Source Language Models with Longtermism](http://arxiv.org/pdf/2401.02954v1)
+* [DeepSeek LLM: Scaling Open-Source Language Models with Longtermism](https://arxiv.org/pdf/2401.02954v1)
 * [DeepSeek-LLM (GitHub)](https://github.com/deepseek-ai/DeepSeek-LLM)

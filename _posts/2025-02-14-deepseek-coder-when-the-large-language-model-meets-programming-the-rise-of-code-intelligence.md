@@ -5,7 +5,7 @@ seo_title: "DeepSeek-Coder: The Rise of Code Intelligence"  # <title> only; the 
 date: 2024-01-25 14:17:53
 paper_author: "DeepSeek AI"
 description: >-
-  DeepSeek-Coder는 87개 프로그래밍 언어의 2조 토큰을 저장소 단위로 구성하고 FIM과 16K 컨텍스트로 1.3B~33B 코드 모델을 학습했습니다. Instruct 33B는 GPT-3.5 Turbo를 앞섰습니다. 데이터 구축과 학습 전략을 정리합니다.
+  DeepSeek-Coder는 87개 프로그래밍 언어의 2조 토큰을 저장소 단위로 구성하고 FIM과 16K 컨텍스트로 1.3B~33B 코드 모델을 학습했습니다. Instruct 33B는 대부분의 벤치마크에서 GPT-3.5 Turbo를 앞섰습니다. 데이터 구축과 학습 전략을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Repository-Level-Data-Construction", "Fill-in-the-Middle-Code-Completion", "Cross-File-Code-Completion", "Long-Context-Adaptation", "Repository-Level-Deduplication", "Dependency-Aware-Training", "Project-Level-Code-Understanding", "Cross-File-Dependency-Analysis", "Topological-Sorting-for-Code-Learning", "LeetCode-Competition-Benchmark", "DeepSeek"]
 cover: /assets/images/language-models.jpg
@@ -22,7 +22,7 @@ DeepSeek-Coder는 세 가지 핵심적인 기술적 혁신을 도입했습니다
 DeepSeek-Coder는 1.3B부터 33B 파라미터에 이르는 다양한 규모의 모델을 제공합니다. 학습 데이터는 소스 코드 87%, 영어 코드 관련 자연어 코퍼스 10%, 중국어 자연어 코퍼스 3%로 구성되었습니다. 데이터 구축 과정에서는 크롤링, 규칙 기반 필터링, 의존성 분석, 저장소 수준의 중복 제거, 품질 검사 단계를 거쳤습니다. 특히 의존성 분석을 통해 파일 간의 호출 관계를 고려한 학습 데이터를 구성했으며, Fill-In-Middle 학습 전략을 통해 코드의 전체적인 구조와 흐름을 이해하도록 했습니다.
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
-DeepSeek-Coder는 다양한 벤치마크에서 기존의 오픈소스 코드 모델들을 능가하는 성능을 보여주었으며, 특히 DeepSeek-Coder-Instruct 33B 모델은 GPT-3.5 Turbo의 성능을 뛰어넘는 결과를 달성했습니다. 더욱 주목할 만한 점은 7B 규모의 모델이 33B 규모의 다른 모델들과 비교해도 경쟁력 있는 성능을 보여주었다는 것입니다. 이는 모델 크기보다 효율적인 학습 방법과 데이터 구성이 더 중요할 수 있다는 점을 시사합니다. 또한 이 연구는 코드 인텔리전스 분야에서 오픈소스 모델의 가능성을 입증하고, 향후 연구 방향을 제시했다는 점에서 큰 의미를 가집니다.
+DeepSeek-Coder는 다양한 벤치마크에서 기존의 오픈소스 코드 모델들을 능가하는 성능을 보여주었으며, 특히 DeepSeek-Coder-Instruct 33B 모델은 대부분의 벤치마크에서 GPT-3.5 Turbo의 성능을 뛰어넘는 결과를 달성했습니다. 더욱 주목할 만한 점은 7B 규모의 모델이 33B 규모의 다른 모델들과 비교해도 경쟁력 있는 성능을 보여주었다는 것입니다. 이는 모델 크기보다 효율적인 학습 방법과 데이터 구성이 더 중요할 수 있다는 점을 시사합니다. 또한 이 연구는 코드 인텔리전스 분야에서 오픈소스 모델의 가능성을 입증하고, 향후 연구 방향을 제시했다는 점에서 큰 의미를 가집니다.
 - - -
 ## DeepSeek-Coder: 코드 인텔리전스의 부상과 대규모 언어 모델의 만남
 
@@ -274,4 +274,4 @@ DeepSeek-Coder-Base 모델의 학습 과정에서 성능 변화를 추적하기 
 
 - - -
 ### References
-* [DeepSeek-Coder: When the Large Language Model Meets Programming -- The Rise of Code Intelligence](http://arxiv.org/pdf/2401.14196v2)
+* [DeepSeek-Coder: When the Large Language Model Meets Programming -- The Rise of Code Intelligence](https://arxiv.org/pdf/2401.14196v2)

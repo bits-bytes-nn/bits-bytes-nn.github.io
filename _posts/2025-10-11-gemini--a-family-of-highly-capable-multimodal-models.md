@@ -1502,4 +1502,4 @@ plt.show()
 이러한 정성적 예시들은 Gemini Ultra의 멀티모달 추론 능력과 다양한 도메인에서의 실제 적용 가능성을 보여주는 포괄적인 데모를 제공합니다. 각 예시는 모델이 텍스트, 이미지, 비디오 등 다양한 입력 모달리티를 자연스럽게 처리하고 의미 있는 응답을 생성할 수 있는 능력을 입증합니다.
 - - -
 ### References
-* [Gemini: A Family of Highly Capable Multimodal Models](http://arxiv.org/pdf/2312.11805v5)
+* [Gemini: A Family of Highly Capable Multimodal Models](https://arxiv.org/pdf/2312.11805v5)

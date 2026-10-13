@@ -878,4 +878,4 @@ Muon에서는 가중치와 업데이트 모두 Adam보다 높은 효과적 순�
 H2D, 브로드캐스트, 가중치 재로드를 오버랩함으로써 훈련 엔진에서 모든 추론 엔진으로 가중치를 재샤딩하는 높은 대역폭을 얻을 수 있습니다.
 - - -
 ### References
-* [Kimi K2: Open Agentic Intelligence](http://arxiv.org/pdf/2507.20534v1)
+* [Kimi K2: Open Agentic Intelligence](https://arxiv.org/pdf/2507.20534v1)

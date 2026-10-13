@@ -4,7 +4,7 @@ title: "LLaMA: Open and Efficient Foundation Language Models"
 date: 2023-02-27 17:11:15
 paper_author: "Meta AI"
 description: >-
-  LLaMA는 공개 데이터만으로 7B~65B 모델을 1.4T 토큰까지 학습해, 13B 모델이 GPT-3(175B)를 앞서고 65B 모델이 PaLM-540B와 견줄 성능을 냈습니다. 데이터 구성, 아키텍처 개선과 학습 효율화 방법을 정리합니다.
+  LLaMA는 공개 데이터만으로 7B~65B 모델을 1.4T 토큰까지 학습해, 13B 모델이 대부분의 벤치마크에서 GPT-3(175B)를 앞서고 65B 모델이 PaLM-540B와 견줄 성능을 냈습니다. 데이터 구성, 아키텍처 개선과 학습 효율화 방법을 정리합니다.
 categories: ["Paper Reviews", "Language-Models"]
 tags: ["Rotary-Positional-Embeddings", "SwiGLU-Activation-Function", "Scaling-Laws", "Economical-Training", "Computation-Communication-Overlap", "Public-Dataset-Only-Training", "RMSNorm", "Efficient-Attention", "CommonCrawl-Quality-Filtering", "Llama"]
 cover: /assets/images/language-models.jpg
@@ -22,7 +22,7 @@ LLaMA는 기존 접근법과 달리 모델 크기와 학습 데이터 양 사이
 LLaMA의 구현은 최신 트랜스포머 아키텍처를 기반으로 하되, 여러 가지 효율적인 최적화 기법을 도입했습니다. 사전 정규화, SwiGLU 활성화 함수, RoPE(회전 위치 임베딩) 등을 적용하여 모델의 성능과 학습 효율성을 개선했습니다. 학습 과정에서는 AdamW 옵티마이저와 코사인 학습률 스케줄링을 사용했으며, 효율적인 구현을 위해 xformers 라이브러리의 최적화된 어텐션 메커니즘을 활용했습니다. 특히 2048개의 A100 GPU를 사용하여 GPU당 약 380 토큰/초의 처리 속도를 달성했으며, 이를 통해 1.4T 토큰의 학습을 약 21일 만에 완료할 수 있었습니다.
 
 ### 이 연구의 결과가 가지는 의미는 무엇입니까?
-이 연구의 가장 중요한 의의는 공개 데이터만으로도 최고 수준의 언어 모델을 개발할 수 있다는 것을 입증했다는 점입니다. 특히 13B 파라미터 모델이 GPT-3(175B)를 능가하고, 65B 모델이 PaLM-540B와 견줄만한 성능을 보였다는 것은 매우 중요한 발견입니다. 이는 효율적인 모델 설계와 데이터 선택이 단순한 모델 크기 확장보다 더 중요할 수 있다는 것을 시사합니다. 또한 작은 규모의 모델들이 단일 GPU에서도 실행 가능하다는 점은 LLM 연구의 민주화에 크게 기여할 것으로 기대됩니다. 다만 모델이 여전히 편향성과 유해성을 보이는 것으로 나타나, 이러한 문제들의 해결을 위한 추가 연구의 필요성도 제기되었습니다.
+이 연구의 가장 중요한 의의는 공개 데이터만으로도 최고 수준의 언어 모델을 개발할 수 있다는 것을 입증했다는 점입니다. 특히 13B 파라미터 모델이 대부분의 벤치마크에서 GPT-3(175B)를 능가하고, 65B 모델이 PaLM-540B와 견줄만한 성능을 보였다는 것은 매우 중요한 발견입니다. 이는 효율적인 모델 설계와 데이터 선택이 단순한 모델 크기 확장보다 더 중요할 수 있다는 것을 시사합니다. 또한 작은 규모의 모델들이 단일 GPU에서도 실행 가능하다는 점은 LLM 연구의 민주화에 크게 기여할 것으로 기대됩니다. 다만 모델이 여전히 편향성과 유해성을 보이는 것으로 나타나, 이러한 문제들의 해결을 위한 추가 연구의 필요성도 제기되었습니다.
 - - -
 ## LLaMA: 개방형 고효율 파운데이션 언어 모델
 
@@ -246,5 +246,5 @@ GPT-3는 1,750억 파라미터를 가진 모델로 중요한 돌파구를 마련
 
 - - -
 ### References
-* [LLaMA: Open and Efficient Foundation Language Models](http://arxiv.org/pdf/2302.13971v1)
+* [LLaMA: Open and Efficient Foundation Language Models](https://arxiv.org/pdf/2302.13971v1)
 
