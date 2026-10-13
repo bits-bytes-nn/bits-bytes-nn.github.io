@@ -90,7 +90,7 @@ js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
 assets/images/     Topic cover images, plus post figures and diagrams (flat)
 assets/<slug>/     Figures of some older posts; new posts use assets/images/
 search.json        Full-text search index (consumed by simple-jekyll-search)
-test/              minitest unit tests for the _plugins/ logic
+test/              minitest unit tests for _plugins/ and the post lint
 script/            lint-posts.rb (post sources vs the conventions, before the build)
                    validate-site.sh (post-build discoverability checks)
                    check-plugin-output.rb (each plugin hook's mark on the posts;
@@ -111,8 +111,9 @@ no source file for any of them.
 
 ## Writing a post
 
-The easiest path is the `/write-post` skill, which runs the whole
-research → draft → proofread workflow. To add one by hand, create
+Paper reviews come from scholar-lens as pull requests; the `/write-post` skill
+(local, under the gitignored `.claude/`) runs research → draft → proofread for
+the rest. To add one by hand, create
 `_posts/YYYY-MM-DD-slug.md` starting with this front matter:
 
 ```yaml
@@ -121,13 +122,13 @@ layout: post
 title: "<Post Title>"
 subtitle: "<one-line pitch>"       # optional — shown under the title in the header
 date: YYYY-MM-DD HH:MM:SS
-paper_author: "<Org>"              # the paper's org, not people; omit for Insights/opinion posts
+paper_author: "<Org>"              # the paper's org, not people; paper posts only
 seo_title: "<shorter title>"       # optional — for <title> when the paper title is too long
 description: >-                    # optional, plain text — see below
   <search-snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
 tags: ["<Tag-1>", "<Tag-2>"]
-cover: /assets/images/<topic>.(jpg|png)   # Insights: insights.jpg
+cover: /assets/images/<topic>.(jpg|png)   # the type's or topic's image; see below
 use_math: true                     # ONLY if the post has equations (loads MathJax)
 lang: ko                           # required with translation_id (ko | en)…
 translation_id: <shared-slug>      # …links a Korean post to its -en twin;
@@ -151,17 +152,9 @@ derives one from the post's first real prose paragraph, which is usually good
 enough. Write it by hand when the first paragraph opens on a pull quote or a
 disclosure note — that is, on most Insights posts.
 
-Descriptions must be **unique across the site**; CI fails the build if two pages
-share one. They ship as plain text, so the lint rejects `$$`, `*emphasis*`,
-backticks, links and tags in them.
-
-### Dates, file names and Liquid
-
-The file name starts with the posting day (`YYYY-MM-DD-`); `date:` may be earlier
-(a paper's date) but not later. Jekyll renders every post as Liquid first, so a
-`{{ … }}` or `{% … %}` in a code block (a prompt template, a GitHub Actions
-`${{ … }}`) renders as nothing, or stops the build: wrap it in `{% raw %}…{% endraw %}`. The lint
-checks all three.
+Descriptions must be **unique across the site** and longer than the page title;
+CI fails the build otherwise. They ship as plain text, so the lint rejects
+`$$`, `*emphasis*`, backticks, links and tags in them.
 
 ### Categories drive the URL
 
@@ -172,9 +165,10 @@ Categories are **two levels**:
   A type with no posts yet keeps its tab and renders an empty-state line: a
   missing tab reads as a section that was removed, not one still filling up.
 - `categories[1]` — the **topic**, one of the `topics` in
-  `_data/post_conventions.yml`, which also gives its cover image if it has one (Insights
-  posts use the type's `insights.jpg` instead). When none fits,
-  add one there first; the lint rejects any other value.
+  `_data/post_conventions.yml`, which also gives its cover image if it has one.
+  Insights posts use the type's `insights.jpg`; a topic without an image takes any
+  existing one. When no topic fits, add one there first; the lint rejects any
+  other value.
 
 Jekyll slugifies the two and combines them with the date to build the output
 path (`permalink` in `_config.yml`):
@@ -226,28 +220,25 @@ MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. Wit
 `$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
 dollar signs like `$10M` are fine — they're not math.)
 
-The lint also rejects what renders wrong:
+Inside math, write `\lvert … \rvert` or `\mid` for a bar and `\lVert … \rVert`
+for a norm, never a bare `|`: in a table row kramdown splits the cell there.
 
-- math written `\\(…\\)` or `\\[…\\]`, or TeX next to a single `$`: Markdown
-  reads the formula first, as above.
-- `\_` inside `$$…$$`: MathJax renders a literal underscore, not a subscript. Write
-  `_`; escape it only inside `\text{…}`.
-- a display `$$…$$` line without a blank line before and after, in lists too:
-  kramdown folds it into the paragraph as inline math.
-- Hangul inside a `$$` span: almost always two currency `$$`s read as one span.
-- `$$` math in a post without `use_math: true`: MathJax never loads, so the TeX
-  shows as text.
-- a `<name>` that is not HTML, `<s>`/`<input>`, or a bare `<img>` (a model's special token):
-  kramdown passes it through and the browser drops it. Write it in `code`.
-- a code fence with more than a language after the marker (```` ```python title="a" ````),
-  or one never closed: kramdown does not read it as a fence.
-- a tag spelled two ways across posts (`Grouped-Query-…` and `Grouped-query-…`).
-- a `|` inside `$$` in a table row: kramdown splits the cell there, and turns
-  `\|` into `|` (a norm into an absolute value). Write `\lVert … \rVert`.
+### What else the lint catches
 
-Inside inline math, write `\lvert … \rvert` (or `\mid`) instead of a bare `|`, and
-`\lVert … \rVert` for a norm;
-the lint catches it only in tables.
+`ruby script/lint-posts.rb` names the line and the fix for each finding. The
+rules easiest to trip, each a page that renders wrong with every other gate green:
+
+- `{{ … }}` or `{% … %}` in the body (a prompt template, GitHub Actions'
+  `${{ … }}`): Jekyll renders posts as Liquid first. Wrap it in
+  `{% raw %}…{% endraw %}`.
+- a model token such as `<think>` or `<s>` outside code: the browser drops it.
+  Write it in `code`.
+- `$$` math without `use_math: true`, math written `\\(…\\)`, `\_` inside `$$`,
+  a display `$$` line without blank lines around it.
+- a code fence with more than a language after the marker, or one never closed.
+- a file name that does not start with the posting day, or a `date:` after it.
+- an ar5iv link: ar5iv now answers a lost figure with a placeholder image and
+  HTTP 200. Use `arxiv.org/html/<id>v1/…`, or copy the figure into `assets/images/`.
 
 ### Validate before pushing
 

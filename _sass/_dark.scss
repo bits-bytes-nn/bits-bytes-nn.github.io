@@ -73,6 +73,11 @@
   // to a light disc so it stays visible.
   .logo img { filter: invert(1) hue-rotate(180deg); }
 
+  // Paper figures with a transparent background draw black axes and labels,
+  // invisible on the dark page; give them the white paper they were drawn on.
+  // Zoomable figures only, which leaves the about portrait alone.
+  .post-content a.glightbox img { background-color: #fff; }
+
   // Profile is now a transparent PNG (background flood-filled out), so it sits
   // directly on the dark page with no white panel — no extra framing needed.
 

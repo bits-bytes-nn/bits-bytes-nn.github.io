@@ -111,7 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
   var here = window.location.pathname;
   document.querySelectorAll('.nav-link a').forEach(function (link) {
     var path = new URL(link.getAttribute('href'), window.location.origin).pathname;
-    if (here === path) {
+    // A post sits under its section's path (/paper-reviews/…).
+    if (here === path || (path !== '/' && here.indexOf(path) === 0)) {
       link.classList.add('active');
       link.setAttribute('aria-current', 'page');
     }
@@ -144,8 +145,18 @@ document.addEventListener('DOMContentLoaded', function () {
     a.appendChild(img);
   });
 
-  // Image zoom (GLightbox reads .glightbox elements)
-  if (window.GLightbox) GLightbox({ selector: '.glightbox' });
+  // Image zoom (GLightbox reads .glightbox elements). On close, focus returns to
+  // the image that opened it, so a screen reader keeps its place.
+  if (window.GLightbox) {
+    var opener = null;
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest && e.target.closest('.glightbox');
+      if (link) opener = link; // not the lightbox's own close button
+    }, true);
+    GLightbox({ selector: '.glightbox' }).on('close', function () {
+      if (opener) opener.focus();
+    });
+  }
 
   // Spoken, never shown, so in the page's language: a Korean voice reading
   // "Table, scrollable" is unintelligible. (The visible chrome stays English.)

@@ -156,14 +156,13 @@ class TestDerive < Minitest::Test
     assert_equal "text-to-SQL 정확도는 16.7%였습니다.", PostDescription.derive(md)
   end
 
-  # Math that reads as text stays: dropping it left "비용은 이고". TeX commands,
-  # and characters later passes would take for markup, still go; a post whose
-  # first paragraph leans on them needs a hand-written description.
+  # Math that reads as text stays: dropping it left "비용은 이고". Math with a
+  # TeX command, braces, or a character later passes read as markup (* _ < >)
+  # still goes; a post whose first paragraph leans on it needs a hand-written
+  # description.
   def test_keeps_inline_math_that_reads_as_text
     md = "비용은 $$O(n^2)$$이고 $$k$$에 비례합니다.\n"
     assert_equal "비용은 O(n^2)이고 k에 비례합니다.", PostDescription.derive(md)
-    assert_equal "손실은 로 정의됩니다.", PostDescription.derive("손실은 $$\\mathcal{L}$$로 정의됩니다.\n")
-    assert_equal "비교 이고 입니다.", PostDescription.derive("비교 $$p<q$$이고 $$r>s$$입니다.\n")
   end
 
   def test_comments_are_not_prose

@@ -97,21 +97,12 @@ if [ -f "$SITE/sitemap.xml" ]; then
 fi
 
 # --- feed authorship ---------------------------------------------------------
-# jekyll-feed takes each entry's <author> from the post's `author`, falling back
-# to the site's. Paper posts name the paper's organisation in `paper_author`; one
-# that says `author:` instead credits that organisation with this blog's post.
-SITE_AUTHOR=$(ruby -ryaml -e 'print YAML.safe_load_file(ARGV[0])["author"]' "$CONFIG")
-if [ -z "$SITE_AUTHOR" ]; then
+# jekyll-feed takes each entry's <author> from the site's `author`; posts may not
+# set their own (forbidden_keys, script/lint-posts.rb).
+if [ -n "$(ruby -ryaml -e 'print YAML.safe_load_file(ARGV[0])["author"].to_s.strip' "$CONFIG")" ]; then
+  pass "_config.yml names the feed's author"
+else
   fail "_config.yml sets no author:, so every feed entry ships an empty <author>"
-elif [ -f "$SITE/feed.xml" ]; then
-  others=$(grep -oE '<author><name>[^<]*' "$SITE/feed.xml" | sed 's/<author><name>//' |
-    grep -vxF "$SITE_AUTHOR" | sort -u || true)
-  if [ -n "$others" ]; then
-    fail "feed.xml credits someone other than '$SITE_AUTHOR' (a post set author: instead of paper_author:?):"
-    printf '%s\n' "$others" | sed 's/^/          /' >&2
-  else
-    pass "every feed entry is credited to $SITE_AUTHOR"
-  fi
 fi
 
 # --- reproducible post URLs --------------------------------------------------
@@ -143,34 +134,13 @@ else
   fi
 fi
 
-# --- legacy-URL redirects ----------------------------------------------------
-# jekyll-redirect-from stubs at the old /paper%20reviews/… paths. Each must land
-# on a page this build actually contains, or the old link becomes a redirect
-# to a 404.
-redirects=$(grep -rl 'http-equiv="refresh"' "$SITE" --include='*.html' | sort)
-dangling=""
-while IFS= read -r f; do
-  [ -n "$f" ] || continue
-  to=$(grep -m1 -oE 'http-equiv="refresh" content="0; url=[^"]+"' "$f" | sed -E 's/.*url=//; s/"$//')
-  case "$to" in "$BASE_URL"/*|/*) ;; *) continue ;; esac # redirect_to another site
-  # Served as Jekyll writes it: a directory URL from index.html, a bare one from .html.
-  rel=$(ruby -ruri -e 'p = URI.decode_uri_component(URI(ARGV[0]).path.delete_prefix("/")); print(p.end_with?("/") || p.empty? ? "#{p}index.html" : File.extname(p).empty? ? "#{p}.html" : p)' "$to")
-  [ -f "$SITE/$rel" ] || dangling="$dangling$f -> $to"$'\n'
-done <<< "$redirects"
-if [ -n "$dangling" ]; then
-  fail "redirect stubs pointing at pages that do not exist:"
-  printf '%s' "$dangling" | sed 's/^/          /' >&2
-else
-  pass "$(printf '%s\n' "$redirects" | grep -c .) redirect stub(s), every target exists"
-fi
-
 # --- plugin hooks ------------------------------------------------------------
-# What each _plugins/ hook adds to a post, checked against Jekyll's own reading
-# of the posts; the script says which hook and why.
+# What each _plugins/ hook adds to a post, and the listings, ids and feed,
+# checked against Jekyll's own reading of the posts (script/check-plugin-output.rb).
 if hooks=$(cd "$ROOT" && bundle exec ruby script/check-plugin-output.rb "$SITE"); then
-  pass "every post carries what the plugin hooks add, and the feed has room for all"
+  pass "posts carry what the plugin hooks add; listings, ids and the feed are sound"
 elif [ -n "$hooks" ]; then
-  fail "plugin output missing:"
+  fail "post and listing checks failed:"
   printf '%s\n' "$hooks" | sed 's/^/          /' >&2
 else
   fail "the plugin-output check could not run (error above)"
@@ -178,14 +148,14 @@ fi
 
 # --- rendered pages ----------------------------------------------------------
 # Only Jekyll-rendered documents; the search-engine ownership-verification files
-# also end in .html but are plain text by design, and redirect stubs (above) are
-# not pages a reader stays on.
+# also end in .html but are plain text by design, and redirect stubs are not
+# pages a reader stays on.
 # --null/-0 because output paths can contain spaces ("paper reviews/").
 pages=$(grep -rl --null '<!DOCTYPE html>' "$SITE" --include='*.html' |
   xargs -0 grep -L 'http-equiv="refresh"' | sort)
 page_count=$(printf '%s\n' "$pages" | grep -c .)
 if [ "$page_count" -lt 1 ]; then
-  fail "no rendered pages found in $SITE — the six per-page checks below would pass vacuously"
+  fail "no rendered pages found in $SITE — the per-page checks below would pass vacuously"
 else
   pass "$page_count rendered pages found"
 fi
@@ -297,51 +267,6 @@ if [ "$dup_title" -gt 0 ]; then
   printf '%s' "$titles" | dupes | sed 's/^/          /' >&2
 else
   pass "every <title> is unique"
-fi
-
-# --- translations stay out of the listings ----------------------------------
-# A translation pair is one article, so the listings show only the version in
-# the site's language (_plugins/translations.rb). A listing page that skips the
-# `listed` filter shows the English twin again, and htmlproofer is blind to it.
-SITE_LANG=$(sed -nE 's/^lang:[[:space:]]*"?([a-z-]+)"?.*/\1/p' "$CONFIG" | head -1)
-BASE_PATH=$(sed -nE "s/^baseurl:[[:space:]]*['\"]?([^'\"[:space:]]*)['\"]?.*/\1/p" "$CONFIG" | head -1)
-# Pages that show the language switcher, i.e. built translations.
-TRANSLATED=$(grep -rl --include='*.html' 'class="language-switcher"' "$SITE" | grep -c .)
-twins_ok=1
-listed_twins=$(TRANSLATED="$TRANSLATED" ruby -e '
-  site, site_lang, base, base_path = ARGV
-  hreflang = /<link rel="alternate" hreflang="#{Regexp.escape(site_lang)}"/
-  twins = Dir.glob("#{site}/**/*.html").filter_map do |f|
-    html = File.read(f, encoding: "UTF-8")
-    lang = html[/<html lang="([^"]+)"/, 1]
-    f.delete_prefix(site) if lang && lang != site_lang && html.match?(hreflang)
-  end
-  # No twin found while translations exist means the hreflang links are gone,
-  # and the scan below would pass checking nothing.
-  puts "no page carries hreflang=\"#{site_lang}\" though posts are translated" if twins.empty? && ENV["TRANSLATED"].to_i.positive?
-  # Every rendered page but the posts themselves, whose previous/next links may
-  # name a twin, and redirect stubs.
-  listings = Dir.glob("#{site}/**/*.html").reject do |f|
-    html = File.read(f, encoding: "UTF-8")
-    !html.include?("<!DOCTYPE html>") || html.include?(%(property="og:type" content="article")) || html.include?(%(http-equiv="refresh"))
-  end
-  listings.each do |f|
-    html = File.read(f, encoding: "UTF-8")
-    twins.each do |t|
-      hrefs = [t, "#{base_path}#{t}", "#{base}#{base_path}#{t}"].map { |u| %(href="#{u}") }
-      puts "#{f.delete_prefix(site)} -> #{t}" if hrefs.any? { |h| html.include?(h) }
-    end
-  end
-' "$SITE" "$SITE_LANG" "$BASE_URL" "$BASE_PATH") || twins_ok=0
-if [ -z "$SITE_LANG" ]; then
-  fail "could not read 'lang:' from $CONFIG"
-elif [ "$twins_ok" -eq 0 ]; then
-  fail "the translation-listing check could not run (error above)"
-elif [ -n "$listed_twins" ]; then
-  fail "listing pages that link a translation besides its original, or no hreflang at all:"
-  printf '%s\n' "$listed_twins" | sed 's/^/          /' >&2
-else
-  pass "listing pages show each translated article once"
 fi
 
 # --- authoring sources must not ship ----------------------------------------

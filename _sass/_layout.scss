@@ -24,6 +24,26 @@ input:focus-visible,
 	border-radius: 1px;
 }
 
+// A zoomable figure is an inline <a> around a block <img>: an inline box with
+// no area, so its focus ring had nothing to draw around. Shrink-wrap it.
+.post-content a.glightbox {
+	display: block;
+	width: fit-content;
+	max-width: 100%;
+	margin-inline: auto;
+}
+
+// Short pages (an empty section, 404) keep the footer at the bottom.
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+main.page-content {
+	flex: 1 0 auto;
+}
+
 // Off-screen until focused.
 .skip-link {
 	position: absolute;
@@ -361,7 +381,10 @@ blockquote {
 		background-color: transparent;
 		color: $action-color;
 		border-radius: 0;
-		padding: 0.5em 0 0;
+		// 44px wide: a thumb, not a cursor, presses it.
+		min-width: 44px;
+		min-height: 44px;
+		padding: 0.5em 0.5em 0;
 		display: block;
 		float: right;
 		margin: 0;
@@ -735,7 +758,7 @@ blockquote {
 */
 .site-footer {
 	$link-color: $white;
-	padding: 1em 1em 2em 1em;
+	padding: 1em 0 2em;
 	background-color: $highlight-color;
 	color: $white;
 
@@ -783,8 +806,16 @@ blockquote {
 		}
 	}
 
+	// The inset of .page-content .wrapper, so footer text starts where the
+	// column above it does, on a phone and on a wide screen.
 	.wrapper {
 		@include outer-container;
+		padding: 0 1em;
+	}
+
+	// A post's column is wider than a listing's (_post.scss).
+	body:has(.page-content .post) & .wrapper {
+		max-width: 60em;
 	}
 
 	/*
@@ -852,5 +883,37 @@ blockquote {
 		}
 
 		font-size: 0.9em;
+	}
+}
+
+// Print: the page on paper, not the screen around it. The fixed header would
+// repeat over every page's first line, and a saved dark theme prints pale text.
+@media print {
+	.navigation,
+	.skip-link,
+	.post-toc,
+	.share,
+	.post-nav,
+	.related-posts,
+	.site-footer {
+		display: none !important;
+	}
+
+	main.page-content {
+		margin-top: 0;
+	}
+
+	// Black on white whatever the theme; the cover image goes with it.
+	*, *::before, *::after {
+		color: #000 !important;
+		background: transparent !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+		transition: none !important;
+	}
+
+	html {
+		color-scheme: light;
+		background: #fff !important;
 	}
 }

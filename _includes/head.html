@@ -85,9 +85,9 @@
 
 	<title>{{ html_title }}</title>
 	<meta name="description" content="{{ page_description | escape }}" />
-	{% if site.name %}
-	<meta name="author" content="{{ site.name }}" />
-	<meta name="copyright" content="&copy; {{ site.name }} {{ site.time | date: '%Y' }}" />
+	{% if site.author %}
+	<meta name="author" content="{{ site.author }}" />
+	<meta name="copyright" content="&copy; {{ site.author }} {{ site.time | date: '%Y' }}" />
 	{% endif %}
 
 	<!-- The hero banner is the largest thing on the first screen, but as a CSS
@@ -114,7 +114,6 @@
 	<link rel="manifest" href="{{ '/assets/icons/manifest.json' | prepend: site.baseurl }}">
 
 	<!-- Facebook OGP cards -->
-	{% if site.protocols.fb_image %}
 	<meta property="og:description" content="{{ page_description | escape }}" />
 	<meta property="og:url" content="{{ page_full_url }}" />
 	<meta property="og:site_name" content="{{ site.title }}" />
@@ -133,7 +132,6 @@
 	{% endif %}	{% for cat in page.categories %}<meta property="article:section" content="{{ cat }}" />
 	{% endfor %}{% for tag in page.tags %}<meta property="article:tag" content="{{ tag | replace: '-', ' ' }}" />
 	{% endfor %}{% endif %}
-	{% endif %}
 
 	<!-- Twitter: card tags -->
 	<!-- Every image used here (page covers and the site default) is a wide
@@ -170,8 +168,8 @@
 	  "dateModified": "{{ page.last_modified_at | default: page.date | date_to_xmlschema }}",
 	  "description": {{ page_description | jsonify }},
 	  "image": "{{ social_image }}",
-	  "author": { "@type": "Person", "name": {{ site.name | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
-	  "publisher": { "@type": "Person", "name": {{ site.name | jsonify }} },
+	  "author": { "@type": "Person", "name": {{ site.author | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
+	  "publisher": { "@type": "Person", "name": {{ site.author | jsonify }} },
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
 	}
 	</script>
@@ -185,7 +183,7 @@
 	  "url": "{{ site.url }}{{ site.baseurl }}/",
 	  "inLanguage": "{{ page_lang }}",
 	  "description": {{ page_description | jsonify }},
-	  "author": { "@type": "Person", "name": {{ site.name | jsonify }} }
+	  "author": { "@type": "Person", "name": {{ site.author | jsonify }} }
 	}
 	</script>
 	{% endif %}

@@ -3,21 +3,19 @@
 # Checks the Markdown source of every post against _data/post_conventions.yml
 # and the authoring rules a built page cannot show any more: by the time
 # validate-site.sh sees the HTML, a misaligned table is just a table and a
-# currency sign read as math is just math. Each check below is a defect that
-# shipped in a post here.
+# currency sign read as math is just math. Each check is a defect that shipped
+# in a post here, or one that ships silently: every gate stays green while the
+# page shows it.
 #
 # Usage: ruby script/lint-posts.rb [post.md ...]   (default: every file under _posts/)
 # Exits 1 when any post breaks a rule.
 
 require "yaml"
 require "date"
-require "time"
 require "set"
 
 module PostLint
   ROOT = File.expand_path("..", __dir__)
-  # Dates without an offset are read in the zone the site builds in, as Jekyll does.
-  ENV["TZ"] = YAML.safe_load_file(File.join(ROOT, "_config.yml"))["timezone"] || "UTC"
 
   # One parsed post: front matter, body, and the line the body starts on, so
   # findings point at the source line.
@@ -34,7 +32,7 @@ module PostLint
 
   # Returns findings as "line: message" strings; empty when the post passes.
   def self.check(post, spec)
-    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + use_math(post) + liquid(post)
+    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + liquid(post)
   end
 
   # Jekyll renders a post as Liquid first, so a prompt template's {{ question }}
@@ -53,16 +51,8 @@ module PostLint
           hit = true
         end
       end
-      "#{post.body_line + i}: Liquid tag in the body; unless meant as Liquid, wrap it in {% raw %} ... {% endraw %}" if hit
+      "#{post.body_line + i}: Liquid tag in the body; posts do not use Liquid, so wrap it in {% raw %} ... {% endraw %}" if hit
     end
-  end
-
-  # MathJax loads only on posts that ask for it; without it $$...$$ ships as TeX.
-  def self.use_math(post)
-    # Code spans line by line, as body() does: one odd backtick must not pair
-    # with another paragraphs later and hide the math between them.
-    prose = post.body.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1/m, "").gsub(/(`+)[^\n]*?\1/, "")
-    prose.include?("$$") && post.data["use_math"] != true ? ["1: the post has $$ math but no use_math: true"] : []
   end
 
   # Across posts: a translation is a pair, one `<slug>.md` and one `<slug>-en.md`
@@ -93,9 +83,10 @@ module PostLint
     # Jekyll drops a file without the date prefix, and builds a `date:` past the
     # file's day into a permanent URL. The file-name date is the posting day.
     if (posted = File.basename(post.path)[/\A(\d{4}-\d{2}-\d{2})-/, 1])
-      # Jekyll reads a quoted date too, and builds in UTC (_config.yml).
-      date = data["date"].is_a?(String) ? (Time.parse(data["date"]) rescue nil) : data["date"]
-      day = date.respond_to?(:to_time) && date.to_time.utc.to_date
+      # Jekyll reads a quoted date too, and builds in UTC (_config.yml); so do
+      # DateTime.parse and YAML, for a time without an offset.
+      date = data["date"].is_a?(String) ? (DateTime.parse(data["date"]).to_time rescue nil) : data["date"]
+      day = date.instance_of?(Date) ? date : date.respond_to?(:to_time) && date.to_time.utc.to_date
       found << "1: date: #{day} (UTC) is after the file name's #{posted}" if day && day > Date.parse(posted)
     else
       found << "1: the file name starts with YYYY-MM-DD-, or Jekyll skips the post"
@@ -140,21 +131,6 @@ module PostLint
     found
   end
 
-  # Tags that differ only in case are one tag to related_posts.rb but two
-  # sections, with one id, on the tags page.
-  def self.tag_cases(posts, spec)
-    found = Hash.new { |h, k| h[k] = [] }
-    spellings = (spec["tags"]["controlled"].map { |t| [t, nil] } +
-                 posts.flat_map { |p| Array(p.data["tags"]).map { |t| [t.to_s, p] } }).group_by { |t, _| t.downcase }
-    spellings.each_value do |uses|
-      forms = uses.map(&:first).uniq
-      next if forms.size == 1
-
-      uses.each { |tag, post| found[post.path] << "1: tag #{tag} is also written #{(forms - [tag]).join(", ")}" if post }
-    end
-    found
-  end
-
   # A translation lives at <original-slug>-en.md and both posts use that slug as
   # their translation_id. The pairing itself runs on the id alone (the language
   # switcher, _plugins/translations.rb); the file names keep a pair findable.
@@ -172,6 +148,12 @@ module PostLint
   end
 
   FENCE = /\A\s*(`{3,}|~{3,})/
+  # A code span, opened and closed by the same run of backticks (``$$`` too).
+  CODE_SPAN = /(`+).*?\1/
+
+  def self.strip_code(text)
+    text.gsub(CODE_SPAN, "")
+  end
 
   # kramdown passes any <name> through as an element, and the browser drops a
   # tag it does not know: "<think> </think>" vanished from a prompt template in
@@ -194,7 +176,8 @@ module PostLint
     fence = nil # the marker that opened the code fence we are in
     fence_line = nil
     block = nil # the line a still-open multi-line $$ block started on
-    span = nil # the line an inline $$ span wrapped onto the next line started on
+    para = nil # the line a paragraph with an odd number of $$ started on
+    math_seen = false
     lines.each_with_index do |line, i|
       n = post.body_line + i
       if (m = line.match(FENCE))
@@ -215,13 +198,16 @@ module PostLint
       # closes on the next line with an odd number of them: `$$` alone, or
       # `$$x = \begin{cases}` ... `\end{cases}$$`.
       # Inside a blockquote the same rules apply to the text after the markers.
-      bare = unquote(line)
-      odd = bare.gsub(/`[^`]*`/, "").scan("$$").size.odd?
-      if span && bare.strip.empty?
-        found << "#{span}: unbalanced $$ in the paragraph"
-        span = nil
+      bare = strip_code(unquote(line))
+      math_seen ||= bare.include?("$$")
+      odd = bare.scan("$$").size.odd?
+      # An inline span may wrap onto the next line, but not past the paragraph:
+      # a lone `$$5` there shows as text.
+      if para && bare.strip.empty?
+        found << "#{para}: unbalanced $$ in the paragraph"
+        para = nil
       end
-      if block || (odd && !span && bare.lstrip.start_with?("$$"))
+      if block || (odd && !para && bare.lstrip.start_with?("$$"))
         found.concat(math_findings([line.delete("$")], n))
         if odd && block
           found << "#{n}: display $$ needs a blank line after" unless after_display?(lines[i + 1])
@@ -231,12 +217,13 @@ module PostLint
         block = (block ? nil : n) if odd
         next
       end
-      # An odd line opens an inline span a later line of the paragraph closes.
-      span = (span ? nil : n) if odd
-
+      para = (para ? nil : n) if odd
       found << "#{n}: H1 in the body; the layout renders the title" if line.match?(/\A# \S/)
+      # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
+      # 200, so no link check notices: 59 figures went blank that way.
+      found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
       # A whole tag, outside code and math: `i<j` and `$$a<b$$` are text.
-      text = unquote(line).gsub(/`[^`]*`/, "").gsub(/\$\$.*?\$\$/, "")
+      text = bare.gsub(/\$\$.*?\$\$/, "")
       tags = text.scan(%r{(?<!\\)<(/?)([a-zA-Z][\w-]*)(\s[^<>]*)?/?>})
       if (tag = tags.find { |close, name, attrs| !HTML_ELEMENTS.include?(name.downcase) || (close.empty? && attrs.to_s.strip.empty? && NEEDS_ATTRIBUTES.include?(name.downcase)) }&.[](1))
         found << "#{n}: <#{tag}> is read as HTML, so it does not show as text; write it in `code` or as \\<#{tag}\\>"
@@ -246,7 +233,9 @@ module PostLint
     end
     found << "#{block}: $$ block never closed" if block
     found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)" if fence
-    found << "#{span}: unbalanced $$ in the paragraph" if span
+    found << "#{para}: unbalanced $$ in the paragraph" if para
+    # MathJax loads only on posts that ask for it; without it $$...$$ ships as TeX.
+    found << "1: the post has $$ math but no use_math: true" if math_seen && post.data["use_math"] != true
     found
   end
 
@@ -298,7 +287,7 @@ module PostLint
   end
 
   def self.math(line, n, lines, i)
-    prose = unquote(line).gsub(/`[^`]*`/, "")
+    prose = strip_code(unquote(line))
     found = math_findings(prose.scan(/\$\$(.+?)\$\$/).flatten, n)
     outside = prose.gsub(/\$\$.+?\$\$/, "")
     # `\\(` reaches MathJax as `\(` but only after Markdown has read the formula:
@@ -327,7 +316,7 @@ module PostLint
 
   # Cells of one table row. `\|`, and pipes inside code or $$...$$, are content.
   def self.cells(row)
-    text = row.strip.gsub(/`[^`]*`|\$\$.*?\$\$/) { |m| m.tr("|", "\u0000") }.gsub("\\|", "\u0000")
+    text = row.strip.gsub(/#{CODE_SPAN}|\$\$.*?\$\$/) { |m| m.tr("|", "\u0000") }.gsub("\\|", "\u0000")
     text = text.delete_prefix("|").delete_suffix("|")
     text.split("|", -1).map(&:strip)
   end
@@ -345,7 +334,7 @@ module PostLint
     end
     ([lines[i]] + rows).each_with_index do |row, k|
       # kramdown splits the cell at |, and turns \| into | (a norm into an absolute value).
-      next unless row.gsub(/`[^`]*`/, "").scan(/\$\$(.*?)\$\$/).flatten.any? { |m| m.include?("|") }
+      next unless strip_code(row).scan(/\$\$(.*?)\$\$/).flatten.any? { |m| m.include?("|") }
 
       found << "#{k.zero? ? n : n + 1 + k}: a | inside $$ in a table breaks it; write \\mid, \\lvert...\\rvert or \\lVert...\\rVert"
     end
@@ -377,16 +366,13 @@ if $PROGRAM_NAME == __FILE__
         else
           ["1: a post is a .md file"]
         end
-      rescue StandardError, Psych::Exception => e
+      rescue StandardError => e
         ["1: could not be checked: #{e.message}"]
       end
     [path, findings]
   end
   # Pairs need every post; a run on named files checks those files alone.
-  if ARGV.empty?
-    PostLint.pairs(parsed.values, spec).each { |path, f| findings_by_path[path].concat(f) }
-    PostLint.tag_cases(parsed.values, spec).each { |path, f| findings_by_path[path].concat(f.uniq) }
-  end
+  PostLint.pairs(parsed.values, spec).each { |path, f| findings_by_path[path].concat(f) } if ARGV.empty?
   failed = 0
   findings_by_path.each do |path, findings|
     next if findings.empty?

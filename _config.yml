@@ -32,10 +32,8 @@ exclude:
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
 email: aldente0630@gmail.com
-name: Jonas Kim
-# jekyll-feed reads `author` (not `name`) for the Atom <author> element. Without
-# it every entry ships an empty <author><name></name></author>. Posts never set
-# `author` themselves — paper posts use `paper_author` — so this is every entry's.
+# The site's author: jekyll-feed's Atom <author> and head.html's author meta and
+# JSON-LD. Posts never set `author` themselves — paper posts use `paper_author`.
 author: Jonas Kim
 # The site's default language: the feed's xml:lang. Pages and posts still set
 # their own `lang`; a post without one is in this language.
@@ -55,7 +53,7 @@ url: https://bits-bytes-nn.github.io
 # afternoon-dated posts onto the next day and 404 their live URLs. Pinned to UTC
 # because every published URL was built that way.
 timezone: UTC
-# Build posts dated later than the build. Posts here are dated 12:00 on their
+# Build posts dated later than the build. Insights posts are dated 12:00 on their
 # day (21:00 KST), so a same-day merge in the Korean morning would deploy
 # without the post, and nothing rebuilds the site later. Nothing is scheduled.
 future: true

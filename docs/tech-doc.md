@@ -352,15 +352,15 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 - **CI(자동 배포)** — `.github/workflows/jekyll.yml`이 `main` 브랜치에 푸시될 때마다
   `JEKYLL_ENV=production`으로 빌드하고 `actions/deploy-pages`로 GitHub Pages에 올린다.
   빌드 직후 **html-proofer**가 내부 링크·이미지·앵커가 다 살아 있는지 검사하고, 하나라도
-  깨졌으면 **배포를 막는다**(외부 링크는 느리고 불안정해 건너뛴다). 푸시 전에 README의
-  "Validate before pushing" 명령으로 같은 검사를 로컬에서 돌리면 배포 실패를 예방할 수 있다.
+  깨졌으면 **배포를 막는다**(외부 링크는 느리고 불안정해 건너뛴다). 푸시 전에
+  README.ko.md "푸시 전에 확인하세요"의 명령으로 같은 검사를 로컬에서 돌리면 배포 실패를 예방할 수 있다.
 
   권한은 잡별로 나눈다. 워크플로 기본값은 `contents: read`이고, Pages 쓰기와 OIDC 토큰은
   `deploy` 잡에만 준다. 동시 실행 그룹은 ref별이라 PR 실행이 대기 중인 배포를 밀어내지 않고,
   같은 PR의 이전 실행은 새 커밋이 오면 취소된다.
 
   같은 워크플로가 **`main`으로 향하는 PR에서도** 돈다(`deploy` 잡과 아티팩트 업로드만
-  `github.event_name != 'pull_request'`로 건너뛴다). 그래서 게이트가 머지를 **막는다.** PR
+  `github.event_name != 'pull_request'`와 `github.ref == 'refs/heads/main'` 조건으로 건너뛴다). 그래서 게이트가 머지를 **막는다.** PR
   트리거가 없으면 검사는 머지 뒤에야 돌고, 잘못된 변경은 main에 착지한 다음 배포에 실패한다 —
   사이트는 마지막 정상 배포를 계속 서빙하지만 main이 빨간 상태로 남는다.
 
@@ -373,8 +373,8 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   안내한다. 손으로 만든 `robots.txt`를 두면 그 생성이 꺼진다. `head.html`은
   `<link rel="alternate">`로 피드 위치를 알린다. 내용이 없는 `/search/`와 `404.html`은
   `sitemap: false`로 사이트맵에서 뺀다.
-- **저자 표기** — 글의 저자는 항상 블로그 저자다. JSON-LD `author`는 `site.name`, 피드의
-  `<author>`는 `site.author`를 쓴다. 논문을 낸 기관은 `author`가 아니라 `paper_author`에
+- **저자 표기** — 글의 저자는 항상 블로그 저자다. JSON-LD `author`, `<meta name="author">`, 피드의
+  `<author>`가 모두 `site.author`를 쓴다. 논문을 낸 기관은 `author`가 아니라 `paper_author`에
   적고 화면에 "Paper by …"로만 표시한다 — jekyll-feed가 글의 `author`를 피드 저자로 쓰기
   때문이다.
 - **검색 노출 검사** — `script/validate-site.sh`가 빌드된 사이트를 훑어 사이트맵·피드가
@@ -383,15 +383,18 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   스크립트 자체다** — 각 검사 옆 주석에 그 검사가 왜 있는지가 적혀 있다. htmlproofer가 보지
   않는 영역을 메우는 게 목적이다. 인자로 빌드 경로를 받고, 없으면 `_site`를 본다.
   플러그인 훅이 글에 남겨야 할 결과(옛 URL 리디렉션, 수정일, 이전·다음 링크, 이미지 `loading`·`width`,
-  표 스크롤 컨테이너), kramdown이 읽지 못해 닫는 태그가 글자로 나간 블록 HTML, 피드 상한은
+  표 스크롤 컨테이너), kramdown이 읽지 못해 닫는 태그가 글자로 나간 블록 HTML, 번역본을 함께 싣는 목록,
+  한 페이지 안의 중복 `id`, 피드 상한은
   `script/check-plugin-output.rb`가 Jekyll로 글을 직접 읽어
   확인하고, `validate-site.sh`가 이를 실행한다. 단위 테스트는 플러그인 함수만 보므로 훅이 빠져도
   빌드는 통과하기 때문이다.
-- **글 원본 린트** — `script/lint-posts.rb`가 `_posts`(하위 폴더 포함)의 마크다운을 빌드 전에 검사한다. 글은 `.md` 파일이어야 한다.
-  프런트매터는 `_data/post_conventions.yml`과 대조한다(카테고리·표지·금지 키·통제 태그·폐기된
-  태그 이름·태그 형식·번역본 파일명·논문 글의 `paper_author`). 빌드된 HTML에서는 더 보이지 않는 결함도 잡는다: 헤더와
-  열 수가 어긋난 표, 2단 헤더를 펴다 생긴 하위 헤더 행, `$$` 안의 `\_`, 빈 줄 없는 디스플레이
-  수식(목록 안 포함), `\\(`·`\\[`로 쓴 수식과 단일 `$` 옆의 TeX, 짝이 맞지 않는 `$$`, `use_math: true` 없는 수식, 표 행의 `$$` 안에 있는 `|`(`\|` 포함), `{% raw %}` 밖의 Liquid 태그(코드 블록의 `{{ }}`는 빈칸으로 렌더된다), HTML이 아닌 `<think>` 같은 태그(브라우저가 태그를 지운다), kramdown이 펜스로 읽지 않는 코드 펜스(정보 문자열의 공백, 닫히지 않은 펜스), 글마다 대소문자를 다르게 쓴 태그, 본문 H1. 프런트매터에서는 첫 줄의 `---`, 평문 `description`(마크업·링크 없음), 파일명의 `YYYY-MM-DD-`, 파일명 날짜보다 늦지 않은 `date:`도 본다. `_config.yml`의 `future: true`는 정오로 날짜를 적은 당일 글이 한국 오전 머지에서 빠지지 않게 하고, `strict_filters`는 등록되지 않은 필터를 빌드 오류로 만든다. 글 사이의 규칙으로는 번역 짝(`<slug>.md`와 `<slug>-en.md`가 같은 `translation_id`)이 둘 다 있는지 본다. 통화 `$$`가 연 수식은 그 사이에 한글이 있을 때만 잡는다. 검사 목록의 정본은 스크립트와 `test/test_lint_posts.rb`다.
+- **글 원본 린트** — `script/lint-posts.rb`가 `_posts`의 원본을 빌드 전에 검사한다.
+  프런트매터는 `_data/post_conventions.yml`과 대조하고, 본문에서는 빌드된 HTML로는 더 보이지
+  않는 결함(어긋난 표, 깨지는 수식, Liquid·HTML로 읽히는 텍스트, kramdown이 읽지 못하는
+  코드 펜스)을 잡는다. 규칙마다 주석에 그 규칙이 막는 결함이 적혀 있고, 검사 목록의 정본은
+  스크립트와 `test/test_lint_posts.rb`다. `_config.yml`의 `future: true`는 정오로 날짜를 적은
+  당일 글이 한국 오전 머지에서 빠지지 않게 하고, `strict_filters`는 등록되지 않은 필터를
+  빌드 오류로 만든다.
 - **단위 테스트** — `test/`가 `_plugins/`의 순수 로직(플러그인당 한 파일)과 글 원본 린트를
   minitest로 검사한다. `ruby test/run_all.rb`로 돌리며 CI에서 빌드보다 먼저 실행된다.
   플러그인은 모든 페이지의 메타데이터를 만들기 때문에, 여기서 조용히 동작이 바뀌면 사이트

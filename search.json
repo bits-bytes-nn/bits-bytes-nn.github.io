@@ -21,7 +21,7 @@ layout: null
       "title": {{ post.title | jsonify }},
       "url": "{{ site.baseurl }}{{ post.url }}",
       "date": "{{ post.date | date: site.date_format }}",
-      "category": {{ post.categories | join: ', ' | jsonify }},
+      "category": {{ post.categories | join: ', ' | replace: '-', ' ' | jsonify }},
       "tags": {{ post.tags | join: ', ' | replace: '-', ' ' | jsonify }},
       "content": {{ post.content | plain_text | jsonify }}
     }{% unless forloop.last %},{% endunless %}

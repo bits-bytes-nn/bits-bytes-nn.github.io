@@ -67,9 +67,10 @@ jobs:
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}" --strict-front-matter
+        run: bundle exec jekyll build --baseurl "$BASE_PATH" --strict-front-matter
         env:
           JEKYLL_ENV: production
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Validate HTML, internal links, and images
         # Catches broken internal links/anchors and missing images before deploy.
         # External links are skipped (slow, flaky) but must be https; hash-only
@@ -80,7 +81,9 @@ jobs:
           bundle exec htmlproofer ./_site \
             --disable-external \
             --allow-hash-href \
-            --swap-urls "^${{ steps.pages.outputs.base_path }}:"
+            --swap-urls "^$BASE_PATH:"
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Validate discoverability (sitemap, feed, metadata)
         # Guards what htmlproofer does not look at: that the sitemap and feed
         # parse, that every page carries a description and a canonical, that no
