@@ -86,6 +86,7 @@ class TestLintPosts < Minitest::Test
     found = lint(sub_header)
     assert_finding(/empty cell/, found)
     assert_finding(/second header row/, found)
+    assert_finding(/first cell is empty/, lint("| | A | B |\n|---|---|---|\n| x | 1 | 2 |\n"))
     assert_finding(/row has 5 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 | 4 |\n"))
     assert_finding(/row has 4 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 |\n"))
   end
@@ -290,9 +291,10 @@ class TestLintPosts < Minitest::Test
     with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
     assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))
     assert_equal [], lint(front: with_doi.call('"10.18653/v1/2024.acl-long.1"'))
-    ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"', '"10.48550/arXiv.2310.06825v2"'].each do |doi|
+    ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"'].each do |doi|
       assert_finding(/paper_doi is a bare DOI/, lint(front: with_doi.call(doi)))
     end
+    assert_finding(/carries an arXiv version/, lint(front: with_doi.call('"10.48550/arXiv.2310.06825v2"')))
     guide = with_doi.call('"10.48550/arXiv.2310.06825"').sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"')
     assert_finding(/paper_doi is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
     assert_finding(/paper_author is for Paper Reviews and Paper Summaries posts/, lint(front: guide))

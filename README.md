@@ -247,8 +247,8 @@ rules easiest to trip, each a page that renders wrong with every other gate gree
 Two prose rules are style, not rendering, and match the ones scholar-lens holds
 its generated posts to: no translationese with no natural reading (a double
 passive like "보여지는", "에 있어서는", "학습함에 있어"), and no sentence ending
-in a colon ("다음과 같습니다:"). Headings, quotations, tables and the reference
-list are exempt.
+in a colon ("다음과 같습니다:"). Headings, quotations, tables, image alt text,
+code and the reference list are exempt.
 
 ### Validate before pushing
 
