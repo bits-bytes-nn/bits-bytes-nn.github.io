@@ -378,7 +378,8 @@ module PostLint
 
   # Cells of one table row. `\|`, and pipes inside code or $$...$$, are content.
   def self.cells(row)
-    text = row.strip.gsub(/#{CODE_SPAN}|\$\$.*?\$\$/) { |m| m.tr("|", "\u0000") }.gsub("\\|", "\u0000")
+    # \u0001, not NUL: strip removes NUL, so a cell holding only `\|` read as empty.
+    text = row.strip.gsub(/#{CODE_SPAN}|\$\$.*?\$\$/) { |m| m.tr("|", "\u0001") }.gsub("\\|", "\u0001")
     text = text.delete_prefix("|").delete_suffix("|")
     text.split("|", -1).map(&:strip)
   end
