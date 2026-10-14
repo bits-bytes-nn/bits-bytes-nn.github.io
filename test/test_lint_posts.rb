@@ -279,6 +279,7 @@ class TestLintPosts < Minitest::Test
     end
     guide = with_doi.call('"10.48550/arXiv.2310.06825"').sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"')
     assert_finding(/paper_doi is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
+    assert_finding(/paper_author is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
   end
 end
 
