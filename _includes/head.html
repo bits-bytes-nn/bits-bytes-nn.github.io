@@ -245,14 +245,21 @@
 	        });
 	        // Every formula, not just the ones that scroll now: one that stopped
 	        // scrolling on a resize has to lose its Tab stop again.
-	        // Numbered like js/main.js's tables, so a landmark list tells them apart.
-	        document.querySelectorAll('.post-content mjx-container').forEach(function (el, i) {
-	          var scrolls = (el.hasAttribute('display') || el.classList.contains('is-wide')) &&
+	        // Numbered like js/main.js's tables, so a landmark list tells them apart:
+	        // display equations in order, inline ones on a count of their own.
+	        var english = document.documentElement.lang.indexOf('en') === 0;
+	        var shown = 0, inline = 0;
+	        document.querySelectorAll('.post-content mjx-container').forEach(function (el) {
+	          var display = el.hasAttribute('display');
+	          var n = display ? ++shown : ++inline;
+	          var scrolls = (display || el.classList.contains('is-wide')) &&
 	            el.scrollWidth > el.clientWidth;
 	          if (scrolls && el.getAttribute('tabindex') !== '0') {
 	            el.setAttribute('tabindex', '0');
 	            el.setAttribute('role', 'region');
-	            el.setAttribute('aria-label', document.documentElement.lang.indexOf('en') === 0 ? 'Equation ' + (i + 1) + ', scrollable' : '수식 ' + (i + 1) + ', 가로 스크롤');
+	            el.setAttribute('aria-label', display
+	              ? (english ? 'Equation ' + n + ', scrollable' : '수식 ' + n + ', 가로 스크롤')
+	              : (english ? 'Inline equation ' + n + ', scrollable' : '인라인 수식 ' + n + ', 가로 스크롤'));
 	          } else if (!scrolls && el.getAttribute('role') === 'region') {
 	            el.removeAttribute('tabindex');
 	            el.removeAttribute('role');

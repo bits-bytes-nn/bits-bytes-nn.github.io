@@ -228,6 +228,7 @@ class TestLintPosts < Minitest::Test
     assert_finding(/not its image/, lint(%(<a class='glightbox wide' href='https://a.b/page'><img src='/assets/images/a.png' alt='a'></a>\n)))
     assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox" data-glightbox="title: A -> B"><img src="/x.png" alt="a > b"></a>\n)))
     assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><img alt="A -> B" src="/x.png"></a>\n)))
+    assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><IMG SRC="/x.png" alt="x"></a>\n)))
     # After a fence the finding still names its own line.
     found = lint(%(```\nx\n```\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n))
     assert_match(/\A13: /, found.first)

@@ -45,7 +45,7 @@ module PostLint
   # or endless box. 16 figures in the AI-ready-data pair shipped that way.
   # Attribute values may hold `>` (a caption "A -> B"), so runs skip quoted text.
   ATTRS = %q{(?:[^>"']|"[^"]*"|'[^']*')*}
-  LIGHTBOX = %r{<a\b#{ATTRS}\bclass=["'][^"']*\bglightbox\b[^"']*["']#{ATTRS}>\s*<img\b#{ATTRS}>}mi
+  LIGHTBOX = %r{<a\b#{ATTRS}\bclass=["'][^"']*\bglightbox\b[^"']*["']#{ATTRS}>\s*(?<img><img\b#{ATTRS}>)}mi
 
   def self.lightbox(post)
     # Fenced code keeps its line count, so an example there is neither read nor
@@ -54,7 +54,7 @@ module PostLint
     body.to_enum(:scan, LIGHTBOX).filter_map do
       m = Regexp.last_match
       href = m[0][/\shref=["']([^"']+)/i, 1]
-      src = m[0][/<img\b#{ATTRS}>/][/\ssrc=["']([^"']+)/i, 1]
+      src = m[:img][/\ssrc=["']([^"']+)/i, 1]
       next unless href && src && href != src
 
       "#{post.body_line + body[0, m.begin(0)].count("\n")}: a glightbox link opens #{href}, not its image; set href to #{src}"
