@@ -99,7 +99,7 @@ Action: Search[Y]
 ...
 ```
 
-![ReAct pattern: combining Reasoning and Acting — Yao et al., 2022](https://ylanglabs.com/static/images/blogs/react-reasoning-and-acting-in-language-models/react-act-reason.png)
+![ReAct pattern: combining Reasoning and Acting — Yao et al., 2022](/assets/images/evolution-of-ai-agentic-patterns-react.png)
 
 Two key results. First, external tool use **reduces hallucination** — the model can look up what it doesn't know. Second, the reasoning process is transparent — you can trace why it gave a particular answer. A 34% absolute improvement on ALFWorld, 10% on WebShop. **The archetype of the agent was born here.** Every AI agent today — Claude Code, Cursor Agent, GitHub Copilot Coding Agent — is a variation on this Thought-Action-Observation loop.
 
@@ -107,7 +107,7 @@ So far, smooth sailing. The trouble started when people pushed these ideas harde
 
 **Tree-of-Thought** — [Yao et al., 2023](https://arxiv.org/abs/2305.10601). In 2023, the push was to expand reasoning's "breadth," not just its depth.
 
-![Tree-of-Thought: tree-search-based reasoning vs. linear CoT — Yao et al., 2023](https://www.promptingguide.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FTOT.3b13bc5e.png&w=1920&q=75)
+![Tree-of-Thought: tree-search-based reasoning vs. linear CoT — Yao et al., 2023](/assets/images/evolution-of-ai-agentic-patterns-tree-of-thoughts.png)
 
 Where CoT reasons in a straight line, Tree-of-Thought explores multiple reasoning paths simultaneously, backtracking from dead ends. Like reading ahead in chess: "if I play this move... and they respond like this... then I could..." Fascinating, but costs exploded. A single problem required dozens of API calls. The paper's "Future Work" section mentions cost in a one-liner caveat; on a production engineer's AWS bill, it's the first line of a crisis.
 
@@ -385,7 +385,7 @@ Simon Willison's agent definition reads in this same context: "An agent is an LL
 
 "Harness" sounds grand, but it's ultimately a collection of mechanisms that catch and correct agent mistakes. Fowler/Böckeler [organized it cleanly](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html) in a 2x2 framework.
 
-|  | **Feedforward (Pre-guidance)** | **Feedback (Post-correction)** |
+| Kind | **Feedforward (Pre-guidance)** | **Feedback (Post-correction)** |
 |---|---|---|
 | **Deterministic** | **Guides**: AGENTS.md, `.cursorrules`, coding conventions | **Computational**: Compilers, type checkers, linters |
 | **Non-deterministic** | **System prompts/instructions**: Role definitions, behavioral constraints, few-shot examples | **Inferential**: LLM-as-judge, semantic code review |

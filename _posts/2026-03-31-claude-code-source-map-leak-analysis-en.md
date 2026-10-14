@@ -72,7 +72,7 @@ Using React for a terminal app might seem like overkill. But when you look at th
 
 ### Official Open Source vs. Leaked Code: The Gap in Numbers
 
-| | Official Repo (`anthropics/claude-code`) | Leaked Code |
+| Aspect | Official Repo (`anthropics/claude-code`) | Leaked Code |
 |---|---|---|
 | File Count | ~279 (scripts/configs) | **4,600+** (full-stack engine) |
 | Core Engine | **Not included** | Included |
