@@ -54,7 +54,7 @@ module PostLint
     body.to_enum(:scan, LIGHTBOX).filter_map do
       m = Regexp.last_match
       href = m[0][/\shref=["']([^"']+)/i, 1]
-      src = m[0][/<img\b[^>]*\ssrc=["']([^"']+)/i, 1]
+      src = m[0][/<img\b#{ATTRS}>/][/\ssrc=["']([^"']+)/i, 1]
       next unless href && src && href != src
 
       "#{post.body_line + body[0, m.begin(0)].count("\n")}: a glightbox link opens #{href}, not its image; set href to #{src}"
@@ -129,7 +129,9 @@ module PostLint
       end
       # js/citations.js puts it in the request path as is, so a URL, a `doi:`
       # prefix, or a `?` or `#` in it finds nothing there.
-      if data.key?("paper_doi") && !data["paper_doi"].to_s.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})
+      # arXiv registers one DOI per paper, without the version (…v2).
+      doi = data["paper_doi"].to_s
+      if data.key?("paper_doi") && (!doi.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z}) || doi.match?(%r{\A10\.48550/.*v\d+\z}i))
         found << "1: paper_doi is a bare DOI (10.<registrant>/<suffix>), got #{data["paper_doi"].inspect}"
       end
     else

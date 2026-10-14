@@ -227,6 +227,7 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint(%(<a href="/assets/images/a.png" class="glightbox">\n<img src="/assets/images/a.png" alt="a" />\n</a>\n))
     assert_finding(/not its image/, lint(%(<a class='glightbox wide' href='https://a.b/page'><img src='/assets/images/a.png' alt='a'></a>\n)))
     assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox" data-glightbox="title: A -> B"><img src="/x.png" alt="a > b"></a>\n)))
+    assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><img alt="A -> B" src="/x.png"></a>\n)))
     # After a fence the finding still names its own line.
     found = lint(%(```\nx\n```\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n))
     assert_match(/\A13: /, found.first)
@@ -274,12 +275,14 @@ class TestLintPosts < Minitest::Test
     with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
     assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))
     assert_equal [], lint(front: with_doi.call('"10.18653/v1/2024.acl-long.1"'))
-    ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"'].each do |doi|
+    ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"', '"10.48550/arXiv.2310.06825v2"'].each do |doi|
       assert_finding(/paper_doi is a bare DOI/, lint(front: with_doi.call(doi)))
     end
     guide = with_doi.call('"10.48550/arXiv.2310.06825"').sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"')
     assert_finding(/paper_doi is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
     assert_finding(/paper_author is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
+    survey = FRONT.sub('"Paper Reviews"', '"Paper Surveys"').sub("paper_author: \"Mistral AI\"\n", "")
+    assert_equal [], lint(front: survey)
   end
 end
 
