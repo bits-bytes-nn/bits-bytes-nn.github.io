@@ -272,7 +272,7 @@ class TestLintPosts < Minitest::Test
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))
   end
 
-  # The Mistral, Llama 3 and Gemini posts shipped these.
+  # Five paper posts shipped these (DeepSeek LLM, DeepSeekMath, Llama 3, Gemini, Mistral).
   def test_translationese_and_a_colon_ending_in_prose
     assert_finding(/translationese "보여지"/, lint("그림에서 보여지는 곡선입니다.\n"))
     assert_finding(/translationese "에 있어서는"/, lint("추론에 있어서는 그렇습니다.\n"))
@@ -282,6 +282,7 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("이 점에 있어서 중요합니다.\n")
     assert_equal [], lint("## 정리합니다: 요약\n\n> 그는 말했다: 아니다\n\n\"이렇다: 저렇다\"라고 합니다.\n\n`a다:b`\n")
     assert_equal [], lint("| 바다: 깊이 | 1 |\n|---|---|\n| 2 | 3 |\n")
+    assert_equal [], lint("- 항목\n\n  | 같습니다: | 2 |\n  |---|---|\n  | 3 | 4 |\n\n![정리합니다: 그림](/a.png)\n")
     assert_equal [], lint("### References\n\n* 보여지는 것들: 논문\n")
   end
 

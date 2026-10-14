@@ -207,8 +207,8 @@ module PostLint
   # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
   NEEDS_ATTRIBUTES = %w[a audio iframe img script source video].to_set
 
-  # The prose rules scholar-lens holds its generated posts to (its
-  # markdown_lint.py), so a hand-written post answers to them too.
+  # The patterns of scholar-lens's prose rules (its markdown_lint.py), so a
+  # hand-written post answers to them too. Its scope is wider for the first.
   # Translationese with no natural reading: a double passive ("보여지는") and
   # the calque "에 있어서는", "학습함에 있어". A bare "에 있어서" stays.
   TRANSLATIONESE = /되어[지진져집]|보여[지진져]|에 있어(?:서[는도의](?! 안)|[는의])|[음함]에 있어(?![야요])/
@@ -217,11 +217,12 @@ module PostLint
   QUOTED = /"[^"\n]*"|“[^”\n]*”|‘[^’\n]*’|「[^」\n]*」/
   REFERENCES = /\A\#{1,6}\s+(?:references|bibliography|참고 ?자료|참고 ?문헌)\b/i
 
-  # Not in a heading, a quotation, a table row or the reference list.
+  # Not in a heading, a quotation, a table row (indented under a list too),
+  # image alt text (scholar-lens fills it from the heading) or the reference list.
   def self.prose(line, text, in_references)
-    return [] if in_references || line.start_with?("#", "|") || line.lstrip.start_with?(">")
+    return [] if in_references || line.start_with?("#") || line.lstrip.start_with?(">", "|")
 
-    text = text.gsub(QUOTED, "")
+    text = text.gsub(QUOTED, "").gsub(/!\[[^\]\n]*\]\([^)\n]*\)/, "")
     [(%(translationese "#{$&}"; reword it) if text =~ TRANSLATIONESE),
      ("a sentence ends in a colon (#{$&}); end it with a period" if text =~ SENTENCE_COLON)].compact
   end
