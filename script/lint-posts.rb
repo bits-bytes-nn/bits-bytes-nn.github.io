@@ -132,8 +132,12 @@ module PostLint
       if data.key?("paper_doi") && !data["paper_doi"].to_s.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})
         found << "1: paper_doi is a bare DOI (10.<registrant>/<suffix>), got #{data["paper_doi"].inspect}"
       end
-    elsif data.key?("paper_doi")
-      found << "1: paper_doi is for #{spec["types"].select { |_, t| t["paper"] }.keys.join(" and ")} posts"
+    else
+      paper_types = spec["types"].select { |_, t| t["paper"] }.keys.join(" and ")
+      # The layout prints "Paper by …" for any post that has it.
+      %w[paper_author paper_doi].each do |k|
+        found << "1: #{k} is for #{paper_types} posts" if data.key?(k)
+      end
     end
 
     cover = spec["types"][type]["cover"] || spec["topics"][topic]

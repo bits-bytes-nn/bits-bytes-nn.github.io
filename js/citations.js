@@ -18,7 +18,7 @@
   // Zero is not a count worth showing: Semantic Scholar answers it for a
   // duplicate record of a paper, and it stands in for "not found" below.
   function show(entry) {
-    if (!(entry.count > 0)) return;
+    if (!(entry.count > 0) || !entry.paperId) return;
     var count = entry.count.toLocaleString('en-US');
     var link = document.createElement('a');
     link.className = 'meta-value';
@@ -34,7 +34,8 @@
   var cached = null;
   try { cached = JSON.parse(localStorage.getItem(key)); } catch (e) {}
   if (cached && typeof cached.count !== 'number') cached = null;
-  if (cached && Date.now() - cached.at < DAY) return show(cached);
+  var age = cached && Date.now() - cached.at;
+  if (cached && age >= 0 && age < DAY) return show(cached); // a clock set back is not fresh
 
   var controller = new AbortController();
   var timer = setTimeout(function () { controller.abort(); }, 5000);
@@ -54,8 +55,12 @@
       show(entry);
     })
     .catch(function (err) {
-      console.error('Citation count:', err);
-      if (cached) show(cached);
+      console.warn('Citation count:', err); // expected: the keyless API often answers 429
+      if (!cached) return;
+      // Kept for another day, or every view of a paper gone missing asks again.
+      cached.at = Date.now();
+      try { localStorage.setItem(key, JSON.stringify(cached)); } catch (e) {}
+      show(cached);
     })
     .finally(function () { clearTimeout(timer); });
 })();

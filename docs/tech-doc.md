@@ -56,7 +56,7 @@ Pages가 그대로 서빙.**
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
 | 스타일 | Sass(`_sass/`), 벤더링된 Bourbon + Neat 그리드 프레임워크 | "벤더링"은 외부 라이브러리를 저장소 안에 복사해 둔 것. `jekyll-sass-converter` 2.x(libsass)로 **고정** — 3.x(dart-sass)는 Bourbon/Neat의 구식 `/` 나눗셈 문법에서 에러 |
-| 자바스크립트 | 바닐라 JS(`js/main.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 아이콘은 Font Awesome 경로를 복사한 인라인 SVG(`_includes/icon.html`)라 아이콘 글꼴을 받지 않는다. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
+| 자바스크립트 | 바닐라 JS(`js/main.js`, 검색 페이지의 `js/search.js`, 논문 글의 `js/citations.js`, jQuery 없음) | "바닐라"는 프레임워크 없이 순수 JS만 쓴다는 뜻. 이미지 확대는 GLightbox. 아이콘은 Font Awesome 경로를 복사한 인라인 SVG(`_includes/icon.html`)라 아이콘 글꼴을 받지 않는다. 외부 CDN 스크립트는 **SRI**로 무결성 검증(아래 설명) |
 | 검색 | `search.json`(전체 본문 색인) 위에 `simple-jekyll-search` | 서버 없이 브라우저에서 도는 검색. 미리 만들어 둔 색인 파일을 받아 클라이언트가 직접 찾는다 |
 | 다크모드 | 라이트가 기본, 토글로 opt-in(`_sass/_dark.scss`, `[data-theme="dark"]`) | OS의 다크모드 설정은 **따르지 않고**, 사용자가 버튼을 눌러 켜야 한다. 테마에 따라 바뀌어야 하는 두 값이 CSS 밖에 있다 — `color-scheme`(스크롤바 등 브라우저 위젯)은 `_dark.scss`가 `data-theme`으로 처리하고, `theme-color`(모바일 주소창)는 메타 태그라 `head.html`의 인라인 스크립트와 `main.js`의 토글이 함께 갱신한다 |
 | 호스팅/CI | GitHub Actions로 GitHub Pages 배포(`.github/workflows/jekyll.yml`) | `main`에 푸시하면 자동으로 빌드·검사·배포. 같은 검사가 `main`으로 향하는 PR에서도 돌아 머지 전에 막는다 |
