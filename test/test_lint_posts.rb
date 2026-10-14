@@ -272,6 +272,19 @@ class TestLintPosts < Minitest::Test
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))
   end
 
+  # The Mistral, Llama 3 and Gemini posts shipped these.
+  def test_translationese_and_a_colon_ending_in_prose
+    assert_finding(/translationese "보여지"/, lint("그림에서 보여지는 곡선입니다.\n"))
+    assert_finding(/translationese "에 있어서는"/, lint("추론에 있어서는 그렇습니다.\n"))
+    assert_finding(/translationese "함에 있어"/, lint("학습함에 있어 중요합니다.\n"))
+    assert_finding(/ends in a colon/, lint("다음과 같이 작동합니다:\n\n1. 하나\n"))
+    # A bare "에 있어서", and a colon in a heading, a quote, a table, code or the references.
+    assert_equal [], lint("이 점에 있어서 중요합니다.\n")
+    assert_equal [], lint("## 정리합니다: 요약\n\n> 그는 말했다: 아니다\n\n\"이렇다: 저렇다\"라고 합니다.\n\n`a다:b`\n")
+    assert_equal [], lint("| 바다: 깊이 | 1 |\n|---|---|\n| 2 | 3 |\n")
+    assert_equal [], lint("### References\n\n* 보여지는 것들: 논문\n")
+  end
+
   def test_paper_doi_is_a_bare_doi_on_paper_posts_only
     with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
     assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))

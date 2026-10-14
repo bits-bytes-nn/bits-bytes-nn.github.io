@@ -207,8 +207,28 @@ module PostLint
   # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
   NEEDS_ATTRIBUTES = %w[a audio iframe img script source video].to_set
 
+  # The prose rules scholar-lens holds its generated posts to (its
+  # markdown_lint.py), so a hand-written post answers to them too.
+  # Translationese with no natural reading: a double passive ("보여지는") and
+  # the calque "에 있어서는", "학습함에 있어". A bare "에 있어서" stays.
+  TRANSLATIONESE = /되어[지진져집]|보여[지진져]|에 있어(?:서[는도의](?! 안)|[는의])|[음함]에 있어(?![야요])/
+  # A sentence ending glued to a colon ("다음과 같습니다:"): end the sentence.
+  SENTENCE_COLON = /다:/
+  QUOTED = /"[^"\n]*"|“[^”\n]*”|‘[^’\n]*’|「[^」\n]*」/
+  REFERENCES = /\A\#{1,6}\s+(?:references|bibliography|참고 ?자료|참고 ?문헌)\b/i
+
+  # Not in a heading, a quotation, a table row or the reference list.
+  def self.prose(line, text, in_references)
+    return [] if in_references || line.start_with?("#", "|") || line.lstrip.start_with?(">")
+
+    text = text.gsub(QUOTED, "")
+    [(%(translationese "#{$&}"; reword it) if text =~ TRANSLATIONESE),
+     ("a sentence ends in a colon (#{$&}); end it with a period" if text =~ SENTENCE_COLON)].compact
+  end
+
   def self.body(post)
     found = []
+    in_references = false
     lines = post.body.split("\n", -1)
     fence = nil # the marker that opened the code fence we are in
     fence_line = nil
@@ -256,6 +276,7 @@ module PostLint
       end
       para = (para ? nil : n) if odd
       found << "#{n}: H1 in the body; the layout renders the title" if line.match?(/\A# \S/)
+      in_references = line.match?(REFERENCES) if line.start_with?("#")
       # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
       # 200, so no link check notices: 59 figures went blank that way.
       found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
@@ -265,6 +286,7 @@ module PostLint
       if (tag = tags.find { |close, name, attrs| !HTML_ELEMENTS.include?(name.downcase) || (close.empty? && attrs.to_s.strip.empty? && NEEDS_ATTRIBUTES.include?(name.downcase)) }&.[](1))
         found << "#{n}: <#{tag}> is read as HTML, so it does not show as text; write it in `code` or as \\<#{tag}\\>"
       end
+      found.concat(prose(line, text, in_references).map { |f| "#{n}: #{f}" })
       found.concat(math(line, n, lines, i))
       found.concat(table(lines, i, n)) if table_start?(lines, i)
     end
