@@ -121,6 +121,17 @@ document.addEventListener('DOMContentLoaded', function () {
   // Add a class to the nav once the page is scrolled
   var nav = document.querySelector('.navigation');
   if (nav) {
+    // The page starts below the fixed bar, which grows to two rows when its
+    // tabs do not fit on one. The phone menu's dropdown is not the bar: there
+    // the bar stays one row and the open menu covers the page on purpose.
+    var wide = window.matchMedia('(min-width: 768px)');
+    var syncNavHeight = function () {
+      if (wide.matches) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+      else document.documentElement.style.removeProperty('--nav-height');
+    };
+    if (window.ResizeObserver) new ResizeObserver(syncNavHeight).observe(nav);
+    wide.addEventListener('change', syncNavHeight);
+    syncNavHeight();
     window.addEventListener('scroll', function () {
       nav.classList.toggle('scrolled', window.pageYOffset > 50);
     }, { passive: true });

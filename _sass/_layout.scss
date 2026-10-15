@@ -62,14 +62,16 @@ main.page-content {
 
 // Whatever the browser scrolls into view clears the fixed 66px header, which
 // would otherwise cover it: fragment targets (the TOC, /tags/#… from another
-// page, the skip link's #content) and the control keyboard focus moves to.
+// page, the skip link's #main-content) and the control keyboard focus moves to.
 // Done here rather than in a click handler so it also holds for links followed
 // from elsewhere and for ids a CSS selector cannot parse ("#1-서론").
 //
 // No `scroll-behavior: smooth`. A smooth jump passes lazy images that load on
 // the way and grow the page, so on long posts it stopped short of the heading.
+// --nav-height is the bar's real height, set by js/main.js: more tabs than one
+// row holds wrap it to two, and the page moves down with it.
 html {
-	scroll-padding-top: 80px;
+	scroll-padding-top: calc(var(--nav-height, 66px) + 14px);
 }
 
 // Visible to assistive technology, not on screen. Used by the copy-button live
@@ -560,7 +562,8 @@ blockquote {
 			// from 768px to about 785px, iPad portrait included. The bar wrapped to
 			// two rows, 130px tall, and hid the top of every page beneath it. 1.1em
 			// above it: seven tabs at 1.5em wrapped in the fallback font, before the
-			// web font arrives.
+			// web font arrives. A tab past what one row holds still wraps the bar;
+			// the page follows its height (--nav-height, below).
 			@include media ($tablet) {
 				padding-right: 1em;
 			}
@@ -612,7 +615,7 @@ blockquote {
 *	Body
 */
 .page-content {
-	margin-top: 66px;
+	margin-top: var(--nav-height, 66px);
 
 	.wrapper {
 		@include outer-container;
