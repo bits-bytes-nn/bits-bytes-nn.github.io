@@ -68,7 +68,9 @@ main.page-content {
 //
 // No `scroll-behavior: smooth`. A smooth jump passes lazy images that load on
 // the way and grow the page, so on long posts it stopped short of the heading.
-// --nav-height is the bar's real height, set by js/main.js: more tabs than one
+// --nav-height is the bar's real height, set before first paint by an inline
+// script in _layouts/default.html and kept in step by js/main.js (both at
+// $tablet, 768px, written out there): more tabs than one
 // row holds wrap it to two, and the page moves down with it.
 html {
 	scroll-padding-top: calc(var(--nav-height, 66px) + 14px);

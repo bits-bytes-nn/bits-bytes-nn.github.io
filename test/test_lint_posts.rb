@@ -292,6 +292,9 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("> ```text\n> 답을 <think> 안에 쓰세요: 그다음 답합니다\n> ```\n")
     assert_equal [], lint("> ```html\n> <a class=\"glightbox\" href=\"/p\"><img src=\"/a.png\"></a>\n> ```\n")
     assert_finding(/<think> is read as HTML/, lint("> 답을 <think> 안에 씁니다.\n"))
+    # A quoted fence in a Markdown example is part of the example.
+    assert_equal [], lint("```markdown\n> ```python\n> <think>\n> ```\n<think>\n```\n")
+    assert_finding(/code fence never closed/, lint("앞 문단입니다.\n\n> ```text\n> <think>\n"))
   end
 
   def test_paper_doi_is_a_bare_doi_on_paper_posts_only

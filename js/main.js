@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // The page starts below the fixed bar, which grows to two rows when its
     // tabs do not fit on one. The phone menu's dropdown is not the bar: there
     // the bar stays one row and the open menu covers the page on purpose.
-    var wide = window.matchMedia('(min-width: 768px)');
+    var wide = window.matchMedia('(min-width: 768px)'); // $tablet, as in default.html
     var syncNavHeight = function () {
       if (wide.matches) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
       else document.documentElement.style.removeProperty('--nav-height');

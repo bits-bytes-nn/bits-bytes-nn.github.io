@@ -12,7 +12,8 @@
 
     {% include header.html %}
     <!-- The bar's height before first paint, so a bar that wraps to two rows does
-         not drop the page once js/main.js runs; main.js keeps it in step. -->
+         not drop the page once js/main.js runs; main.js keeps it in step.
+         768px is $tablet in _sass/base/_variables.scss, as in main.js. -->
     <script>(function () { var n = document.querySelector('.navigation'); if (n && matchMedia('(min-width: 768px)').matches) document.documentElement.style.setProperty('--nav-height', n.offsetHeight + 'px'); })();</script>
 
     <main class="page-content" id="main-content">
