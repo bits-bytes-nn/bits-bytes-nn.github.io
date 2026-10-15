@@ -526,7 +526,10 @@ blockquote {
 				max-height: calc(100vh - 4em);
 				max-height: calc(100dvh - 4em);
 				overflow-y: auto;
-				padding: 4px 4px 6px 0; // the scroll box clips; room for the focus ring
+				// The scroll box clips: room for the focus ring, at the end and
+				// wherever focus scrolls an item into view.
+				padding: 4px 4px 6px 0;
+				scroll-padding: 4px 0 6px;
 			}
 		}
 	}
