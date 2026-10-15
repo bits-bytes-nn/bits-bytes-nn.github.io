@@ -287,6 +287,13 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("### References\n\n* 보여지는 것들: 논문\n")
   end
 
+  # scholar-lens quotes a prompt as a fenced block inside "> ".
+  def test_a_fence_inside_a_blockquote_is_code
+    assert_equal [], lint("> ```text\n> 답을 <think> 안에 쓰세요: 그다음 답합니다\n> ```\n")
+    assert_equal [], lint("> ```html\n> <a class=\"glightbox\" href=\"/p\"><img src=\"/a.png\"></a>\n> ```\n")
+    assert_finding(/<think> is read as HTML/, lint("> 답을 <think> 안에 씁니다.\n"))
+  end
+
   def test_paper_doi_is_a_bare_doi_on_paper_posts_only
     with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
     assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))

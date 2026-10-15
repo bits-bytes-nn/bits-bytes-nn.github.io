@@ -50,7 +50,7 @@ module PostLint
   def self.lightbox(post)
     # Fenced code keeps its line count, so an example there is neither read nor
     # shifts the line numbers after it.
-    body = post.body.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*/m) { |code| "\n" * code.count("\n") }
+    body = post.body.gsub(/^[\s>]*(`{3,}|~{3,}).*?^[\s>]*\1[^\n]*/m) { |code| "\n" * code.count("\n") }
     body.to_enum(:scan, LIGHTBOX).filter_map do
       m = Regexp.last_match
       href = m[0][/\shref=["']([^"']+)/i, 1]
@@ -240,14 +240,15 @@ module PostLint
     math_seen = false
     lines.each_with_index do |line, i|
       n = post.body_line + i
-      if (m = line.match(FENCE))
+      # A fence inside a blockquote ("> ```") is code too.
+      if (m = unquote(line).match(FENCE))
         if fence.nil?
           fence = m[1]
           fence_line = n
           # kramdown's GFM fence takes one word after the marker; with more it
           # renders the whole block as inline code.
-          found << "#{n}: code fence info has a space; write just the language" if line.strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
-        elsif line.strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
+          found << "#{n}: code fence info has a space; write just the language" if unquote(line).strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
+        elsif unquote(line).strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
           fence = nil
         end
         next
