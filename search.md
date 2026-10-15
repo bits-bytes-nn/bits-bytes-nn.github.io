@@ -15,8 +15,8 @@ sitemap: false
 
 <div id="search-container">
   <input type="search" id="search-input" data-index="{{ '/search.json' | prepend: site.baseurl }}" placeholder="Search posts by title, content, category, or tag…"
-         autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search posts">
-  <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
+         autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search posts" lang="en">
+  <p id="search-status" class="search-status" role="status" aria-live="polite" lang="en"></p>
   <div id="results-container"></div>
 </div>
 

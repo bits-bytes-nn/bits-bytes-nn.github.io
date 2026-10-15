@@ -200,9 +200,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Spoken, never shown, so in the page's language: a Korean voice reading
   // "Table, scrollable" is unintelligible. (The visible chrome stays English.)
+  // Numbered, so a reader's landmark list tells one table from the next.
   function scrollerLabel(el) {
-    if (el.tagName === 'PRE') return english ? 'Code block, scrollable' : '코드 블록, 가로 스크롤';
-    return english ? 'Table, scrollable' : '표, 가로 스크롤';
+    var code = el.tagName === 'PRE';
+    var n = Array.prototype.indexOf.call(document.querySelectorAll(code ? '.post-content pre' : '.post-content .table-container'), el) + 1;
+    if (code) return english ? 'Code block ' + n + ', scrollable' : '코드 블록 ' + n + ', 가로 스크롤';
+    return english ? 'Table ' + n + ', scrollable' : '표 ' + n + ', 가로 스크롤';
   }
 
   // A horizontally scrolling box can only be scrolled by keyboard if it is

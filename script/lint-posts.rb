@@ -45,7 +45,7 @@ module PostLint
   # or endless box. 16 figures in the AI-ready-data pair shipped that way.
   # Attribute values may hold `>` (a caption "A -> B"), so runs skip quoted text.
   ATTRS = %q{(?:[^>"']|"[^"]*"|'[^']*')*}
-  LIGHTBOX = %r{<a\b#{ATTRS}\bclass=["'][^"']*\bglightbox\b[^"']*["']#{ATTRS}>\s*<img\b#{ATTRS}>}mi
+  LIGHTBOX = %r{<a\b#{ATTRS}\bclass=["'][^"']*\bglightbox\b[^"']*["']#{ATTRS}>\s*(?<img><img\b#{ATTRS}>)}mi
 
   def self.lightbox(post)
     # Fenced code keeps its line count, so an example there is neither read nor
@@ -54,7 +54,7 @@ module PostLint
     body.to_enum(:scan, LIGHTBOX).filter_map do
       m = Regexp.last_match
       href = m[0][/\shref=["']([^"']+)/i, 1]
-      src = m[0][/<img\b[^>]*\ssrc=["']([^"']+)/i, 1]
+      src = m[:img][/\ssrc=["']([^"']+)/i, 1]
       next unless href && src && href != src
 
       "#{post.body_line + body[0, m.begin(0)].count("\n")}: a glightbox link opens #{href}, not its image; set href to #{src}"
@@ -129,8 +129,12 @@ module PostLint
       end
       # js/citations.js puts it in the request path as is, so a URL, a `doi:`
       # prefix, or a `?` or `#` in it finds nothing there.
-      if data.key?("paper_doi") && !data["paper_doi"].to_s.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})
+      # arXiv registers one DOI per paper, without the version (…v2).
+      doi = data["paper_doi"].to_s
+      if data.key?("paper_doi") && !doi.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})
         found << "1: paper_doi is a bare DOI (10.<registrant>/<suffix>), got #{data["paper_doi"].inspect}"
+      elsif doi.match?(%r{\A10\.48550/.*v\d+\z}i)
+        found << "1: paper_doi #{doi.inspect} carries an arXiv version; drop the vN"
       end
     else
       paper_types = spec["types"].select { |_, t| t["paper"] }.keys.join(" and ")
@@ -205,8 +209,29 @@ module PostLint
   # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
   NEEDS_ATTRIBUTES = %w[a audio iframe img script source video].to_set
 
+  # The patterns of scholar-lens's prose rules (its markdown_lint.py), so a
+  # hand-written post answers to them too. Its scope is wider for the first.
+  # Translationese with no natural reading: a double passive ("보여지는") and
+  # the calque "에 있어서는", "학습함에 있어". A bare "에 있어서" stays.
+  TRANSLATIONESE = /되어[지진져집]|보여[지진져]|에 있어(?:서[는도의](?! 안)|[는의])|[음함]에 있어(?![야요])/
+  # A sentence ending glued to a colon ("다음과 같습니다:"): end the sentence.
+  SENTENCE_COLON = /다:/
+  QUOTED = /"[^"\n]*"|“[^”\n]*”|‘[^’\n]*’|「[^」\n]*」/
+  REFERENCES = /\A\#{1,6}\s+(?:references|bibliography|참고 ?자료|참고 ?문헌)\b/i
+
+  # Not in a heading, a quotation, a table row (indented under a list too),
+  # image alt text (scholar-lens fills it from the heading) or the reference list.
+  def self.prose(line, text, in_references)
+    return [] if in_references || line.start_with?("#") || line.lstrip.start_with?(">", "|")
+
+    text = text.gsub(QUOTED, "").gsub(/!\[[^\]\n]*\]\([^)\n]*\)/, "")
+    [(%(translationese "#{$&}"; reword it) if text =~ TRANSLATIONESE),
+     ("a sentence ends in a colon (#{$&}); end it with a period" if text =~ SENTENCE_COLON)].compact
+  end
+
   def self.body(post)
     found = []
+    in_references = false
     lines = post.body.split("\n", -1)
     fence = nil # the marker that opened the code fence we are in
     fence_line = nil
@@ -254,6 +279,7 @@ module PostLint
       end
       para = (para ? nil : n) if odd
       found << "#{n}: H1 in the body; the layout renders the title" if line.match?(/\A# \S/)
+      in_references = line.match?(REFERENCES) if line.start_with?("#")
       # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
       # 200, so no link check notices: 59 figures went blank that way.
       found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
@@ -263,6 +289,7 @@ module PostLint
       if (tag = tags.find { |close, name, attrs| !HTML_ELEMENTS.include?(name.downcase) || (close.empty? && attrs.to_s.strip.empty? && NEEDS_ATTRIBUTES.include?(name.downcase)) }&.[](1))
         found << "#{n}: <#{tag}> is read as HTML, so it does not show as text; write it in `code` or as \\<#{tag}\\>"
       end
+      found.concat(prose(line, text, in_references).map { |f| "#{n}: #{f}" })
       found.concat(math(line, n, lines, i))
       found.concat(table(lines, i, n)) if table_start?(lines, i)
     end
@@ -351,7 +378,8 @@ module PostLint
 
   # Cells of one table row. `\|`, and pipes inside code or $$...$$, are content.
   def self.cells(row)
-    text = row.strip.gsub(/#{CODE_SPAN}|\$\$.*?\$\$/) { |m| m.tr("|", "\u0000") }.gsub("\\|", "\u0000")
+    # \u0001, not NUL: strip removes NUL, so a cell holding only `\|` read as empty.
+    text = row.strip.gsub(/#{CODE_SPAN}|\$\$.*?\$\$/) { |m| m.tr("|", "\u0001") }.gsub("\\|", "\u0001")
     text = text.delete_prefix("|").delete_suffix("|")
     text.split("|", -1).map(&:strip)
   end
@@ -362,6 +390,9 @@ module PostLint
     found = []
     if header.drop(1).any?(&:empty?)
       found << "#{n}: table header has an empty cell; merge a two-row header into one (\"AIME 2024 pass@1\")"
+    elsif header.first&.empty?
+      # An empty <th> names nothing to a screen reader; nine shipped that way.
+      found << "#{n}: table header's first cell is empty; name the column (\"구분\", \"모델\")"
     end
     first = rows.first && cells(rows.first)
     if first && first[0].empty? && first.none? { |c| c.match?(/\A[-+]?[\d.,]+%?\z/) }

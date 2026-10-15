@@ -244,6 +244,12 @@ rules easiest to trip, each a page that renders wrong with every other gate gree
 - an ar5iv link: ar5iv now answers a lost figure with a placeholder image and
   HTTP 200. Use `arxiv.org/html/<id>v1/…`, or copy the figure into `assets/images/`.
 
+Two prose rules are style, not rendering, and match the ones scholar-lens holds
+its generated posts to: no translationese with no natural reading (a double
+passive like "보여지는", "에 있어서는", "학습함에 있어"), and no sentence ending
+in a colon ("다음과 같습니다:"). Headings, quotations, tables, image alt text,
+code and the reference list are exempt.
+
 ### Validate before pushing
 
 These are the gates CI runs, in the same order. Build to a throwaway

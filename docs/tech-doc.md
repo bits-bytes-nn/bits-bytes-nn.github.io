@@ -401,7 +401,8 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 - **글 원본 린트** — `script/lint-posts.rb`가 `_posts`의 원본을 빌드 전에 검사한다.
   프런트매터는 `_data/post_conventions.yml`과 대조하고, 본문에서는 빌드된 HTML로는 더 보이지
   않는 결함(어긋난 표, 깨지는 수식, Liquid·HTML로 읽히는 텍스트, kramdown이 읽지 못하는
-  코드 펜스)을 잡는다. 규칙마다 주석에 그 규칙이 막는 결함이 적혀 있고, 검사 목록의 정본은
+  코드 펜스)을 잡는다. 문체 규칙 둘(번역투, 쌍점으로 끝나는 문장)도 scholar-lens와 같은 패턴으로
+  검사한다. 규칙마다 주석에 그 규칙이 막는 결함이 적혀 있고, 검사 목록의 정본은
   스크립트와 `test/test_lint_posts.rb`다. `_config.yml`의 `future: true`는 정오로 날짜를 적은
   당일 글이 한국 오전 머지에서 빠지지 않게 하고, `strict_filters`는 등록되지 않은 필터를
   빌드 오류로 만든다.

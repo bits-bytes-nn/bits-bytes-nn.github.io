@@ -42,7 +42,7 @@ So this post narrows to a single claim: **making data AI-ready is translation, n
 
 The three look like stages in an evolution, but what they demand of data differs in kind. The dividing line is **where the context lives**.
 
-| | Era | Where context lives | Consumer |
+| Kind | Era | Where context lives | Consumer |
 |------|------|----------------|--------|
 | Analytics-ready | BI, dashboards | The analyst's **head** | Humans |
 | ML-ready | Predictive models | **Feature definitions and labels** | Task-specific models |
@@ -674,7 +674,7 @@ It isn't only iterative retrieval, either. In the same table, vector RAG with re
 
 This evaluation also re-measured the costs from §4.4. Table 4 (on MultiHop-RAG) puts the three approaches' times and volumes side by side. **KG-GraphRAG** in that table puts an entity-relationship graph in place without communities and traverses per query, while **Community-GraphRAG** is §4.2's Microsoft approach, pre-building community summaries. The retrieval latency column is reported at dataset granularity, so it **isn't the time for a single query** (the paper labels the column only *"retrieval latency"*). Read it only as ratios between approaches.
 
-| | Construction time | Retrieval latency | Storage |
+| Method | Construction time | Retrieval latency | Storage |
 |---|---|---|---|
 | Vector RAG | 135s | 1,724s | 127MB |
 | KG-GraphRAG | 7,702s (**57x**) | 14,434s (8x) | 117MB |

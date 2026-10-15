@@ -1,4 +1,5 @@
 ---
+lang: en
 layout: page
 title: "Categories"
 permalink: /categories/
@@ -30,7 +31,7 @@ description: >-
   {% for post in cat_posts %}
     <li>
       <strong>
-        <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        <a href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}">{{ post.title }}</a>
       </strong>
       <span class="post-date">- {{ post.date | date: site.date_format }}</span>
     </li>

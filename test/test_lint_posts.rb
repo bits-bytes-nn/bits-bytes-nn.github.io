@@ -86,6 +86,7 @@ class TestLintPosts < Minitest::Test
     found = lint(sub_header)
     assert_finding(/empty cell/, found)
     assert_finding(/second header row/, found)
+    assert_finding(/first cell is empty/, lint("| | A | B |\n|---|---|---|\n| x | 1 | 2 |\n"))
     assert_finding(/row has 5 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 | 4 |\n"))
     assert_finding(/row has 4 cells, the header 3/, lint("| 모델 | A | B |\n|---|---|---|\n| V3 | 1 | 2 | 3 |\n"))
   end
@@ -227,6 +228,8 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint(%(<a href="/assets/images/a.png" class="glightbox">\n<img src="/assets/images/a.png" alt="a" />\n</a>\n))
     assert_finding(/not its image/, lint(%(<a class='glightbox wide' href='https://a.b/page'><img src='/assets/images/a.png' alt='a'></a>\n)))
     assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox" data-glightbox="title: A -> B"><img src="/x.png" alt="a > b"></a>\n)))
+    assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><img alt="A -> B" src="/x.png"></a>\n)))
+    assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><IMG SRC="/x.png" alt="x"></a>\n)))
     # After a fence the finding still names its own line.
     found = lint(%(```\nx\n```\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n))
     assert_match(/\A13: /, found.first)
@@ -270,6 +273,20 @@ class TestLintPosts < Minitest::Test
     assert_finding(/paper_author/, lint(front: FRONT.sub('"Mistral AI"', '["A", "B"]')))
   end
 
+  # Five paper posts shipped these (DeepSeek LLM, DeepSeekMath, Llama 3, Gemini, Mistral).
+  def test_translationese_and_a_colon_ending_in_prose
+    assert_finding(/translationese "보여지"/, lint("그림에서 보여지는 곡선입니다.\n"))
+    assert_finding(/translationese "에 있어서는"/, lint("추론에 있어서는 그렇습니다.\n"))
+    assert_finding(/translationese "함에 있어"/, lint("학습함에 있어 중요합니다.\n"))
+    assert_finding(/ends in a colon/, lint("다음과 같이 작동합니다:\n\n1. 하나\n"))
+    # A bare "에 있어서", and a colon in a heading, a quote, a table, code or the references.
+    assert_equal [], lint("이 점에 있어서 중요합니다.\n")
+    assert_equal [], lint("## 정리합니다: 요약\n\n> 그는 말했다: 아니다\n\n\"이렇다: 저렇다\"라고 합니다.\n\n`a다:b`\n")
+    assert_equal [], lint("| 바다: 깊이 | 1 |\n|---|---|\n| 2 | 3 |\n")
+    assert_equal [], lint("- 항목\n\n  | 같습니다: | 2 |\n  |---|---|\n  | 3 | 4 |\n\n![정리합니다: 그림](/a.png)\n")
+    assert_equal [], lint("### References\n\n* 보여지는 것들: 논문\n")
+  end
+
   def test_paper_doi_is_a_bare_doi_on_paper_posts_only
     with_doi = ->(doi) { FRONT.sub("paper_author: \"Mistral AI\"\n", "\\0paper_doi: #{doi}\n") }
     assert_equal [], lint(front: with_doi.call('"10.48550/arXiv.2310.06825"'))
@@ -277,9 +294,12 @@ class TestLintPosts < Minitest::Test
     ['"https://doi.org/10.48550/arXiv.2310.06825"', '"arXiv:2310.06825"', '""', "10.48550", '"10.1000/a?b"', '"10.1000/a#b"'].each do |doi|
       assert_finding(/paper_doi is a bare DOI/, lint(front: with_doi.call(doi)))
     end
+    assert_finding(/carries an arXiv version/, lint(front: with_doi.call('"10.48550/arXiv.2310.06825v2"')))
     guide = with_doi.call('"10.48550/arXiv.2310.06825"').sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"')
     assert_finding(/paper_doi is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
     assert_finding(/paper_author is for Paper Reviews and Paper Summaries posts/, lint(front: guide))
+    survey = FRONT.sub('"Paper Reviews"', '"Paper Surveys"').sub("paper_author: \"Mistral AI\"\n", "")
+    assert_equal [], lint(front: survey)
   end
 end
 
