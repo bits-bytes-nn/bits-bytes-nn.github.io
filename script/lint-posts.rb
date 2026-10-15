@@ -192,7 +192,8 @@ module PostLint
   # Per line: [:open, match] on a fence's first line, :code inside, :close on
   # its last, nil outside. A fence inside a blockquote ("> ```") is code too,
   # and only such a fence closes on a quoted marker: a "> ```" line inside a
-  # bare ```markdown block is part of its example.
+  # bare ```markdown block is part of its example. A blank line ends the
+  # blockquote, and with it a quoted fence left open (:unclosed).
   def self.fences(lines)
     fence = nil
     quoted = false
@@ -204,6 +205,9 @@ module PostLint
         fence = m[1]
         quoted = line.match?(/\A\s*>/)
         [:open, m]
+      elsif quoted && line.strip.empty?
+        fence = nil
+        :unclosed
       elsif (quoted ? text : line).strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
         fence = nil
         :close
@@ -273,6 +277,10 @@ module PostLint
         found << "#{n}: code fence info has a space; write just the language" if unquote(line).strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
       elsif state == :close
         fence_line = nil
+      elsif state == :unclosed
+        found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)"
+        fence_line = nil
+        next
       end
       next if state
 

@@ -295,6 +295,10 @@ class TestLintPosts < Minitest::Test
     # A quoted fence in a Markdown example is part of the example.
     assert_equal [], lint("```markdown\n> ```python\n> <think>\n> ```\n<think>\n```\n")
     assert_finding(/code fence never closed/, lint("앞 문단입니다.\n\n> ```text\n> <think>\n"))
+    # The blockquote ends at the blank line, and the fence with it.
+    found = lint("> ```text\n> 인용입니다.\n\n<think> 뒤 문단입니다.\n\n```python\nx\n```\n")
+    assert_finding(/code fence never closed/, found)
+    assert_finding(/<think> is read as HTML/, found)
   end
 
   def test_paper_doi_is_a_bare_doi_on_paper_posts_only
