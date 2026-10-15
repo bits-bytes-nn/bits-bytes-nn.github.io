@@ -261,8 +261,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var heads = document.querySelectorAll('.post-content h2[id]');
     if (heads.length >= 3) {
       var ul = toc.querySelector('ul');
-      // Headings that number themselves ("1. 배경") would read "2 1. 배경".
-      var numbered = Array.prototype.some.call(heads, function (h) { return /^\s*\d+[.)]\s/.test(h.textContent); });
+      // Headings that number themselves ("1. 배경") would read "2 1. 배경". Most of
+      // them, not one: a lone "1. …" among plain headings keeps the numbers.
+      var numbered = Array.prototype.filter.call(heads, function (h) { return /^\s*\d+[.)]\s/.test(h.textContent); }).length > heads.length / 2;
       heads.forEach(function (h, i) {
         var li = document.createElement('li');
         var a = document.createElement('a');
