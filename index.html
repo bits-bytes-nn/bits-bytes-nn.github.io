@@ -28,9 +28,9 @@ description: >-
 	<div class="wrapper">
 		<ul class="post-list">
 			{% for post in paginator.posts %}
-			<li>
+			<li lang="{{ post.lang | default: site.lang }}">
 				<h2>
-					<a class="post-link" href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}"
+					<a class="post-link" href="{{ post.url | prepend: site.baseurl }}"
 						>{{ post.title }}</a
 					>
 				</h2>

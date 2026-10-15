@@ -516,6 +516,16 @@ blockquote {
 		&.show {
 			display: block;
 		}
+
+		// The open phone menu is part of the fixed bar; held sideways, a phone is
+		// shorter than the list, and the last items sat below the screen.
+		@media screen and (max-width: $tablet - 1px) {
+			&.show {
+				max-height: calc(100vh - 4em);
+				max-height: calc(100dvh - 4em);
+				overflow-y: auto;
+			}
+		}
 	}
 
 	ul li.nav-link {

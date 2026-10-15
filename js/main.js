@@ -258,6 +258,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var heads = document.querySelectorAll('.post-content h2[id]');
     if (heads.length >= 3) {
       var ul = toc.querySelector('ul');
+      // Headings that number themselves ("1. 배경") would read "2 1. 배경".
+      var numbered = Array.prototype.some.call(heads, function (h) { return /^\s*\d+[.)]\s/.test(h.textContent); });
       heads.forEach(function (h, i) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -267,7 +269,8 @@ document.addEventListener('DOMContentLoaded', function () {
         num.textContent = i + 1;
         // Text node, not innerHTML: a heading that names a tag ("<think> 토큰")
         // would otherwise be parsed as markup.
-        a.append(num, h.textContent);
+        if (numbered) a.append(h.textContent);
+        else a.append(num, h.textContent);
         li.appendChild(a);
         ul.appendChild(li);
       });
