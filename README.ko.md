@@ -120,7 +120,7 @@ subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). 논문 글에만
 paper_doi: "10.48550/arXiv.<id>"   # 선택, 논문 글에만 — 메타 패널의 인용 수
-seo_title: "<짧은 제목>"            # 선택 — 논문 제목이 너무 길 때 <title>에 대신 씁니다
+seo_title: "<짧은 제목>"            # 선택 — 제목이 너무 길 때 <title>에 대신 씁니다
 description: >-                    # 선택, 평문 — 아래 설명 참고
   <검색 결과에 노출될 문장, 150자 안팎>
 categories: ["<유형>", "<주제>"]

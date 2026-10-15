@@ -1,7 +1,8 @@
 // Site behaviors: theme toggle, code-copy, mobile menu, nav highlight,
 // sticky-nav class, image zoom (GLightbox), and the post table of contents.
 // Vanilla JS, no jQuery. The fixed-header offset for in-page jumps is CSS
-// (`scroll-padding-top` in _sass/_layout.scss), not script.
+// (`scroll-padding-top` in _sass/_layout.scss); this keeps its --nav-height
+// in step with the bar.
 document.addEventListener('DOMContentLoaded', function () {
   // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
   // The OS setting is intentionally NOT followed.
@@ -121,6 +122,19 @@ document.addEventListener('DOMContentLoaded', function () {
   // Add a class to the nav once the page is scrolled
   var nav = document.querySelector('.navigation');
   if (nav) {
+    // The page starts below the fixed bar, which grows to two rows when its
+    // tabs do not fit on one. The phone menu's dropdown is not the bar: there
+    // the bar stays one row and the open menu covers the page on purpose.
+    var wide = window.matchMedia('(min-width: 768px)'); // $tablet, as in default.html
+    var syncNavHeight = function () {
+      if (wide.matches) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+      else document.documentElement.style.removeProperty('--nav-height');
+    };
+    if (window.ResizeObserver) new ResizeObserver(syncNavHeight).observe(nav);
+    else window.addEventListener('resize', syncNavHeight);
+    if (wide.addEventListener) wide.addEventListener('change', syncNavHeight);
+    else wide.addListener(syncNavHeight); // Safari before 14
+    syncNavHeight();
     window.addEventListener('scroll', function () {
       nav.classList.toggle('scrolled', window.pageYOffset > 50);
     }, { passive: true });
@@ -247,6 +261,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var heads = document.querySelectorAll('.post-content h2[id]');
     if (heads.length >= 3) {
       var ul = toc.querySelector('ul');
+      // Headings that number themselves ("1. 배경") would read "2 1. 배경". Most of
+      // them, not one: a lone "1. …" among plain headings keeps the numbers.
+      var numbered = Array.prototype.filter.call(heads, function (h) { return /^\s*\d+[.)]\s/.test(h.textContent); }).length > heads.length / 2;
       heads.forEach(function (h, i) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -256,7 +273,8 @@ document.addEventListener('DOMContentLoaded', function () {
         num.textContent = i + 1;
         // Text node, not innerHTML: a heading that names a tag ("<think> 토큰")
         // would otherwise be parsed as markup.
-        a.append(num, h.textContent);
+        if (numbered) a.append(h.textContent);
+        else a.append(num, h.textContent);
         li.appendChild(a);
         ul.appendChild(li);
       });

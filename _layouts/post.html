@@ -84,13 +84,13 @@ layout: default
       {% if page.adjacent_older %}
       <a class="post-nav-link prev" href="{{ page.adjacent_older.url | prepend: site.baseurl }}" rel="prev">
         <span class="post-nav-dir">← Previous</span>
-        <span class="post-nav-title">{{ page.adjacent_older.title }}</span>
+        <span class="post-nav-title" lang="{{ page.adjacent_older.lang | default: site.lang }}">{{ page.adjacent_older.title }}</span>
       </a>
       {% else %}<span></span>{% endif %}
       {% if page.adjacent_newer %}
       <a class="post-nav-link next" href="{{ page.adjacent_newer.url | prepend: site.baseurl }}" rel="next">
         <span class="post-nav-dir">Next →</span>
-        <span class="post-nav-title">{{ page.adjacent_newer.title }}</span>
+        <span class="post-nav-title" lang="{{ page.adjacent_newer.lang | default: site.lang }}">{{ page.adjacent_newer.title }}</span>
       </a>
       {% else %}<span></span>{% endif %}
     </nav>

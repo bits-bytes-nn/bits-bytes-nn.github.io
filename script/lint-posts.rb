@@ -50,7 +50,8 @@ module PostLint
   def self.lightbox(post)
     # Fenced code keeps its line count, so an example there is neither read nor
     # shifts the line numbers after it.
-    body = post.body.gsub(/^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*/m) { |code| "\n" * code.count("\n") }
+    lines = post.body.split("\n", -1)
+    body = fences(lines).zip(lines).map { |state, line| state ? "" : line }.join("\n")
     body.to_enum(:scan, LIGHTBOX).filter_map do
       m = Regexp.last_match
       href = m[0][/\shref=["']([^"']+)/i, 1]
@@ -187,6 +188,34 @@ module PostLint
   end
 
   FENCE = /\A\s*(`{3,}|~{3,})/
+
+  # Per line: [:open, match] on a fence's first line, :code inside, :close on
+  # its last, nil outside. A fence inside a blockquote ("> ```") is code too,
+  # and only such a fence closes on a quoted marker: a "> ```" line inside a
+  # bare ```markdown block is part of its example. A blank line ends the
+  # blockquote, and with it a quoted fence left open (:unclosed).
+  def self.fences(lines)
+    fence = nil
+    quoted = false
+    lines.map do |line|
+      text = unquote(line)
+      if fence.nil?
+        next unless (m = text.match(FENCE))
+
+        fence = m[1]
+        quoted = line.match?(/\A\s*>/)
+        [:open, m]
+      elsif quoted && line.strip.empty?
+        fence = nil
+        :unclosed
+      elsif (quoted ? text : line).strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
+        fence = nil
+        :close
+      else
+        :code
+      end
+    end
+  end
   # A code span, opened and closed by the same run of backticks (``$$`` too).
   CODE_SPAN = /(`+).*?\1/
 
@@ -201,9 +230,9 @@ module PostLint
   # writes, not all of HTML.
   HTML_ELEMENTS = %w[
     a abbr audio b blockquote br caption center cite code col colgroup dd del details
-    div dl dt em figcaption figure h1 h2 h3 h4 h5 h6 hr i iframe img ins kbd li mark
-    ol p picture pre script section small source span strong sub summary sup svg
-    table tbody td tfoot th thead tr ul video wbr
+    dfn div dl dt em figcaption figure h1 h2 h3 h4 h5 h6 hr i iframe img ins kbd li
+    mark ol p picture pre q samp script section small source span strong sub summary
+    sup svg table tbody td tfoot th thead time tr track u ul var video wbr
     circle defs g line path polygon polyline rect text tspan use
   ].to_set # the last row: an inline <svg>'s children
   # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
@@ -233,26 +262,27 @@ module PostLint
     found = []
     in_references = false
     lines = post.body.split("\n", -1)
-    fence = nil # the marker that opened the code fence we are in
-    fence_line = nil
+    states = fences(lines)
+    fence_line = nil # where a still-open code fence started
     block = nil # the line a still-open multi-line $$ block started on
     para = nil # the line a paragraph with an odd number of $$ started on
     math_seen = false
     lines.each_with_index do |line, i|
       n = post.body_line + i
-      if (m = line.match(FENCE))
-        if fence.nil?
-          fence = m[1]
-          fence_line = n
-          # kramdown's GFM fence takes one word after the marker; with more it
-          # renders the whole block as inline code.
-          found << "#{n}: code fence info has a space; write just the language" if line.strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
-        elsif line.strip.match?(/\A#{Regexp.escape(fence[0])}{#{fence.size},}\z/)
-          fence = nil
-        end
+      state = states[i]
+      if state.is_a?(Array)
+        fence_line = n
+        # kramdown's GFM fence takes one word after the marker; with more it
+        # renders the whole block as inline code.
+        found << "#{n}: code fence info has a space; write just the language" if unquote(line).strip.match?(/\A(`{3,}|~{3,})\s*\S+\s+\S/)
+      elsif state == :close
+        fence_line = nil
+      elsif state == :unclosed
+        found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)"
+        fence_line = nil
         next
       end
-      next if fence
+      next if state
 
       # A display block over several lines opens on a line starting with $$ and
       # closes on the next line with an odd number of them: `$$` alone, or
@@ -294,7 +324,7 @@ module PostLint
       found.concat(table(lines, i, n)) if table_start?(lines, i)
     end
     found << "#{block}: $$ block never closed" if block
-    found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)" if fence
+    found << "#{fence_line}: code fence never closed (a nested fence closes the outer one)" if fence_line
     found << "#{para}: unbalanced $$ in the paragraph" if para
     # MathJax loads only on posts that ask for it; without it $$...$$ ships as TeX.
     found << "1: the post has $$ math but no use_math: true" if math_seen && post.data["use_math"] != true

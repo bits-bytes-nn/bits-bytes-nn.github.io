@@ -4,15 +4,19 @@
   {% include head.html %}
 
   <body>
-    <!-- Ten focusable elements sit before <main> on every page (logo, menu
-         button, seven nav links, theme toggle), and a long post then leads with a
+    <!-- A dozen focusable elements sit before <main> on every page (logo, menu
+         button, the nav links, theme toggle), and a long post then leads with a
          copy button per code block. Screen readers can jump by landmark; sighted
          keyboard users had no shortcut. -->
-    <a class="skip-link" href="#content">Skip to content</a>
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
     {% include header.html %}
+    <!-- The bar's height before first paint, so a bar that wraps to two rows does
+         not drop the page once js/main.js runs; main.js keeps it in step.
+         768px is $tablet in _sass/base/_variables.scss, as in main.js. -->
+    <script>(function () { var n = document.querySelector('.navigation'); if (n && matchMedia('(min-width: 768px)').matches) document.documentElement.style.setProperty('--nav-height', n.offsetHeight + 'px'); })();</script>
 
-    <main class="page-content" id="content">
+    <main class="page-content" id="main-content">
       {{ content }}
     </main>
 
