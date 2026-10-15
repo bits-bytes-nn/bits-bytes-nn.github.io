@@ -44,6 +44,7 @@
 {%- if page.layout == 'page' -%}
 	{%- assign html_title = page_title | append: ' | ' | append: site.title -%}
 {%- endif -%}
+{%- if page.seo_title -%}{%- assign html_title = page.seo_title -%}{%- endif -%}
 {%- comment -%}
   A paper post's <title> says what the page is, in the words a reader searches
   with: "Mistral 7B 논문 리뷰", where the bare paper title gave "Mistral 7B".

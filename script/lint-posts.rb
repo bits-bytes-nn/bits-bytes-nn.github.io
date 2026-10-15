@@ -204,7 +204,7 @@ module PostLint
     dfn div dl dt em figcaption figure h1 h2 h3 h4 h5 h6 hr i iframe img ins kbd li
     mark ol p picture pre q samp script section small source span strong sub summary
     sup svg table tbody td tfoot th thead time tr track u ul var video wbr
-    circle defs ellipse g line marker path polygon polyline rect text tspan use
+    circle defs g line path polygon polyline rect text tspan use
   ].to_set # the last row: an inline <svg>'s children
   # Elements that mean nothing bare: <img> or <audio> alone is a token, not media.
   NEEDS_ATTRIBUTES = %w[a audio iframe img script source video].to_set

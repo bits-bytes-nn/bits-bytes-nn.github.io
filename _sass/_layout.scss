@@ -60,7 +60,7 @@ main.page-content {
 	}
 }
 
-// Whatever the browser scrolls into view clears the fixed 66px header, which
+// Whatever the browser scrolls into view clears the fixed header, which
 // would otherwise cover it: fragment targets (the TOC, /tags/#… from another
 // page, the skip link's #main-content) and the control keyboard focus moves to.
 // Done here rather than in a click handler so it also holds for links followed

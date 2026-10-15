@@ -1,7 +1,8 @@
 // Site behaviors: theme toggle, code-copy, mobile menu, nav highlight,
 // sticky-nav class, image zoom (GLightbox), and the post table of contents.
 // Vanilla JS, no jQuery. The fixed-header offset for in-page jumps is CSS
-// (`scroll-padding-top` in _sass/_layout.scss), not script.
+// (`scroll-padding-top` in _sass/_layout.scss); this keeps its --nav-height
+// in step with the bar.
 document.addEventListener('DOMContentLoaded', function () {
   // Dark-mode toggle. Light is the default; dark is opt-in and persisted.
   // The OS setting is intentionally NOT followed.
@@ -130,7 +131,9 @@ document.addEventListener('DOMContentLoaded', function () {
       else document.documentElement.style.removeProperty('--nav-height');
     };
     if (window.ResizeObserver) new ResizeObserver(syncNavHeight).observe(nav);
-    wide.addEventListener('change', syncNavHeight);
+    else window.addEventListener('resize', syncNavHeight);
+    if (wide.addEventListener) wide.addEventListener('change', syncNavHeight);
+    else wide.addListener(syncNavHeight); // Safari before 14
     syncNavHeight();
     window.addEventListener('scroll', function () {
       nav.classList.toggle('scrolled', window.pageYOffset > 50);
