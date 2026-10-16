@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
+subtitle: "Llama 2: 오픈 파운데이션 모델과 파인튜닝된 채팅 모델"
 date: 2023-07-18 14:31:57
 paper_author: "Meta AI"
 paper_doi: "10.48550/arXiv.2307.09288"

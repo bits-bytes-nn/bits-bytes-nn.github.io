@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"
+subtitle: "직접 선호 최적화: 언어 모델은 사실 보상 모델이다"
 date: 2023-05-29 17:57:46
 paper_author: "Stanford University"
 paper_doi: "10.48550/arXiv.2305.18290"

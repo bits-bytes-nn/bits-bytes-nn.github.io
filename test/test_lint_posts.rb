@@ -12,6 +12,7 @@ class TestLintPosts < Minitest::Test
   FRONT = <<~YAML
     layout: post
     title: "Mistral 7B"
+    subtitle: "GQA와 슬라이딩 윈도우 어텐션으로 효율을 높인 7B 언어 모델"
     paper_author: "Mistral AI"
     categories: ["Paper Reviews", "Language-Models"]
     tags: ["Sliding-Window-Attention", "Efficient-Attention"]
@@ -19,8 +20,8 @@ class TestLintPosts < Minitest::Test
     use_math: true
   YAML
 
-  def lint(body = "Text.\n", front: FRONT, path: "_posts/2025-02-27-mistral-7b.md")
-    PostLint.check(PostLint.parse(path, "---\n#{front}---\n#{body}"), SPEC)
+  def lint(body = "Text.\n", front: FRONT, path: "_posts/2025-02-27-mistral-7b.md", spec: SPEC)
+    PostLint.check(PostLint.parse(path, "---\n#{front}---\n#{body}"), spec)
   end
 
   def assert_finding(pattern, findings)
@@ -47,9 +48,25 @@ class TestLintPosts < Minitest::Test
   end
 
   def test_a_topic_without_an_image_takes_any_existing_one
+    # Every topic has an image today; one added without stays legal.
+    spec = SPEC.merge("topics" => SPEC["topics"].merge("Agentic-AI" => nil))
     front = FRONT.sub('"Paper Reviews", "Language-Models"', '"Tech Guides", "Agentic-AI"').sub("paper_author: \"Mistral AI\"\n", "")
-    assert_equal [], lint(front: front.sub("language-models.jpg", "insights.jpg"))
-    assert_finding(/does not exist/, lint(front: front.sub("language-models.jpg", "nope.jpg")))
+    assert_equal [], lint(front: front.sub("language-models.jpg", "insights.jpg"), spec: spec)
+    assert_finding(/does not exist/, lint(front: front.sub("language-models.jpg", "nope.jpg"), spec: spec))
+  end
+
+  def test_a_paper_post_needs_a_subtitle_other_than_its_title
+    assert_finding(/need a subtitle/, lint(front: FRONT.sub(/^subtitle: .*\n/, "")))
+    assert_finding(/need a subtitle/, lint(front: FRONT.sub(/^subtitle: .*$/, 'subtitle: "Mistral 7B"')))
+    insights = FRONT.sub('"Paper Reviews"', '"Insights"').gsub(/^(subtitle|paper_author): .*\n/, "").sub("language-models.jpg", "insights.jpg")
+    assert_equal [], lint(front: insights)
+  end
+
+  def test_every_spec_cover_has_a_credit
+    # Their license wants the credit visible; _layouts/post.html prints it from here.
+    credits = YAML.load_file(File.expand_path("../_data/covers.yml", __dir__))
+    covers = SPEC["types"].values.filter_map { |t| t["cover"] } + SPEC["topics"].values.compact
+    assert_equal [], covers.uniq - credits.keys
   end
 
   def test_rejects_an_unknown_topic_and_a_wrong_cover
@@ -108,7 +125,7 @@ class TestLintPosts < Minitest::Test
   def test_a_body_h1_outside_code
     assert_finding(/H1 in the body/, lint("# Title again\n"))
     # A blank line after the front matter still counts toward the line number.
-    assert_equal ["11: H1 in the body; the layout renders the title"], lint("\n# Title again\n")
+    assert_equal ["12: H1 in the body; the layout renders the title"], lint("\n# Title again\n")
     assert_equal [], lint("```bash\n# a comment\n```\n")
   end
 
@@ -232,7 +249,7 @@ class TestLintPosts < Minitest::Test
     assert_finding(/not its image/, lint(%(<a href="https://a.b" class="glightbox"><IMG SRC="/x.png" alt="x"></a>\n)))
     # After a fence the finding still names its own line.
     found = lint(%(```\nx\n```\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n))
-    assert_match(/\A13: /, found.first)
+    assert_match(/\A14: /, found.first)
     assert_equal [], lint(%(```html\n<a href="https://a.b" class="glightbox"><img src="/x.png" alt="x"></a>\n```\n))
   end
 

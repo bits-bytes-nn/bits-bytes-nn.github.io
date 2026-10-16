@@ -18,6 +18,9 @@ layout: default
   </div>
 
   <div class="wrapper">
+    {%- comment -%} The cover's CC BY 4.0 credit, which must be visible (_data/covers.yml). {%- endcomment -%}
+    {%- assign cover_source = site.data.covers[page.cover] -%}
+    {% if cover_source %}<p class="cover-credit">Cover: <a href="{{ cover_source.url }}">{{ cover_source.title }}</a>, {{ cover_source.credit }} (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)</p>{% endif %}
     <section class="post-meta">
       <div class="post-header-info">
         <div class="post-date">

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "DeepSeek-Coder: When the Large Language Model Meets Programming - The Rise of Code Intelligence"
+subtitle: "DeepSeek-Coder: 대규모 언어 모델과 프로그래밍의 만남, 코드 인텔리전스의 부상"
 seo_title: "DeepSeek-Coder: The Rise of Code Intelligence"  # <title> only; the paper title runs past a results list
 date: 2024-01-25 14:17:53
 paper_author: "DeepSeek AI"

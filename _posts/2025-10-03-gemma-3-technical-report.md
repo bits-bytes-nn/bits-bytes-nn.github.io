@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Gemma 3 Technical Report"
+subtitle: "Gemma 3 기술 보고서"
 date: 2025-03-25 15:52:34
 paper_author: "Google DeepMind"
 paper_doi: "10.48550/arXiv.2503.19786"

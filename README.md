@@ -343,5 +343,6 @@ What to do instead:
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Built on the
+MIT — see [LICENSE](LICENSE), which also credits the James Webb cover images
+(ESA/Webb, CC BY 4.0). Built on the
 [Centrarium](http://jekyllthemes.org/themes/centrarium/) Jekyll theme.

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models"
+subtitle: "DeepSeekMath: 오픈 언어 모델의 수학 추론 한계를 넓히다"
 date: 2024-02-05 18:55:32
 paper_author: "DeepSeek AI"
 paper_doi: "10.48550/arXiv.2402.03300"

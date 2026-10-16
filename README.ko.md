@@ -321,5 +321,6 @@ curl -sS  https://bits-bytes-nn.github.io/robots.txt
 
 ## 라이선스
 
-MIT — [LICENSE](LICENSE) 참고. [Centrarium](http://jekyllthemes.org/themes/centrarium/)
+MIT — [LICENSE](LICENSE) 참고. 제임스 웹 표지 이미지(ESA/Webb, CC BY 4.0)의 출처도 거기에
+밝혀 두었습니다. [Centrarium](http://jekyllthemes.org/themes/centrarium/)
 Jekyll 테마를 기반으로 합니다.

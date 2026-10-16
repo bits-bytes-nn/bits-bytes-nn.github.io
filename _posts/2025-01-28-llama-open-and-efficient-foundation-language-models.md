@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "LLaMA: Open and Efficient Foundation Language Models"
+subtitle: "LLaMA: 공개된 효율적인 파운데이션 언어 모델"
 date: 2023-02-27 17:11:15
 paper_author: "Meta AI"
 paper_doi: "10.48550/arXiv.2302.13971"
