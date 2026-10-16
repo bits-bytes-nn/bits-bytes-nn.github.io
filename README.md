@@ -263,7 +263,7 @@ ruby script/lint-posts.rb                                   # post sources follo
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # does it build clean?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href                                         # broken links, images, anchors, http://?
+  --allow-hash-href --no-ignore-empty-alt                   # broken links, images, anchors, http://, alt=""?
 script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings
 shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml, on PRs and main
 ```

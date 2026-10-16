@@ -349,8 +349,8 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
 > 않는다.
 
 접근성 기준(`_layout.scss`): 키보드로 이동할 때 포커스가 보이도록 상호작용 요소에
-`:focus-visible` 아웃라인을 주고, 움직임에 민감한 사용자를 위해 호버 시 확대/이동 효과를
-무력화하는 `prefers-reduced-motion` 블록을 둔다. 모바일 메뉴 버튼은 스크린리더용
+`:focus-visible` 아웃라인을 주고, 움직임에 민감한 사용자를 위해 애니메이션·전환·부드러운
+스크롤을 사실상 없애는 `prefers-reduced-motion` 블록을 둔다(호버 확대는 움직임 없이 바로 바뀐다). 모바일 메뉴 버튼은 스크린리더용
 `aria-label`/`aria-expanded`/`aria-controls`를 갖고, JS가 열림/닫힘 상태에 맞춰
 `aria-expanded`를 동기화한다. 현재 보고 있는 내비 링크는 `aria-current="page"`를 받는다.
 

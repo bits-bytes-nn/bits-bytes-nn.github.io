@@ -74,13 +74,15 @@ jobs:
       - name: Validate HTML, internal links, and images
         # Catches broken internal links/anchors and missing images before deploy.
         # External links are skipped (slow, flaky) but must be https; hash-only
-        # hrefs are allowed.
+        # hrefs are allowed. An empty alt fails: `![](…)` renders one, which a
+        # screen reader skips and the lightbox has no caption for.
         # --swap-urls strips the Pages base_path so absolute /baseurl/... links
         # resolve against _site/ regardless of what base_path the build used.
         run: |
           bundle exec htmlproofer ./_site \
             --disable-external \
             --allow-hash-href \
+            --no-ignore-empty-alt \
             --swap-urls "^$BASE_PATH:"
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
