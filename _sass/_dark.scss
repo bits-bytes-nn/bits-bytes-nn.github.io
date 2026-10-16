@@ -25,6 +25,9 @@
   // dark text stays dark-on-dark and vanishes.
   body { background-color: $bg; color: $fg; }
   h1, h2, h3, h4, h5, h6 { color: $fg; }
+  // Except a title over a cover: it stays white like the lines under it, and
+  // $fg there fell to 2.9:1 over the brightest cover.
+  .has-cover .title { color: $white; }
 
   a {
     color: $link;

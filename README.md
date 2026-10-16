@@ -97,7 +97,8 @@ script/            lint-posts.rb (post sources vs the conventions, before the bu
                    check-plugin-output.rb (each plugin hook's mark on the posts;
                    run by validate-site.sh)
 _data/             post_conventions.yml (categories, covers, controlled and
-                   retired tags — the one copy, also read by scholar-lens)
+                   retired tags — the one copy, also read by scholar-lens);
+                   covers.yml (each cover's source and credit, shown under the hero)
 .github/workflows/ CI: tests → lint → build → html-proofer → validate-site; deploys on push to main
                    workflow-lint.yml: actionlint and shellcheck
 ```
@@ -121,7 +122,7 @@ the rest. To add one by hand, create
 ---
 layout: post
 title: "<Post Title>"
-subtitle: "<one-line pitch>"       # optional — shown under the title in the header
+subtitle: "<one-line pitch>"       # paper posts: required, not the title; else optional
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<Org>"              # the paper's org, not people; paper posts only
 paper_doi: "10.48550/arXiv.<id>"   # optional, paper posts only — the citation count in the meta panel
@@ -170,7 +171,8 @@ Categories are **two levels**:
   `_data/post_conventions.yml`, which also gives its cover image if it has one.
   Insights posts use the type's `insights.jpg`; a topic without an image takes any
   existing one. When no topic fits, add one there first; the lint rejects any
-  other value.
+  other value. A cover needs its credit in `_data/covers.yml`, which the page
+  prints under the hero; `script/validate-site.sh` fails a post without one.
 
 Jekyll slugifies the two and combines them with the date to build the output
 path (`permalink` in `_config.yml`):
