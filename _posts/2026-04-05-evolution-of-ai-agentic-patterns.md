@@ -42,7 +42,7 @@ translation_id: evolution-of-ai-agentic-patterns
 
 각 이동은 이전 시대의 실패가 촉발했습니다. 그 실패의 궤적을 추적해 보겠습니다.
 
-<a href="/assets/images/three-era-timeline.png" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: AI 에이전틱 패턴의 진화 타임라인">
+<a href="/assets/images/three-era-timeline.png" class="glightbox" data-gallery="post-images" data-glightbox="title: AI 에이전틱 패턴의 진화 타임라인">
   <img src="/assets/images/three-era-timeline.png" alt="AI 에이전틱 패턴의 진화 타임라인 — Prompt → Context → Harness Engineering" />
 </a>
 
@@ -285,7 +285,7 @@ Anthropic은 2025년 9월, "[Effective Context Engineering for AI Agents](https:
 
 KV-cache(Key-Value Cache)의 작동 원리를 설명하겠습니다. LLM API에 프롬프트를 보내면, 모델은 각 토큰의 어텐션 키(Key)와 값(Value)을 계산합니다. 이 계산은 비용이 큽니다. 그런데 이전 요청의 프롬프트 **접두어**가 현재 요청과 동일하면, 그 부분은 재계산할 필요 없이 캐시된 결과를 사용할 수 있습니다. Claude Sonnet 기준 캐시 히트 시 비용이 **10분의 1**로 줄어듭니다. 에이전트가 30번의 턴을 거치면서 매번 시스템 프롬프트를 재계산하는 것과, 캐시를 활용하는 것의 차이는 어마어마합니다.
 
-<a href="/assets/images/kv-cache-mechanism.png" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: KV-cache 작동 원리 — 안정 접두어가 비용을 결정한다">
+<a href="/assets/images/kv-cache-mechanism.png" class="glightbox" data-gallery="post-images" data-glightbox="title: KV-cache 작동 원리 — 안정 접두어가 비용을 결정한다">
   <img src="/assets/images/kv-cache-mechanism.png" alt="KV-cache 작동 원리 — 안정 접두어가 비용을 결정한다" />
 </a>
 

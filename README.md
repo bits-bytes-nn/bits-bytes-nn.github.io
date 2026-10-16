@@ -95,7 +95,8 @@ test/              minitest unit tests for _plugins/ and the post lint
 script/            lint-posts.rb (post sources vs the conventions, before the build)
                    validate-site.sh (post-build discoverability checks)
                    check-plugin-output.rb (each plugin hook's mark on the posts;
-                   run by validate-site.sh)
+                   run by validate-site.sh), published-urls.txt (every URL a
+                   post has been published under)
 _data/             post_conventions.yml (categories, covers, controlled and
                    retired tags — the one copy, also read by scholar-lens);
                    covers.yml (each cover's source and credit, shown under the hero)
@@ -184,7 +185,11 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 ```
 
 So **changing the categories or date of a published post changes its URL**, which
-breaks inbound links and search results. Set them once and leave them.
+breaks inbound links and search results. Set them once and leave them. Every
+published URL is listed in `script/published-urls.txt`, and `validate-site.sh`
+fails when one is no longer built; if a change is unavoidable, add the old URL
+to the post's `redirect_from`. After a post merges, record its URL with
+`bundle exec ruby script/check-plugin-output.rb <site_dir> --record`.
 
 Posts first published under the old unslugified form (`/paper%20reviews/…`) keep
 working: `_plugins/legacy_urls.rb` adds that path to each post's `redirect_from`,
