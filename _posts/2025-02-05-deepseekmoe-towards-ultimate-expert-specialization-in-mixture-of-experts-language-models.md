@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models"
+subtitle: "DeepSeekMoE: Mixture-of-Experts 언어 모델에서 전문가 특화를 극한까지"
 seo_title: "DeepSeekMoE: Ultimate Expert Specialization in MoE"  # <title> only; the paper title runs past a results list
 date: 2024-01-11 17:31:42
 paper_author: "DeepSeek AI"

@@ -1,0 +1,35 @@
+# Where each cover image comes from, keyed by its `cover` path. ESA/Webb
+# licenses these under CC BY 4.0 on condition that the credit is visible, so
+# _layouts/post.html prints it under the hero of every post using the image.
+/assets/images/language-models.jpg:
+  title: "Cosmic Cliffs in Carina"
+  credit: "NASA, ESA, CSA, and STScI"
+  url: https://esawebb.org/images/weic2205a/
+/assets/images/multimodal-learning.jpg:
+  title: "Ring Nebula (NIRCam and MIRI)"
+  credit: "ESA/Webb, NASA, CSA, M. Barlow, N. Cox, R. Wesson"
+  url: https://esawebb.org/images/weic2320a/
+/assets/images/finetuning.jpg:
+  title: "Rho Ophiuchi cloud complex"
+  credit: "NASA, ESA, CSA, STScI, K. Pontoppidan (STScI), A. Pagan (STScI)"
+  url: https://esawebb.org/images/weic2316a/
+/assets/images/retrieval-augmented-generation.jpg:
+  title: "Cat's Paw Nebula"
+  credit: "NASA, ESA, CSA, STScI"
+  url: https://esawebb.org/images/weic2513a/
+/assets/images/agentic-ai.jpg:
+  title: "Herbig-Haro 46/47"
+  credit: "NASA, ESA, CSA, J. DePasquale (STScI)"
+  url: https://esawebb.org/images/weic2319a/
+/assets/images/data-architecture.jpg:
+  title: "The Crab Nebula"
+  credit: "NASA, ESA, CSA, STScI, T. Temim (Princeton University)"
+  url: https://esawebb.org/images/weic2326a/
+/assets/images/insights.jpg:
+  title: "NGC 602"
+  credit: "ESA/Webb, NASA & CSA, P. Zeidler, E. Sabbi, A. Nota, M. Zamani (ESA/Webb)"
+  url: https://esawebb.org/images/weic2425a/
+/assets/images/default.jpg:
+  title: "Tarantula Nebula"
+  credit: "NASA, ESA, CSA, and STScI"
+  url: https://esawebb.org/images/weic2212a/

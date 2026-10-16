@@ -26,3 +26,11 @@ THE SOFTWARE.
 The icon paths in _includes/icon.html are from Font Awesome Free 6.5.1
 (https://fontawesome.com), licensed under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/).
+
+---
+
+The cover images in assets/images/ that _data/covers.yml lists are James Webb
+Space Telescope images from ESA/Webb (https://esawebb.org), cropped and
+resized, and licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). _data/covers.yml gives each
+one's source and credit.

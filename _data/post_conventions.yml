@@ -29,8 +29,8 @@ topics:
   Multimodal-Learning: /assets/images/multimodal-learning.jpg
   Finetuning: /assets/images/finetuning.jpg
   Retrieval-Augmented-Generation: /assets/images/retrieval-augmented-generation.jpg
-  Agentic-AI:
-  Data-Architecture:
+  Agentic-AI: /assets/images/agentic-ai.jpg
+  Data-Architecture: /assets/images/data-architecture.jpg
 
 # Never in front matter. jekyll-feed reads `author` as the entry's author, which
 # is the site's (see _config.yml); a paper's authors go in `paper_author`.

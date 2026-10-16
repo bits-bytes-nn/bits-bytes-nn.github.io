@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "The Llama 3 Herd of Models"
+subtitle: "Llama 3 모델 패밀리"
 date: 2024-07-31 17:54:27
 paper_author: "Meta AI"
 paper_doi: "10.48550/arXiv.2407.21783"

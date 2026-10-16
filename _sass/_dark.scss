@@ -210,13 +210,15 @@
   [tabindex]:focus-visible { outline-color: $link; }
 
   // $medium-gray (#767676) is 4.17:1 here and 3.81:1 on $surface. The dark rules
-  // above only repaint it inside `.page-content .post`, so these five — two of
+  // above only repaint it inside `.page-content .post`, so these — two of
   // them on the site's entry pages — kept the light value.
   .page-content .pagination,
   .page-content .post-list .post-meta,
   .page-content .page .posts-list .post-date,
   .page-content .post .related-posts-link .related-posts-sub,
-  .page-content .post .post-toc .post-toc-count { color: $fg-muted; }
+  .page-content .post .post-toc .post-toc-count,
+  .page-content .post .cover-credit { color: $fg-muted; }
+  .page-content .post .cover-credit a:hover { color: $link; }
 
   // The related-post cards kept the light `1px solid #ddd`, which reads as glaring
   // white boxes on dark.

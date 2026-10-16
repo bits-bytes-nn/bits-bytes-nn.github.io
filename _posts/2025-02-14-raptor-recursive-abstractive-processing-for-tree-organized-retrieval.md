@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval"
+subtitle: "RAPTOR: 트리 구조 검색을 위한 재귀적 추상 요약"
 date: 2024-01-31 18:30:21
 paper_author: "Stanford University"
 paper_doi: "10.48550/arXiv.2401.18059"

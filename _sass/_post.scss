@@ -134,6 +134,22 @@
     }
   }
 
+  // The cover's credit, small under the hero. Links are underlined: in this
+  // grey they would not read as links otherwise.
+  .cover-credit {
+    margin: 0.6rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: right;
+    color: $medium-gray;
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      &:hover { color: $action-color; }
+    }
+  }
+
   // Post metadata panel — light card with a subtle accent edge
   .post-meta {
     margin: 2rem 0 2.5rem;

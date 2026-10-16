@@ -9,7 +9,7 @@ paper_doi: "10.48550/arXiv.2511.21689"
 description: "ToolOrchestra는 8B 오케스트레이터가 도구와 더 강한 LLM을 골라 호출하도록 정답·효율·선호 보상으로 강화학습시키는 방법입니다. HLE에서 37.1%로 GPT-5(35.1%)를 넘으면서 2.5배 더 효율적이었습니다."
 categories: ["Paper Summaries", "Agentic-AI"]
 tags: ["Tool-Orchestration", "Orchestrator-Model", "Multi-Objective-Reward", "ToolScale-Dataset", "Cost-Aware-Reinforcement-Learning", "Agentic-AI", "Reasoning-Models"]
-cover: /assets/images/default.jpg
+cover: /assets/images/agentic-ai.jpg
 use_math: true
 ---
 ## TL;DR

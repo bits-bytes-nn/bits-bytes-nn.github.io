@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"
+subtitle: "DeepSeek LLM: 장기적 관점으로 오픈소스 언어 모델 확장하기"
 date: 2024-01-05 18:59:13
 paper_author: "DeepSeek AI"
 paper_doi: "10.48550/arXiv.2401.02954"

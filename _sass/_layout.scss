@@ -323,11 +323,11 @@ blockquote {
 		transition: background-color $transition-normal;
 
 		&.has-cover {
-			// 0.3 left white text at 2.46:1 over the brightest 24px block of the worst
-			// cover (finetuning.jpg). 0.45 takes that to 3.85:1, which clears the 3:1
+			// 0.3 left white text at 2.29:1 over the brightest 24px block of the worst
+			// cover (finetuning.jpg). 0.45 takes that to 3.61:1, which clears the 3:1
 			// that both the hero title (47.8px/700) and the subtitle (19.2px/700, see
-			// above) need as large text. Reaching 4.5:1 there would have required 0.50
-			// and visibly flattened the artwork.
+			// above) need as large text. Reaching 4.5:1 there would take more than
+			// 0.50 and visibly flatten the artwork.
 			background-color: rgba(0,0,0,0.45);
 			// Scaled with the title above, so the hero no longer fills a phone screen.
 			padding: 3em 1em !important;
@@ -988,5 +988,10 @@ blockquote {
 
 	.post-header-container .scrim.has-cover {
 		padding: 1em !important;
+	}
+
+	// It credits a cover that does not print.
+	.cover-credit {
+		display: none;
 	}
 }

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "From Local to Global: A Graph RAG Approach to Query-Focused Summarization"
+subtitle: "로컬에서 글로벌로: 질의 중심 요약을 위한 Graph RAG 접근법"
 date: 2024-04-24 18:38:11
 paper_author: "Microsoft Research"
 paper_doi: "10.48550/arXiv.2404.16130"

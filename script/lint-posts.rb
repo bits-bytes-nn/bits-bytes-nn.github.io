@@ -128,6 +128,12 @@ module PostLint
       unless author.is_a?(String) && !author.strip.empty? && !author.match?(/et al/i)
         found << "1: paper_author must name the paper's organisation, got #{author.inspect}"
       end
+      # Printed under the title (_layouts/post.html): a paper's title is
+      # English, and this is what a Korean reader sees there in Korean.
+      subtitle = data["subtitle"].to_s.strip
+      if subtitle.empty? || subtitle == data["title"].to_s.strip
+        found << "1: #{type} posts need a subtitle that is not the title"
+      end
       # js/citations.js puts it in the request path as is, so a URL, a `doi:`
       # prefix, or a `?` or `#` in it finds nothing there.
       # arXiv registers one DOI per paper, without the version (…v2).

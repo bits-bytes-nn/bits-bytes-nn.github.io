@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "LightRAG: Simple and Fast Retrieval-Augmented Generation"
+subtitle: "LightRAG: 단순하고 빠른 검색 증강 생성"
 date: 2024-10-08 08:00:12
 paper_author: "Beijing University of Posts and Telecommunications"
 paper_doi: "10.48550/arXiv.2410.05779"
