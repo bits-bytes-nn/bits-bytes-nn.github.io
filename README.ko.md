@@ -250,7 +250,7 @@ ruby script/lint-posts.rb                                   # 글 원본이 규�
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # 빌드가 깨끗한가?
 bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href                                         # 깨진 링크·이미지·앵커, http:// 링크는 없나?
+  --allow-hash-href --no-ignore-empty-alt                   # 깨진 링크·이미지·앵커, http://, 빈 alt는 없나?
 script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
 shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml이 PR과 main에서 실행
 ```

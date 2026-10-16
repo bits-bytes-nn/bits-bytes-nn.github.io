@@ -112,10 +112,11 @@ document.addEventListener('DOMContentLoaded', function () {
   var here = window.location.pathname;
   document.querySelectorAll('.nav-link a').forEach(function (link) {
     var path = new URL(link.getAttribute('href'), window.location.origin).pathname;
-    // A post sits under its section's path (/paper-reviews/…).
+    // A post sits under its section's path (/paper-reviews/…): there the link is
+    // where the reader is, not the page itself.
     if (here === path || (path !== '/' && here.indexOf(path) === 0)) {
       link.classList.add('active');
-      link.setAttribute('aria-current', 'page');
+      link.setAttribute('aria-current', here === path ? 'page' : 'location');
     }
   });
 
