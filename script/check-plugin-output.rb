@@ -2,8 +2,8 @@
 #
 # Checks that the _plugins/ hooks that change a post's page left their mark,
 # that kramdown parsed the post's block HTML, that no listing shows a
-# translation beside its original, that no page repeats an id, and that the
-# feed has room for every post.
+# translation beside its original, that every cover is credited on its page,
+# that no page repeats an id, and that the feed has room for every post.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
@@ -76,6 +76,16 @@ posts.each do |post|
   # scrollable_tables.rb
   if html.scan("<table").size > html.scan(%(class="table-container")).size
     problems << "#{name}: a table outside a scroll container"
+  end
+
+  # Not a hook: the cover's credit, which its CC BY license wants visible, and
+  # which the layout leaves out without a word when _data/covers.yml lacks it.
+  if (cover = post.data["cover"])
+    if !site.data.dig("covers", cover)
+      problems << "#{name}: no credit for #{cover} in _data/covers.yml"
+    elsif !html.include?(%(class="cover-credit"))
+      problems << "#{name}: the cover credit is not on the page"
+    end
   end
 
   # Not a hook: block HTML kramdown could not parse (a one-line <div>…</div>, a

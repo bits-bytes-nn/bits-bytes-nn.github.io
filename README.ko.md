@@ -95,7 +95,8 @@ script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
                    check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
                    validate-site.sh가 실행)
 _data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
-                   유일한 정본. scholar-lens도 읽음)
+                   유일한 정본. scholar-lens도 읽음), covers.yml (표지마다 출처와
+                   저작자 표시. 글 머리 이미지 아래에 표시)
 .github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
                    workflow-lint.yml: actionlint와 shellcheck
 ```
@@ -116,7 +117,7 @@ gitignore된 `.claude/` 아래)이 리서치 → 초안 → 퇴고를 진행합�
 ---
 layout: post
 title: "<글 제목>"
-subtitle: "<한 줄 소개>"            # 선택 — 헤더의 제목 아래에 표시됩니다
+subtitle: "<한 줄 소개>"            # 논문 글은 필수(제목과 달라야 함), 그 밖에는 선택
 date: YYYY-MM-DD HH:MM:SS
 paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). 논문 글에만
 paper_doi: "10.48550/arXiv.<id>"   # 선택, 논문 글에만 — 메타 패널의 인용 수
@@ -163,7 +164,8 @@ RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_descri
 - `categories[1]` — **주제**: `_data/post_conventions.yml`의 `topics` 중 하나이며, 표지
   이미지도 거기서 정해집니다. Insights 글은 유형의 `insights.jpg`를 쓰고, 이미지가 없는
   주제는 저장소에 있는 아무 이미지나 씁니다. 맞는 주제가 없으면 먼저 거기에 추가합니다.
-  목록에 없는 값은 린트가 막습니다.
+  목록에 없는 값은 린트가 막습니다. 표지는 `_data/covers.yml`에 출처가 있어야 하며, 글
+  머리 이미지 아래에 표시됩니다. 출처가 없는 글은 `script/validate-site.sh`가 막습니다.
 
 Jekyll은 이 둘을 슬러그로 바꾸고(`_config.yml`의 `permalink`) 날짜와 합쳐 출력 경로를
 만듭니다.
