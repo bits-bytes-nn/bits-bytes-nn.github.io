@@ -91,6 +91,8 @@ jobs:
         # its mark on the posts (script/check-plugin-output.rb). Each check maps
         # to a defect that shipped here or would ship silently.
         run: script/validate-site.sh ./_site
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

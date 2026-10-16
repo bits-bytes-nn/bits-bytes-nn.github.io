@@ -952,8 +952,10 @@ blockquote {
 		transition: none !important;
 	}
 
+	// !important: html[data-theme="dark"] is as specific and loads later, and its
+	// dark color-scheme had Chrome print the page margins near-black.
 	html {
-		color-scheme: light;
+		color-scheme: light !important;
 		background: #fff !important;
 	}
 

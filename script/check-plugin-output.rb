@@ -17,7 +17,11 @@ require "jekyll"
 
 site_dir = File.expand_path(ARGV.fetch(0))
 root = File.expand_path("..", __dir__)
-config = Jekyll.configuration("source" => root, "destination" => site_dir, "quiet" => true)
+# The base path the site was built with (CI passes the Pages one), or its links
+# and image paths would match nothing here.
+overrides = { "source" => root, "destination" => site_dir, "quiet" => true }
+overrides["baseurl"] = ENV["BASE_PATH"] if ENV["BASE_PATH"]
+config = Jekyll.configuration(overrides)
 site = Jekyll::Site.new(config)
 site.reset
 site.read
@@ -81,8 +85,9 @@ posts.each do |post|
   # Not a hook: the cover's credit, which its CC BY license wants visible, and
   # which the layout leaves out without a word when _data/covers.yml lacks it.
   if (cover = post.data["cover"])
-    if !site.data.dig("covers", cover)
-      problems << "#{name}: no credit for #{cover} in _data/covers.yml"
+    source = site.data.dig("covers", cover)
+    if !source.is_a?(Hash) || %w[title credit url].any? { |k| source[k].to_s.strip.empty? }
+      problems << "#{name}: no title, credit and url for #{cover} in _data/covers.yml"
     elsif !html.include?(%(class="cover-credit"))
       problems << "#{name}: the cover credit is not on the page"
     end
