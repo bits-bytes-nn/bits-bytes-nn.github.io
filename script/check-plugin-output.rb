@@ -3,16 +3,17 @@
 # Checks that the _plugins/ hooks that change a post's page left their mark,
 # that the search index parses and holds every post, that kramdown parsed the
 # post's block HTML, that no listing shows a translation beside its original,
-# that every cover is credited on its page, that no page repeats an id, and
-# that the feed has room for every post.
+# that every cover is credited on its page, that no page repeats an id, that
+# the feed has room for every post, and that no published URL went missing.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
 # so which posts exist (published, future, folders, slug) is its answer, not a
 # second guess from the file names.
 #
-# Usage: bundle exec ruby script/check-plugin-output.rb <site_dir>
-# Prints one line per problem; exits 1 when there is any.
+# Usage: bundle exec ruby script/check-plugin-output.rb <site_dir> [--record]
+# Prints one line per problem; exits 1 when there is any. --record adds every
+# post's URL and redirect stub to script/published-urls.txt instead.
 
 require "jekyll"
 require "json"
@@ -44,6 +45,20 @@ limit = site.config.dig("feed", "posts_limit") || 10 # jekyll-feed's default
 # The feed is sorted by `date:`, the paper's date, so past the cap a new review
 # of an old paper never reaches it.
 problems << "feed.posts_limit is #{limit} for #{posts.size} posts; raise it in _config.yml" if posts.size > limit
+
+# A post's URL comes from its `date:` and categories, so an edit to either moves
+# it, and legacy_urls.rb's stub moves with it: both indexed URLs then 404.
+# Every URL listed here must still be built, as a page or a redirect stub.
+published = File.join(root, "script/published-urls.txt")
+listed = File.file?(published) ? File.readlines(published, chomp: true).grep(%r{\A/}) : []
+if ARGV.include?("--record")
+  urls = posts.flat_map { |p| [p.url] + Array(p.data["redirect_from"]).map { |u| Jekyll::URL.escape_path(u) } }
+  File.write(published, File.read(published).lines.grep_v(%r{\A/}).join + (listed | urls).sort.join("\n") + "\n")
+  exit
+end
+listed.each do |url|
+  problems << "#{url}: published but no longer built; add it to the post's redirect_from" unless File.file?(built.call(url))
+end
 
 # search.json, with search_index.rb's plain_text: an index that does not parse
 # leaves js/search.js finding nothing, and saying nothing either.

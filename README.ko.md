@@ -93,7 +93,8 @@ test/              _plugins/와 글 린트의 minitest 단위 테스트
 script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
                    validate-site.sh (빌드 후 검색 노출 검사)
                    check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
-                   validate-site.sh가 실행)
+                   validate-site.sh가 실행), published-urls.txt (글이 게시된
+                   적 있는 모든 URL)
 _data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
                    유일한 정본. scholar-lens도 읽음), covers.yml (표지마다 출처와
                    저작자 표시. 글 머리 이미지 아래에 표시)
@@ -177,7 +178,10 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 ```
 
 그래서 **이미 게시된 글의 카테고리나 날짜를 바꾸면 URL이 바뀝니다.** 외부에서 걸린 링크와
-검색 결과가 깨지므로, 한 번 정하면 그대로 둡니다.
+검색 결과가 깨지므로, 한 번 정하면 그대로 둡니다. 게시된 URL은 모두
+`script/published-urls.txt`에 있고, 그중 하나라도 빌드되지 않으면 `validate-site.sh`가 실패합니다.
+꼭 바꿔야 한다면 예전 URL을 글의 `redirect_from`에 넣습니다. 글이 머지되면
+`bundle exec ruby script/check-plugin-output.rb <site_dir> --record`로 그 URL을 기록합니다.
 
 예전 규칙으로 게시된 옛 URL(`/paper%20reviews/…`)은 계속 동작합니다.
 `_plugins/legacy_urls.rb`가 그 경로를 글의 `redirect_from`에 넣고, jekyll-redirect-from이 그

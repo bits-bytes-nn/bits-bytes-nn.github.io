@@ -42,7 +42,7 @@ This post has one thesis: **Engineering rigor never disappeared. It relocated.**
 
 Each relocation was triggered by the previous era's failure. Let's trace that arc.
 
-<a href="/assets/images/three-era-timeline.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: Evolution timeline of AI agentic patterns">
+<a href="/assets/images/three-era-timeline.svg" class="glightbox" data-gallery="post-images" data-glightbox="title: Evolution timeline of AI agentic patterns">
   <img src="/assets/images/three-era-timeline.svg" alt="Evolution timeline of AI agentic patterns — Prompt → Context → Harness Engineering" />
 </a>
 
@@ -285,7 +285,7 @@ The metric they called "the single most important metric" for production agents 
 
 Here's how KV-cache works. When you send a prompt to an LLM API, the model computes attention Keys and Values for each token. This computation is expensive. But if the **prefix** of the current request matches the previous request, that portion can reuse cached results — no recomputation needed. On Claude Sonnet, a cache hit reduces cost by **10x**. The difference between an agent re-computing the system prompt across 30 turns versus leveraging the cache is enormous.
 
-<a href="/assets/images/kv-cache-mechanism.svg" class="glightbox" data-gallery="agentic-patterns" data-glightbox="title: How KV-cache works — the stable prefix determines cost">
+<a href="/assets/images/kv-cache-mechanism.svg" class="glightbox" data-gallery="post-images" data-glightbox="title: How KV-cache works — the stable prefix determines cost">
   <img src="/assets/images/kv-cache-mechanism.svg" alt="How KV-cache works — the stable prefix determines cost" />
 </a>
 
