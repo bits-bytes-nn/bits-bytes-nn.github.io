@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 #
 # Checks that the _plugins/ hooks that change a post's page left their mark,
-# that kramdown parsed the post's block HTML, that no listing shows a
-# translation beside its original, that every cover is credited on its page,
-# that no page repeats an id, and that the feed has room for every post.
+# that the search index parses and holds every post, that kramdown parsed the
+# post's block HTML, that no listing shows a translation beside its original,
+# that every cover is credited on its page, that no page repeats an id, and
+# that the feed has room for every post.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
@@ -14,6 +15,7 @@
 # Prints one line per problem; exits 1 when there is any.
 
 require "jekyll"
+require "json"
 
 site_dir = File.expand_path(ARGV.fetch(0))
 root = File.expand_path("..", __dir__)
@@ -31,6 +33,7 @@ abort "no posts read from #{root}/_posts" if posts.empty?
 problems = []
 lang = ->(post) { post.data["lang"] || site.config["lang"] }
 per_lang = posts.group_by(&lang).transform_values(&:size)
+metas = posts.map { |p| RelatedPosts.meta(p) }
 # Where Jekyll writes a URL: a directory one to index.html, a bare one to .html.
 built = lambda do |url|
   file = url.end_with?("/") ? "#{url}index.html" : File.extname(url).empty? ? "#{url}.html" : url
@@ -41,6 +44,17 @@ limit = site.config.dig("feed", "posts_limit") || 10 # jekyll-feed's default
 # The feed is sorted by `date:`, the paper's date, so past the cap a new review
 # of an old paper never reaches it.
 problems << "feed.posts_limit is #{limit} for #{posts.size} posts; raise it in _config.yml" if posts.size > limit
+
+# search.json, with search_index.rb's plain_text: an index that does not parse
+# leaves js/search.js finding nothing, and saying nothing either.
+index = begin
+  JSON.parse(File.read(File.join(site_dir, "search.json")))
+rescue SystemCallError, JSON::ParserError
+  nil
+end
+unless index.is_a?(Array) && index.size == posts.size && index.all? { |e| e["url"] && !e["content"].to_s.strip.empty? }
+  problems << "search.json is not a list of every post with its url and text"
+end
 
 posts.each do |post|
   name = File.basename(post.path)
@@ -63,9 +77,13 @@ posts.each do |post|
     end
   end
 
-  # related_posts.rb: previous/next links, given another post in the language.
+  # related_posts.rb: previous/next links, given another post in the language,
+  # and Related reading, given a post it ranks.
   if per_lang[lang.call(post)] > 1 && !html.include?(%(class="post-nav"))
     problems << "#{name}: no previous/next links"
+  end
+  if RelatedPosts.rank(RelatedPosts.meta(post), metas).any? && !html.include?(%(class="related-posts"))
+    problems << "#{name}: no Related reading"
   end
 
   imgs = html.scan(/<img\b[^>]*>/)
