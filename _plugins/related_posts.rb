@@ -110,6 +110,18 @@ module RelatedPosts
   def self.sort_time(post)
     post[:date].respond_to?(:to_time) ? post[:date].to_time.to_i : 0
   end
+
+  # The hash `rank` and `adjacent` take, from a Jekyll post.
+  def self.meta(doc)
+    {
+      id: doc.url,
+      tags: doc.data["tags"],
+      categories: doc.data["categories"],
+      lang: doc.data["lang"],
+      translation_id: doc.data["translation_id"],
+      date: doc.data["date"]
+    }
+  end
 end
 
 # --- Jekyll wiring -----------------------------------------------------------
@@ -119,16 +131,7 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register :site, :pre_render do |site|
     docs = site.posts.docs
-    meta = docs.map do |d|
-      {
-        id: d.url,
-        tags: d.data["tags"],
-        categories: d.data["categories"],
-        lang: d.data["lang"],
-        translation_id: d.data["translation_id"],
-        date: d.data["date"]
-      }
-    end
+    meta = docs.map { |d| RelatedPosts.meta(d) }
     by_url = docs.to_h { |d| [d.url, d] }
     # Sorted here rather than trusting the collection's order, and by id as well
     # as date so posts with the same timestamp keep one order on every build.
