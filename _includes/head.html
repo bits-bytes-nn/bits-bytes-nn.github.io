@@ -290,8 +290,8 @@
 		crossorigin="anonymous"></script>
 	{% endif %}
 
-	<!-- Google Analytics -->
-	{% if site.ga_tracking_id %}
+	<!-- Google Analytics, on the deployed build only: a local serve would count as traffic. -->
+	{% if site.ga_tracking_id and jekyll.environment == 'production' %}
 	<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga_tracking_id }}"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];

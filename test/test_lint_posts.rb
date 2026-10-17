@@ -280,6 +280,12 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint(front: "#{FRONT}description: \"Mixtral 8*7B와 C++ [1]\"\n")
   end
 
+  def test_title_and_subtitle_have_no_tags
+    assert_finding(/\A1: title has a tag/, lint(front: FRONT.sub('"Mistral 7B"', '"Reasoning with <think> Tokens"')))
+    assert_finding(/subtitle has a tag/, lint(front: FRONT.sub(/^subtitle: .*$/, 'subtitle: "<s> 토큰"')))
+    assert_equal [], lint(front: FRONT.sub('"Mistral 7B"', '"Mistral 7B < 13B"'))
+  end
+
   def test_front_matter_starts_on_line_one
     assert_raises(ArgumentError) { PostLint.parse("_posts/2025-02-27-x.md", "\n---\n#{FRONT}---\nText.\n") }
     assert_equal "Mistral 7B", PostLint.parse("_posts/2025-02-27-x.md", "\uFEFF---\n#{FRONT}---\nText.\n").data["title"]

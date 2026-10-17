@@ -105,6 +105,10 @@ module PostLint
     if data["description"].to_s.match?(/\$\$|\*\S[^*]*\*|`|\]\(|<[a-zA-Z\/]|\{[{%]/)
       found << "1: description is plain text; no $$, *emphasis*, backticks, links or tags"
     end
+    # The layouts print these unescaped, so <think> would vanish as a tag.
+    %w[title subtitle].each do |key|
+      found << "1: #{key} has a tag; the page reads it as HTML" if data[key].to_s.match?(/<[a-zA-Z\/]/)
+    end
 
     # Jekyll drops a file without the date prefix, and builds a `date:` past the
     # file's day into a permanent URL. The file-name date is the posting day.

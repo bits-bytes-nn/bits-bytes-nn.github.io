@@ -347,6 +347,17 @@ blockquote {
 	}
 }
 
+// The hero is as tall as its title, so a two-line title made one post's cover
+// taller than its neighbours'. Two lines reserved (lh is the h1's
+// $heading-line-height), one centred in them, keeps most heroes one height; a
+// longer title still grows it.
+.post-header-container.has-cover .title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 2lh;
+}
+
 // Inline SVG icons (_includes/icon.html). Sized like the glyph font they
 // replace: one em tall, as wide as the drawing, sitting on the text baseline.
 .icon {
@@ -990,6 +1001,11 @@ blockquote {
 
 	.post-header-container .scrim.has-cover {
 		padding: 1em !important;
+	}
+
+	// The two lines are reserved for the cover, which does not print.
+	.post-header-container.has-cover .title {
+		min-height: 0;
 	}
 
 	// It credits a cover that does not print.
