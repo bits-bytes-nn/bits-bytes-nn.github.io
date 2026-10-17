@@ -284,7 +284,7 @@ shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml�
 1. **`ruby test/run_all.rb`**로 `_plugins/`와 린트의 단위 테스트를 돌리고
 2. **`ruby script/lint-posts.rb`**로 프런트매터를 `_data/post_conventions.yml`과 대조하고,
    마크다운 원본의 표·수식·헤딩 규칙을 검사하고
-3. `JEKYLL_ENV=production`으로 사이트를 빌드하고
+3. `JEKYLL_ENV=production`으로 사이트를 빌드하고(Google Analytics는 이 빌드에만 들어갑니다)
 4. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
 5. **`script/validate-site.sh`**로 htmlproofer가 보지 않는 빌드 후 검사(사이트맵, 피드,
    메타데이터, 헤딩, 리디렉션, 플러그인 결과)를 돌린 뒤 — 항목은 스크립트에 있습니다
@@ -328,5 +328,5 @@ curl -sS  https://bits-bytes-nn.github.io/robots.txt
 ## 라이선스
 
 MIT — [LICENSE](LICENSE) 참고. 제임스 웹 표지 이미지(ESA/Webb, CC BY 4.0)의 출처도 거기에
-밝혀 두었습니다. [Centrarium](http://jekyllthemes.org/themes/centrarium/)
+밝혀 두었습니다. [Centrarium](https://github.com/bencentra/centrarium)
 Jekyll 테마를 기반으로 합니다.

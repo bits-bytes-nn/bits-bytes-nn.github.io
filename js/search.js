@@ -20,7 +20,7 @@
   var searchInput = document.getElementById('search-input');
   var resultsContainer = document.getElementById('results-container');
   var statusEl = document.getElementById('search-status');
-  if (!searchInput || !resultsContainer) return;
+  if (!searchInput || !resultsContainer || !statusEl) return;
 
   var LIMIT = 10;         // must match the `limit` passed to SimpleJekyllSearch
   var WINDOW_CHARS = 220; // length of the excerpt shown

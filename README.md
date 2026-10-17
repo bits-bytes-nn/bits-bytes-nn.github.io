@@ -303,7 +303,7 @@ requests. In order, it:
 2. runs **`ruby script/lint-posts.rb`** — front matter against
    `_data/post_conventions.yml`, plus table, math and heading rules in the
    Markdown source,
-3. builds the site with `JEKYLL_ENV=production`,
+3. builds the site with `JEKYLL_ENV=production` (the only build that loads Google Analytics),
 4. runs **html-proofer** over `_site/` (internal links, images, anchors),
 5. runs **`script/validate-site.sh`** — the post-build checks htmlproofer does
    not cover (sitemap, feed, metadata, headings, redirects, plugin output); the
@@ -352,4 +352,4 @@ What to do instead:
 
 MIT — see [LICENSE](LICENSE), which also credits the James Webb cover images
 (ESA/Webb, CC BY 4.0). Built on the
-[Centrarium](http://jekyllthemes.org/themes/centrarium/) Jekyll theme.
+[Centrarium](https://github.com/bencentra/centrarium) Jekyll theme.
