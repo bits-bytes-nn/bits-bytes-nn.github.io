@@ -1092,7 +1092,7 @@ print(response.text)
 
 아래 구조도에서는 두 경로가 갈라지는 부분을 눈여겨보면 됩니다. 하나는 컨트롤러가 프록시와 레플리카를 관리하는 제어 경로이고, 다른 하나는 클라이언트 요청이 프록시나 핸들을 거쳐 레플리카로 가는 데이터 경로입니다.
 
-[](../_images/architecture-2.0.svg)
+![Serve 인스턴스의 컨트롤러, 프록시, 레플리카와 요청 경로를 보여 주는 Ray Serve 아키텍처 구조도](https://docs.ray.io/en/latest/_images/architecture-2.0.svg)
 
 | 액터 | 개수 | 맡은 일 |
 |---|---|---|
