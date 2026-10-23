@@ -89,7 +89,7 @@ agent('How many letter R\'s are in the word "strawberry"? Write the answer to an
 
 방금 실행한 에이전트 안에서는 모델 추론과 도구 사용(tool use)이 번갈아 반복되었습니다. 아래 그림에서 도구 결과가 다시 모델 입력으로 돌아가는 경로를 보면 루프 구조가 드러납니다.
 
-![모델 추론과 도구 실행이 반복되는 에이전트 루프 흐름도](https://strandsagents.com/_astro/agent-loop-flow.CgHBgQw3_nJnxY.webp)
+![모델 추론과 도구 실행이 반복되는 에이전트 루프 흐름도](/assets/2026-10-23-strands-agents-sdk-the-agent-loop-hooks-and-production-controls/agent-loop-flow.png)
 
 한 사이클은 다음 순서로 진행됩니다.
 
@@ -529,7 +529,9 @@ from strands import Agent
 agent = Agent(callback_handler=None)
 result = agent("Explain the difference between a process and a thread.")
 
+print(result.stop_reason)      # 루프가 끝난 이유
 print(result.message)          # 마지막 어시스턴트 메시지
+print(result.metrics.get_summary())  # 사이클 수, 누적 토큰, 도구별 사용량
 ```
 
 HTTP 응답으로 돌려줄 때는 `{"output": result.message}`처럼 마지막 메시지만 담습니다. 스트림 이벤트는 화면에 그리고 나면 지나가므로, 기록으로 남길 값은 호출이 끝난 뒤 결과 객체에서 읽어 저장하는 편이 안전합니다.
@@ -1405,7 +1407,7 @@ def process_order(order_id: str):
 - 별도 서비스로 실행되는 에이전트를 Agent-to-Agent(A2A) 프로토콜로 연결하는 방법
 - Graph·Swarm·Workflow로 구조화해 조율하는 방법
 
-어느 방법이든 최소 실행 단위는 Strands `Agent` 하나이고, 에이전트들이 정보를 주고받으며 최종 답에 다가갑니다.
+어느 방법이든 가장 작은 실행 단위는 Strands `Agent` 하나이며, 에이전트들이 정보를 주고받으면서 최종 답에 다가갑니다.
 
 ### 도구로서의 에이전트
 
@@ -1710,7 +1712,7 @@ def ping():
     return {"status": "healthy"}
 ```
 
-모듈 수준에서 에이전트 하나를 공유하면 문제가 두 가지 생깁니다. 공유 인스턴스에 호출이 겹치면 앞서 설명한 동시 호출 모드의 기본값 `THROW` 때문에 예외로 끝납니다. `async def` 핸들러 안에서 동기 `agent(...)`로 부르면 이벤트 루프가 막힙니다. 실제 서비스에서는 위처럼 요청마다 에이전트를 만듭니다.
+모듈 수준에서 에이전트 하나를 공유하면 호출 방식에 따라 다른 문제가 생깁니다. `invoke_async`로 부르면 요청이 겹칠 때 앞서 설명한 동시 호출 모드의 기본값 `THROW` 때문에 뒤에 온 요청이 `ConcurrencyException`으로 끝납니다. `async def` 핸들러 안에서 동기 `agent(...)`로 부르면 예외는 나지 않지만 이벤트 루프가 막혀 같은 프로세스의 요청이 하나씩 차례로 처리됩니다. 어느 쪽이든 앞 요청의 대화 기록이 다음 요청에 그대로 이어지므로, 실제 서비스에서는 위처럼 요청마다 에이전트를 만들고 비동기 핸들러에서는 `invoke_async`를 씁니다.
 
 | 배포 대상 | 성격 | 적합한 경우 |
 | --- | --- | --- |
