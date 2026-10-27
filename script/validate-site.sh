@@ -178,7 +178,8 @@ while IFS= read -r f; do
   [ -n "$f" ] || continue
   d=$(extract_meta "$f" description)
   [ -n "$d" ] || missing_desc="$missing_desc$f"$'\n'
-  grep -q 'rel="canonical"' "$f" || missing_canonical="$missing_canonical$f"$'\n'
+  # A noindex page (head.html: one kept out of the sitemap) has no canonical.
+  grep -q -e 'rel="canonical"' -e 'name="robots" content="noindex"' "$f" || missing_canonical="$missing_canonical$f"$'\n'
   h1=$(grep -oE '<h1[^>]*>' "$f" | grep -c .)
   [ "$h1" = "1" ] || bad_h1="$bad_h1$h1  $f"$'\n'
   t=$(grep -m1 -oE '<title>[^<]*</title>' "$f" | sed -E 's|</?title>||g')
@@ -243,10 +244,10 @@ else
 fi
 
 if [ -n "$missing_canonical" ]; then
-  fail "pages with no rel=canonical:"
+  fail "pages with neither rel=canonical nor noindex:"
   printf '%s' "$missing_canonical" | sed 's/^/          /' >&2
 else
-  pass "every page has rel=canonical"
+  pass "every page has rel=canonical or noindex"
 fi
 
 # Lines that occur more than once. Compared byte for byte: under a UTF-8 locale

@@ -12,8 +12,8 @@ layout: null
   There is no `snippet` field: js/search.js cuts the shown excerpt around the
   match in `content`.
 
-  Every field here is searched: simple-jekyll-search walks each key and matches a
-  post when all query words appear in one of them.
+  Every field but `url` is searched (js/search.js excludes it): simple-jekyll-search
+  walks each key and matches a post when all query words appear in one of them.
 {%- endcomment -%}
 [
   {% for post in site.posts %}

@@ -4,7 +4,8 @@
 # that the search index parses and holds every post, that kramdown parsed the
 # post's block HTML, that no listing shows a translation beside its original,
 # that every cover is credited on its page, that no page repeats an id, that
-# the feed has room for every post, and that no published URL went missing.
+# the feed has room for every post, that every JSON-LD block parses, and that no
+# published URL went missing, says noindex, or redirects with noindex.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
@@ -77,11 +78,18 @@ posts.each do |post|
   next problems << "#{name}: not built at #{post.url}" unless File.file?(path)
 
   html = File.read(path, encoding: "UTF-8")
+  # head.html marks a page noindex when it is out of the sitemap; a post never is.
+  problems << "#{name}: the page says noindex" if html[%r{<head>.*?</head>}m].to_s.include?('name="robots" content="noindex"')
 
   # legacy_urls.rb: a stub at the pre-slug URL of a post published before the change.
   legacy = Jekyll::URL.new(template: LegacyUrls::TEMPLATE, placeholders: post.url_placeholders).to_s
   if LegacyUrls.legacy?(name) && legacy != post.url && !File.file?(built.call(legacy))
     problems << "#{name}: no redirect stub at #{Jekyll::URL.unescape_path(legacy)}"
+  end
+  # _layouts/redirect.html: a stub with noindex is dropped, not followed.
+  Array(post.data["redirect_from"]).each do |from|
+    stub = built.call(Jekyll::URL.escape_path(from))
+    problems << "#{name}: the stub at #{from} says noindex" if File.file?(stub) && File.read(stub).include?("noindex")
   end
 
   # posted_date.rb: a modified time no earlier than a later file-name date.
@@ -152,6 +160,12 @@ Dir.glob(File.join(site_dir, "**/*.html")).each do |file|
   ids = html.gsub(%r{<(pre|code)\b.*?</\1>}m, "").scan(/\sid="([^"]+)"/).flatten
   if (dup = ids.tally.find { |_, count| count > 1 })
     problems << "#{file.delete_prefix(site_dir)}: id \"#{dup[0]}\" is used #{dup[1]} times"
+  end
+  # A "</script>" inside a JSON-LD value ends the block and runs what follows.
+  html.scan(%r{<script type="application/ld\+json">(.*?)</script>}m).flatten.each do |json|
+    JSON.parse(json)
+  rescue JSON::ParserError
+    problems << "#{file.delete_prefix(site_dir)}: its JSON-LD does not parse"
   end
   next if html.include?(%(property="og:type" content="article")) # a post's prev/next may name a twin
 

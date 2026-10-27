@@ -7,9 +7,10 @@ description: >-
   or tag.
 main_nav: true
 nav_order: 7
+lang: en
 stylesheet: /css/search.css
 # An empty shell until JavaScript runs, so there is nothing here for a search
-# engine to index.
+# engine to index: out of the sitemap, and head.html marks it noindex.
 sitemap: false
 ---
 
@@ -17,6 +18,7 @@ sitemap: false
   <input type="search" id="search-input" data-index="{{ '/search.json' | prepend: site.baseurl }}" placeholder="Search posts by title, content, category, or tag…"
          autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search posts" lang="en">
   <p id="search-status" class="search-status" role="status" aria-live="polite" lang="en"></p>
+  <noscript><p class="search-status">Search runs in the browser and needs JavaScript.</p></noscript>
   <div id="results-container"></div>
 </div>
 
