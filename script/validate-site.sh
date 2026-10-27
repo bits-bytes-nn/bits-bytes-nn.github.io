@@ -98,7 +98,7 @@ if [ -f "$SITE/sitemap.xml" ]; then
 fi
 
 # --- feed authorship ---------------------------------------------------------
-# jekyll-feed takes each entry's <author> from the site's `author`; posts may not
+# feed.xml takes each entry's <author> from the site's `author`; posts may not
 # set their own (forbidden_keys, script/lint-posts.rb).
 if [ -n "$(ruby -ryaml -e 'print YAML.safe_load_file(ARGV[0])["author"].to_s.strip' "$CONFIG")" ]; then
   pass "_config.yml names the feed's author"

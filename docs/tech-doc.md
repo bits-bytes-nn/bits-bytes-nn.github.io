@@ -51,7 +51,7 @@ Pages가 그대로 서빙.**
 | 영역 | 선택 | 한 줄 설명 |
 |------|------|-----------|
 | 정적 사이트 생성기 | Jekyll 4.4 (`Gemfile`, Ruby 3.3+), kramdown(GFM 입력) | 마크다운 글을 HTML로 굽는 본체. `Gemfile`은 Ruby의 의존성 목록(= `package.json`에 해당) |
-| 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-feed`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도), `feed.xml`(RSS 구독) 자동 생성, 옛 URL 리디렉션 페이지 생성 |
+| 플러그인(gem) | `jekyll-paginate`, `jekyll-sitemap`, `jekyll-redirect-from` | 각각 목록 페이지 나누기, `sitemap.xml`(검색엔진용 지도) 자동 생성, 옛 URL 리디렉션 페이지 생성. `feed.xml`(RSS 구독)은 루트의 템플릿 페이지가 만든다 |
 | 로컬 플러그인(`_plugins/`) | `reading_time.rb`(한·영 읽기시간 계산), `lazy_images.rb`(`<img>`에 lazy-load 부여), `image_dimensions.rb`(저장소 안 PNG·JPEG·SVG의 `width`/`height`를 파일 헤더나 SVG 루트 요소에서 읽어 부여 — 늦게 로드되는 이미지가 페이지를 밀지 않게), `post_description.rb`(글의 검색 설명문 생성), `related_posts.rb`(공유 태그로 관련 글 선정 + 글 끝 이전/다음 링크), `scrollable_tables.rb`(넓은 표를 가로 스크롤 컨테이너로 감싸기), `search_index.rb`(검색 색인용 평문 변환), `legacy_urls.rb`(옛 글 URL을 리디렉션 대상으로 등록 — 규칙이 바뀐 2026-10-11 전에 게시한 글만), `translations.rb`(번역 짝의 다른 언어 글에 `hidden`을 달아 홈·카테고리·태그 목록에서 빼기 — 글 자체와 사이트맵·피드·검색에는 그대로 남는다), `posted_date.rb`(파일명의 게시일이 `date:`보다 늦으면 `last_modified_at`으로 넣어 사이트맵 `<lastmod>`·피드 `<updated>`·JSON-LD `dateModified`가 게시일을 따르게) | 우리가 직접 만든 Ruby 확장. 이것 때문에 GitHub Pages 기본 빌드 대신 Jekyll을 직접 돌린다(§1 아래 참고) |
 | 신택스 하이라이팅 | Rouge(서버사이드, kramdown 내장) | 코드 블록에 색을 입히는 작업을 **빌드 때 미리** 한다(브라우저 부담 0). 색 테마는 `_sass/_syntax.scss` |
 | 수식 | kramdown `math_engine: mathjax` → MathJax 3, 포스트별 `use_math`로 로드 | 수학 기호를 브라우저에서 예쁘게 그려 주는 라이브러리. 수식이 있는 글에서만 불러온다 |
@@ -375,14 +375,15 @@ Bourbon → base/ → Neat → _layout → _post → _tags → _syntax(Rouge 코
   > 돌려주는 파이프라인이다. 여기서는 GitHub Actions가 그 역할을 한다.
 
 - **사이트맵/피드** — `jekyll-sitemap`이 `/sitemap.xml`(검색엔진이 페이지 목록을 파악하는
-  지도)을, `jekyll-feed`가 `/feed.xml`(RSS 구독용)을 자동 생성한다. 원본에 `robots.txt`가
+  지도)을 자동 생성하고, `/feed.xml`(RSS 구독용)은 루트의 `feed.xml` 템플릿이 게시일 순으로
+  만든다. 원본에 `robots.txt`가
   없으면 `jekyll-sitemap`이 `Sitemap:` 한 줄짜리 `robots.txt`를 만들어 크롤러를 사이트맵으로
   안내한다. 손으로 만든 `robots.txt`를 두면 그 생성이 꺼진다. `head.html`은
   `<link rel="alternate">`로 피드 위치를 알린다. 내용이 없는 `/search/`와 `404.html`은
   `sitemap: false`로 사이트맵에서 뺀다.
 - **저자 표기** — 글의 저자는 항상 블로그 저자다. JSON-LD `author`, `<meta name="author">`, 피드의
   `<author>`가 모두 `site.author`를 쓴다. 논문을 낸 기관은 `author`가 아니라 `paper_author`에
-  적고 화면에 "Paper by …"로만 표시한다 — jekyll-feed가 글의 `author`를 피드 저자로 쓰기
+  적고 화면에 "Paper by …"로만 표시한다 — 글의 `author`는 이 글을 쓴 사람으로 읽히기
   때문이다.
 - **인용 수** — `paper_doi`가 있는 논문 글은 메타 패널 끝에 Semantic Scholar 인용 수(Citations)를
   보여 준다. 빌드가 아니라 브라우저에서 `js/citations.js`가 받아 오므로 정적 페이지에 숫자가 굳지

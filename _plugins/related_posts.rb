@@ -119,7 +119,7 @@ module RelatedPosts
       categories: doc.data["categories"],
       lang: doc.data["lang"],
       translation_id: doc.data["translation_id"],
-      date: doc.data["date"]
+      date: doc.data["posted_at"] # posted_date.rb; the day it went up here
     }
   end
 end
@@ -133,9 +133,9 @@ if defined?(Jekyll::Hooks)
     docs = site.posts.docs
     meta = docs.map { |d| RelatedPosts.meta(d) }
     by_url = docs.to_h { |d| [d.url, d] }
-    # Sorted here rather than trusting the collection's order, and by id as well
-    # as date so posts with the same timestamp keep one order on every build.
-    ordered = meta.sort_by { |m| [RelatedPosts.sort_time(m), m[:id].to_s] }
+    # The listings' order (posted_date.rb's Document#<=>: posted day, then
+    # `date:`, then path), so a day with several posts reads the same both ways.
+    ordered = docs.sort.map { |d| RelatedPosts.meta(d) }
 
     meta.each_with_index do |target, i|
       ids = RelatedPosts.rank(target, meta)

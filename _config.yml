@@ -1,12 +1,11 @@
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll-feed
   - jekyll-redirect-from
 
 feed:
   excerpt_only: true
-  posts_limit: 50  # above the post count (script/check-plugin-output.rb checks); excerpts only, so the feed stays small
+  posts_limit: 50  # feed.xml; excerpts only, so the feed stays small
 
 # NOTE: the Google/Naver site-verification HTML files are intentionally NOT
 # excluded — they must be served at the site root, or Search Console / Naver
@@ -32,7 +31,7 @@ exclude:
 title: Bits, Bytes and Neural Networks
 subtitle: A Data Scientist's Digital Playground
 email: aldente0630@gmail.com
-# The site's author: jekyll-feed's Atom <author> and head.html's author meta and
+# The site's author: feed.xml's Atom <author> and head.html's author meta and
 # JSON-LD. Posts never set `author` themselves — paper posts use `paper_author`.
 author: Jonas Kim
 # The site's default language: the feed's xml:lang. Pages and posts still set
