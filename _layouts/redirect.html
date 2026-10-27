@@ -1,0 +1,16 @@
+{%- comment -%}
+  jekyll-redirect-from's stub, minus its robots noindex. GitHub Pages cannot send
+  a 301, so the instant refresh is the redirect, and Google reads it as a
+  permanent one. With noindex beside it, Google only dropped each old
+  /paper%20reviews/ URL from the index and never moved it to the new one.
+{%- endcomment -%}
+<!DOCTYPE html>
+<html lang="en-US">
+  <meta charset="utf-8">
+  <title>Redirecting&hellip;</title>
+  <link rel="canonical" href="{{ page.redirect.to | escape }}">
+  <script>location={{ page.redirect.to_js }}</script>
+  <meta http-equiv="refresh" content="0; url={{ page.redirect.to | escape }}">
+  <h1>Redirecting&hellip;</h1>
+  <a href="{{ page.redirect.to | escape }}">Click here if you are not redirected.</a>
+</html>

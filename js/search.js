@@ -188,6 +188,9 @@
       return undefined;
     },
     noResultsText: '',
+    // The library matches every field, and every url ends in .html: a search for
+    // "html" listed the first ten posts with nothing marked.
+    exclude: ['^/.*\\.html$'],
     limit: LIMIT,
     fuzzy: false,
     success: function () {

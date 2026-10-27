@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 Bits, Bytes and Neural Networks
+# Bits, Bytes and Neural Networks
 
 **AI/ML 논문 리뷰·요약과 기술 가이드를 블로그로 발행합니다.**
 
@@ -11,13 +11,15 @@ Jekyll 정적 사이트로 만들어 GitHub Pages에 배포합니다.
 ![Jekyll](https://img.shields.io/badge/SSG-Jekyll-CC0000)
 ![GitHub Pages](https://img.shields.io/badge/hosting-GitHub%20Pages-222)
 
-🇺🇸 [English README](./README.md)
+[English README](./README.md)
 
 ![Bits, Bytes and Neural Networks](assets/my_header_image_full.jpg)
 
 </div>
 
----
+**목차:** [빠른 시작](#빠른-시작) · [글 작성하기](#글-작성하기) ·
+[푸시 전에 확인하세요](#푸시-전에-확인하세요) · [배포](#배포) ·
+[Search Console](#search-console) · [저장소 구조](#저장소-구조) · [라이선스](#라이선스)
 
 ## 빠른 시작
 
@@ -49,7 +51,8 @@ bundle exec jekyll serve
 `_posts/`, `_sass/`, `_includes/` 아래 파일을 고치고 저장한 뒤 새로고침하면
 대부분 바로 반영됩니다. 단, `_config.yml`을 바꿨을 때는 서버를 다시 시작해야 합니다.
 
-**4. 최종 결과물이 필요하면 빌드합니다** (CI 옵션은 `.github/workflows/jekyll.yml`, 로컬 검사는 "푸시 전에 확인하세요" 참고).
+**4. 최종 결과물이 필요하면 빌드합니다.** 변경을 CI와 같은 방식으로 확인하려면
+[푸시 전에 확인하세요](#푸시-전에-확인하세요)의 검사를 대신 돌립니다.
 
 ```bash
 bundle exec jekyll build   # 결과물은 _site/ 에 생성
@@ -58,56 +61,6 @@ bundle exec jekyll build   # 결과물은 _site/ 에 생성
 > **왜 `github-pages` gem이 아니라 순수 `jekyll`인가요?**
 > 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인을 씁니다. `github-pages` gem은 보안
 > 샌드박스 때문에 커스텀 플러그인을 막으므로, 로컬과 CI 모두 Jekyll을 직접 실행합니다.
-
----
-
-## 저장소 구조
-
-```
-_posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역본은 -en.md)
-_layouts/          페이지 템플릿: default → post / page
-_includes/         재사용 조각: head, header, footer, nav_links,
-                   page_divider, category-posts, language_switcher,
-                   related_posts, icon(인라인 SVG 아이콘)
-_sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
-                   _dark(다크모드), base/*
-                   ⚠ bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
-_plugins/          reading_time.rb      (한·영 읽기 시간 계산)
-                   lazy_images.rb       (<img>에 loading="lazy" 추가)
-                   image_dimensions.rb  (로컬 <img>에 width/height 부여)
-                   post_description.rb  (글의 page.description 채우기)
-                   related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
-                   scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
-                   search_index.rb      (search.json용 plain_text 필터)
-                   legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
-                   translations.rb      (번역본을 글 목록에서 빼기)
-                   posted_date.rb       (파일명 날짜가 더 늦으면 last_modified_at 채우기)
-css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
-js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
-                   search.js(검색창 동작)
-                   citations.js(논문 글의 인용 수, Semantic Scholar에서)
-assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(플랫)
-assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
-search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
-test/              _plugins/와 글 린트의 minitest 단위 테스트
-script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
-                   validate-site.sh (빌드 후 검색 노출 검사)
-                   check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
-                   validate-site.sh가 실행), published-urls.txt (글이 게시된
-                   적 있는 모든 URL)
-_data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
-                   유일한 정본. scholar-lens도 읽음), covers.yml (표지마다 출처와
-                   저작자 표시. 글 머리 이미지 아래에 표시)
-.github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
-                   workflow-lint.yml: actionlint와 shellcheck
-```
-
-**최상위 페이지:** `index.html`(홈), 다섯 개의 섹션 페이지인 `paper-reviews.md`·
-`paper-summaries.md`·`paper-surveys.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
-`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`feed.xml`·`robots.txt`는
-플러그인이 생성하며 원본 파일이 없습니다.
-
----
 
 ## 글 작성하기
 
@@ -186,7 +139,11 @@ _site/paper-reviews/language-models/2025/01/23/<slug>.html
 예전 규칙으로 게시된 옛 URL(`/paper%20reviews/…`)은 계속 동작합니다.
 `_plugins/legacy_urls.rb`가 그 경로를 글의 `redirect_from`에 넣고, jekyll-redirect-from이 그
 자리에 새 URL로 보내는 페이지를 만듭니다. 규칙이 바뀐 날(2026-10-11)부터 게시한 글은 옛 URL이
-없으므로 이 페이지를 만들지 않습니다.
+없으므로 이 페이지를 만들지 않습니다. 이 페이지는 `_layouts/redirect.html`로 만들며, gem
+기본 템플릿의 `noindex`를 뺐습니다. GitHub Pages는 301을 보낼 수 없어 Google이 즉시
+새로고침을 리디렉션으로 읽어야 하는데, `noindex`가 함께 있으면 Google은 옛 URL을 색인에서
+빼기만 하고 새 URL로 옮기지 않았습니다. `noindex`가 있는 리디렉션 페이지는
+`check-plugin-output.rb`가 막습니다.
 
 ### 태그: 세부 태그 위에 주제 태그를 하나
 
@@ -273,8 +230,6 @@ shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml�
 단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기 때문입니다. **`_plugins/`를 건드리면
 사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기 전에 테스트 케이스를 먼저 추가하세요.
 
----
-
 ## 배포
 
 `.github/workflows/jekyll.yml`은 `main` 푸시뿐 아니라 **`main`으로 향하는 PR에서도**
@@ -293,13 +248,24 @@ shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml�
 실패하면 대개 4·5단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로
 나옵니다. 수동 배포 단계는 없습니다.
 
-> **⚠ `google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**
+> **`google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**
 > Search Console·네이버 소유권 인증 토큰이라 사이트 루트에 그대로 올라가야 합니다.
 > 제외하면 소유권 인증이 조용히 망가집니다.
 
-### Search Console이 사이트맵을 "가져올 수 없음"이라고 할 때
+## Search Console
 
-먼저 파일을 확인하세요. 대개 파일은 정상입니다.
+속성은 URL 접두어 `https://bits-bytes-nn.github.io/`이며, 사이트 루트의 `google*.html`
+파일로 인증합니다.
+
+**글의 상태는 사이트맵 행이 아니라 URL 검사로 확인합니다.** 눈여겨볼 결과는 둘입니다.
+
+- *URL이 Google에 알려지지 않음*과 *참조 사이트맵이 감지되지 않음*: Google이 사이트맵으로도
+  링크로도 그 URL을 찾지 못했습니다. **색인 생성 요청**을 누릅니다. 하루 할당량이 적으니
+  검색으로 많이 들어오는 글부터 요청합니다.
+- 순위에 올라야 할 URL이 *'noindex' 태그에 의해 제외됨*: 그 페이지나 리디렉션 페이지에
+  `noindex`가 있습니다. `noindex`는 `sitemap: false`인 페이지에만 있어야 합니다([저장소 구조](#저장소-구조) 참고).
+
+**사이트맵 행이 "가져올 수 없음"이면** 먼저 파일을 확인하세요. 대개 파일은 정상입니다.
 
 ```bash
 curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # 200, application/xml 기대
@@ -308,22 +274,61 @@ curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
 curl -sS  https://bits-bytes-nn.github.io/robots.txt
 ```
 
-세 개가 다 통과하면 원인은 사이트가 아니고, 파일을 고쳐서 해결되지 않습니다. "가져올 수
-없음"은 요청 실패가 아니라 Google이 아직 사이트맵을 가져가지 않았다는 표시이고, 언제
-가져갈지는 Google의 크롤링 일정이 정합니다. `*.github.io` 속성에서 흔하며 다른 URL로 다시
-제출해도 달라지지 않습니다.
+세 개가 다 통과하면 파일을 고쳐서 해결되지 않습니다. 이 상태는 요청 실패가 아니라 Google이
+아직 사이트맵을 가져가지 않았다는 뜻이고, 언제 가져갈지는 Google의 크롤링 일정이 정합니다.
+`*.github.io` 속성에서 흔하며, 다른 URL로 다시 제출해도 달라지지 않습니다. 항목은
+`https://bits-bytes-nn.github.io/sitemap.xml` 하나만 두고, URL이 크게 바뀐 뒤에는 다시
+제출합니다. 행에 읽은 날짜가 찍힐 때까지는 중요한 글을 색인 생성 요청으로 챙깁니다. 모든 글은 홈·섹션 페이지·`/tags/`에서도 링크되고,
+`robots.txt`가 사이트맵을 알립니다. 사이트맵을 가져가게 했다고 보고된 방법은 커스텀 도메인을
+도메인 속성으로 인증하는 것뿐인데, 모든 URL이 바뀌므로 별도로 결정할 일입니다.
 
-대신 이렇게 합니다.
+## 저장소 구조
 
-- `https://bits-bytes-nn.github.io/sitemap.xml` 하나만 제출하고 그대로 둡니다. 다른
-  사이트맵 항목은 삭제합니다.
-- 색인 여부는 사이트맵 행이 아니라 **색인 생성 → 페이지** 보고서와 몇몇 글의 **URL 검사**로
-  판단합니다. 모든 글이 홈·섹션 페이지·`/tags/`에서 링크되고 `robots.txt`가 사이트맵을
-  알리므로, 사이트맵이 처리되지 않아도 Google은 글을 찾을 수 있습니다.
-- 사이트맵을 가져가게 했다고 보고된 방법은 커스텀 도메인으로 옮겨 도메인 속성으로 인증하는
-  것뿐입니다. 모든 URL이 바뀌어 리디렉션이 필요하므로 별도로 결정할 일입니다.
+```
+_posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역본은 -en.md)
+_layouts/          페이지 템플릿: default → post / page, redirect(redirect_from이
+                   만드는 리디렉션 페이지. gem 기본값의 noindex를 뺌)
+_includes/         재사용 조각: head, header, footer, nav_links,
+                   page_divider, category-posts, language_switcher,
+                   related_posts, icon(인라인 SVG 아이콘)
+_sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
+                   _dark(다크모드), base/*
+                   bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
+_plugins/          reading_time.rb      (한·영 읽기 시간 계산)
+                   lazy_images.rb       (<img>에 loading="lazy" 추가)
+                   image_dimensions.rb  (로컬 <img>에 width/height 부여)
+                   post_description.rb  (글의 page.description 채우기)
+                   related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
+                   scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
+                   search_index.rb      (search.json용 plain_text 필터)
+                   legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
+                   translations.rb      (번역본을 글 목록에서 빼기)
+                   posted_date.rb       (파일명 날짜가 더 늦으면 last_modified_at 채우기)
+css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
+js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
+                   search.js(검색창 동작)
+                   citations.js(논문 글의 인용 수, Semantic Scholar에서)
+assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(플랫)
+assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
+search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
+test/              _plugins/와 글 린트의 minitest 단위 테스트
+script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
+                   validate-site.sh (빌드 후 검색 노출 검사)
+                   check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
+                   validate-site.sh가 실행), published-urls.txt (글이 게시된
+                   적 있는 모든 URL)
+_data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
+                   유일한 정본. scholar-lens도 읽음), covers.yml (표지마다 출처와
+                   저작자 표시. 글 머리 이미지 아래에 표시)
+.github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
+                   workflow-lint.yml: actionlint와 shellcheck
+```
 
----
+**최상위 페이지:** `index.html`(홈), 다섯 개의 섹션 페이지인 `paper-reviews.md`·
+`paper-summaries.md`·`paper-surveys.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
+`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`feed.xml`·`robots.txt`는
+플러그인이 생성하며 원본 파일이 없습니다. `sitemap: false`인 페이지(검색, 404)에는 canonical
+링크 대신 `<meta name="robots" content="noindex">`가 들어갑니다.
 
 ## 라이선스
 

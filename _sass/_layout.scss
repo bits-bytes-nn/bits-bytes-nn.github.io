@@ -154,6 +154,13 @@ blockquote {
 	overflow-y: hidden;
 }
 
+// MathJax's hidden screen-reader copy of a formula is as wide as the formula
+// unwrapped: an inline one that fit on screen still widened the QLoRA post to
+// 327px on a 320px phone.
+.post-content mjx-assistive-mml {
+	max-width: 100%;
+}
+
 // Set by the MathJax startup hook in head.html on inline formulas wider than
 // their paragraph. Only those: overflow on an inline box moves its baseline.
 .post-content mjx-container.is-wide {

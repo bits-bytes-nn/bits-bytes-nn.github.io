@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     copyStatus.textContent = msg;
   }
+  // A fence in a language Rouge does not know (```cedar) is a bare <pre>: give it
+  // the .highlight box the button is placed in and shown by.
+  document.querySelectorAll('.post-content pre:not(.highlight):not(.highlight pre)').forEach(function (pre) {
+    var box = document.createElement('div');
+    box.className = 'highlight';
+    pre.parentNode.insertBefore(box, pre);
+    box.appendChild(pre);
+  });
   document.querySelectorAll('.post-content .highlight').forEach(function (block) {
     var pre = block.querySelector('pre');
     if (!pre) return;

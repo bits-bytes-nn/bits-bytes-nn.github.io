@@ -148,10 +148,23 @@
 	<!-- Site styles -->
 	<link rel="stylesheet" href="{{ '/css/main.css' | prepend: site.baseurl }}">
 	{% if page.stylesheet %}<link rel="stylesheet" href="{{ page.stylesheet | prepend: site.baseurl }}">{% endif %}
-	<link rel="canonical" href="{{ page_full_url }}" />
+	<!-- Without JS the phone menu stays open (main.js closes it): let it scroll
+	     away with the page rather than cover two thirds of the screen. -->
+	<noscript><style>.navigation { position: absolute; }</style></noscript>
+	{%- comment -%}
+	  A page kept out of the sitemap (search, 404) is one with nothing to rank, and
+	  Google had indexed the empty search shell. noindex says so; a canonical
+	  beside it would contradict it.
+	{%- endcomment %}
+	{% if page.sitemap == false %}<meta name="robots" content="noindex" />{% else %}<link rel="canonical" href="{{ page_full_url }}" />{% endif %}
 	<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
 	<!-- Structured data (schema.org JSON-LD) for rich search results -->
+	{%- comment -%}
+	  jsonify leaves "<" as is, so a "</script>" in a derived description (code
+	  text from the first paragraph) ended this block and ran what followed.
+	  \u003c is the same character to a JSON parser.
+	{%- endcomment %}
 	{% if page.layout == 'post' %}
 	<script type="application/ld+json">
 	{
@@ -161,17 +174,17 @@
 	    Google drops Article rich results when headline runs past ~110 chars, and
 	    several paper titles here are longer than that.
 	  {%- endcomment -%}
-	  "headline": {{ page.title | truncate: 110 | jsonify }},
+	  "headline": {{ page.title | truncate: 110 | jsonify | replace: '<', '\u003c' }},
 	  "url": "{{ page_full_url }}",
 	  "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ page_full_url }}" },
 	  "inLanguage": "{{ page_lang }}",
 	  "datePublished": "{{ page.date | date_to_xmlschema }}",
 	  "dateModified": "{{ page.last_modified_at | default: page.date | date_to_xmlschema }}",
-	  "description": {{ page_description | jsonify }},
+	  "description": {{ page_description | jsonify | replace: '<', '\u003c' }},
 	  "image": "{{ social_image }}",
 	  "author": { "@type": "Person", "name": {{ site.author | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
 	  "publisher": { "@type": "Person", "name": {{ site.author | jsonify }} },
-	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify }}
+	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify | replace: '<', '\u003c' }}
 	}
 	</script>
 	{% elsif page.url == '/' %}
@@ -183,7 +196,7 @@
 	  "name": {{ site.title | jsonify }},
 	  "url": "{{ site.url }}{{ site.baseurl }}/",
 	  "inLanguage": "{{ page_lang }}",
-	  "description": {{ page_description | jsonify }},
+	  "description": {{ page_description | jsonify | replace: '<', '\u003c' }},
 	  "author": { "@type": "Person", "name": {{ site.author | jsonify }} }
 	}
 	</script>
