@@ -9,8 +9,8 @@ layout: default
         {% if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>{% endif %}
         {%- comment -%}
           `paper_author`, not `author`: it names who wrote the paper, not this
-          post. jekyll-feed reads `author` for each entry's <author>, and the
-          post's author is always site.author.
+          post. feed.xml names site.author in each entry's <author>: this
+          post's author is always the site's.
         {%- endcomment -%}
         {% if page.paper_author %}<p class="info">Paper by <strong>{{ page.paper_author }}</strong></p>{% endif %}
       </header>
@@ -25,8 +25,15 @@ layout: default
       <div class="post-header-info">
         <div class="post-date">
           <span class="meta-label">Published</span>
+          <time class="meta-value" datetime="{{ page.posted_at | date_to_xmlschema }}">{{ page.posted_at | date: site.date_format }}</time>
+        </div>
+        {%- comment -%} A paper post's `date:` is the paper's (_plugins/posted_date.rb). {%- endcomment -%}
+        {% if page.paper_author and page.posted_at != page.date %}
+        <div class="post-date">
+          <span class="meta-label">Paper</span>
           <time class="meta-value" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: site.date_format }}</time>
         </div>
+        {% endif %}
         <div class="post-readtime">
           <span class="meta-label">Read time</span>
           <span class="meta-value">{{ content | reading_time }}&nbsp;min</span>
@@ -78,7 +85,7 @@ layout: default
 
     {%- comment -%}
       adjacent_older / adjacent_newer come from _plugins/related_posts.rb, not
-      Jekyll's page.previous / page.next. The built-ins walk raw date order, and
+      Jekyll's page.previous / page.next. The built-ins walk every post, and
       a translation pair sits a second apart, English first — so "← Previous" on a
       Korean post would be that same article in English.
     {%- endcomment -%}

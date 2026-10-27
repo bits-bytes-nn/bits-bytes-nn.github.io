@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 #
-# Sets `last_modified_at` to the day a post went up, when that is later than
-# its `date:`.
+# Gives every post `posted_at`, the day it went up here, and orders the posts by
+# it. Sets `last_modified_at` to that day when it is later than `date:`.
 #
-# A paper post's `date:` is the paper's publication date: it orders the archive
-# and builds the URL. The file name carries the day the post was published here.
-# Left alone, the sitemap's <lastmod>, the feed's <updated> and the JSON-LD
-# dateModified all fell back to `date:`, telling crawlers a post written this
-# year had not changed since the paper came out. jekyll-sitemap and jekyll-feed
-# already read `last_modified_at`; head.html reads it too. Posts never set it
-# themselves (forbidden_keys in _data/post_conventions.yml).
+# A paper post's `date:` is the paper's publication date: it builds the URL, so
+# it stays. The file name carries the day the post was published here. Read
+# from `date:`, a review written this year was listed below last year's posts,
+# shown as "Published" in the paper's year, and dated that way in the JSON-LD,
+# and the sitemap's <lastmod> and the feed's <updated> said it had not changed
+# since the paper came out.
+#
+# The layouts show and date a post by `posted_at`; the post page also shows
+# `date:` as the paper's date. jekyll-sitemap and feed.xml read
+# `last_modified_at`. Posts never set it themselves (forbidden_keys in
+# _data/post_conventions.yml).
 require "date"
 
 module PostedDate
@@ -21,14 +25,37 @@ module PostedDate
   rescue ArgumentError
     nil
   end
+
+  # The day the post went up: the later file-name date, else `date:` itself.
+  def self.posted_at(basename, date)
+    last_modified(basename, date) || date
+  end
+
+  # Jekyll orders posts with Document#<=>, by `date:`: site.posts, site.tags,
+  # site.categories and jekyll-paginate's home pages all come from it. Posts
+  # compare by `posted_at` first; anything without one, as before.
+  module Order
+    def <=>(other)
+      mine = data["posted_at"]
+      theirs = other.respond_to?(:data) ? other.data["posted_at"] : nil
+      cmp = mine && theirs ? mine <=> theirs : nil
+      cmp.nil? || cmp.zero? ? super : cmp
+    end
+  end
 end
 
 # Guarded so test/ can require this file without Jekyll loaded.
 if defined?(Jekyll::Hooks)
+  Jekyll::Document.prepend(PostedDate::Order)
+
   Jekyll::Hooks.register :site, :post_read do |site|
     site.posts.docs.each do |post|
-      modified = PostedDate.last_modified(File.basename(post.path), post.date)
+      basename = File.basename(post.path)
+      post.data["posted_at"] = PostedDate.posted_at(basename, post.date)
+      modified = PostedDate.last_modified(basename, post.date)
       post.data["last_modified_at"] = modified if modified
     end
+    # The reader sorted them by `date:`, before `posted_at` was set.
+    site.posts.docs.sort!
   end
 end

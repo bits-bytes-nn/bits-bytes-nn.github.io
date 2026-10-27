@@ -72,7 +72,7 @@ gitignore된 `.claude/` 아래)이 리서치 → 초안 → 퇴고를 진행합�
 layout: post
 title: "<글 제목>"
 subtitle: "<한 줄 소개>"            # 논문 글은 필수(제목과 달라야 함), 그 밖에는 선택
-date: YYYY-MM-DD HH:MM:SS
+date: YYYY-MM-DD HH:MM:SS          # 논문 글은 논문 발표일, 그 밖에는 게시일
 paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). 논문 글에만
 paper_doi: "10.48550/arXiv.<id>"   # 선택, 논문 글에만 — 메타 패널의 인용 수
 seo_title: "<짧은 제목>"            # 선택 — 제목이 너무 길 때 <title>에 대신 씁니다
@@ -88,6 +88,12 @@ translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 
                                    #    목록에는 한국어 글만 나옵니다
 ---
 ```
+
+URL은 `date:`로 만들지만, 사이트가 따르는 날짜는 파일명의 게시일입니다.
+`_plugins/posted_date.rb`가 이 날짜를 `posted_at`으로 만들고, 홈·섹션 페이지·`/tags/`·이전/다음
+글 링크·`feed.xml`이 이 순서를 따릅니다. 페이지·피드·구조화 데이터의 "Published"도 이
+날짜입니다. 논문 글은 `date:`를 "Paper" 줄에 따로 보여 줍니다. 같은 날 올린 글끼리는
+`date:` 순서를 따르고, 논문 글은 그날 UTC 자정에 올린 것으로 칩니다.
 
 논문 글의 `<title>`은 제목(또는 `seo_title`) 뒤에 "논문 리뷰"·"논문 요약"을 붙입니다.
 독자가 검색하는 말이기 때문이고, 소셜 카드는 원래 제목을 그대로 씁니다.
@@ -276,11 +282,12 @@ curl -sS  https://bits-bytes-nn.github.io/robots.txt
 
 세 개가 다 통과하면 파일을 고쳐서 해결되지 않습니다. 이 상태는 요청 실패가 아니라 Google이
 아직 사이트맵을 가져가지 않았다는 뜻이고, 언제 가져갈지는 Google의 크롤링 일정이 정합니다.
-`*.github.io` 속성에서 흔하며, 다른 URL로 다시 제출해도 달라지지 않습니다. 항목은
-`https://bits-bytes-nn.github.io/sitemap.xml` 하나만 두고, URL이 크게 바뀐 뒤에는 다시
-제출합니다. 행에 읽은 날짜가 찍힐 때까지는 중요한 글을 색인 생성 요청으로 챙깁니다. 모든 글은 홈·섹션 페이지·`/tags/`에서도 링크되고,
-`robots.txt`가 사이트맵을 알립니다. 사이트맵을 가져가게 했다고 보고된 방법은 커스텀 도메인을
-도메인 속성으로 인증하는 것뿐인데, 모든 URL이 바뀌므로 별도로 결정할 일입니다.
+`*.github.io` 속성에서 흔합니다. 항목은 `sitemap.xml`과 `feed.xml` 두 개를 둡니다. Google은
+Atom 피드도 사이트맵으로 읽고, 피드에는 최근 글이 있습니다. URL이 크게 바뀐 뒤에는 다시
+제출하고, 행에 읽은 날짜가 찍힐 때까지는 중요한 글을 색인 생성 요청으로 챙깁니다. 모든 글은
+홈·섹션 페이지·`/tags/`에서도 링크되고, `robots.txt`가 사이트맵을 알립니다. 사이트맵을
+가져가게 했다고 보고된 방법은 커스텀 도메인을 도메인 속성으로 인증하는 것뿐인데, 모든 URL이
+바뀌므로 별도로 결정할 일입니다.
 
 ## 저장소 구조
 
@@ -303,7 +310,8 @@ _plugins/          reading_time.rb      (한·영 읽기 시간 계산)
                    search_index.rb      (search.json용 plain_text 필터)
                    legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
                    translations.rb      (번역본을 글 목록에서 빼기)
-                   posted_date.rb       (파일명 날짜가 더 늦으면 last_modified_at 채우기)
+                   posted_date.rb       (파일명의 게시일을 posted_at으로: 목록 순서,
+                                         "Published", last_modified_at)
 css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
 js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
                    search.js(검색창 동작)
@@ -326,8 +334,9 @@ _data/             post_conventions.yml (카테고리·표지·통제 태그·�
 
 **최상위 페이지:** `index.html`(홈), 다섯 개의 섹션 페이지인 `paper-reviews.md`·
 `paper-summaries.md`·`paper-surveys.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
-`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`feed.xml`·`robots.txt`는
-플러그인이 생성하며 원본 파일이 없습니다. `sitemap: false`인 페이지(검색, 404)에는 canonical
+`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`robots.txt`는
+플러그인이 생성하며 원본 파일이 없습니다. `feed.xml`은 jekyll-feed 템플릿을 이 사이트에
+필요한 부분만 남겨 `posted_at` 순으로 바꾼 페이지입니다. `sitemap: false`인 페이지(검색, 404)에는 canonical
 링크 대신 `<meta name="robots" content="noindex">`가 들어갑니다.
 
 ## 라이선스

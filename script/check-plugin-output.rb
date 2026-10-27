@@ -4,8 +4,9 @@
 # that the search index parses and holds every post, that kramdown parsed the
 # post's block HTML, that no listing shows a translation beside its original,
 # that every cover is credited on its page, that no page repeats an id, that
-# the feed has room for every post, that every JSON-LD block parses, and that no
-# published URL went missing, says noindex, or redirects with noindex.
+# the home pages and the feed are in posted order, that every JSON-LD block
+# parses, and that no published URL went missing, says noindex, or redirects
+# with noindex.
 #
 # test/ covers the plugins' functions, not the Jekyll hooks that apply them, and
 # with a hook gone the build still passes. Jekyll itself reads the posts here,
@@ -42,10 +43,6 @@ built = lambda do |url|
   File.join(site_dir, Jekyll::URL.unescape_path(file))
 end
 
-limit = site.config.dig("feed", "posts_limit") || 10 # jekyll-feed's default
-# The feed is sorted by `date:`, the paper's date, so past the cap a new review
-# of an old paper never reaches it.
-problems << "feed.posts_limit is #{limit} for #{posts.size} posts; raise it in _config.yml" if posts.size > limit
 
 # A post's URL comes from its `date:` and categories, so an edit to either moves
 # it, and legacy_urls.rb's stub moves with it: both indexed URLs then 404.
@@ -60,6 +57,18 @@ end
 listed.each do |url|
   problems << "#{url}: published but no longer built; add it to the post's redirect_from" unless File.file?(built.call(url))
 end
+
+# posted_date.rb's order: the home pages and the feed (feed.xml) list posts by
+# the day each went up, not by `date:`, which on a paper post is the paper's.
+# Ties fall back to `date:` then path, as Document#<=> does.
+newest_first = posts.sort_by { |p| [PostedDate.posted_at(File.basename(p.path), p.date), p.date, p.path] }.reverse
+home_order = newest_first.reject { |p| p.data["hidden"] }.map { |p| "#{site.baseurl}#{p.url}" }
+home = Dir.glob(File.join(site_dir, "{index.html,page/*/index.html}")).sort_by { |f| f[%r{page/(\d+)/}, 1].to_i }
+on_home = home.flat_map { |f| File.read(f).scan(/class="post-link" href="([^"]+)"/).flatten }
+problems << "the home pages are not in posted order" unless on_home == home_order
+feed_order = newest_first.first(site.config.dig("feed", "posts_limit") || posts.size).map { |p| "#{site.config["url"]}#{site.baseurl}#{p.url}" }
+in_feed = File.read(File.join(site_dir, "feed.xml")).scan(%r{<link href="([^"]+)" rel="alternate" type="text/html" title=}).flatten
+problems << "feed.xml is not in posted order" unless in_feed == feed_order
 
 # search.json, with search_index.rb's plain_text: an index that does not parse
 # leaves js/search.js finding nothing, and saying nothing either.
@@ -92,7 +101,12 @@ posts.each do |post|
     problems << "#{name}: the stub at #{from} says noindex" if File.file?(stub) && File.read(stub).include?("noindex")
   end
 
-  # posted_date.rb: a modified time no earlier than a later file-name date.
+  # posted_date.rb: published on the file-name day, and a modified time no
+  # earlier than a later file-name date.
+  published = html[/article:published_time" content="([^"]+)"/, 1]
+  unless published && Date.parse(published) == Date.parse(name[0, 10])
+    problems << "#{name}: published time #{published.inspect}, posted #{name[0, 10]}"
+  end
   if (posted = PostedDate.last_modified(name, post.date))
     modified = html[/article:modified_time" content="([^"]+)"/, 1]
     unless modified && Date.parse(modified) >= posted.to_date

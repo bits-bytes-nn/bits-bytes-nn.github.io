@@ -4,7 +4,7 @@
 # stores it in `page.description`.
 #
 # Three separate renderers need a post description: the meta/OG/Twitter/JSON-LD
-# block in _includes/head.html, the Atom <summary> that jekyll-feed builds, and
+# block in _includes/head.html, the Atom <summary> in feed.xml, and
 # the excerpt card on the home page. Jekyll's `page.excerpt` is the first block
 # up to the excerpt separator — and on this blog that block is almost never prose:
 #
@@ -12,11 +12,10 @@
 #     question>", so all of them produced the *same* description; and
 #   * essay posts open with an H1 repeating the title, so theirs echoed the title.
 #
-# Deriving it once here (rather than in a Liquid filter) is what lets jekyll-feed
-# see it too: the plugin cannot reach into that gem's template, but it can set the
-# front-matter key the template already reads. The hook runs on :site, :pre_render,
-# which fires after generators have created the feed page and before anything is
-# rendered, so every consumer observes the same value.
+# Deriving it once here (rather than in a Liquid filter) gives all three one
+# value: each reads the front-matter key. The hook runs on :site, :pre_render,
+# after the generators and before anything is rendered, so every consumer
+# observes the same value.
 module PostDescription
   # The two budgets, declared once. Templates call the filters by name rather than
   # passing a number, so a limit cannot drift between Ruby and Liquid.
@@ -196,7 +195,7 @@ end
 # Liquid loaded, and without registering anything.
 
 if defined?(Jekyll::Hooks)
-  # Fill in `description` before anything renders, so head.html, jekyll-feed and
+  # Fill in `description` before anything renders, so head.html, feed.xml and
   # index.html all read the same value.
   # `subtitle` is deliberately NOT consulted here. On paper posts the subtitle is
   # the Korean rendering of the English title ("Qwen3 Technical Report" -> "Qwen3
