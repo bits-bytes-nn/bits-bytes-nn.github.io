@@ -99,7 +99,9 @@ Action: Search[Y]
 ...
 ```
 
-![ReAct 패턴: 추론(Reasoning)과 행동(Acting)의 결합 — Yao et al., 2022](/assets/images/evolution-of-ai-agentic-patterns-react.png)
+![ReAct 패턴: 추론만 하는 루프, 행동만 하는 루프(LM과 환경), 그리고 둘을 하나의 LM에서 잇는 ReAct](/assets/images/evolution-of-ai-agentic-patterns-react.png)
+
+*Yao et al., 2022의 그림을 바탕으로 다시 그렸습니다.*
 
 핵심 성과는 두 가지입니다. 첫째, 외부 도구를 사용하므로 **환각이 줄어듭니다** — 모델이 "모르는 것"을 검색으로 해결할 수 있습니다. 둘째, 추론 과정이 투명합니다 — 왜 그런 답을 냈는지 추적할 수 있습니다. ALFWorld 벤치마크에서 34% 절대 향상, WebShop에서 10% 향상. **에이전트의 원형이 여기서 태어났습니다.** 오늘날의 모든 AI 에이전트 — Claude Code, Cursor Agent, GitHub Copilot Coding Agent — 가 이 Thought-Action-Observation 루프의 변형입니다.
 
@@ -107,7 +109,9 @@ Action: Search[Y]
 
 **Tree-of-Thought** — [Yao et al., 2023](https://arxiv.org/abs/2305.10601). 2023년에는 추론의 "깊이"가 아닌 "너비"를 확장하려는 시도가 나왔습니다.
 
-![Tree-of-Thought: 일직선(CoT) 대비 트리 탐색 기반 추론 — Yao et al., 2023](/assets/images/evolution-of-ai-agentic-patterns-tree-of-thoughts.png)
+![Tree-of-Thought: 일직선(CoT) 대비 트리 탐색 기반 추론](/assets/images/evolution-of-ai-agentic-patterns-tree-of-thoughts.png)
+
+*그림: Yao et al., [Tree of Thoughts: Deliberate Problem Solving with Large Language Models](https://arxiv.org/abs/2305.10601)(2023), Figure 1. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*
 
 CoT가 일직선으로 추론한다면, Tree-of-Thought는 여러 가지 추론 경로를 동시에 탐색하고, 막다른 길에 도달하면 백트래킹(되돌아가기)합니다. 체스에서 "이 수를 두면... 상대가 이렇게 나오면... 그럼 내가 이렇게..." 하고 여러 수를 미리 읽는 것과 같은 원리입니다. 매혹적이었지만, 비용이 폭발했습니다. 하나의 문제에 대해 수십 번의 API 호출이 필요합니다. 논문의 "Future Work" 섹션에서는 비용을 한 줄짜리 caveat으로 언급하지만, 프로덕션 엔지니어의 AWS 청구서에서는 그게 첫 줄짜리 위기입니다.
 

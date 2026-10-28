@@ -4,8 +4,8 @@
 $mobile: 480px;
 $tablet: 768px;
 $desktop: 960px;
-$base-font-family: "Source Sans Pro", "Noto Sans KR", "Helvetica Neue", sans-serif;
-$heading-font-family: "Source Serif Pro", "Noto Serif KR", serif;
+$base-font-family: "Source Sans Pro", "Source Sans Pro Fallback", "Noto Sans KR", "Helvetica Neue", sans-serif;
+$heading-font-family: "Source Serif Pro", "Source Serif Pro Fallback", "Noto Serif KR", serif;
 
 // Font Sizes
 $base-font-size: $em-base;
