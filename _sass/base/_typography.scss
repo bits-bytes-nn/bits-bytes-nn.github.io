@@ -1,3 +1,57 @@
+// Until the web fonts arrive (display=swap), Latin text is set in a local font
+// scaled to the web font's width and line metrics, so the swap no longer rewraps
+// the page: /tags/ shifted 0.36 at 768px. The numbers are the web font's
+// advance width (averaged over the Latin text of the post titles and tags) and
+// hhea metrics over the local font's, from fontTools, for each weight loaded. A device without the
+// local font skips the face. Hangul is not covered: its fallback differs per OS.
+// The range is Google Fonts' latin subset: outside it (arrows, math signs) the web
+// font has no glyph, and the local font would take over for good.
+$latin-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+
+@font-face {
+  font-family: "Source Sans Pro Fallback";
+  src: local("Arial");
+  font-weight: 400;
+  size-adjust: 92.78%;
+  ascent-override: 106.05%;
+  descent-override: 29.42%;
+  line-gap-override: 0%;
+  unicode-range: $latin-range;
+}
+
+@font-face {
+  font-family: "Source Sans Pro Fallback";
+  src: local("Arial Bold");
+  font-weight: 600;
+  size-adjust: 89.18%;
+  ascent-override: 110.34%;
+  descent-override: 30.61%;
+  line-gap-override: 0%;
+  unicode-range: $latin-range;
+}
+
+@font-face {
+  font-family: "Source Sans Pro Fallback";
+  src: local("Arial Bold");
+  font-weight: 700;
+  size-adjust: 91.61%;
+  ascent-override: 107.41%;
+  descent-override: 29.8%;
+  line-gap-override: 0%;
+  unicode-range: $latin-range;
+}
+
+@font-face {
+  font-family: "Source Serif Pro Fallback";
+  src: local("Georgia Bold");
+  font-weight: 700;
+  size-adjust: 89.41%;
+  ascent-override: 102.67%;
+  descent-override: 37.47%;
+  line-gap-override: 0%;
+  unicode-range: $latin-range;
+}
+
 body {
   @include font-feature-settings("kern", "liga", "pnum");
   -webkit-font-smoothing: antialiased;

@@ -99,7 +99,9 @@ Action: Search[Y]
 ...
 ```
 
-![ReAct pattern: combining Reasoning and Acting — Yao et al., 2022](/assets/images/evolution-of-ai-agentic-patterns-react.png)
+![ReAct pattern: a reason-only loop, an act-only loop between LM and environment, and ReAct joining both through one LM](/assets/images/evolution-of-ai-agentic-patterns-react.png)
+
+*Redrawn after Yao et al., 2022.*
 
 Two key results. First, external tool use **reduces hallucination** — the model can look up what it doesn't know. Second, the reasoning process is transparent — you can trace why it gave a particular answer. A 34% absolute improvement on ALFWorld, 10% on WebShop. **The archetype of the agent was born here.** Every AI agent today — Claude Code, Cursor Agent, GitHub Copilot Coding Agent — is a variation on this Thought-Action-Observation loop.
 
@@ -107,7 +109,9 @@ So far, smooth sailing. The trouble started when people pushed these ideas harde
 
 **Tree-of-Thought** — [Yao et al., 2023](https://arxiv.org/abs/2305.10601). In 2023, the push was to expand reasoning's "breadth," not just its depth.
 
-![Tree-of-Thought: tree-search-based reasoning vs. linear CoT — Yao et al., 2023](/assets/images/evolution-of-ai-agentic-patterns-tree-of-thoughts.png)
+![Tree-of-Thought: tree-search-based reasoning vs. linear CoT](/assets/images/evolution-of-ai-agentic-patterns-tree-of-thoughts.png)
+
+*Figure: Yao et al., [Tree of Thoughts: Deliberate Problem Solving with Large Language Models](https://arxiv.org/abs/2305.10601) (2023), Figure 1. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*
 
 Where CoT reasons in a straight line, Tree-of-Thought explores multiple reasoning paths simultaneously, backtracking from dead ends. Like reading ahead in chess: "if I play this move... and they respond like this... then I could..." Fascinating, but costs exploded. A single problem required dozens of API calls. The paper's "Future Work" section mentions cost in a one-liner caveat; on a production engineer's AWS bill, it's the first line of a crisis.
 

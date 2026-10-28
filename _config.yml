@@ -42,8 +42,10 @@ lang: ko
 date_format: "%B %-d, %Y"
 # `>-` (folded, chomped) not `|` — a literal block keeps the trailing newline,
 # which then leaks into meta content="" attributes and the feed <subtitle>.
+# The home page's description too, and the feed <subtitle> and footer: one text.
 description: >-
-  A tech blog focusing on AI/ML paper reviews and latest research trends
+  AI/ML 논문을 설계 결정과 트레이드오프까지 파고들어 읽고, 에이전틱 AI·데이터 아키텍처 현장에서
+  겪은 문제를 정리하는 기술 블로그입니다.
 baseurl: ''
 url: https://bits-bytes-nn.github.io
 # Post URLs embed :year/:month/:day, and front-matter dates carry no offset, so
