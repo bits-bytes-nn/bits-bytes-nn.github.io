@@ -4,7 +4,7 @@
 
 **AI/ML 논문 리뷰·요약과 기술 가이드를 블로그로 발행합니다.**
 
-Jekyll 정적 사이트로 만들어 GitHub Pages에 배포합니다.
+[bits-bytes-nn.github.io](https://bits-bytes-nn.github.io) · GitHub Pages에서 서빙하는 Jekyll 정적 사이트
 
 [![Deploy](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml/badge.svg)](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml)
 ![Ruby](https://img.shields.io/badge/ruby-3.3%2B-red)
@@ -17,330 +17,41 @@ Jekyll 정적 사이트로 만들어 GitHub Pages에 배포합니다.
 
 </div>
 
-**목차:** [빠른 시작](#빠른-시작) · [글 작성하기](#글-작성하기) ·
-[푸시 전에 확인하세요](#푸시-전에-확인하세요) · [배포](#배포) ·
-[Search Console](#search-console) · [저장소 구조](#저장소-구조) · [라이선스](#라이선스)
+## 무엇이 있나
+
+글은 한국어가 기본이고 일부는 영어 번역본이 있습니다. 섹션은 Paper Reviews, Paper
+Summaries, Paper Surveys, Tech Guides, Insights 다섯 개입니다. 논문 글·서베이·기술 가이드는
+[scholar-lens](https://github.com/bits-bytes-nn/scholar-lens)가 PR로 올리고, Insights는 직접
+씁니다. `main`으로 가는 모든 PR에서 전체 검사가 돌고, 머지하면 배포됩니다.
 
 ## 빠른 시작
 
-Jekyll 사이트를 처음 다뤄도 따라올 수 있도록 전체 흐름을 정리했습니다.
+1. **Ruby 3.3 이상과 Bundler.** 저장소의 `.ruby-version`에 버전이 있어 rbenv나 asdf가
+   알아서 맞춥니다. macOS 기본 Ruby는 너무 오래됐습니다.
+2. **의존성 설치:** `bundle install`
+3. **개발 서버**(저장하면 다시 빌드, `http://localhost:4000`):
+   `bundle exec jekyll serve`. `_config.yml`을 바꾸면 다시 시작합니다.
+4. **CI와 같은 검사:**
 
-**1. Ruby 3.3 이상과 Bundler를 준비합니다.** 먼저 설치된 버전을 확인하세요.
+   ```bash
+   ruby test/run_all.rb && ruby script/lint-posts.rb
+   bundle exec jekyll build --strict-front-matter --destination /tmp/site-verify
+   bundle exec htmlproofer /tmp/site-verify --disable-external --allow-hash-href --no-ignore-empty-alt
+   script/validate-site.sh /tmp/site-verify
+   ```
 
-```bash
-ruby --version     # 3.3 이상 필요 (.ruby-version에 명시)
-bundle --version   # Ruby에 기본 포함. 없으면: gem install bundler
-```
+## 문서
 
-macOS 기본 Ruby는 너무 오래됐습니다. [rbenv](https://github.com/rbenv/rbenv)나 asdf로
-3.3 이상을 설치하세요. 저장소에 `.ruby-version`이 있으니 버전 매니저가 알아서 맞춰 줍니다.
+상세 문서는 영어로 한 벌만 둡니다.
 
-**2. 프로젝트 의존성을 설치합니다** (Jekyll, 플러그인, html-proofer).
-
-```bash
-bundle install
-```
-
-**3. 개발 서버를 띄웁니다.** 파일을 저장할 때마다 자동으로 다시 빌드하고
-`http://localhost:4000`에서 보여 줍니다.
-
-```bash
-bundle exec jekyll serve
-```
-
-`_posts/`, `_sass/`, `_includes/` 아래 파일을 고치고 저장한 뒤 새로고침하면
-대부분 바로 반영됩니다. 단, `_config.yml`을 바꿨을 때는 서버를 다시 시작해야 합니다.
-
-**4. 최종 결과물이 필요하면 빌드합니다.** 변경을 CI와 같은 방식으로 확인하려면
-[푸시 전에 확인하세요](#푸시-전에-확인하세요)의 검사를 대신 돌립니다.
-
-```bash
-bundle exec jekyll build   # 결과물은 _site/ 에 생성
-```
-
-> **왜 `github-pages` gem이 아니라 순수 `jekyll`인가요?**
-> 이 사이트는 `_plugins/`에 직접 만든 Ruby 플러그인을 씁니다. `github-pages` gem은 보안
-> 샌드박스 때문에 커스텀 플러그인을 막으므로, 로컬과 CI 모두 Jekyll을 직접 실행합니다.
-
-## 글 작성하기
-
-논문 리뷰는 scholar-lens가 PR로 올리고, 나머지 글은 `/write-post` 스킬(로컬 전용,
-gitignore된 `.claude/` 아래)이 리서치 → 초안 → 퇴고를 진행합니다. 직접 만들 때는 `_posts/YYYY-MM-DD-slug.md` 파일을 만들고 아래 프런트매터로 시작하세요.
-
-```yaml
----
-layout: post
-title: "<글 제목>"
-subtitle: "<한 줄 소개>"            # 논문 글은 필수(제목과 달라야 함), 그 밖에는 선택
-date: YYYY-MM-DD HH:MM:SS          # 논문 글은 논문 발표일, 그 밖에는 게시일
-paper_author: "<기관>"             # 논문을 낸 기관(사람 이름 아님). 논문 글에만
-paper_doi: "10.48550/arXiv.<id>"   # 선택, 논문 글에만 — 메타 패널의 인용 수
-seo_title: "<짧은 제목>"            # 선택 — 제목이 너무 길 때 <title>에 대신 씁니다
-description: >-                    # 선택, 평문 — 아래 설명 참고
-  <검색 결과에 노출될 문장, 150자 안팎>
-categories: ["<유형>", "<주제>"]
-tags: ["<태그-1>", "<태그-2>"]
-cover: /assets/images/<topic>.(jpg|png)   # 유형이나 주제의 이미지, 아래 참고
-use_math: true                     # 수식이 있을 때만 (MathJax를 불러옵니다)
-lang: ko                           # translation_id를 쓰면 필수(ko | en)…
-translation_id: <공통-슬러그>       # …한국어 글과 -en 번역본을 연결합니다.
-                                   #    두 글 모두에 씁니다(린트가 짝을 확인).
-                                   #    목록에는 한국어 글만 나옵니다
----
-```
-
-URL은 `date:`로 만들지만, 사이트가 따르는 날짜는 파일명의 게시일입니다.
-`_plugins/posted_date.rb`가 이 날짜를 `posted_at`으로 만들고, 홈·섹션 페이지·`/tags/`·이전/다음
-글 링크·`feed.xml`이 이 순서를 따릅니다. 페이지·피드·구조화 데이터의 "Published"도 이
-날짜입니다. 논문 글은 `date:`를 "Paper" 줄에 따로 보여 줍니다. 같은 날 올린 글끼리는
-`date:` 순서를 따르고, 논문 글은 그날 UTC 자정에 올린 것으로 칩니다.
-
-논문 글의 `<title>`은 제목(또는 `seo_title`) 뒤에 "논문 리뷰"·"논문 요약"을 붙입니다.
-독자가 검색하는 말이기 때문이고, 소셜 카드는 원래 제목을 그대로 씁니다.
-
-**본문 첫 줄에 제목을 H1으로 다시 쓰지 마세요.** 레이아웃이 이미 제목을 렌더링하므로
-`# 제목`을 넣으면 `<h1>`이 두 개가 되고, 검색 결과 설명문에도 그 제목이 새어 나갑니다.
-부제를 붙이고 싶으면 `subtitle:`을 쓰세요.
-
-### `description:` — 검색 결과에 뜨는 문장
-
-`description:`은 구글이 링크 아래에 보여 주는 문장이고, 소셜 카드가 인용하는 문장이며,
-RSS `<summary>`에 실리는 문장입니다. 생략하면 `_plugins/post_description.rb`가 본문의
-첫 산문 단락에서 뽑아 주는데, 대개 그걸로 충분합니다. 다만 첫 단락이 인용문이나 공개
-고지로 시작하는 글 — 즉 대부분의 Insights 글 — 은 직접 쓰는 편이 낫습니다.
-
-설명문은 **사이트 전체에서 중복되면 안 되고** 페이지 제목보다 길어야 합니다. 어기면 CI가
-빌드를 실패시킵니다. 설명문은 평문으로 나가므로 `$$`, `*강조*`, 백틱, 링크, 태그를 쓰면
-린트가 막습니다.
-
-### 카테고리가 URL을 결정합니다
-
-카테고리는 **두 단계**입니다.
-
-- `categories[0]` — **유형**: `Paper Reviews`, `Paper Summaries`, `Paper Surveys`,
-  `Tech Guides`, `Insights` 중 하나. 글이 어느 내비 탭에 들어갈지를 정합니다. 아직 글이 없는 유형도
-  **탭을 유지하고** 빈 상태 문구를 띄웁니다 — 탭이 없으면 채우는 중인 섹션이 아니라
-  없어진 섹션으로 읽히기 때문입니다.
-- `categories[1]` — **주제**: `_data/post_conventions.yml`의 `topics` 중 하나이며, 표지
-  이미지도 거기서 정해집니다. Insights 글은 유형의 `insights.jpg`를 쓰고, 이미지가 없는
-  주제는 저장소에 있는 아무 이미지나 씁니다. 맞는 주제가 없으면 먼저 거기에 추가합니다.
-  목록에 없는 값은 린트가 막습니다. 표지는 `_data/covers.yml`에 출처가 있어야 하며, 글
-  머리 이미지 아래에 표시됩니다. 출처가 없는 글은 `script/validate-site.sh`가 막습니다.
-
-Jekyll은 이 둘을 슬러그로 바꾸고(`_config.yml`의 `permalink`) 날짜와 합쳐 출력 경로를
-만듭니다.
-
-```
-categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
-        ↓
-_site/paper-reviews/language-models/2025/01/23/<slug>.html
-```
-
-그래서 **이미 게시된 글의 카테고리나 날짜를 바꾸면 URL이 바뀝니다.** 외부에서 걸린 링크와
-검색 결과가 깨지므로, 한 번 정하면 그대로 둡니다. 게시된 URL은 모두
-`script/published-urls.txt`에 있고, 그중 하나라도 빌드되지 않으면 `validate-site.sh`가 실패합니다.
-꼭 바꿔야 한다면 예전 URL을 글의 `redirect_from`에 넣습니다. 글이 머지되면
-`bundle exec ruby script/check-plugin-output.rb <site_dir> --record`로 그 URL을 기록합니다.
-
-예전 규칙으로 게시된 옛 URL(`/paper%20reviews/…`)은 계속 동작합니다.
-`_plugins/legacy_urls.rb`가 그 경로를 글의 `redirect_from`에 넣고, jekyll-redirect-from이 그
-자리에 새 URL로 보내는 페이지를 만듭니다. 규칙이 바뀐 날(2026-10-11)부터 게시한 글은 옛 URL이
-없으므로 이 페이지를 만들지 않습니다. 이 페이지는 `_layouts/redirect.html`로 만들며, gem
-기본 템플릿의 `noindex`를 뺐습니다. GitHub Pages는 301을 보낼 수 없어 Google이 즉시
-새로고침을 리디렉션으로 읽어야 하는데, `noindex`가 함께 있으면 Google은 옛 URL을 색인에서
-빼기만 하고 새 URL로 옮기지 않았습니다. `noindex`가 있는 리디렉션 페이지는
-`check-plugin-output.rb`가 막습니다.
-
-### 태그: 세부 태그 위에 주제 태그를 하나
-
-태그는 자유 형식·하이픈 연결입니다. 논문 하나의 기여를 그대로 옮긴 태그
-(`Fine-Grained-Expert-Segmentation`)는 그 논문에만 붙을 수 있습니다. 색인으로는 정확하지만
-글을 **잇지는** 못하고, `_plugins/related_posts.rb`가 **공유** 태그를 요구하므로 그렇게만
-달린 글은 "Related reading"이 아예 붙지 않은 채 배포됩니다.
-
-그래서 글마다 통제된 주제 태그를 최소 하나 답니다. 목록은
-[`_data/post_conventions.yml`](_data/post_conventions.yml)의 `tags.controlled` 하나뿐이고,
-`script/lint-posts.rb`와 scholar-lens가 같은 파일을 읽습니다.
-
-세부 태그는 **그대로 남깁니다.** 주제 태그가 담지 못하는 내용을 담고 있습니다.
-**주제 태그는 얹는 것이지 바꿔 다는 게 아닙니다.**
-
-새 태그를 만들기 전에 기존 태그로 덮이지 않는지 확인하세요. 한 개념을 세 이름으로
-부르면(`Agentic-Architecture`·`Agentic-Patterns`·`Agentic-Infrastructure`) 글마다 아무도
-공유하지 않는 태그를 하나씩 들고 있게 되고, 그건 주제 태그가 없는 것과 같습니다. 두 태그가
-같은 개념이라고 판단되면 하나를 남기고 다른 하나를 `tags.aliases`에 올립니다. 그러면 린트가
-옛 이름을 막습니다.
-
-### 수식은 반드시 `$$…$$`로
-
-인라인이든 디스플레이든 `$$…$$`로 쓰고 `use_math: true`를 켜세요.
-
-**단일 `$…$`는 절대 쓰지 마세요.** kramdown은 단일 `$`를 수식으로 보지 않습니다.
-그래서 MathJax가 돌기 *전에* 마크다운 단계가 `$` 안의 `_`·`*`를 `<em>`·`<strong>`으로
-바꿔 버립니다 — 예를 들어 `$a*b*c$`가 `$a<em>b</em>c$`가 되어 깨집니다. `$$`로 감싸면
-kramdown이 내용을 그대로 보존해 `\(…\)`로 내보내므로 안전합니다. (`$10M` 같은 본문 속
-달러 표기는 수식이 아니니 그대로 둬도 됩니다.)
-
-수식 안의 막대는 `\lvert … \rvert`나 `\mid`로, 노름은 `\lVert … \rVert`로 쓰고 맨 `|`는
-쓰지 않습니다. 표 행에서는 kramdown이 거기서 셀을 나눕니다.
-
-### 린트가 잡는 그 밖의 것
-
-`ruby script/lint-posts.rb`는 찾은 줄과 고치는 방법을 함께 알려 줍니다. 자주 걸리는
-규칙은 다음과 같습니다. 모두 다른 검사는 통과하는데 페이지가 잘못 렌더링되는 경우입니다.
-
-- 본문의 `{{ … }}`·`{% … %}`(프롬프트 템플릿, GitHub Actions의 `${{ … }}`): Jekyll이 글을
-  먼저 Liquid로 렌더링합니다. `{% raw %}…{% endraw %}`로 감쌉니다.
-- 코드 밖의 `<think>`·`<s>` 같은 모델 토큰: 브라우저가 지웁니다. `코드`로 씁니다.
-- `use_math: true` 없는 `$$` 수식, `\\(…\\)`로 쓴 수식, `$$` 안의 `\_`, 앞뒤 빈 줄이 없는
-  디스플레이 `$$` 줄.
-- 마커 뒤에 언어 말고 다른 것이 붙은 코드 펜스, 닫히지 않은 펜스.
-- 게시일로 시작하지 않는 파일명, 그보다 늦은 `date:`.
-- `href`가 이미지 `src`와 다른 직접 쓴 `<a class="glightbox">`: 라이트박스가 그 페이지를
-  iframe으로 열고 사이트가 이를 거부합니다. 출처는 캡션에 적습니다.
-- ar5iv 링크: ar5iv는 잃어버린 그림 대신 대체 이미지를 HTTP 200으로 돌려줍니다.
-  `arxiv.org/html/<id>v1/…`를 쓰거나 그림을 `assets/images/`에 복사합니다.
-
-렌더링이 아니라 문체 규칙도 둘 있습니다. scholar-lens가 생성 글에 거는 것과 같습니다.
-자연스럽게 읽히지 않는 번역투("보여지는" 같은 이중 피동, "에 있어서는", "학습함에 있어")와
-쌍점으로 끝나는 문장("다음과 같습니다:")을 잡습니다. 제목, 인용, 표, 그림 대체 텍스트, 코드,
-참고 문헌 목록은 검사하지 않습니다.
-
-### 푸시 전에 확인하세요
-
-CI가 돌리는 게이트를 같은 순서로 미리 돌립니다. `_site/`가 아니라 임시 경로로 빌드하는
-이유는 아래 주의에 있습니다.
-
-```bash
-ruby test/run_all.rb                                        # 플러그인 로직이 여전히 맞나?
-ruby script/lint-posts.rb                                   # 글 원본이 규칙을 지키나?
-bundle exec jekyll build --strict-front-matter \
-  --destination /tmp/site-verify                            # 빌드가 깨끗한가?
-bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-ignore-empty-alt                   # 깨진 링크·이미지·앵커, http://, 빈 alt는 없나?
-script/validate-site.sh /tmp/site-verify                    # 사이트맵·피드·메타데이터·헤딩
-shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml이 PR과 main에서 실행
-```
-
-> **검사 결과가 말이 안 되면 먼저 떠 있는 `jekyll serve`를 찾으세요.** 파일을 감시하며
-> `_site/`를 계속 덮어쓰고, `site.url`을 `http://localhost:4000`으로 바꾸며(사이트맵 URL이
-> 전부 틀리게 보입니다), 시작할 때 읽은 `_config.yml`을 계속 들고 있어 그 뒤에 추가한
-> `exclude`가 적용되지 않습니다. 다른 경로로 빌드하면 세 문제를 한꺼번에 비켜 갑니다.
->
-> ```bash
-> ps aux | grep '[j]ekyll serve'
-> ```
-
-`test/`는 `_plugins/`의 순수 로직(플러그인당 한 파일)과 `script/lint-posts.rb`를 단위 테스트합니다. `bundle exec`가
-아니라 plain `ruby`인 이유는, 각 플러그인이 Jekyll·Liquid 등록을 `defined?`로 감싸 로직만
-단독 로드되게 해 두었고 minitest는 Ruby에 기본 포함이기 때문입니다. **`_plugins/`를 건드리면
-사이트의 모든 페이지가 바뀝니다.** 동작을 바꾸기 전에 테스트 케이스를 먼저 추가하세요.
-
-## 배포
-
-`.github/workflows/jekyll.yml`은 `main` 푸시뿐 아니라 **`main`으로 향하는 PR에서도**
-돕니다. 그래서 아래 게이트가 잘못된 머지를 사후에 보고하는 데 그치지 않고 막습니다.
-1~5단계는 두 경우 모두, 6단계는 PR에서 건너뜁니다. 순서대로:
-
-1. **`ruby test/run_all.rb`**로 `_plugins/`와 린트의 단위 테스트를 돌리고
-2. **`ruby script/lint-posts.rb`**로 프런트매터를 `_data/post_conventions.yml`과 대조하고,
-   마크다운 원본의 표·수식·헤딩 규칙을 검사하고
-3. `JEKYLL_ENV=production`으로 사이트를 빌드하고(Google Analytics는 이 빌드에만 들어갑니다)
-4. `_site/`에 **html-proofer**를 돌려 내부 링크·이미지·앵커를 검사하고
-5. **`script/validate-site.sh`**로 htmlproofer가 보지 않는 빌드 후 검사(사이트맵, 피드,
-   메타데이터, 헤딩, 리디렉션, 플러그인 결과)를 돌린 뒤 — 항목은 스크립트에 있습니다
-6. GitHub Pages에 배포합니다.
-
-실패하면 대개 4·5단계입니다. Actions 로그에 어떤 링크·이미지·페이지가 문제인지 그대로
-나옵니다. 수동 배포 단계는 없습니다.
-
-> **`google*.html` / `naver*.html`을 `_config.yml`의 `exclude`에 넣지 마세요.**
-> Search Console·네이버 소유권 인증 토큰이라 사이트 루트에 그대로 올라가야 합니다.
-> 제외하면 소유권 인증이 조용히 망가집니다.
-
-## Search Console
-
-속성은 URL 접두어 `https://bits-bytes-nn.github.io/`이며, 사이트 루트의 `google*.html`
-파일로 인증합니다.
-
-**글의 상태는 사이트맵 행이 아니라 URL 검사로 확인합니다.** 눈여겨볼 결과는 둘입니다.
-
-- *URL이 Google에 알려지지 않음*과 *참조 사이트맵이 감지되지 않음*: Google이 사이트맵으로도
-  링크로도 그 URL을 찾지 못했습니다. **색인 생성 요청**을 누릅니다. 하루 할당량이 적으니
-  검색으로 많이 들어오는 글부터 요청합니다.
-- 순위에 올라야 할 URL이 *'noindex' 태그에 의해 제외됨*: 그 페이지나 리디렉션 페이지에
-  `noindex`가 있습니다. `noindex`는 `sitemap: false`인 페이지에만 있어야 합니다([저장소 구조](#저장소-구조) 참고).
-
-**사이트맵 행이 "가져올 수 없음"이면** 먼저 파일을 확인하세요. 대개 파일은 정상입니다.
-
-```bash
-curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # 200, application/xml 기대
-curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
-  ruby -rrexml/document -e 'REXML::Document.new(File.read("/tmp/s.xml")); puts "well-formed"'
-curl -sS  https://bits-bytes-nn.github.io/robots.txt
-```
-
-세 개가 다 통과하면 파일을 고쳐서 해결되지 않습니다. 이 상태는 요청 실패가 아니라 Google이
-아직 사이트맵을 가져가지 않았다는 뜻이고, 언제 가져갈지는 Google의 크롤링 일정이 정합니다.
-`*.github.io` 속성에서 흔합니다. 항목은 `sitemap.xml`과 `feed.xml` 두 개를 둡니다. Google은
-Atom 피드도 사이트맵으로 읽고, 피드에는 최근 글이 있습니다. URL이 크게 바뀐 뒤에는 다시
-제출하고, 행에 읽은 날짜가 찍힐 때까지는 중요한 글을 색인 생성 요청으로 챙깁니다. 모든 글은
-홈·섹션 페이지·`/tags/`에서도 링크되고, `robots.txt`가 사이트맵을 알립니다. 사이트맵을
-가져가게 했다고 보고된 방법은 커스텀 도메인을 도메인 속성으로 인증하는 것뿐인데, 모든 URL이
-바뀌므로 별도로 결정할 일입니다.
-
-## 저장소 구조
-
-```
-_posts/            글 — YYYY-MM-DD-slug.md (한국어 기본, 영어 번역본은 -en.md)
-_layouts/          페이지 템플릿: default → post / page, redirect(redirect_from이
-                   만드는 리디렉션 페이지. gem 기본값의 noindex를 뺌)
-_includes/         재사용 조각: head, header, footer, nav_links,
-                   page_divider, category-posts, language_switcher,
-                   related_posts, icon(인라인 SVG 아이콘)
-_sass/             스타일: _layout, _post, _tags, _syntax(Rouge 코드 테마),
-                   _dark(다크모드), base/*
-                   bourbon/ · neat/ 는 벤더링된 프레임워크 — 수정하지 말 것
-_plugins/          reading_time.rb      (한·영 읽기 시간 계산)
-                   lazy_images.rb       (<img>에 loading="lazy" 추가)
-                   image_dimensions.rb  (로컬 <img>에 width/height 부여)
-                   post_description.rb  (글의 page.description 채우기)
-                   related_posts.rb     (page.related, 그리고 이전/다음 글 링크)
-                   scrollable_tables.rb (넓은 표를 스크롤 컨테이너로 감싸기)
-                   search_index.rb      (search.json용 plain_text 필터)
-                   legacy_urls.rb       (슬러그 이전의 옛 글 URL 리디렉션)
-                   translations.rb      (번역본을 글 목록에서 빼기)
-                   posted_date.rb       (파일명의 게시일을 posted_at으로: 목록 순서,
-                                         "Published", last_modified_at)
-css/               main.scss(Sass 진입점) · search.css(검색 페이지 전용)
-js/                main.js(테마 토글·코드 복사·목차·메뉴·이미지 확대 등)
-                   search.js(검색창 동작)
-                   citations.js(논문 글의 인용 수, Semantic Scholar에서)
-assets/images/     토픽별 커버 이미지와 글의 그림·다이어그램(플랫)
-assets/<slug>/     일부 오래된 글의 그림 폴더. 새 글은 assets/images/를 씀
-search.json        전체 본문 검색 색인 (simple-jekyll-search가 사용)
-test/              _plugins/와 글 린트의 minitest 단위 테스트
-script/            lint-posts.rb (빌드 전 글 원본 규칙 검사)
-                   validate-site.sh (빌드 후 검색 노출 검사)
-                   check-plugin-output.rb (플러그인 훅이 글에 남긴 결과 검사,
-                   validate-site.sh가 실행), published-urls.txt (글이 게시된
-                   적 있는 모든 URL)
-_data/             post_conventions.yml (카테고리·표지·통제 태그·폐기 태그의
-                   유일한 정본. scholar-lens도 읽음), covers.yml (표지마다 출처와
-                   저작자 표시. 글 머리 이미지 아래에 표시)
-.github/workflows/ CI: 테스트 → 린트 → 빌드 → html-proofer → validate-site, main 푸시 시 배포
-                   workflow-lint.yml: actionlint와 shellcheck
-```
-
-**최상위 페이지:** `index.html`(홈), 다섯 개의 섹션 페이지인 `paper-reviews.md`·
-`paper-summaries.md`·`paper-surveys.md`·`tech-guides.md`·`insights.md`, 그리고 `categories.html`·
-`tags.html`·`search.md`·`about.md`·`404.html`. `sitemap.xml`·`robots.txt`는
-플러그인이 생성하며 원본 파일이 없습니다. `feed.xml`은 jekyll-feed 템플릿을 이 사이트에
-필요한 부분만 남겨 `posted_at` 순으로 바꾼 페이지입니다. `sitemap: false`인 페이지(검색, 404)에는 canonical
-링크 대신 `<meta name="robots" content="noindex">`가 들어갑니다.
+| 문서 | 내용 |
+|---|---|
+| [docs/writing.md](docs/writing.md) | 글 작성: 프런트매터, 날짜, 카테고리와 표지, 태그, 번역본, 수식, 이미지, 린트 |
+| [docs/operations.md](docs/operations.md) | 검사, CI와 배포, 배포 실패 복구, 게시 URL 기록, scholar-lens, Search Console, 문제 해결 |
+| [docs/architecture.md](docs/architecture.md) | 빌드 구조: 파이프라인, 플러그인, URL과 목록, head와 피드, 검색, 스타일, 수식, 검증, 알려진 한계 |
 
 ## 라이선스
 
 MIT — [LICENSE](LICENSE) 참고. 제임스 웹 표지 이미지(ESA/Webb, CC BY 4.0)의 출처도 거기에
-밝혀 두었습니다. [Centrarium](https://github.com/bencentra/centrarium)
-Jekyll 테마를 기반으로 합니다.
+밝혀 두었습니다. [Centrarium](https://github.com/bencentra/centrarium) Jekyll 테마를
+기반으로 합니다.

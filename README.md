@@ -4,7 +4,7 @@
 
 **In-depth AI/ML paper reviews, summaries, and tech guides — published as a blog.**
 
-A Jekyll static site, deployed to GitHub Pages.
+[bits-bytes-nn.github.io](https://bits-bytes-nn.github.io) · a Jekyll static site on GitHub Pages
 
 [![Deploy](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml/badge.svg)](https://github.com/bits-bytes-nn/bits-bytes-nn.github.io/actions/workflows/jekyll.yml)
 ![Ruby](https://img.shields.io/badge/ruby-3.3%2B-red)
@@ -17,355 +17,38 @@ A Jekyll static site, deployed to GitHub Pages.
 
 </div>
 
-**Contents:** [Quick start](#quick-start) · [Writing a post](#writing-a-post) ·
-[Validate before pushing](#validate-before-pushing) · [Deployment](#deployment) ·
-[Search Console](#search-console) · [Project structure](#project-structure) ·
-[License](#license)
+## What's here
+
+Posts are Korean first, some with an English twin, in five sections: Paper
+Reviews, Paper Summaries, Paper Surveys, Tech Guides and Insights. Paper posts,
+surveys and tech guides arrive as pull requests from
+[scholar-lens](https://github.com/bits-bytes-nn/scholar-lens); Insights are
+written by hand. Every pull request to `main` runs the full set of checks, and a
+merge deploys.
 
 ## Quick start
 
-If you've never run a Jekyll site before, here's the whole loop.
+1. **Ruby 3.3 or newer and Bundler.** The repo pins the version in
+   `.ruby-version`, so rbenv or asdf picks it up; macOS's system Ruby is too old.
+2. **Install the gems:** `bundle install`
+3. **Serve with live reload** at `http://localhost:4000`:
+   `bundle exec jekyll serve`. Restart it after changing `_config.yml`.
+4. **Check a change the way CI does:**
 
-**1. Install Ruby 3.3+ and Bundler.** Check what you have:
+   ```bash
+   ruby test/run_all.rb && ruby script/lint-posts.rb
+   bundle exec jekyll build --strict-front-matter --destination /tmp/site-verify
+   bundle exec htmlproofer /tmp/site-verify --disable-external --allow-hash-href --no-ignore-empty-alt
+   script/validate-site.sh /tmp/site-verify
+   ```
 
-```bash
-ruby --version     # need 3.3 or newer (see .ruby-version)
-bundle --version   # ships with Ruby; if missing: gem install bundler
-```
+## Documentation
 
-On macOS the system Ruby is old — use [rbenv](https://github.com/rbenv/rbenv) or
-asdf to install 3.3+. (The repo pins the version in `.ruby-version`, so a version
-manager will pick it up automatically.)
-
-**2. Install the project's gems** (Jekyll, plugins, html-proofer):
-
-```bash
-bundle install
-```
-
-**3. Run the dev server.** It rebuilds on save and serves at
-`http://localhost:4000`:
-
-```bash
-bundle exec jekyll serve
-```
-
-Edit a file under `_posts/`, `_sass/`, or `_includes/`, save, and refresh — most
-changes appear immediately. (Changes to `_config.yml` need a server restart.)
-
-**4. Build** when you want the final output in `_site/`. To check a change the
-way CI does, use the gates under [Validate before pushing](#validate-before-pushing)
-instead.
-
-```bash
-bundle exec jekyll build
-```
-
-> **Why plain `jekyll` and not `github-pages`?** This site uses custom Ruby
-> plugins in `_plugins/`, which the sandboxed `github-pages` gem disallows. So
-> both local builds and CI run Jekyll directly.
-
-## Writing a post
-
-Paper reviews come from scholar-lens as pull requests; the `/write-post` skill
-(local, under the gitignored `.claude/`) runs research → draft → proofread for
-the rest. To add one by hand, create
-`_posts/YYYY-MM-DD-slug.md` starting with this front matter:
-
-```yaml
----
-layout: post
-title: "<Post Title>"
-subtitle: "<one-line pitch>"       # paper posts: required, not the title; else optional
-date: YYYY-MM-DD HH:MM:SS          # paper posts: the paper's date; else the posting date
-paper_author: "<Org>"              # the paper's org, not people; paper posts only
-paper_doi: "10.48550/arXiv.<id>"   # optional, paper posts only — the citation count in the meta panel
-seo_title: "<shorter title>"       # optional — for <title> when the title is too long
-description: >-                    # optional, plain text — see below
-  <search-snippet, ~150 chars>
-categories: ["<Type>", "<Topic>"]
-tags: ["<Tag-1>", "<Tag-2>"]
-cover: /assets/images/<topic>.(jpg|png)   # the type's or topic's image; see below
-use_math: true                     # ONLY if the post has equations (loads MathJax)
-lang: ko                           # required with translation_id (ko | en)…
-translation_id: <shared-slug>      # …links a Korean post to its -en twin;
-                                   #    set on both (the lint checks the pair);
-                                   #    only the Korean one is listed
----
-```
-
-The URL is built from `date:`, but the posting day in the file name is what the
-site goes by: `_plugins/posted_date.rb` makes it `posted_at`, which orders the
-home page, section pages, `/tags/`, the previous/next links and `feed.xml`, and
-is the "Published" date on the page, in the feed and in the structured data. A
-paper post shows its `date:` on a second line, "Paper". Posts that went up on one
-day keep `date:` order among themselves; a paper post counts as posted at
-midnight UTC.
-
-A paper post's `<title>` is its title (or `seo_title`) plus "논문 리뷰" / "논문
-요약", the words a reader searches with; social cards keep the plain title.
-
-**Don't repeat the title as an H1 in the body.** The layout already renders it,
-so a leading `# Title` produces two `<h1>`s and leaks into the search snippet.
-Put a tagline in `subtitle:` instead.
-
-### `description:` — the search snippet
-
-`description:` is what Google shows under the link, what social cards quote, and
-what the RSS `<summary>` carries. If you omit it, `_plugins/post_description.rb`
-derives one from the post's first real prose paragraph, which is usually good
-enough. Write it by hand when the first paragraph opens on a pull quote or a
-disclosure note — that is, on most Insights posts.
-
-Descriptions must be **unique across the site** and longer than the page title;
-CI fails the build otherwise. They ship as plain text, so the lint rejects
-`$$`, `*emphasis*`, backticks, links and tags in them.
-
-### Categories drive the URL
-
-Categories are **two levels**:
-
-- `categories[0]` — the **type**: `Paper Reviews`, `Paper Summaries`,
-  `Paper Surveys`, `Tech Guides`, or `Insights`. This decides which nav tab the post appears under.
-  A type with no posts yet keeps its tab and renders an empty-state line: a
-  missing tab reads as a section that was removed, not one still filling up.
-- `categories[1]` — the **topic**, one of the `topics` in
-  `_data/post_conventions.yml`, which also gives its cover image if it has one.
-  Insights posts use the type's `insights.jpg`; a topic without an image takes any
-  existing one. When no topic fits, add one there first; the lint rejects any
-  other value. A cover needs its credit in `_data/covers.yml`, which the page
-  prints under the hero; `script/validate-site.sh` fails a post without one.
-
-Jekyll slugifies the two and combines them with the date to build the output
-path (`permalink` in `_config.yml`):
-
-```
-categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
-        ↓
-_site/paper-reviews/language-models/2025/01/23/<slug>.html
-```
-
-So **changing the categories or date of a published post changes its URL**, which
-breaks inbound links and search results. Set them once and leave them. Every
-published URL is listed in `script/published-urls.txt`, and `validate-site.sh`
-fails when one is no longer built; if a change is unavoidable, add the old URL
-to the post's `redirect_from`. After a post merges, record its URL with
-`bundle exec ruby script/check-plugin-output.rb <site_dir> --record`.
-
-Posts first published under the old unslugified form (`/paper%20reviews/…`) keep
-working: `_plugins/legacy_urls.rb` adds that path to each post's `redirect_from`,
-and jekyll-redirect-from writes a stub there that redirects to the new URL. Posts
-published on or after the change (2026-10-11) never had an old URL and get no stub.
-The stub comes from `_layouts/redirect.html`, which drops the gem's
-`noindex`: GitHub Pages cannot send a 301, so Google has to read the stub's
-instant refresh as the redirect, and with `noindex` beside it Google dropped the
-old URL without moving to the new one. `check-plugin-output.rb` fails a stub
-that says `noindex`.
-
-### Tags: one topic tag on top of the specific ones
-
-Tags are free-form and hyphenated, and a tag phrased as one paper's contribution
-(`Fine-Grained-Expert-Segmentation`) can only ever apply to that paper. Those
-make a precise index and connect nothing, and `_plugins/related_posts.rb`
-requires a **shared** tag — so a post tagged only that way ships with no
-"Related reading" block at all.
-
-So also give each post at least one tag from the controlled topic layer,
-`tags.controlled` in [`_data/post_conventions.yml`](_data/post_conventions.yml).
-That file is the one copy of the list; `script/lint-posts.rb` and scholar-lens
-both read it.
-
-Keep the specific tags — they say something the topic tag does not. **Add the
-topic tag, don't swap for it.**
-
-Before coining a new tag, check that an existing one doesn't already cover it.
-Three names for one idea (`Agentic-Architecture`, `Agentic-Patterns`,
-`Agentic-Infrastructure`) leave every post holding a tag no other post shares,
-which is the same as having no topic tag at all. When two tags turn out to name
-one idea, keep one and add the other to `tags.aliases`; the lint then rejects the
-retired name.
-
-### Math: always use `$$…$$`
-
-Write `$$…$$` for both inline and display math, and set `use_math: true`.
-
-**Never use single `$…$`.** kramdown doesn't treat single `$` as math, so its
-Markdown pass turns `_`/`*` inside the span into `<em>`/`<strong>` *before*
-MathJax runs — e.g. `$a*b*c$` becomes `$a<em>b</em>c$` and renders broken. With
-`$$`, kramdown emits verbatim `\(…\)` and leaves the contents alone. (Prose
-dollar signs like `$10M` are fine — they're not math.)
-
-Inside math, write `\lvert … \rvert` or `\mid` for a bar and `\lVert … \rVert`
-for a norm, never a bare `|`: in a table row kramdown splits the cell there.
-
-### What else the lint catches
-
-`ruby script/lint-posts.rb` names the line and the fix for each finding. The
-rules easiest to trip, each a page that renders wrong with every other gate green:
-
-- `{{ … }}` or `{% … %}` in the body (a prompt template, GitHub Actions'
-  `${{ … }}`): Jekyll renders posts as Liquid first. Wrap it in
-  `{% raw %}…{% endraw %}`.
-- a model token such as `<think>` or `<s>` outside code: the browser drops it.
-  Write it in `code`.
-- `$$` math without `use_math: true`, math written `\\(…\\)`, `\_` inside `$$`,
-  a display `$$` line without blank lines around it.
-- a code fence with more than a language after the marker, or one never closed.
-- a file name that does not start with the posting day, or a `date:` after it.
-- a hand-written `<a class="glightbox">` whose `href` is not its image's `src`: the
-  lightbox loads the page in an iframe the site refuses. Credit the source in the caption.
-- an ar5iv link: ar5iv now answers a lost figure with a placeholder image and
-  HTTP 200. Use `arxiv.org/html/<id>v1/…`, or copy the figure into `assets/images/`.
-
-Two prose rules are style, not rendering, and match the ones scholar-lens holds
-its generated posts to: no translationese with no natural reading (a double
-passive like "보여지는", "에 있어서는", "학습함에 있어"), and no sentence ending
-in a colon ("다음과 같습니다:"). Headings, quotations, tables, image alt text,
-code and the reference list are exempt.
-
-### Validate before pushing
-
-These are the gates CI runs, in the same order. Build to a throwaway
-directory rather than `_site/`, for the reason in the note below:
-
-```bash
-ruby test/run_all.rb                                        # plugin logic still correct?
-ruby script/lint-posts.rb                                   # post sources follow the conventions?
-bundle exec jekyll build --strict-front-matter \
-  --destination /tmp/site-verify                            # does it build clean?
-bundle exec htmlproofer /tmp/site-verify --disable-external \
-  --allow-hash-href --no-ignore-empty-alt                   # broken links, images, anchors, http://, alt=""?
-script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings
-shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml, on PRs and main
-```
-
-> **If a check reports something impossible, look for a running `jekyll serve`
-> first.** It watches the tree and rewrites `_site/` behind you, it overrides
-> `site.url` with `http://localhost:4000` (so every sitemap URL looks wrong), and
-> it holds the `_config.yml` it started with — so `exclude` entries added since
-> then don't apply. Building elsewhere sidesteps all three:
->
-> ```bash
-> ps aux | grep '[j]ekyll serve'
-> ```
-
-`test/` unit-tests the pure logic in `_plugins/` (one file per plugin) and
-`script/lint-posts.rb`. Plain
-`ruby`, not `bundle exec`: each plugin guards its Jekyll/Liquid registration
-behind `defined?` so the logic loads standalone, and minitest ships with Ruby.
-**Anything you change in `_plugins/` changes every page on the site**, so add a
-case before changing behaviour.
-
-## Deployment
-
-`.github/workflows/jekyll.yml` runs on **pull requests to `main` as well as
-pushes to it**, so the gates below block a bad merge rather than merely reporting
-one after the fact. Steps 1–5 run on both events; step 6 is skipped for pull
-requests. In order, it:
-
-1. runs **`ruby test/run_all.rb`** (the `_plugins/` and lint unit tests),
-2. runs **`ruby script/lint-posts.rb`** — front matter against
-   `_data/post_conventions.yml`, plus table, math and heading rules in the
-   Markdown source,
-3. builds the site with `JEKYLL_ENV=production` (the only build that loads Google Analytics),
-4. runs **html-proofer** over `_site/` (internal links, images, anchors),
-5. runs **`script/validate-site.sh`** — the post-build checks htmlproofer does
-   not cover (sitemap, feed, metadata, headings, redirects, plugin output); the
-   script lists them — and
-6. deploys to GitHub Pages.
-
-A failure is almost always step 4 or 5; the Actions log names the exact link,
-image, or page. There is no manual deploy step.
-
-> **Don't add `google*.html` / `naver*.html` to `_config.yml`'s `exclude`.**
-> They're Search Console / Naver ownership-verification tokens that must ship to
-> the site root. Excluding them silently breaks ownership verification.
-
-## Search Console
-
-The property is the URL prefix `https://bits-bytes-nn.github.io/`, verified by
-the `google*.html` file at the site root.
-
-**Check a post's status with URL Inspection**, not with the sitemap row. Two
-answers matter:
-
-- *URL is unknown to Google* with *No referring sitemaps detected*: Google has
-  found the URL neither in the sitemap nor through a link. Use **Request
-  indexing** on it; the daily quota is small, so start with the posts people
-  search for.
-- *Excluded by 'noindex' tag* on a URL that should rank: a page or stub carries
-  `noindex`. Only `sitemap: false` pages should; see [Project structure](#project-structure).
-
-**If the sitemap row says "Couldn't fetch"**, check the file first; it is
-usually fine:
-
-```bash
-curl -sI  https://bits-bytes-nn.github.io/sitemap.xml   # expect 200, application/xml
-curl -sS  https://bits-bytes-nn.github.io/sitemap.xml -o /tmp/s.xml && \
-  ruby -rrexml/document -e 'REXML::Document.new(File.read("/tmp/s.xml")); puts "well-formed"'
-curl -sS  https://bits-bytes-nn.github.io/robots.txt
-```
-
-If those pass, no change to the file will fix it. The status means Google has
-not fetched the sitemap yet: its scheduling, not a failed request, and common on
-`*.github.io` properties. Keep two entries, `sitemap.xml` and `feed.xml` (Google
-reads an Atom feed as a sitemap too, and the feed lists the newest posts).
-Resubmit them after a large URL change, and use Request indexing for the posts
-that matter until a row shows a read date. Every post is also linked from the
-home page, the section pages and `/tags/`, and `robots.txt` names the sitemap.
-The only change reported to get the sitemap fetched is a custom domain verified
-as a Domain property, which moves every URL and is a decision of its own.
-
-## Project structure
-
-```
-_posts/            Posts — YYYY-MM-DD-slug.md (Korean; English twin is -en.md)
-_layouts/          Page templates: default → post / page; redirect (the
-                   redirect_from stub, without the gem's noindex)
-_includes/         Reusable fragments: head, header, footer, nav_links,
-                   page_divider, category-posts, language_switcher,
-                   related_posts, icon (inline SVG icons)
-_sass/             Styles: _layout, _post, _tags, _syntax (Rouge code theme),
-                   _dark (dark mode), base/*
-                   bourbon/ and neat/ are vendored frameworks — don't edit
-_plugins/          reading_time.rb      (KO/EN-aware read time)
-                   lazy_images.rb       (adds loading="lazy" to <img>)
-                   image_dimensions.rb  (width/height on local <img>)
-                   post_description.rb  (fills page.description for posts)
-                   related_posts.rb     (page.related, and the prev/next links)
-                   scrollable_tables.rb (wraps wide tables so they scroll)
-                   search_index.rb      (plain_text filter for search.json)
-                   legacy_urls.rb       (redirects pre-slug post URLs)
-                   translations.rb      (keeps a post's translation out of the lists)
-                   posted_date.rb       (posted_at from the file name: listing order,
-                                         "Published"; last_modified_at)
-css/               main.scss (Sass entry point) · search.css (search page only)
-js/                main.js (theme toggle, code-copy, TOC, menu, image zoom…)
-                   search.js (drives the search box)
-                   citations.js (a paper post's citation count, from Semantic Scholar)
-assets/images/     Topic cover images, plus post figures and diagrams (flat)
-assets/<slug>/     Figures of some older posts; new posts use assets/images/
-search.json        Full-text search index (consumed by simple-jekyll-search)
-test/              minitest unit tests for _plugins/ and the post lint
-script/            lint-posts.rb (post sources vs the conventions, before the build)
-                   validate-site.sh (post-build discoverability checks)
-                   check-plugin-output.rb (each plugin hook's mark on the posts;
-                   run by validate-site.sh), published-urls.txt (every URL a
-                   post has been published under)
-_data/             post_conventions.yml (categories, covers, controlled and
-                   retired tags — the one copy, also read by scholar-lens);
-                   covers.yml (each cover's source and credit, shown under the hero)
-.github/workflows/ CI: tests → lint → build → html-proofer → validate-site; deploys on push to main
-                   workflow-lint.yml: actionlint and shellcheck
-```
-
-**Top-level pages:** `index.html` (home), plus `paper-reviews.md`,
-`paper-summaries.md`, `paper-surveys.md`, `tech-guides.md`, `insights.md` (the five section pages),
-`categories.html`, `tags.html`, `search.md`, `about.md`, and `404.html`.
-`sitemap.xml` and `robots.txt` are generated by jekyll-sitemap and have no
-source file. `feed.xml` is a page: jekyll-feed's template, cut to what this site
-uses and ordered by `posted_at`. A page with `sitemap: false` (search, 404) also
-gets `<meta name="robots" content="noindex">` in place of a canonical link.
+| Read | For |
+|---|---|
+| [docs/writing.md](docs/writing.md) | writing a post: front matter, dates, categories and covers, tags, translations, math, images, the lint |
+| [docs/operations.md](docs/operations.md) | the checks, CI and deploy, recovering a failed deploy, recording published URLs, scholar-lens, Search Console, troubleshooting |
+| [docs/architecture.md](docs/architecture.md) | how the build works: pipeline, plugins, URLs and listings, head and feed, search, styles, math, validation, known limits |
 
 ## License
 
