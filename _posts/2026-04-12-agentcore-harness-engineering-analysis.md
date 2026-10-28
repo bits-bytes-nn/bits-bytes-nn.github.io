@@ -414,7 +414,7 @@ re:Invent 세션에서 특별히 강조된 실무 팁이 **에이전트 간 핸�
 
 ### 5.1 Mission Cloud — 데이터 마이그레이션 챗봇을 13주에
 
-[Mission Cloud의 공개 사례](https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot)는 프레임워크 선택이라는 현실적 결정을 드러냅니다. 데이터 마이그레이션은 복잡한 작업입니다. 소스 시스템에서 타겟 시스템으로 데이터를 옮기면서 스키마 변환, 정합성 검증, 오류 처리를 동시에 해야 합니다. 이 과정에서 나오는 자연어 질문 — "이 테이블은 아직 마이그레이션 안 됐나?", "지난주 레코드 중 불일치가 있었나?", "소스와 타겟의 레코드 수가 맞나?" — 에 즉시 답하는 챗봇을 **13주** 안에 완성해야 했습니다.
+[Mission Cloud의 공개 사례](https://web.archive.org/web/20260313041358/https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot)는 프레임워크 선택이라는 현실적 결정을 드러냅니다. 데이터 마이그레이션은 복잡한 작업입니다. 소스 시스템에서 타겟 시스템으로 데이터를 옮기면서 스키마 변환, 정합성 검증, 오류 처리를 동시에 해야 합니다. 이 과정에서 나오는 자연어 질문 — "이 테이블은 아직 마이그레이션 안 됐나?", "지난주 레코드 중 불일치가 있었나?", "소스와 타겟의 레코드 수가 맞나?" — 에 즉시 답하는 챗봇을 **13주** 안에 완성해야 했습니다.
 
 아키텍처는 **슈퍼 에이전트(Super Agent)** 가 최상위에서 사용자의 의도를 분석한 뒤 세 개의 전문 서브 에이전트로 라우팅하는 계층 구조입니다. **Discovery Agent**는 RAG(검색 증강 생성) 기반으로 벡터 DB에 인덱싱된 수천 페이지의 마이그레이션 문서에서 답을 찾고, **Text-to-SQL Agent**는 자연어를 PostgreSQL 쿼리로 변환한 뒤 Code Interpreter로 집계와 시각화까지 처리하며, **Validation Agent**는 소스와 타겟의 레코드 수를 비교해 불일치를 발견하면 어떤 레코드가 누락되었는지까지 추적합니다. "지난 주 일별 마이그레이션 레코드 수를 보여줘"라는 한 문장이 `SELECT date, COUNT(*) FROM migration_log WHERE migrated_at >= NOW() - INTERVAL '7 days' GROUP BY date`로 변환·실행되고 차트로 렌더링되기까지의 전 과정이 하나의 에이전트 파이프라인으로 엮이는 구조입니다. 덧붙이자면, Discovery Agent가 직접 짠 벡터 DB 인덱싱 부분은 §3.3에서 본 Managed Knowledge Base가 GA된 지금이라면 손수 구축하지 않고 Gateway 타겟으로 대체할 수 있는 자리입니다 — 앞서 말한 "경계선이 플랫폼 쪽으로 밀렸다"는 변화가 실제 아키텍처에서 어디를 덜어 주는지 보여주는 구체적 예입니다.
 
@@ -430,7 +430,7 @@ re:Invent 세션에서 특별히 강조된 실무 팁이 **에이전트 간 핸�
 
 마케팅 담당자가 에이전트에게 "25-34세 여성, 최근 3개월 내 스포츠 용품 구매 이력, 뉴욕 거주자를 타겟으로 봄 캠페인을 설정해줘"라고 요청하는 순간 파이프라인이 네 단계로 흐릅니다. 첫째, **오디언스 에이전트**가 2억 명 데이터베이스에서 조건에 맞는 세그먼트를 생성합니다. 이건 데이터 조회가 아니라 새로운 데이터 객체를 만드는 **상태 변경**입니다. 둘째, **콘텐츠 에이전트**가 캠페인 메시지를 생성하고 이메일·SMS·소셜 채널별 템플릿에 매핑합니다. 또 다른 상태 변경입니다. 셋째, **스케줄링 에이전트**가 발송 일정을 예약합니다. 이건 되돌리기 어려운 상태 변경입니다. 한 번 발송되면 끝입니다. 넷째, **분석 에이전트**가 발송 후 오픈율·클릭률·전환율을 추적해 다음 캠페인의 입력으로 피드백합니다.
 
-성과는 캠페인 설정 시간 **30퍼센트 단축**, 개인화 역량 **20퍼센트 향상**, 주간 **8시간 절약**. 연간 수천 개 캠페인을 실행하는 Epsilon 규모에서 30퍼센트 단축은 수만 시간의 절약을 의미합니다. 하지만 이 사례가 진짜로 흥미로운 건 **고위험 시나리오에서의 안전 설계**입니다. [Simon Willison의 "Lethal Trifecta"](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/) — 신뢰할 수 없는 입력(자연어 요청) + 민감한 데이터 접근(2억 명 정보) + 상태 변경(캠페인 생성·발송) — 이 정확히 여기에 적용됩니다. 세 요소가 동시에 존재할 때 보안 사고는 시간 문제입니다.
+성과는 캠페인 설정 시간 **30퍼센트 단축**, 개인화 역량 **20퍼센트 향상**, 주간 **8시간 절약**. 연간 수천 개 캠페인을 실행하는 Epsilon 규모에서 30퍼센트 단축은 수만 시간의 절약을 의미합니다. 하지만 이 사례가 진짜로 흥미로운 건 **고위험 시나리오에서의 안전 설계**입니다. [Simon Willison의 "Lethal Trifecta"](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) — 신뢰할 수 없는 입력(자연어 요청) + 민감한 데이터 접근(2억 명 정보) + 상태 변경(캠페인 생성·발송) — 이 정확히 여기에 적용됩니다. 세 요소가 동시에 존재할 때 보안 사고는 시간 문제입니다.
 
 Cedar 정책이 계층적 가드레일을 만듭니다. **1단계**로 "발송 예약은 반드시 human approval을 거쳐야 한다"는 규칙이 에이전트 권한과 무관하게 강제되고, **2단계**로 "세그먼트 크기가 100만 명을 초과하면 시니어 매니저 승인 필요"가 규모에 따른 위험도를 반영하며, **3단계**로 "캠페인 콘텐츠에 개인 식별 정보(PII)가 포함되면 차단"이 규제 준수를 자동화합니다. 에이전트가 아무리 자율적으로 작동해도 이 세 가지 가드레일은 프롬프트 인젝션이나 환각에 관계없이 기계적으로 강제됩니다.
 
@@ -537,9 +537,9 @@ AgentCore의 개별 서비스 중 그 자체로 새로운 것은 많지 않습�
 
 ### 실전 사례 자료
 
-32. Mission Cloud, [Building Enterprise AI Agents with AgentCore: Lessons from a Data Migration Chatbot](https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot), 2025.11
+32. Mission Cloud, [Building Enterprise AI Agents with AgentCore: Lessons from a Data Migration Chatbot](https://web.archive.org/web/20260313041358/https://www.missioncloud.com/blog/building-enterprise-ai-agents-with-amazon-bedrock-agentcore-lessons-from-a-data-migration-chatbot), 2025.11
 33. re:Invent 2025 세션 AIM395, [Concept to Campaign: Marketing Agents on AgentCore (Epsilon)](https://dev.to/kazuya_dev/aws-reinvent-2025-concept-to-campaign-marketing-agents-on-amazon-bedrock-agentcore-aim395-55cl)
-34. re:Invent 2025 세션 AIM3310, [Agents in the Enterprise: Best Practices with AgentCore (Clearwater Analytics)](https://dev.to/kazuya_dev/aws-reinvent-2025-agents-in-the-enterprise-best-practices-with-amazon-bedrock-agentcore-aim3310-2m8a)
+34. re:Invent 2025 세션 AIM3310, [Agents in the Enterprise: Best Practices with AgentCore (Clearwater Analytics)](https://dev.to/kazuya_dev/aws-reinvent-2025-agents-in-the-enterprise-best-practices-with-amazon-bedrock-agentcoreaim3310-2m8a)
 
 ### 커뮤니티 분석
 
@@ -559,7 +559,7 @@ AgentCore의 개별 서비스 중 그 자체로 새로운 것은 많지 않습�
 
 ### 보안·리스크
 
-45. Simon Willison, [The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/), 2025.06 — Epsilon 사례 분석의 이론적 프레임
+45. Simon Willison, [The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), 2025.06 — Epsilon 사례 분석의 이론적 프레임
 46. AuthZed, [A Timeline of MCP Security Breaches](https://authzed.com/blog/timeline-mcp-breaches), 2025
 47. Snyk, [Malicious MCP Server on npm: postmark-mcp](https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/), 2025.09 — Gateway Interceptor의 필요성을 드러낸 실제 공급망 공격 사례
 

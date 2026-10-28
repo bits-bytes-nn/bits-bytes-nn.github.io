@@ -1,0 +1,45 @@
+name: Check external links
+
+# The deploy gate skips external links (slow, and a flaky host would block a
+# deploy). They still rot: an audit found eight dead ones and two made-up arXiv
+# ids in posts. This run checks them weekly and fails on a dead one, which
+# notifies the repo owner without blocking anything.
+on:
+  schedule:
+    - cron: "17 3 * * 1"  # Mondays 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external-links:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1.328.0
+        with:
+          bundler-cache: true
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --strict-front-matter
+        env:
+          JEKYLL_ENV: production
+      - name: Check external links
+        # 403, 429 and 999 are bot walls and rate limits, not dead pages
+        # (OpenAI, Medium and LinkedIn answer scripts that way). The preconnect
+        # hints name bare origins, which 404, and the site's own absolute URLs
+        # are the deploy gate's to check. Two hosts load in a browser but fail
+        # any script: cerebras.ai serves its blog with status 500, and
+        # mckinsey.com resets automated connections.
+        run: |
+          bundle exec htmlproofer ./_site \
+            --checks Links,Images \
+            --allow-hash-href \
+            --ignore-status-codes 403,429,999 \
+            --ignore-urls '/^https:\/\/fonts\.(googleapis|gstatic)\.com\/?$/,/^https:\/\/bits-bytes-nn\.github\.io\//,/^https:\/\/www\.(cerebras\.ai|mckinsey\.com)\//' \
+            --hydra '{"max_concurrency":8}'

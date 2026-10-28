@@ -27,7 +27,7 @@ nav_order: 3
   {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
   {%- comment -%}
     slugify, like every other category anchor on the site (post metadata links,
-    /categories/) — the convention in docs/tech-doc.md §3.
+    /categories/) — see docs/architecture.md, "URLs, navigation and listings".
   {%- endcomment -%}
   <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
   <ul class="posts-list">

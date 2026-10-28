@@ -1,5 +1,6 @@
 // Site behaviors: theme toggle, code-copy, mobile menu, nav highlight,
-// sticky-nav class, image zoom (GLightbox), and the post table of contents.
+// sticky-nav class and image zoom (GLightbox). The table of contents is built
+// at build time (_plugins/post_toc.rb).
 // Vanilla JS, no jQuery. The fixed-header offset for in-page jumps is CSS
 // (`scroll-padding-top` in _sass/_layout.scss); this keeps its --nav-height
 // in step with the bar.
@@ -26,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
       var next = isDark() ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
+      syncTheme();
+    });
+    // A switch made in another tab: follow it rather than keep the old theme.
+    window.addEventListener('storage', function (e) {
+      if (e.key !== 'theme' || (e.newValue !== 'dark' && e.newValue !== 'light')) return;
+      document.documentElement.setAttribute('data-theme', e.newValue);
       syncTheme();
     });
   }
@@ -172,7 +179,22 @@ document.addEventListener('DOMContentLoaded', function () {
   // the image that opened it, so a screen reader keeps its place.
   var english = document.documentElement.lang.indexOf('en') === 0;
 
-  if (window.GLightbox) {
+  // GLightbox's script and stylesheet load async (_includes/footer.html), so
+  // either may arrive after this. Set up once both have: opened before its CSS
+  // applied, the viewer drew at the page bottom and would not close.
+  var lightboxScript = document.getElementById('glightbox-js');
+  var lightboxCss = document.getElementById('glightbox-css');
+  var lightboxReady = function () {
+    if (window.GLightbox && lightboxCss && lightboxCss.media === 'all' && !lightboxReady.done) {
+      lightboxReady.done = true;
+      setupLightbox();
+    }
+  };
+  if (lightboxScript) lightboxScript.addEventListener('load', lightboxReady);
+  if (lightboxCss) lightboxCss.addEventListener('load', function () { setTimeout(lightboxReady, 0); });
+  lightboxReady();
+
+  function setupLightbox() {
     var opener = null;
     // `focused` is the class GLightbox's own Tab trap looks for; without it
     // Tab leaves the dialog.
@@ -263,33 +285,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: true });
   }
 
-  // Build a table of contents from post h2 headings (3+ only). The <details>
-  // ships with `open`, so it starts expanded; visitors can collapse it.
-  var toc = document.getElementById('post-toc');
-  if (toc) {
-    var heads = document.querySelectorAll('.post-content h2[id]');
-    if (heads.length >= 3) {
-      var ul = toc.querySelector('ul');
-      // Headings that number themselves ("1. 배경") would read "2 1. 배경". Most of
-      // them, not one: a lone "1. …" among plain headings keeps the numbers.
-      var numbered = Array.prototype.filter.call(heads, function (h) { return /^\s*\d+[.)]\s/.test(h.textContent); }).length > heads.length / 2;
-      heads.forEach(function (h, i) {
-        var li = document.createElement('li');
-        var a = document.createElement('a');
-        var num = document.createElement('span');
-        a.href = '#' + h.id;
-        num.className = 'toc-num';
-        num.textContent = i + 1;
-        // Text node, not innerHTML: a heading that names a tag ("<think> 토큰")
-        // would otherwise be parsed as markup.
-        if (numbered) a.append(h.textContent);
-        else a.append(num, h.textContent);
-        li.appendChild(a);
-        ul.appendChild(li);
-      });
-      var count = toc.querySelector('.post-toc-count');
-      if (count) count.textContent = heads.length;
-      toc.hidden = false;
-    }
-  }
 });

@@ -59,9 +59,9 @@ Google에서 개발된 고도로 능력 있는 멀티모달 모델 패밀리인 
 
 ### 성능 평가 및 벤치마크 결과
 
-언어, 코딩, 추론, 멀티모달 작업을 포괄하는 광범위한 내부 및 외부 벤치마크 모음에서 사전 훈련 및 사후 훈련된 Gemini 모델의 성능을 평가했습니다. Gemini 패밀리는 대규모 언어 모델링([Anil et al., 2023](https://arxiv.org/pdf/2305.10403v3); [Brown et al., 2020](https://arxiv.org/pdf/2005.14165v4); [Chowdhery et al., 2023](https://arxiv.org/pdf/2204.02311v5); [Hoffmann et al., 2022](https://arxiv.org/abs/2203.15556); [OpenAI, 2023a](https://arxiv.org/pdf/2303.08774v6); [Radford et al., 2019](https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf); [Rae et al., 2021](https://arxiv.org/abs/2112.11446)), 이미지 이해([Alayrac et al., 2022](https://arxiv.org/abs/2204.14198); [Chen et al., 2022](https://arxiv.org/abs/2204.07118); [Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929); [OpenAI, 2023b](https://arxiv.org/pdf/2303.08774v6); [Reed et al., 2022](https://arxiv.org/abs/2205.06175); [Yu et al., 2022a](https://arxiv.org/abs/2205.01917)), 오디오 처리([Radford et al., 2023](https://arxiv.org/abs/2212.04356); [Zhang et al., 2023](https://arxiv.org/abs/2305.13516)), 비디오 이해([Alayrac et al., 2022](https://arxiv.org/abs/2204.14198); [Chen et al., 2023](https://arxiv.org/abs/2212.04356))에서 최신 기술 수준을 발전시킵니다.
+언어, 코딩, 추론, 멀티모달 작업을 포괄하는 광범위한 내부 및 외부 벤치마크 모음에서 사전 훈련 및 사후 훈련된 Gemini 모델의 성능을 평가했습니다. Gemini 패밀리는 대규모 언어 모델링([Anil et al., 2023](https://arxiv.org/pdf/2305.10403v3); [Brown et al., 2020](https://arxiv.org/pdf/2005.14165v4); [Chowdhery et al., 2023](https://arxiv.org/pdf/2204.02311v5); [Hoffmann et al., 2022](https://arxiv.org/abs/2203.15556); [OpenAI, 2023a](https://arxiv.org/pdf/2303.08774v6); [Radford et al., 2019](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf); [Rae et al., 2021](https://arxiv.org/abs/2112.11446)), 이미지 이해([Alayrac et al., 2022](https://arxiv.org/abs/2204.14198); [Chen et al., 2022](https://arxiv.org/abs/2209.06794); [Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929); [OpenAI, 2023b](https://cdn.openai.com/papers/GPTV_System_Card.pdf); [Reed et al., 2022](https://arxiv.org/abs/2205.06175); [Yu et al., 2022a](https://arxiv.org/abs/2205.01917)), 오디오 처리([Radford et al., 2023](https://arxiv.org/abs/2212.04356); [Zhang et al., 2023](https://arxiv.org/abs/2303.01037)), 비디오 이해([Alayrac et al., 2022](https://arxiv.org/abs/2204.14198); [Chen et al., 2023](https://arxiv.org/abs/2305.18565))에서 최신 기술 수준을 발전시킵니다.
 
-또한 시퀀스 모델([Sutskever et al., 2014](https://arxiv.org/abs/1409.3215)), 신경망 기반 딥러닝의 오랜 연구 역사([LeCun et al., 2015](https://www.nature.com/articles/nature14539)), 대규모 훈련을 가능하게 하는 머신러닝 분산 시스템([Barham et al., 2022](https://arxiv.org/abs/2204.02311); [Bradbury et al., 2018](https://arxiv.org/abs/1912.03356); [Dean et al., 2012](https://www.usenix.org/system/files/conference/osdi12/osdi12-final-74.pdf))의 연구 성과를 기반으로 구축되었습니다.
+또한 시퀀스 모델([Sutskever et al., 2014](https://arxiv.org/abs/1409.3215)), 신경망 기반 딥러닝의 오랜 연구 역사([LeCun et al., 2015](https://www.nature.com/articles/nature14539)), 대규모 훈련을 가능하게 하는 머신러닝 분산 시스템([Barham et al., 2022](https://arxiv.org/abs/2203.12533); [Bradbury et al., 2018](https://github.com/jax-ml/jax); [Dean et al., 2012](https://proceedings.neurips.cc/paper/2012/hash/6aca97005c68f1206823815f66102863-Abstract.html))의 연구 성과를 기반으로 구축되었습니다.
 
 ### 주요 성과 및 혁신
 
@@ -83,7 +83,7 @@ Google에서 개발된 고도로 능력 있는 멀티모달 모델 패밀리인 
 
 ### 복합 추론 시스템과 AlphaCode 2
 
-대규모 언어 모델의 추론 능력은 더 복잡한 다단계 문제를 해결할 수 있는 일반화 에이전트 구축에 대한 가능성을 보여줍니다. AlphaCode 팀은 Gemini 모델의 추론 능력을 검색 및 도구 사용과 결합하여 경쟁 프로그래밍 문제 해결에 뛰어난 성능을 보이는 새로운 Gemini 모델 기반 에이전트인 AlphaCode 2([Leblond et al, 2023](https://arxiv.org/pdf/2203.07814v1))를 구축했습니다.
+대규모 언어 모델의 추론 능력은 더 복잡한 다단계 문제를 해결할 수 있는 일반화 에이전트 구축에 대한 가능성을 보여줍니다. AlphaCode 팀은 Gemini 모델의 추론 능력을 검색 및 도구 사용과 결합하여 경쟁 프로그래밍 문제 해결에 뛰어난 성능을 보이는 새로운 Gemini 모델 기반 에이전트인 AlphaCode 2([Leblond et al, 2023](https://storage.googleapis.com/deepmind-media/AlphaCode2/AlphaCode2_Tech_Report.pdf))를 구축했습니다.
 
 AlphaCode 2는 Codeforces 경쟁 프로그래밍 플랫폼에서 상위 15% 내에 랭크되어, 상위 50%에 있던 최신 기술 수준의 전작([Li et al., 2022](https://arxiv.org/pdf/2203.07814v1))에 비해 큰 개선을 보였습니다.
 
@@ -138,7 +138,7 @@ Gemini 1.0은 다양한 애플리케이션을 지원하기 위해 세 가지 주
 
 Gemini 모델의 가장 혁신적인 특징 중 하나는 텍스트 입력과 함께 자연 이미지, 차트, 스크린샷, PDF, 비디오 등 다양한 오디오 및 시각적 입력이 인터리브된 형태로 처리할 수 있다는 점입니다. 또한 텍스트와 이미지 출력을 모두 생성할 수 있습니다.
 
-이러한 시각적 인코딩은 [Flamingo](https://arxiv.org/abs/2204.14198), [CoCa](https://arxiv.org/abs/2205.01917), [PaLI](https://arxiv.org/abs/2204.07118)에서의 기초 연구에서 영감을 받았습니다. 특히 중요한 차이점은 Gemini 모델이 처음부터 멀티모달로 설계되었으며, [Ramesh et al.](https://arxiv.org/pdf/2021.01000)과 [Yu et al.](https://arxiv.org/pdf/2206.10789)에서 제안된 이산 이미지 토큰을 사용하여 네이티브하게 이미지를 출력할 수 있다는 점입니다.
+이러한 시각적 인코딩은 [Flamingo](https://arxiv.org/abs/2204.14198), [CoCa](https://arxiv.org/abs/2205.01917), [PaLI](https://arxiv.org/abs/2209.06794)에서의 기초 연구에서 영감을 받았습니다. 특히 중요한 차이점은 Gemini 모델이 처음부터 멀티모달로 설계되었으며, [Ramesh et al.](https://arxiv.org/abs/2102.12092)과 [Yu et al.](https://arxiv.org/pdf/2206.10789)에서 제안된 이산 이미지 토큰을 사용하여 네이티브하게 이미지를 출력할 수 있다는 점입니다.
 
 ### 이산 이미지 토큰의 작동 원리
 
@@ -154,7 +154,7 @@ $$\text{Encode}(I) = \{t_1, t_2, ..., t_n\} \text{ where } t_i \in \mathcal{V}_{
 
 비디오 이해는 대용량 컨텍스트 윈도우에서 비디오를 프레임 시퀀스로 인코딩하여 수행됩니다. 비디오 프레임이나 이미지는 모델 입력의 일부로 텍스트나 오디오와 자연스럽게 인터리브될 수 있습니다. 이는 마치 사람이 영화를 보면서 동시에 대화를 듣고 자막을 읽는 것처럼, 여러 모달리티의 정보를 동시에 처리하는 것과 같습니다.
 
-모델은 세밀한 이해가 필요한 작업에 더 많은 계산을 투입하기 위해 가변 입력 해상도를 처리할 수 있습니다. 또한 Gemini 모델은 [Zhang et al.](https://arxiv.org/abs/2305.13516)의 Universal Speech Model(USM) 특성을 사용하여 16kHz에서 오디오 신호를 직접 수집할 수 있습니다.
+모델은 세밀한 이해가 필요한 작업에 더 많은 계산을 투입하기 위해 가변 입력 해상도를 처리할 수 있습니다. 또한 Gemini 모델은 [Zhang et al.](https://arxiv.org/abs/2303.01037)의 Universal Speech Model(USM) 특성을 사용하여 16kHz에서 오디오 신호를 직접 수집할 수 있습니다.
 
 ### USM 기반 오디오 처리의 기술적 세부사항
 
@@ -197,13 +197,13 @@ Gemini Ultra의 경우, 연구팀은 핫 스탠바이(hot standby)와 롤링 유
 
 ### 다중 데이터센터 네트워킹과 통신 패러다임
 
-TPU 가속기들은 주로 고속 칩 간 상호연결을 통해 통신하지만, Gemini Ultra 규모에서는 Google의 클러스터 내 및 클러스터 간 네트워크를 사용하여 여러 데이터센터의 SuperPod들을 결합해야 했습니다. 이는 [Google의 데이터센터 네트워크 인프라](https://arxiv.org/pdf/2203.12533v1)에서 설명된 고급 네트워킹 기술들을 활용합니다.
+TPU 가속기들은 주로 고속 칩 간 상호연결을 통해 통신하지만, Gemini Ultra 규모에서는 Google의 클러스터 내 및 클러스터 간 네트워크를 사용하여 여러 데이터센터의 SuperPod들을 결합해야 했습니다. 이는 [Google의 데이터센터 네트워크 인프라](https://doi.org/10.1145/3544216.3544265)에서 설명된 고급 네트워킹 기술들을 활용합니다.
 
 Google의 네트워크 지연시간과 대역폭은 일반적으로 사용되는 동기식 훈련 패러다임을 지원하기에 충분하며, 이는 슈퍼팟 내에서는 모델 병렬성을, 슈퍼팟 간에서는 데이터 병렬성을 활용합니다. 이러한 하이브리드 병렬화 전략은 통신 오버헤드를 최소화하면서도 대규모 모델 훈련을 가능하게 합니다.
 
 ### 단일 컨트롤러 프로그래밍 모델의 혁신
 
-[JAX](https://arxiv.org/pdf/1912.03356)와 [Pathways](https://arxiv.org/pdf/2203.12533v1)의 '단일 컨트롤러' 프로그래밍 모델은 단일 Python 프로세스가 전체 훈련 실행을 조율할 수 있게 해주어 개발 워크플로우를 극적으로 단순화합니다.
+[JAX](https://github.com/jax-ml/jax)와 [Pathways](https://arxiv.org/pdf/2203.12533v1)의 '단일 컨트롤러' 프로그래밍 모델은 단일 Python 프로세스가 전체 훈련 실행을 조율할 수 있게 해주어 개발 워크플로우를 극적으로 단순화합니다.
 
 이 접근법의 핵심은 복잡한 분산 시스템을 마치 단일 컴퓨터에서 실행되는 것처럼 프로그래밍할 수 있다는 점입니다. 개발자는 수천 개의 가속기에 걸친 복잡한 통신 패턴을 직접 관리할 필요 없이, 고수준의 추상화를 통해 모델을 정의하고 훈련할 수 있습니다.
 
@@ -589,7 +589,7 @@ Gemini 모델들은 모델의 이미지 표현 능력을 병목으로 만들 수
 
 #### 오디오 이해 능력
 
-연구팀은 다양한 공개 벤치마크에서 Gemini Nano-1과 Gemini Pro 모델을 평가하고 [Universal Speech Model (USM)](https://arxiv.org/abs/2305.13516)과 [Whisper](https://arxiv.org/abs/2212.04356)(표시된 대로 large-v2 또는 large-v3)와 비교했습니다. 이러한 벤치마크에는 FLEURS, VoxPopuli, Multi-lingual Librispeech와 같은 자동 음성 인식(ASR) 작업뿐만 아니라 다양한 언어를 영어로 번역하는 음성 번역 작업인 CoVoST 2가 포함됩니다.
+연구팀은 다양한 공개 벤치마크에서 Gemini Nano-1과 Gemini Pro 모델을 평가하고 [Universal Speech Model (USM)](https://arxiv.org/abs/2303.01037)과 [Whisper](https://arxiv.org/abs/2212.04356)(표시된 대로 large-v2 또는 large-v3)와 비교했습니다. 이러한 벤치마크에는 FLEURS, VoxPopuli, Multi-lingual Librispeech와 같은 자동 음성 인식(ASR) 작업뿐만 아니라 다양한 언어를 영어로 번역하는 음성 번역 작업인 CoVoST 2가 포함됩니다.
 
 ASR 작업은 단어 오류율(WER) 메트릭을 보고하며, 낮은 수치가 더 좋습니다. 번역 작업은 BiLingual Evaluation Understudy(BLEU) 점수를 보고하며, 높은 수치가 더 좋습니다. FLEURS는 훈련 데이터와 언어 중복이 있는 62개 언어에서 보고됩니다. 4개의 분할된 언어(중국어, 일본어, 한국어, 태국어)는 [Whisper](https://arxiv.org/abs/2212.04356)와 유사하게 WER 대신 문자 오류율(CER)을 보고합니다.
 
@@ -1002,7 +1002,7 @@ BBQ에서 평균 편향 점수는 0에 가깝게 유지되며, 이는 -1(고정�
 
 **이미지-텍스트 접근법**
 
-이미지-텍스트 능력의 경우, 연구팀의 목표는 다양한 사람 그룹을 나타내는 이미지에서 모델 능력을 테스트하는 것입니다. 특히, [Zhao et al.](https://arxiv.org/pdf/1804.06876)을 따라 다양한 성별 외모와 피부톤에 대해 사람의 이미지가 유사한 품질로 설명되는지 명시적으로 테스트합니다.
+이미지-텍스트 능력의 경우, 연구팀의 목표는 다양한 사람 그룹을 나타내는 이미지에서 모델 능력을 테스트하는 것입니다. 특히, [Zhao et al.](https://arxiv.org/abs/2106.08503)을 따라 다양한 성별 외모와 피부톤에 대해 사람의 이미지가 유사한 품질로 설명되는지 명시적으로 테스트합니다.
 
 평가에서 다양한 그룹을 묘사하는 이미지에 대해 CIDEr 점수를 비교하는데, 이는 생성된 캡션이 인간이 작성한 참조 캡션의 정보를 얼마나 잘 반영하는지 포착하는 일반적인 이미지 캡셔닝 메트릭입니다. 다양한 그룹 간에 큰 불일치를 보지는 않지만, 인간 참조 캡션이 본질적으로 편향될 수 있기 때문에 이 메트릭이 불완전하다는 점을 주목합니다.
 
@@ -1215,7 +1215,7 @@ Gemini은 이미지, 오디오, 비디오, 텍스트 데이터에 걸쳐 공동�
 
 **하드웨어**: 훈련은 [Jouppi et al.](https://arxiv.org/pdf/2304.01433v3)에서 설명된 TPUv4 및 TPUv5e에서 수행되었습니다. 이러한 TPU는 대규모 모델 훈련에 최적화된 Google의 전용 AI 가속기입니다.
 
-**소프트웨어**: [JAX](https://arxiv.org/pdf/1912.03356) 및 [ML Pathways](https://arxiv.org/pdf/2203.12533v1)를 사용했습니다. JAX는 연구자들이 TPU를 포함한 최신 세대 하드웨어를 활용하여 대규모 모델을 더 빠르고 효율적으로 훈련할 수 있게 해줍니다. ML Pathways는 여러 작업에 걸쳐 일반화할 수 있는 인공지능 시스템 구축을 위한 Google의 노력을 지원하는 인프라 소프트웨어입니다.
+**소프트웨어**: [JAX](https://github.com/jax-ml/jax) 및 [ML Pathways](https://arxiv.org/pdf/2203.12533v1)를 사용했습니다. JAX는 연구자들이 TPU를 포함한 최신 세대 하드웨어를 활용하여 대규모 모델을 더 빠르고 효율적으로 훈련할 수 있게 해줍니다. ML Pathways는 여러 작업에 걸쳐 일반화할 수 있는 인공지능 시스템 구축을 위한 Google의 노력을 지원하는 인프라 소프트웨어입니다.
 
 JAX와 ML Pathways의 '단일 컨트롤러' 프로그래밍 모델은 단일 Python 프로세스가 전체 훈련 실행을 조율할 수 있게 해주어 개발 워크플로우를 극적으로 단순화합니다. 이는 복잡한 분산 시스템을 마치 단일 컴퓨터에서 실행되는 것처럼 프로그래밍할 수 있게 해주는 혁신적인 접근법입니다.
 

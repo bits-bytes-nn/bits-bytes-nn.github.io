@@ -5,7 +5,7 @@
 # post's front matter against it, in CI before the build, and scholar-lens
 # reads this same file before it opens a pull request here, so a
 # generated post and a hand-written one answer to the same rules. The prose
-# conventions (README.md "Writing a post", docs/tech-doc.md) point here instead
+# conventions (docs/writing.md, docs/architecture.md) point here instead
 # of repeating the lists.
 
 # categories[0]. `paper`: the post reviews one paper, so it names the paper's

@@ -165,42 +165,89 @@
     }
   }
 
-  SimpleJekyllSearch({
-    searchInput: searchInput,
-    resultsContainer: resultsContainer,
-    json: searchInput.getAttribute('data-index'),
-    searchResultTemplate:
-      '<div class="search-result">' +
-        '<h2><a href="{url}">{title}</a></h2>' +
-        '<p class="result-meta"><span class="post-date">{date}</span>' +
-        '<span class="post-category">{category}</span></p>' +
-        '<p class="result-snippet">{content}</p>' +
-        '<p class="result-tags">{tags}</p>' +
-      '</div>',
-    // Returning undefined leaves a field to the library's default, which is what
-    // {url} and {date} want — they are attributes and plain text, not prose.
-    templateMiddleware: function (prop, value) {
-      var words = queryWords();
-      if (prop === 'content') return excerpt(String(value == null ? '' : value), words);
-      if (prop === 'title' || prop === 'tags' || prop === 'category') {
-        return mark(String(value == null ? '' : value), words);
-      }
-      return undefined;
-    },
-    noResultsText: '',
-    // The library matches every field, and every url ends in .html: a search for
-    // "html" listed the first ten posts with nothing marked.
-    exclude: ['^/.*\\.html$'],
-    limit: LIMIT,
-    fuzzy: false,
-    success: function () {
-      // This callback runs before the library fetches the JSON and registers its
-      // own input handler, so this listener is always the earlier of the two.
-      // Deferring by a turn lets the results render first, so the count is read
-      // from the DOM that the visitor is actually looking at.
-      searchInput.addEventListener('input', function () {
-        setTimeout(updateStatus, 0);
+  // The index is every post's full text, about 1 MB over the wire, so it is
+  // fetched when the visitor first reaches for the box, not with the page.
+  // Fetched here rather than by the library so that a query typed while it
+  // downloads is run once it lands, and a failed download says so.
+  var started = false;
+  function start() {
+    if (started) return;
+    started = true;
+    statusEl.textContent = 'Loading the search index…';
+    var index = fetch(searchInput.getAttribute('data-index')).then(function (response) {
+      if (!response.ok) throw new Error(response.status);
+      return response.json();
+    });
+    Promise.all([index, library()])
+      .then(function (loaded) {
+        var search = init(loaded[0]);
+        statusEl.textContent = '';
+        if (searchInput.value.trim()) {
+          search.search(searchInput.value);
+          updateStatus();
+        }
+      })
+      .catch(function () {
+        statusEl.textContent = 'Search could not load. Reload the page to try again.';
       });
-    }
+  }
+  // simple-jekyll-search loads async (search.md): resolves once it has, and
+  // gives up after LIBRARY_WAIT, so a CDN that hangs ends in a message rather
+  // than "Loading" for ever. The library is 4 KB; the index has no such limit.
+  var LIBRARY_WAIT = 15000;
+  function library() {
+    return new Promise(function (resolve, reject) {
+      if (window.SimpleJekyllSearch) return resolve();
+      var script = document.getElementById('search-lib');
+      if (!script || 'failed' in script.dataset) return reject(new Error('no search library'));
+      script.addEventListener('load', resolve);
+      script.addEventListener('error', reject);
+      setTimeout(reject, LIBRARY_WAIT);
+    });
+  }
+  ['focus', 'pointerdown', 'input'].forEach(function (type) {
+    searchInput.addEventListener(type, start, { once: true });
   });
+  // Typed into before this script ran (it is deferred): start now.
+  if (document.activeElement === searchInput || searchInput.value) start();
+
+  function init(index) {
+    return SimpleJekyllSearch({
+      searchInput: searchInput,
+      resultsContainer: resultsContainer,
+      json: index,
+      searchResultTemplate:
+        '<div class="search-result">' +
+          '<h2><a href="{url}">{title}</a></h2>' +
+          '<p class="result-meta"><span class="post-date">{date}</span>' +
+          '<span class="post-category">{category}</span></p>' +
+          '<p class="result-snippet">{content}</p>' +
+          '<p class="result-tags">{tags}</p>' +
+        '</div>',
+      // Returning undefined leaves a field to the library's default, which is what
+      // {url} and {date} want — they are attributes and plain text, not prose.
+      templateMiddleware: function (prop, value) {
+        var words = queryWords();
+        if (prop === 'content') return excerpt(String(value == null ? '' : value), words);
+        if (prop === 'title' || prop === 'tags' || prop === 'category') {
+          return mark(String(value == null ? '' : value), words);
+        }
+        return undefined;
+      },
+      noResultsText: '',
+      // The library matches every field, and every url ends in .html: a search for
+      // "html" listed the first ten posts with nothing marked.
+      exclude: ['^/.*\\.html$'],
+      limit: LIMIT,
+      fuzzy: false,
+      success: function () {
+        // The library registered its own input handler first (it is given the
+        // index, not a URL) and renders synchronously; deferring a turn reads
+        // the count from the DOM the visitor is actually looking at.
+        searchInput.addEventListener('input', function () {
+          setTimeout(updateStatus, 0);
+        });
+      }
+    });
+  }
 })();
