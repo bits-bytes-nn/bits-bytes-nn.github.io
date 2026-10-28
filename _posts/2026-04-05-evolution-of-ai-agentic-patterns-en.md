@@ -359,7 +359,7 @@ Context engineering was real progress. No question. But teams running agents in 
 
 **Second, no error recovery.** A tool call fails. The model hallucinates. Costs spike. No matter how well you compose context, handling runtime exceptions requires separate mechanisms. Production agents need cost-aware error recovery (try the free option first, then cheap, then expensive), diminishing-returns detection (stop the loop if it keeps repeating the same mistake), and circuit breakers (automatically halt when consecutive failures are detected). These are beyond the scope of context engineering.
 
-**Third, security.** If an agent processes external input while also accessing sensitive data and modifying state, a single prompt injection can exfiltrate company data. Simon Willison called this the "[Lethal Trifecta](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)," covered in detail in Section 5.4. Context engineering addresses "what to put in" but not "what to **prevent**."
+**Third, security.** If an agent processes external input while also accessing sensitive data and modifying state, a single prompt injection can exfiltrate company data. Simon Willison called this the "[Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)," covered in detail in Section 5.4. Context engineering addresses "what to put in" but not "what to **prevent**."
 
 The cause of death for the context era: even perfect context fails when the system consuming it is poorly designed. Context was a necessary condition, not a sufficient one. Time for rigor to move again.
 
@@ -444,7 +444,7 @@ The more programmatically verifiable the checks (compile, test, lint), the more 
 
 ### 5.4 Security: The Lethal Trifecta and the Rule of Two
 
-In harness engineering, security isn't optional — it's structural. Willison's "[Lethal Trifecta](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)" is the core framework.
+In harness engineering, security isn't optional — it's structural. Willison's "[Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)" is the core framework.
 
 ![Lethal Trifecta — when all three coexist, a security incident is inevitable](https://www.promptfoo.dev/img/blog/lethal-trifecta/lethal-trifecta-venn.png)
 
@@ -518,7 +518,7 @@ The question isn't whether rigor relocates. That's confirmed. The question is ho
 3. Andrej Karpathy, "[Context Engineering](https://x.com/karpathy/status/1937902205765607626)" (X post), 2025.06.25
 4. Andrew Ng, "[4 Agentic Design Patterns](https://www.deeplearning.ai/the-batch/how-agents-can-improve-llm-performance/)" (Sequoia AI Ascent + The Batch), 2024.03
 5. Simon Willison, "[Agentic Engineering Patterns](https://simonwillison.net/guides/agentic-engineering-patterns/)", 2026.02
-6. Simon Willison, "[The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)", 2025.06
+6. Simon Willison, "[The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)", 2025.06
 7. Martin Fowler (Birgitta Böckeler), "[Harness Engineering](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html)", 2026.02
 8. Philipp Schmid, "[The Importance of Agent Harness in 2026](https://www.philschmid.de/agent-harness-2026)", 2026.01
 9. Ethan Mollick, "[Models, Apps, and Harnesses](https://www.oneusefulthing.org/p/a-guide-to-which-ai-to-use-in-the)", 2026.02

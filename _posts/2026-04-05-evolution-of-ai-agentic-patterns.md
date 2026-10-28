@@ -359,7 +359,7 @@ RAG(검색 증강 생성)의 실무적 진화 형태라고 할 수 있습니다.
 
 **둘째, 에러 복구의 부재입니다.** 도구 호출이 실패하면? 모델이 환각을 보이면? 비용이 폭주하면? 컨텍스트를 아무리 잘 구성해도, 실행 중 발생하는 예외를 처리하는 메커니즘은 별도로 필요합니다. 프로덕션 에이전트는 비용 인식 에러 복구(무료 옵션 먼저 시도, 그 다음 저비용, 마지막에 고비용), 수확 체감 감지(같은 실수를 반복하면 루프 중단), 서킷 브레이커(전기의 차단기처럼, 연속 실패가 감지되면 자동으로 차단하는 패턴) 같은 메커니즘이 필요합니다. 이것들은 컨텍스트 엔지니어링의 범위를 넘어서는 것들이었습니다.
 
-**셋째, 보안입니다.** 에이전트가 외부 입력을 처리하면서 동시에 민감한 데이터에 접근하고 상태를 변경할 수 있다면, 프롬프트 인젝션(사용자가 악의적 지시를 입력에 숨기는 공격) 한 방에 회사 데이터가 유출될 수 있습니다. Simon Willison은 이것을 "[Lethal Trifecta](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)"라 불렀는데, 섹션 5.4에서 상세히 다룹니다. 컨텍스트 엔지니어링은 "무엇을 넣을 것인가"를 다루지만, "무엇을 **하지 못하게** 할 것인가"는 다루지 않습니다.
+**셋째, 보안입니다.** 에이전트가 외부 입력을 처리하면서 동시에 민감한 데이터에 접근하고 상태를 변경할 수 있다면, 프롬프트 인젝션(사용자가 악의적 지시를 입력에 숨기는 공격) 한 방에 회사 데이터가 유출될 수 있습니다. Simon Willison은 이것을 "[Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)"라 불렀는데, 섹션 5.4에서 상세히 다룹니다. 컨텍스트 엔지니어링은 "무엇을 넣을 것인가"를 다루지만, "무엇을 **하지 못하게** 할 것인가"는 다루지 않습니다.
 
 컨텍스트 시대의 사인(死因)은 이겁니다. 완벽한 컨텍스트를 구성해도, 그것을 소비하는 시스템의 설계가 허술하면 여전히 실패합니다. 컨텍스트는 필요 조건이었지 충분 조건이 아니었습니다. 엄밀함이 또 이동해야 할 때가 온 것입니다.
 
@@ -444,7 +444,7 @@ Simon Willison의 에이전트 정의도 이 맥락에서 읽어야 합니다. "
 
 ### 5.4 보안: Lethal Trifecta와 2인 규칙
 
-하네스 엔지니어링에서 보안은 선택이 아닌 필수입니다. Willison의 "[Lethal Trifecta](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)"가 핵심 프레임워크입니다.
+하네스 엔지니어링에서 보안은 선택이 아닌 필수입니다. Willison의 "[Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)"가 핵심 프레임워크입니다.
 
 ![Lethal Trifecta — 세 가지가 동시에 존재하면 보안 사고는 필연이다](https://www.promptfoo.dev/img/blog/lethal-trifecta/lethal-trifecta-venn.png)
 
@@ -518,7 +518,7 @@ Chad Fowler의 말이 이 글의 결론을 대신합니다. 엄밀함은 사라�
 3. Andrej Karpathy, "[Context Engineering](https://x.com/karpathy/status/1937902205765607626)" (X 포스트), 2025.06.25
 4. Andrew Ng, "[4 Agentic Design Patterns](https://www.deeplearning.ai/the-batch/how-agents-can-improve-llm-performance/)" (Sequoia AI Ascent + The Batch), 2024.03
 5. Simon Willison, "[Agentic Engineering Patterns](https://simonwillison.net/guides/agentic-engineering-patterns/)", 2026.02
-6. Simon Willison, "[The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/2/the-lethal-trifecta/)", 2025.06
+6. Simon Willison, "[The Lethal Trifecta for AI Agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)", 2025.06
 7. Martin Fowler (Birgitta Böckeler), "[Harness Engineering](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html)", 2026.02
 8. Philipp Schmid, "[The Importance of Agent Harness in 2026](https://www.philschmid.de/agent-harness-2026)", 2026.01
 9. Ethan Mollick, "[Models, Apps, and Harnesses](https://www.oneusefulthing.org/p/a-guide-to-which-ai-to-use-in-the)", 2026.02

@@ -140,7 +140,7 @@ Mixtral 모델을 Llama와 비교하기 위해 다양한 벤치마크에서 자�
 평가에 사용된 벤치마크는 다음과 같은 카테고리로 분류됩니다.
 
 - 상식 추론(0-shot): Hellaswag([Zellers와 연구진](https://arxiv.org/pdf/1905.07830)), Winogrande([Sakaguchi와 연구진](https://arxiv.org/abs/1907.10641)), PIQA([Bisk와 연구진](https://arxiv.org/abs/1911.11641)), SIQA([Sap와 연구진](https://arxiv.org/abs/1904.09728)), OpenbookQA([Mihaylov와 연구진](https://arxiv.org/abs/1809.02789)), ARC-Easy, ARC-Challenge([Clark와 연구진](https://arxiv.org/abs/1803.05457)), CommonsenseQA([Talmor와 연구진](https://arxiv.org/abs/1811.00937))
-- 세계 지식(5-shot): NaturalQuestions([Kwiatkowski와 연구진](https://arxiv.org/abs/1901.08634)), TriviaQA([Joshi와 연구진](https://arxiv.org/abs/1705.03551))
+- 세계 지식(5-shot): NaturalQuestions([Kwiatkowski와 연구진](https://aclanthology.org/Q19-1026/)), TriviaQA([Joshi와 연구진](https://arxiv.org/abs/1705.03551))
 - 독해 이해(0-shot): BoolQ([Clark와 연구진](https://arxiv.org/abs/1905.10044)), QuAC([Choi와 연구진](https://arxiv.org/abs/1808.07036))
 - 수학: GSM8K([Cobbe와 연구진](https://arxiv.org/abs/2110.14168))(8-shot, maj@8 사용), MATH([Hendrycks와 연구진](https://arxiv.org/abs/2103.03874))(4-shot, maj@4 사용)
 - 코드: Humaneval([Chen와 연구진](https://arxiv.org/abs/2107.03374))(0-shot), MBPP([Austin와 연구진](https://arxiv.org/abs/2108.07732))(3-shot)
@@ -206,9 +206,9 @@ Mixtral의 다국어 성능 향상은 사전 학습 과정에서 다국어 데�
 
 ### 장거리 성능 평가
 
-Mixtral 모델의 장거리 컨텍스트 처리 능력을 평가하기 위해, [Beltagy와 연구진](https://arxiv.org/pdf/2305.16300)이 소개한 패스키 검색 작업(passkey retrieval task)을 활용했습니다. 이 작업은 긴 프롬프트 내에 무작위로 삽입된 패스키를 모델이 검색할 수 있는 능력을 측정하기 위해 설계된 합성 작업입니다. 아래 그림(왼쪽)의 결과는 Mixtral이 컨텍스트 길이나 패스키의 위치에 관계없이 100%의 검색 정확도를 달성함을 보여줍니다. 이는 모델이 긴 시퀀스에서도 중요한 정보를 효과적으로 추출할 수 있는 강력한 능력을 갖추고 있음을 의미합니다.
+Mixtral 모델의 장거리 컨텍스트 처리 능력을 평가하기 위해, [Mohtashami와 Jaggi](https://arxiv.org/pdf/2305.16300)이 소개한 패스키 검색 작업(passkey retrieval task)을 활용했습니다. 이 작업은 긴 프롬프트 내에 무작위로 삽입된 패스키를 모델이 검색할 수 있는 능력을 측정하기 위해 설계된 합성 작업입니다. 아래 그림(왼쪽)의 결과는 Mixtral이 컨텍스트 길이나 패스키의 위치에 관계없이 100%의 검색 정확도를 달성함을 보여줍니다. 이는 모델이 긴 시퀀스에서도 중요한 정보를 효과적으로 추출할 수 있는 강력한 능력을 갖추고 있음을 의미합니다.
 
-또한 아래 그림(오른쪽)은 [Gao와 연구진](https://arxiv.org/pdf/2101.00027)이 개발한 proof-pile 데이터셋의 일부에 대한 Mixtral의 퍼플렉시티(perplexity)가 컨텍스트 크기가 증가함에 따라 단조롭게 감소함을 보여줍니다. 퍼플렉시티는 언어 모델의 성능을 평가하는 지표로, 값이 낮을수록 모델이 텍스트를 더 정확하게 예측한다는 것을 의미합니다. 이 결과는 Mixtral이 더 많은 컨텍스트를 활용할수록 더 정확한 예측을 할 수 있음을 보여주는 중요한 지표입니다.
+또한 아래 그림(오른쪽)은 [Azerbayev와 연구진](https://arxiv.org/pdf/2310.10631)이 개발한 proof-pile 데이터셋의 일부에 대한 Mixtral의 퍼플렉시티(perplexity)가 컨텍스트 크기가 증가함에 따라 단조롭게 감소함을 보여줍니다. 퍼플렉시티는 언어 모델의 성능을 평가하는 지표로, 값이 낮을수록 모델이 텍스트를 더 정확하게 예측한다는 것을 의미합니다. 이 결과는 Mixtral이 더 많은 컨텍스트를 활용할수록 더 정확한 예측을 할 수 있음을 보여주는 중요한 지표입니다.
 
 ![그림 4: Mixtral의 장거리 성능. (왼쪽) Mixtral은 패스키의 위치와 입력 시퀀스의 길이에 관계없이 패스키 작업에서 100% 검색 정확도를 보여줍니다.](https://arxiv.org/html/2401.04088v1/images/passkey.png) ![(오른쪽) proof-pile 데이터셋에 대한 Mixtral의 퍼플렉시티는 컨텍스트 길이가 증가함에 따라 단조롭게 감소합니다.](https://arxiv.org/html/2401.04088v1/images/perplexity.png)
 
