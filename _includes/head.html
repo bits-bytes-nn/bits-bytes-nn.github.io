@@ -91,20 +91,19 @@
 	<meta name="copyright" content="&copy; {{ site.author }} {{ site.time | date: '%Y' }}" />
 	{% endif %}
 
-	<!-- The hero banner is the largest thing on the first screen, but as a CSS
-	     background the browser finds it only after the stylesheet has loaded.
-	     Fetch it with the stylesheet instead. -->
-	{%- if page.layout == 'post' -%}{%- assign hero_image = page.cover -%}{%- endif -%}
-	{%- if paginator and site.cover -%}{%- assign hero_image = site.cover -%}{%- endif -%}
-	{%- if hero_image %}
-	<link rel="preload" as="image" href="{{ hero_image | prepend: site.baseurl }}">
-	{%- endif %}
-
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<!-- Only the weights actually used: 400 body, 500/600/700 headings/labels. -->
-	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
+	<!-- Only the weights actually used: sans 400 body, 500/600/700 labels (500 is
+	     Noto Sans KR's; Source Sans Pro has none), serif 700 headings.
+	     Loaded without blocking the first paint (media="print" until it arrives):
+	     the text shows at once in the metric-matched fallback faces
+	     (_sass/base/_typography.scss) and swaps when the fonts land, as
+	     display=swap had it do anyway. Blocking, it held a phone's first paint
+	     for the 117 KB stylesheet. -->
+	{%- assign font_css = "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Serif+Pro:wght@700&display=swap" %}
+	<link rel="stylesheet" href="{{ font_css }}" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="{{ font_css }}"></noscript>
 
 	<!-- Icons: the .ico and a 32px PNG for tabs, the 180px touch icon iOS asks
 	     for, and the manifest for Android. Browsers scale these for every other
@@ -203,15 +202,16 @@
 	{% endif %}
 
 	<!-- hreflang alternates for translated posts (paired by translation_id).
-	     x-default, for readers in neither language, is the version in the site's
-	     language: the one the listings show. -->
+	     x-default, for readers in neither language, is the English one: they
+	     are likelier to read English than Korean, and English queries brought
+	     most of the search clicks (Search Console). -->
 	{% if page.translation_id %}
 	<link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />
-	{% if page.lang == site.lang %}<link rel="alternate" hreflang="x-default" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
+	{% if page.lang == 'en' %}<link rel="alternate" hreflang="x-default" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
 	{% for post in site.posts %}
 	  {% if post.translation_id == page.translation_id and post.url != page.url %}
 	<link rel="alternate" hreflang="{{ post.lang }}" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />
-	{% if post.lang == site.lang %}<link rel="alternate" hreflang="x-default" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
+	{% if post.lang == 'en' %}<link rel="alternate" hreflang="x-default" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
 	  {% endif %}
 	{% endfor %}
 	{% endif %}

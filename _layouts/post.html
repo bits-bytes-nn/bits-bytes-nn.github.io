@@ -2,7 +2,8 @@
 layout: default
 ---
 <div class="post">
-  <div class="post-header-container {% if page.cover %}has-cover{% endif %}" {% if page.cover %}style="background-image: url({{ page.cover | prepend: site.baseurl }});"{% endif %}>
+  <div class="post-header-container {% if page.cover %}has-cover{% endif %}">
+    {% if page.cover %}{% include cover.html src=page.cover sizes="(max-width: 767px) 190vw, 100vw" %}{% endif %}
     <div class="scrim {% if page.cover %}has-cover{% endif %}">
       <header class="post-header">
         <h1 class="title">{{ page.title }}</h1>
@@ -68,14 +69,22 @@ layout: default
 
     {% include language_switcher.html %}
 
-    <details id="post-toc" class="post-toc" open hidden>
+    {%- comment -%} From the post's h2s (_plugins/post_toc.rb), when there are 3 or more. {%- endcomment -%}
+    {%- assign toc = content | post_toc -%}
+    {% if toc.size >= 3 %}
+    <details id="post-toc" class="post-toc" open>
       <summary>
         <span class="post-toc-title">Contents</span>
-        <span class="post-toc-count"></span>
+        <span class="post-toc-count">{{ toc.size }}</span>
         <span class="post-toc-chevron" aria-hidden="true"></span>
       </summary>
-      <ul></ul>
+      <ul>
+        {%- for entry in toc %}
+        <li><a href="#{{ entry.id }}">{% if entry.num %}<span class="toc-num">{{ entry.num }}</span>{% endif %}{{ entry.text }}</a></li>
+        {%- endfor %}
+      </ul>
     </details>
+    {% endif %}
 
     <article class="post-content">
       {{ content }}

@@ -1,0 +1,17 @@
+{%- comment -%}
+  The hero's cover, as an image the browser sizes: a phone takes the 960 or
+  1280px copy (script/cover-variants.sh) instead of the 1920px original. As a
+  CSS background it had one size, which made it a phone's slowest paint. It is
+  the first thing on the page: eager, and fetched ahead of everything else.
+
+  `sizes` is the width it is drawn at, not the box's: object-fit: cover fills a
+  box taller than the image's shape, so the cover is drawn wider than the
+  screen. Each caller passes its own: the home banner is 3.2:1 in a tall box,
+  a post's 1.9:1 in a box whose height follows the title. Decorative, as the
+  background was: the credit under the hero names it.
+  Usage: {% include cover.html src=page.cover sizes="..." %}
+{%- endcomment -%}
+{%- assign cover_src = include.src | prepend: site.baseurl -%}
+{%- assign cover_ext = include.src | split: '.' | last -%}
+{%- assign cover_base = cover_src | split: '.' | pop | join: '.' -%}
+<img class="cover-image" src="{{ cover_src }}" srcset="{{ cover_base }}-960.{{ cover_ext }} 960w, {{ cover_base }}-1280.{{ cover_ext }} 1280w, {{ cover_src }} 1920w" sizes="{{ include.sizes }}" alt="" aria-hidden="true" loading="eager" fetchpriority="high">

@@ -154,6 +154,22 @@ blockquote {
 	overflow-y: hidden;
 }
 
+// Forced colours (Windows contrast themes) turned the tall brackets MathJax
+// stretches around a fraction into solid bars: their extender pieces were
+// recoloured as blocks. Left to MathJax's own colours they draw as before. The
+// black-on-transparent logo vanished on such a theme's dark background.
+@media (forced-colors: active) {
+	mjx-stretchy-v, mjx-stretchy-h {
+		forced-color-adjust: none;
+	}
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+	.logo img {
+		filter: invert(1);
+	}
+}
+
 // MathJax's hidden screen-reader copy of a formula is as wide as the formula
 // unwrapped: an inline one that fit on screen still widened the QLoRA post to
 // 327px on a 320px phone.
@@ -290,8 +306,22 @@ blockquote {
 	&.has-cover {
 		color: $white;
 		text-shadow: 0 2px 2px rgba(0,0,0,0.4);
-		background-position: 50% 50%;
-		background-size: cover;
+		// The cover sits under the scrim, filling the box (_includes/cover.html).
+		position: relative;
+		isolation: isolate;
+
+		> .cover-image {
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			width: 100%;
+			height: 100%;
+			max-width: none;
+			margin: 0;
+			object-fit: cover;
+
+			&:hover { box-shadow: none; }
+		}
 
 		// The hero title had one size at every width. modular-scale(6) is 47.8px,
 		// which on a 390px phone turned a long post title into six lines and a
@@ -1010,9 +1040,14 @@ blockquote {
 		padding: 1em !important;
 	}
 
-	// The two lines are reserved for the cover, which does not print.
+	// The two lines are reserved for the cover, which does not print: as an
+	// image it would, unlike the CSS background it replaced.
 	.post-header-container.has-cover .title {
 		min-height: 0;
+	}
+
+	.cover-image {
+		display: none !important;
 	}
 
 	// It credits a cover that does not print.

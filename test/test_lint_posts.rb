@@ -5,6 +5,7 @@
 
 require "minitest/autorun"
 require_relative "../script/lint-posts"
+require_relative "../_plugins/image_dimensions"
 
 class TestLintPosts < Minitest::Test
   SPEC = PostLint.spec
@@ -67,6 +68,22 @@ class TestLintPosts < Minitest::Test
     credits = YAML.load_file(File.expand_path("../_data/covers.yml", __dir__))
     covers = SPEC["types"].values.filter_map { |t| t["cover"] } + SPEC["topics"].values.compact
     assert_equal [], covers.uniq - credits.keys
+  end
+
+  # _includes/cover.html offers these copies by name and labels the original 1920w.
+  def test_every_cover_has_its_phone_and_tablet_copies
+    config = YAML.load_file(File.join(PostLint::ROOT, "_config.yml"))
+    covers = SPEC["types"].values.filter_map { |t| t["cover"] } + SPEC["topics"].values.compact + [config["cover"]]
+    covers.uniq.each do |cover|
+      file = File.join(PostLint::ROOT, cover)
+      assert_equal 1920, ImageDimensions.read(File.binread(file))&.first, "#{cover} is not 1920px wide"
+      [960, 1280].each do |width|
+        copy = file.sub(/(\.\w+)\z/, "-#{width}\\1")
+        hint = "#{copy}: run script/cover-variants.sh #{cover.delete_prefix('/')}"
+        assert File.file?(copy), hint
+        assert_equal width, ImageDimensions.read(File.binread(copy))&.first, hint
+      end
+    end
   end
 
   def test_rejects_an_unknown_topic_and_a_wrong_cover
