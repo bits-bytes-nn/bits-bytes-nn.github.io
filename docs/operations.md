@@ -25,7 +25,7 @@ bundle exec jekyll build --strict-front-matter \
 bundle exec htmlproofer /tmp/site-verify --disable-external \
   --allow-hash-href --no-ignore-empty-alt                   # internal links, images, anchors, https, alt text
 script/validate-site.sh /tmp/site-verify                    # sitemap, feed, metadata, headings, plugin output
-shellcheck script/*.sh assets/images/*.sh && actionlint     # workflow-lint.yml
+shellcheck script/*.sh assets/images/*.sh && actionlint .github/workflows/*.yml   # workflow-lint.yml
 ```
 
 - `test/` covers the pure logic in `_plugins/` (one file per plugin) and
@@ -75,16 +75,19 @@ site unchanged and `main` red.
 
 Every URL a post has been published under is in `script/published-urls.txt`,
 and `validate-site.sh` fails when one is no longer built (a renamed post, a
-changed date or category, a lost redirect stub). After a post merges, record
-its URL. `--record` reads the posts through Jekyll, so no build is needed; the
-site directory argument is required but unused:
+changed date or category, a lost redirect stub). CI also checks every URL in
+the live `sitemap.xml` (`PUBLISHED_SITEMAP` in `jekyll.yml`), so a post is
+protected from its first deploy even if nobody records it; when the live
+sitemap cannot be fetched, that part is skipped with a warning.
+
+Record new URLs to the list after a post merges, and again after a move (the
+new URL alongside the old one in `redirect_from`). `--record` reads the posts
+through Jekyll, so no build is needed (the site directory argument is required
+but unused), and prints what it added:
 
 ```bash
 bundle exec ruby script/check-plugin-output.rb _site --record
 ```
-
-Nothing records it automatically; a post merged without it is simply not
-protected yet.
 
 ## scholar-lens
 
