@@ -52,6 +52,8 @@ merge deploys.
 
 ## License
 
-MIT — see [LICENSE](LICENSE), which also credits the James Webb cover images
-(ESA/Webb, CC BY 4.0). Built on the
+Code is MIT; the writing (posts and their diagrams) is CC BY 4.0. Figures and
+images by others keep their own terms, credited where they appear. Details,
+including the James Webb cover credits (ESA/Webb, CC BY 4.0), are in
+[LICENSE](LICENSE). Built on the
 [Centrarium](https://github.com/bencentra/centrarium) Jekyll theme.
