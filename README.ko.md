@@ -52,6 +52,7 @@ Summaries, Paper Surveys, Tech Guides, Insights 다섯 개입니다. 논문 글�
 
 ## 라이선스
 
-MIT — [LICENSE](LICENSE) 참고. 제임스 웹 표지 이미지(ESA/Webb, CC BY 4.0)의 출처도 거기에
-밝혀 두었습니다. [Centrarium](https://github.com/bencentra/centrarium) Jekyll 테마를
-기반으로 합니다.
+코드는 MIT, 글(포스트와 그 다이어그램)은 CC BY 4.0입니다. 다른 사람이 만든 그림과
+이미지는 원래 라이선스를 따르며, 쓰인 자리에 출처를 밝혀 두었습니다. 제임스 웹 표지 이미지(ESA/Webb,
+CC BY 4.0)의 출처를 포함한 자세한 내용은 [LICENSE](LICENSE)에 있습니다.
+[Centrarium](https://github.com/bencentra/centrarium) Jekyll 테마를 기반으로 합니다.
