@@ -15,7 +15,8 @@
 #
 # Usage: bundle exec ruby script/check-plugin-output.rb <site_dir> [--record]
 # Prints one line per problem; exits 1 when there is any. --record adds every
-# post's URL and redirect stub to script/published-urls.txt instead.
+# post's URL and redirect stub to script/published-urls.txt instead, and prints
+# what it added. PUBLISHED_SITEMAP=<url> also checks every URL in that sitemap.
 
 require "jekyll"
 require "json"
@@ -52,7 +53,24 @@ listed = File.file?(published) ? File.readlines(published, chomp: true).grep(%r{
 if ARGV.include?("--record")
   urls = posts.flat_map { |p| [p.url] + Array(p.data["redirect_from"]).map { |u| Jekyll::URL.escape_path(u) } }
   File.write(published, File.read(published).lines.grep_v(%r{\A/}).join + (listed | urls).sort.join("\n") + "\n")
+  puts((urls - listed).sort.map { |u| "recorded #{u}" })
   exit
+end
+# The live sitemap too, when CI names it (PUBLISHED_SITEMAP): a post merged
+# without --record is protected from its first deploy on. Unreachable, it is
+# skipped with a warning, so a network blip cannot block a deploy; the list
+# above still applies.
+if (sitemap = ENV["PUBLISHED_SITEMAP"])
+  require "net/http"
+  begin
+    response = Net::HTTP.get_response(URI(sitemap))
+    raise "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+    live = response.body.scan(%r{<loc>https?://[^/<]+([^<]*)</loc>}).flatten.map { |path| path.delete_prefix(site.baseurl) }
+    listed |= live.map { |path| path.empty? ? "/" : path }
+  rescue StandardError => e
+    warn "warning: #{sitemap} not checked (#{e.message})"
+  end
 end
 listed.each do |url|
   problems << "#{url}: published but no longer built; add it to the post's redirect_from" unless File.file?(built.call(url))

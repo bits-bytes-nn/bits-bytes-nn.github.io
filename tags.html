@@ -45,7 +45,7 @@ description: >-
 		<li class="post-item">
 			<strong>
 				<a href="{{ post.url | prepend: site.baseurl }}" class="post-link" lang="{{ post.lang | default: site.lang }}"
-					>{{ post.title }}</a
+					>{{ post.title | escape }}</a
 				>
 			</strong>
 			<span class="post-date"> {{ post.posted_at | date: site.date_format }} </span>

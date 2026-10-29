@@ -15,6 +15,9 @@ require "date"
 require "set"
 
 module PostLint
+  # `$x_i$`, `$a*b$`, `$T$`: one line, not starting with a digit or space, not
+  # ending in a space, holding a TeX operator or a lone letter.
+  SINGLE_DOLLAR_MATH = /(?<![$\\\w])\$(?=[^$\s\d])(?:[^$\n]{0,80}?[_^*=\\][^$\n]{0,80}?|[A-Za-z])(?<!\s)\$(?![$\w])/
   ROOT = File.expand_path("..", __dir__)
 
   # One parsed post: front matter, body, and the line the body starts on, so
@@ -78,7 +81,13 @@ module PostLint
           hit = true
         end
       end
-      "#{post.body_line + i}: Liquid tag in the body; posts do not use Liquid, so wrap it in {% raw %} ... {% endraw %}" if hit
+      next unless hit
+      # Wrapped in raw, a post_url ships as a literal href; the fix is a URL.
+      if line.match?(/\{%-?\s*(post_url|link)\b/)
+        "#{post.body_line + i}: Liquid #{line[/\{%-?\s*(post_url|link)/, 1]} in the body; link the post by its root-relative URL (/paper-reviews/.../slug.html, from the built site)"
+      else
+        "#{post.body_line + i}: Liquid tag in the body; posts do not use Liquid, so wrap it in {% raw %} ... {% endraw %}"
+      end
     end
   end
 
@@ -93,21 +102,27 @@ module PostLint
     posts.select { |p| p.data["translation_id"] }.group_by { |p| p.data["translation_id"].to_s }.each do |id, group|
       next if group.map { |p| p.data["lang"].to_s }.sort == spec["languages"].sort
 
-      group.each { |post| found[post.path] << "1: translation_id #{id} is not on one post in each of #{spec["languages"].join(", ")}" }
+      # Name what is missing: a post without `lang`, or a second post in one language.
+      missing = spec["languages"] - group.map { |p| p.data["lang"].to_s }
+      group.each do |post|
+        hint = post.data["lang"].to_s.empty? ? "set lang: #{missing.first || spec["languages"].join(" or ")}" : "no #{missing.join(", ")} post shares it; give the twin translation_id: #{id} and lang: #{missing.join(", ")}"
+        found[post.path] << "1: translation_id #{id} is not on one post in each of #{spec["languages"].join(", ")}; #{hint}"
+      end
     end
     found
   end
 
   def self.front_matter(post, spec)
     data = post.data
-    found = (spec["forbidden_keys"] & data.keys).map { |k| "1: front matter key `#{k}` is not allowed" }
+    hints = { "author" => "; the paper's organisation goes in paper_author", "last_modified_at" => "; _plugins/posted_date.rb sets it" }
+    found = (spec["forbidden_keys"] & data.keys).map { |k| "1: front matter key `#{k}` is not allowed#{hints[k]}" }
     # It ships as plain text (meta, feed, home card); markup would show literally.
     if data["description"].to_s.match?(/\$\$|\*\S[^*]*\*|`|\]\(|<[a-zA-Z\/]|\{[{%]/)
       found << "1: description is plain text; no $$, *emphasis*, backticks, links or tags"
     end
-    # The layouts print these unescaped, so <think> would vanish as a tag.
-    %w[title subtitle].each do |key|
-      found << "1: #{key} has a tag; the page reads it as HTML" if data[key].to_s.match?(/<[a-zA-Z\/]/)
+    # Text the reader sees: a tag in it (<think>, <!-- …) is read as HTML.
+    %w[title subtitle paper_author].each do |key|
+      found << "1: #{key} has a tag; the page reads it as HTML" if data[key].to_s.match?(/<[a-zA-Z\/!]/)
     end
 
     # Jekyll drops a file without the date prefix, and builds a `date:` past the
@@ -119,12 +134,12 @@ module PostLint
       day = date.instance_of?(Date) ? date : date.respond_to?(:to_time) && date.to_time.utc.to_date
       found << "1: date: #{day} (UTC) is after the file name's #{posted}" if day && day > Date.parse(posted)
     else
-      found << "1: the file name starts with YYYY-MM-DD-, or Jekyll skips the post"
+      found << "1: the file name must start with YYYY-MM-DD- (the posting day), or Jekyll skips the post"
     end
 
     type, topic = Array(data["categories"])
     unless Array(data["categories"]).size == 2 && spec["types"].key?(type) && spec["topics"].key?(topic)
-      return found << "1: categories must be [<type>, <topic>] from _data/post_conventions.yml, got #{data["categories"].inspect}"
+      return found << "1: categories must be [<type>, <topic>], got #{data["categories"].inspect}; types: #{spec["types"].keys.join(", ")}; topics: #{spec["topics"].keys.join(", ")} (a new topic: docs/writing.md, \"Categories, URLs and covers\")"
     end
 
     if spec["types"][type]["paper"]
@@ -194,7 +209,12 @@ module PostLint
     return ["1: a post with translation_id must set lang (#{langs.join(" or ")})"] unless langs.include?(post.data["lang"])
 
     expected = post.data["lang"] == "en" ? "#{id}-en" : id
-    slug(post) == expected ? [] : ["1: a post with translation_id #{id} is named #{expected}.md (after the date), not #{slug(post)}.md"]
+    return [] if slug(post) == expected
+
+    # A published post's file name is its URL, so for one of those the id is
+    # what to fix; a new twin can still take the expected name.
+    right = slug(post).delete_suffix("-en")
+    ["1: translation_id #{id} names this post #{expected}.md (after the date), not #{slug(post)}.md; rename a new post, or set translation_id: #{right} on both posts of a published pair"]
   end
 
   FENCE = /\A\s*(`{3,}|~{3,})/
@@ -323,6 +343,8 @@ module PostLint
       # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
       # 200, so no link check notices: 59 figures went blank that way.
       found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
+      # kramdown keeps a javascript: href, and htmlproofer passes it.
+      found << "#{n}: javascript: link; link to a page" if bare.match?(/\]\(\s*javascript:/i)
       # A whole tag, outside code and math: `i<j` and `$$a<b$$` are text.
       text = bare.gsub(/\$\$.*?\$\$/, "")
       tags = text.scan(%r{(?<!\\)<(/?)([a-zA-Z][\w-]*)(\s[^<>]*)?/?>})
@@ -401,6 +423,11 @@ module PostLint
     # preceded by `}` nor followed by a command.
     if outside.match?(/\}\$(?!\$)|(?<!\$)\$\\[a-zA-Z]/)
       found << "#{n}: TeX next to a single `$`; write the formula as $$...$$"
+    # A formula between single `$`s: `$a*b*c$` renders as `$a<em>b</em>c$`. A
+    # price starts with a digit, and two prices on a line leave a space before
+    # the second `$`, so neither reads as one.
+    elsif outside.match?(SINGLE_DOLLAR_MATH)
+      found << "#{n}: math between single `$`s; write the formula as $$...$$"
     end
     if prose.strip.match?(/\A\$\$(?:(?!\$\$).)+\$\$\z/) && !prose.lstrip.start_with?("|")
       before_ok = i.zero? || unquote(lines[i - 1]).strip.empty?
@@ -477,7 +504,8 @@ if $PROGRAM_NAME == __FILE__
           ["1: a post is a .md file"]
         end
       rescue StandardError => e
-        ["1: could not be checked: #{e.message}"]
+        hint = e.is_a?(Psych::SyntaxError) ? " (quote a front-matter value that contains `: `)" : ""
+        ["1: could not be checked: #{e.message}#{hint}"]
       end
     [path, findings]
   end

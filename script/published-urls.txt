@@ -66,3 +66,4 @@
 /paper-reviews/retrieval-augmented-generation/2024/10/08/lightrag-simple-and-fast-retrieval-augmented-generation.html
 /paper-reviews/retrieval-augmented-generation/2025/01/20/zep-a-temporal-knowledge-graph-architecture-for-agent-memory.html
 /paper-summaries/agentic-ai/2025/11/26/toolorchestra-elevating-intelligence-via-efficient-model-and-tool-orchestration-summary.html
+/tech-guides/agentic-ai/2026/10/23/strands-agents-sdk-the-agent-loop-hooks-and-production-controls.html

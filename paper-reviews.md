@@ -35,7 +35,7 @@ nav_order: 3
     {% if post.categories contains cat %}
     <li>
       <strong>
-        <a href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}">{{ post.title }}</a>
+        <a href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}">{{ post.title | escape }}</a>
       </strong>
       <span class="post-date">- {{ post.posted_at | date: site.date_format }}</span>
     </li>

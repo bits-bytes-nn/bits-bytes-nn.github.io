@@ -95,6 +95,9 @@ jobs:
         run: script/validate-site.sh ./_site
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # check-plugin-output.rb also holds the build to the live sitemap, so a
+          # post merged without --record cannot silently lose its URL.
+          PUBLISHED_SITEMAP: https://bits-bytes-nn.github.io/sitemap.xml
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

@@ -170,7 +170,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // data-title, not data-glightbox: GLightbox parses the latter by splitting on
     // ';' then ':', so alts like "TL;DR Best of N" or "Chain-of-Thought: …"
     // produced a mangled caption.
-    if (img.alt) a.setAttribute('data-title', img.alt);
+    // GLightbox writes the title as HTML, and img.alt is already decoded text:
+    // an alt naming a tag ("<think> 토큰") would render, or run, as markup.
+    if (img.alt) a.setAttribute('data-title', img.alt.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }));
     img.parentNode.insertBefore(a, img);
     a.appendChild(img);
   });
