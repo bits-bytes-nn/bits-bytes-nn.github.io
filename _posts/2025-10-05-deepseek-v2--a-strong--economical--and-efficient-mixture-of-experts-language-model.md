@@ -106,7 +106,7 @@ DeepSeek-V2는 두 가지 핵심 기술을 결합하여 강력한 성능, 경제
 
 DeepSeek-V2는 기본적으로 트랜스포머 아키텍처를 따르고 있으며, 각 트랜스포머 블록은 어텐션 모듈과 Feed-Forward Network(FFN)으로 구성됩니다. 하지만 어텐션 모듈과 FFN 모두에서 혁신적인 아키텍처를 설계하고 채택했습니다. 어텐션의 경우 MLA(Multi-head Latent Attention)를 설계했으며, 이는 저랭크 키-값 공동 압축을 활용하여 추론 시 키-값 캐시의 병목 현상을 제거하고 효율적인 추론을 지원합니다. FFN의 경우 DeepSeekMoE 아키텍처를 채택했으며, 이는 경제적인 비용으로 강력한 모델을 훈련할 수 있게 하는 고성능 MoE 아키텍처입니다.
 
-![DeepSeek-V2 아키텍처](https://arxiv.org/html/2405.04434/x4.png)
+![MHA, GQA, MQA, MLA 어텐션 비교](https://arxiv.org/html/2405.04434/x4.png)
 
 위 그림은 Multi-Head Attention(MHA), Grouped-Query Attention(GQA), Multi-Query Attention(MQA), 그리고 Multi-head Latent Attention(MLA)의 서로 다른 어텐션 메커니즘을 보여주는 아키텍처 다이어그램입니다. 이 다이어그램은 입력 쿼리, 키, 값과 같은 핵심 구성 요소와 관계를 보여주며, MLA의 경우 키와 값을 잠재 벡터로 압축하는 과정을 나타냅니다. 이 그림의 연구적 의의는 MLA가 키와 값을 잠재 벡터로 공동 압축함으로써 추론 중 키-값(KV) 캐시를 크게 줄일 수 있다는 핵심 기여를 보여주는 것입니다.
 
