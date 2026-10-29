@@ -63,7 +63,8 @@ end
 if (sitemap = ENV["PUBLISHED_SITEMAP"])
   require "net/http"
   begin
-    response = Net::HTTP.get_response(URI(sitemap))
+    uri = URI(sitemap)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 15, read_timeout: 15) { |http| http.get(uri.request_uri) }
     raise "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
     live = response.body.scan(%r{<loc>https?://[^/<]+([^<]*)</loc>}).flatten.map { |path| path.delete_prefix(site.baseurl) }
