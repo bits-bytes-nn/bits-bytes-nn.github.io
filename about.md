@@ -27,3 +27,22 @@ If something here sparks a thought, I'd love to hear it — reach out through an
 - **GitHub** — [bits-bytes-nn](https://github.com/bits-bytes-nn)
 - **LinkedIn** — [Jonas Kim](https://www.linkedin.com/in/aldente0630)
 - **Threads** — [@aldente0630](https://www.threads.com/@aldente0630)
+
+## Privacy
+
+This blog has no accounts, comments or ads, and keeps no data of its own. What
+your browser shares while you read:
+
+- **Google Analytics** counts page views: the page address, the referring page,
+  your device and browser type and an approximate location. It sets first-party
+  cookies (`_ga`, `_ga_*`) that last up to two years. Google signals and ad
+  personalisation are turned off. To opt out, block those cookies or use
+  [Google's opt-out add-on](https://tools.google.com/dlpage/gaoptout).
+- **Fonts and libraries** load from Google Fonts, jsDelivr and unpkg, which see
+  your IP address as part of serving them.
+- **Paper reviews** ask Semantic Scholar for the paper's citation count, and
+  some posts show figures hosted by their original sites (arXiv and others).
+- **Your browser** keeps your theme choice and cached citation counts in local
+  storage; nothing leaves your device for those.
+
+Questions or requests: [{{ site.email }}](mailto:{{ site.email }}).
