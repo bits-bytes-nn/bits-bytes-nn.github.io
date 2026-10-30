@@ -305,14 +305,19 @@
 		crossorigin="anonymous"></script>
 	{% endif %}
 
-	<!-- Google Analytics, on the deployed build only: a local serve would count as traffic. -->
+	<!-- Google Analytics, on the deployed build only: a local serve would count as traffic.
+	     Google signals and ad personalisation are off: this site shows no ads and
+	     needs page counts, not cross-site profiles (see About, "Privacy"). -->
 	{% if site.ga_tracking_id and jekyll.environment == 'production' %}
 	<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga_tracking_id }}"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
-		gtag('config', '{{ site.ga_tracking_id }}');
+		gtag('config', '{{ site.ga_tracking_id }}', {
+			allow_google_signals: false,
+			allow_ad_personalization_signals: false
+		});
 	</script>
 	{% endif %}
 
