@@ -290,7 +290,7 @@ Gemma 2 모델들은 Gemma 1 모델과 동일한 제어 토큰을 사용하여 �
 |          | `<start_of_turn>model` |
 | 모델:    | `Gemma who?<end_of_turn><eos>` |
 
-표의 각 행은 한 줄이며, 모델에 들어가는 실제 입력은 두 번째 턴을 예로 들면 다음과 같이 이어집니다. `user`와 `model` 뒤에는 줄바꿈이 들어가고, 모델은 마지막 `<start_of_turn>model` 다음부터 생성합니다.
+표의 각 행은 한 줄이며, 대화 전체의 시퀀스는 두 번째 턴을 예로 들면 다음과 같이 이어집니다. `user`와 `model` 뒤에는 줄바꿈이 들어가고, 모델은 마지막 `<start_of_turn>model` 다음부터 생성합니다.
 
 ```
 <start_of_turn>user

@@ -370,19 +370,6 @@ Gemma 3에서는 사전 훈련(PT) 모델과 지시 튜닝(IT) 모델 간에 중
 | 모델 응답   | `<start_of_turn>model` |
 | 턴 종료     | `<end_of_turn>`        |
 
-실제 대화 예시에서 이러한 포맷팅이 어떻게 적용되는지 살펴보면:
-
-```
-[BOS]<start_of_turn>user
-Who are you?<end_of_turn>
-<start_of_turn>model
-My name is Gemma! I'm a helpful AI assistant created by Google.<end_of_turn>
-<start_of_turn>user
-What can you help me with?<end_of_turn>
-<start_of_turn>model
-I can help you with a wide variety of tasks including answering questions, writing, coding, math problems, and creative projects.<end_of_turn>
-```
-
 이러한 구조화된 포맷팅은 모델이 대화의 맥락을 정확히 이해하고 적절한 응답을 생성할 수 있도록 돕습니다. 특히 멀티턴 대화에서 각 발화자의 역할을 명확히 구분하여 일관성 있는 대화를 유지할 수 있게 합니다.
 
 ### 성능 향상 결과

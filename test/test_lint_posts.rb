@@ -85,7 +85,9 @@ class TestLintPosts < Minitest::Test
       end
       ["", "-960", "-1280"].each do |suffix|
         webp = file.sub(/\.\w+\z/, "#{suffix}.webp")
-        assert File.binread(webp, 12).to_s.match?(/\ARIFF....WEBP/m), "#{webp}: run script/cover-variants.sh #{cover.delete_prefix('/')}"
+        hint = "#{webp}: run script/cover-variants.sh #{cover.delete_prefix('/')}"
+        assert File.file?(webp), hint
+        assert File.binread(webp, 12).to_s.match?(/\ARIFF....WEBP/m), hint
       end
     end
   end
@@ -139,7 +141,10 @@ class TestLintPosts < Minitest::Test
   end
 
   def test_no_javascript_links
-    assert_finding(/javascript: link/, lint("[click](javascript:alert(1))\n"))
+    ["[click](javascript:alert(1))\n", "[x](<javascript:alert(1)>)\n", "[r]: javascript:alert(1)\n",
+     "[x](java&#115;cript:alert(1))\n", %(<a href="javascript:alert(1)">x</a>\n)].each do |body|
+      assert_finding(/javascript: link/, lint(body))
+    end
     assert_equal [], lint("`[x](javascript:void(0))` is how not to write it.\n")
   end
 

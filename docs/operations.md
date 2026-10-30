@@ -75,7 +75,7 @@ site unchanged and `main` red.
 
 Every URL a post has been published under is in `script/published-urls.txt`,
 and `validate-site.sh` fails when one is no longer built (a renamed post, a
-changed date or category, a lost redirect stub). CI also checks every URL in
+changed date or category, a lost redirect stub). CI also checks every post URL in
 the live `sitemap.xml` (`PUBLISHED_SITEMAP` in `jekyll.yml`), so a post is
 protected from its first deploy even if nobody records it; when the live
 sitemap cannot be fetched, that part is skipped with a warning.

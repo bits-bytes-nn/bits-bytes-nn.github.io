@@ -67,8 +67,12 @@ if (sitemap = ENV["PUBLISHED_SITEMAP"])
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 15, read_timeout: 15) { |http| http.get(uri.request_uri) }
     raise "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
-    live = response.body.scan(%r{<loc>https?://[^/<]+([^<]*)</loc>}).flatten.map { |path| path.delete_prefix(site.baseurl) }
-    listed |= live.map { |path| path.empty? ? "/" : path }
+    # Posts only (.html): a listing page such as /page/7/ goes when posts do, and
+    # no redirect_from could bring it back.
+    live = response.body.scan(%r{<loc>https?://[^/<]+([^<]*\.html)</loc>}).flatten.map { |path| path.delete_prefix(site.baseurl) }
+    raise "no post URLs in it" if live.empty?
+
+    listed |= live
   rescue StandardError => e
     warn "warning: #{sitemap} not checked (#{e.message})"
   end

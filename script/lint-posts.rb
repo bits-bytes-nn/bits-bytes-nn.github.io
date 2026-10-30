@@ -11,12 +11,14 @@
 # Exits 1 when any post breaks a rule.
 
 require "yaml"
+require "cgi"
 require "date"
 require "set"
 
 module PostLint
   # `$x_i$`, `$a*b$`, `$T$`: one line, not starting with a digit or space, not
   # ending in a space, holding a TeX operator or a lone letter.
+  JAVASCRIPT_LINK = /(?:\]\(\s*<?|^\s*\[[^\]]+\]:\s*<?|\bhref\s*=\s*["']?)\s*javascript:/i
   SINGLE_DOLLAR_MATH = /(?<![$\\\w])\$(?=[^$\s\d])(?:[^$\n]{0,80}?[_^*=\\][^$\n]{0,80}?|[A-Za-z])(?<!\s)\$(?![$\w])/
   ROOT = File.expand_path("..", __dir__)
 
@@ -343,8 +345,9 @@ module PostLint
       # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
       # 200, so no link check notices: 59 figures went blank that way.
       found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
-      # kramdown keeps a javascript: href, and htmlproofer passes it.
-      found << "#{n}: javascript: link; link to a page" if bare.match?(/\]\(\s*javascript:/i)
+      # kramdown keeps a javascript: href, and htmlproofer passes it: inline,
+      # in <…>, as a reference definition or in raw HTML, entities decoded.
+      found << "#{n}: javascript: link; link to a page" if CGI.unescapeHTML(bare).match?(JAVASCRIPT_LINK)
       # A whole tag, outside code and math: `i<j` and `$$a<b$$` are text.
       text = bare.gsub(/\$\$.*?\$\$/, "")
       tags = text.scan(%r{(?<!\\)<(/?)([a-zA-Z][\w-]*)(\s[^<>]*)?/?>})

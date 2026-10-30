@@ -260,7 +260,7 @@ Four layers, each catching what the others cannot:
    checks each hook's mark on the built pages: redirect stubs without
    `noindex`, published times, posted order on the home pages and in the feed,
    previous/next and related links, cover credits, JSON-LD that parses, unique
-   ids, and every recorded URL, and every URL in the live sitemap, still built.
+   ids, and every recorded URL, and every post URL in the live sitemap, still built.
 
 `_config.yml` sets `future: true`, so a post dated later in the day still builds
 in a morning merge, and `strict_filters`, so an unknown Liquid filter fails the
