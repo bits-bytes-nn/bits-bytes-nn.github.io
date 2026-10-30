@@ -67,7 +67,7 @@ class TestLintPosts < Minitest::Test
     # Their license wants the credit visible; _layouts/post.html prints it from here.
     credits = YAML.load_file(File.expand_path("../_data/covers.yml", __dir__))
     covers = SPEC["types"].values.filter_map { |t| t["cover"] } + SPEC["topics"].values.compact
-    assert_equal [], covers.uniq - credits.keys
+    assert_equal [], covers.uniq - credits.keys, "add title, credit and url for these covers to _data/covers.yml"
   end
 
   # _includes/cover.html offers these copies by name and labels the original 1920w.
@@ -82,6 +82,12 @@ class TestLintPosts < Minitest::Test
         hint = "#{copy}: run script/cover-variants.sh #{cover.delete_prefix('/')}"
         assert File.file?(copy), hint
         assert_equal width, ImageDimensions.read(File.binread(copy))&.first, hint
+      end
+      ["", "-960", "-1280"].each do |suffix|
+        webp = file.sub(/\.\w+\z/, "#{suffix}.webp")
+        hint = "#{webp}: run script/cover-variants.sh #{cover.delete_prefix('/')}"
+        assert File.file?(webp), hint
+        assert File.binread(webp, 12).to_s.match?(/\ARIFF....WEBP/m), hint
       end
     end
   end
@@ -101,7 +107,7 @@ class TestLintPosts < Minitest::Test
 
   def test_a_translation_is_named_after_its_original
     front = "#{FRONT}lang: en\ntranslation_id: claude-code-source-map-leak-analysis\n"
-    assert_finding(/is named claude-code-source-map-leak-analysis-en/, lint(front: front, path: "_posts/2026-03-31-claude-code-architecture-analysis.md"))
+    assert_finding(/names this post claude-code-source-map-leak-analysis-en/, lint(front: front, path: "_posts/2026-03-31-claude-code-architecture-analysis.md"))
     assert_equal [], lint(front: front, path: "_posts/2026-03-31-claude-code-source-map-leak-analysis-en.md")
     assert_finding(/must set lang/, lint(front: "#{FRONT}translation_id: mistral-7b\n"))
     assert_finding(/must set lang/, lint(front: "#{FRONT}translation_id: mistral-7b\nlang: kr\n"))
@@ -132,6 +138,19 @@ class TestLintPosts < Minitest::Test
 
   def test_pipes_inside_code_and_math_are_not_cell_breaks
     assert_equal [], lint("| Flag | Tool |\n|---|---|\n| `A` \\|\\| `B` | `$$\\lvert x \\rvert$$` |\n")
+  end
+
+  def test_no_javascript_links
+    ["[click](javascript:alert(1))\n", "[x](<javascript:alert(1)>)\n", "[r]: javascript:alert(1)\n",
+     "[x](java&#115;cript:alert(1))\n", %(<a href="javascript:alert(1)">x</a>\n)].each do |body|
+      assert_finding(/javascript: link/, lint(body))
+    end
+    assert_equal [], lint("`[x](javascript:void(0))` is how not to write it.\n")
+  end
+
+  def test_paper_author_has_no_tags
+    assert_finding(/paper_author has a tag/, lint(front: FRONT.sub('"Mistral AI"', '"<img src=x onerror=alert(1)>"')))
+    assert_finding(/title has a tag/, lint(front: FRONT.sub('"Mistral 7B"', '"<!-- x"')))
   end
 
   def test_no_ar5iv_links
@@ -204,6 +223,16 @@ class TestLintPosts < Minitest::Test
     # A line break inside display math, a price, and code are not the defect.
     assert_equal [], lint("Intro.\n\n$$a \\\\[4pt] b$$\n\nTail.\n")
     assert_equal [], lint("It cost $10.2B and `\\\\(x\\\\)` is how not to write it.\n")
+  end
+
+  # The docs' own example rendered as `$a<em>b</em>c$` with every gate green.
+  def test_a_formula_between_single_dollars
+    ["$a*b*c$를 봅니다.\n", "식 $x_i + y_i$입니다.\n", "시간 $T$ 동안.\n", "$y=mx$\n"].each do |body|
+      assert_finding(/between single `\$`s/, lint(body))
+    end
+    ["$10M과 $5M을 씁니다.\n", "비용은 $X와 $Y 사이입니다.\n", "Write `$a*b$` like this.\n", "식 $$x_i$$ 입니다.\n", "가격은 \\$a_b\\$ 입니다.\n"].each do |body|
+      assert_equal [], lint(body), body
+    end
   end
 
   def test_text_inside_math_and_code_spans_is_left_alone

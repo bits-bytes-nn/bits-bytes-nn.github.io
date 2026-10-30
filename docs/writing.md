@@ -28,8 +28,9 @@ turns a post into pages is in [architecture.md](architecture.md).
 Two rules exist because scholar-lens finds a generated post by its slug to
 update it:
 
-- **Never rename a post's file or its images** (`<slug>-<n>.png`). The slug is
-  also the URL.
+- **Never rename a post's file or its images** (`<slug>-<n>.png`). The URL is
+  built from the file name, slugified (runs of hyphens collapse:
+  `deepseek-r1--incentivizing…` is served at `deepseek-r1-incentivizing….html`).
 - **A hand fix to a generated post** is overwritten when the paper is
   regenerated. List the post and each fix in the PR description, with the
   source value for factual or math errors ("paper 272/122/199, post 27/21/22"),
@@ -128,8 +129,12 @@ categories: ["Paper Reviews", "Language-Models"] + date: 2025-01-23
 
 So **changing a published post's categories or date changes its URL** and
 breaks inbound links and search results. If it cannot be avoided, add the old
-URL to the post's `redirect_from`; the build fails when a recorded URL is no
-longer built.
+URL to the post's front matter, `redirect_from: [/old/path/slug.html]`;
+`validate-site.sh` fails while a published URL is not built, and names it.
+
+**Link to another post** by its root-relative URL, copied from the built site
+(`[DeepSeek-V3](/paper-reviews/language-models/2024/12/27/deepseek-v3-technical-report.html)`).
+Posts are not rendered as Liquid, so `{% post_url %}` is rejected by the lint.
 
 **Covers.** The cover is fixed by the conventions: the type's image when it has
 one (`insights.jpg` for Insights), else the topic's. To add a topic:
@@ -138,10 +143,11 @@ one (`insights.jpg` for Insights), else the topic's. To add a topic:
    (list the change in the PR; scholar-lens keeps a copy of this file).
 2. Put the image in `assets/images/`, exactly 1920px wide, and run
    `script/cover-variants.sh assets/images/<name>.jpg` (macOS: it uses `sips`
-   and `jpegtran`) for the 960 and 1280px copies smaller screens get. A test
+   and `jpegtran`, plus `cwebp`) for the 960 and 1280px JPEG copies and the WebP
+   versions smaller screens and most browsers get. A test
    fails without them or when the original is not 1920px wide.
 3. Credit it in `_data/covers.yml` (title, credit, url). The page prints the
-   credit under the hero, and the build fails without it.
+   credit under the hero; the unit tests and `validate-site.sh` fail without it.
 
 ## Tags
 
@@ -195,7 +201,10 @@ Write `$$…$$` for inline and display math alike, and set `use_math: true`.
 - Every image needs real alt text; the build rejects an empty one. The alt also
   becomes the lightbox caption.
 - A figure from someone else needs a visible credit line under it, with the
-  license and a link when the license asks for one (CC BY does). When
+  license and a link when the license asks for one (CC BY does), as an italic
+  line right under the image:
+  `*Figure: Yao et al., [Tree of Thoughts](https://arxiv.org/abs/2305.10601) (2023), Figure 1. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*`
+  For your own drawing after someone else's, say so (`*Redrawn after Yao et al., 2022.*`). When
   hotlinking an arXiv figure, prefer a pinned version (`arxiv.org/html/<id>v1/…`):
   a revision can renumber the figures.
 - Diagrams are drawn in Excalidraw (`.excalidraw` beside the PNG; the sources
@@ -218,13 +227,15 @@ renders wrong with every other gate green:
   `{% raw %}…{% endraw %}`.
 - A model token such as `<think>` or `<s>` outside code, in the body, title or
   subtitle: the browser drops it as an unknown tag. Write it in `code`.
-- Math written `\\(…\\)`, TeX beside a single `$`, `\_` inside `$$`, a display
+- Math written `\\(…\\)` or between single `$`s (`$x_i$`, `$a*b$`, `$T$`; a
+  price like `$10M` passes), `\_` inside `$$`, a display
   `$$` without blank lines, or `$$` without `use_math: true`.
 - A code fence with more than a language after the marker, or one never closed.
 - A file name that does not start with a date (`YYYY-MM-DD-`), or a `date:` after it.
 - A hand-written `<a class="glightbox">` whose `href` is not its image's `src`:
   the lightbox opens the page in an iframe the site refuses.
 - An ar5iv link: ar5iv answers a lost figure with a placeholder and HTTP 200.
+- A `javascript:` link.
 
 Two prose rules are style, matching the ones scholar-lens holds its posts to: no
 translationese without a natural reading ("보여지는", "에 있어서는",

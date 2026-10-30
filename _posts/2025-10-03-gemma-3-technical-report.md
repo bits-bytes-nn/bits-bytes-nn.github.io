@@ -289,11 +289,11 @@ Gemma 3 모델들은 TPUv4, TPUv5e, TPUv5p를 사용하여 훈련되었습니다
 
 Gemma 3 IT(Instruction-Tuned) 모델들은 특별한 대화 포맷을 사용합니다.
 
-| 컨텍스트  | 포맷팅 |
-| --------- | ------ |
-| 사용자 턴 | user   |
-| 모델 턴   | model  |
-| 턴 종료   |        |
+| 컨텍스트  | 포맷팅                |
+| --------- | --------------------- |
+| 사용자 턴 | `<start_of_turn>user`  |
+| 모델 턴   | `<start_of_turn>model` |
+| 턴 종료   | `<end_of_turn>`        |
 
 대화 예시:
 ```
@@ -305,12 +305,18 @@ Gemma 3 IT(Instruction-Tuned) 모델들은 특별한 대화 포맷을 사용합�
 
 모델 입력 형식:
 ```
-[BOS]user Who are you? model My name is Gemma! user What is 2+2? model
+[BOS]<start_of_turn>user
+Who are you?<end_of_turn>
+<start_of_turn>model
+My name is Gemma!<end_of_turn>
+<start_of_turn>user
+What is 2+2?<end_of_turn>
+<start_of_turn>model
 ```
 
 모델 출력:
 ```
-2+2=4.
+2+2=4.<end_of_turn>
 ```
 
 토큰화 후 명시적으로 [BOS] 토큰을 추가하거나 토크나이저에서 add_bos=True 옵션을 사용해야 합니다. "[BOS]" 텍스트 자체를 토큰화해서는 안 됩니다.
@@ -354,29 +360,15 @@ Gemma 3에서는 사전 훈련(PT) 모델과 지시 튜닝(IT) 모델 간에 중
 
 **[BOS] 토큰 처리**는 두 모델 유형 모두에서 중요합니다. 텍스트는 [BOS] 토큰으로 시작해야 하며, 이는 명시적으로 추가되어야 합니다. "[BOS]" 텍스트 자체는 실제 [BOS] 토큰으로 매핑되지 않기 때문입니다. 예를 들어, Flax에서는 `add_bos=True` 옵션을 사용하여 토큰화 시 이 토큰을 자동으로 추가할 수 있습니다.
 
-**생성 종료 토큰**에서 가장 중요한 차이가 나타납니다. PT 모델은 생성 끝에 특정 토큰을 출력하는 반면, IT 모델은 생성 끝에 다른 토큰을 출력합니다. 이러한 차이는 각 모델 유형의 파인튜닝 시 해당하는 종료 토큰을 추가해야 함을 의미합니다.
+**생성 종료 토큰**에서 가장 중요한 차이가 나타납니다. PT 모델은 생성 끝에 `<eos>` 토큰을 출력하는 반면, IT 모델은 생성 끝에 `<end_of_turn>` 토큰을 출력합니다. 이러한 차이는 각 모델 유형의 파인튜닝 시 해당하는 종료 토큰을 추가해야 함을 의미합니다.
 
 다음 표는 IT 모델의 포맷팅 예시를 보여줍니다.
 
-| 컨텍스트    | 포맷팅          |
-| ----------- | --------------- |
-| 사용자 입력 | `user`          |
-| 모델 응답   | `model`         |
-| 턴 종료     | `<end_of_turn>` |
-
-실제 대화 예시에서 이러한 포맷팅이 어떻게 적용되는지 살펴보면:
-
-```
-[BOS]user
-Who are you?
-model
-My name is Gemma! I'm a helpful AI assistant created by Google.
-<end_of_turn>user
-What can you help me with?
-model
-I can help you with a wide variety of tasks including answering questions, writing, coding, math problems, and creative projects.
-<end_of_turn>
-```
+| 컨텍스트    | 포맷팅                 |
+| ----------- | ---------------------- |
+| 사용자 입력 | `<start_of_turn>user`  |
+| 모델 응답   | `<start_of_turn>model` |
+| 턴 종료     | `<end_of_turn>`        |
 
 이러한 구조화된 포맷팅은 모델이 대화의 맥락을 정확히 이해하고 적절한 응답을 생성할 수 있도록 돕습니다. 특히 멀티턴 대화에서 각 발화자의 역할을 명확히 구분하여 일관성 있는 대화를 유지할 수 있게 합니다.
 

@@ -269,13 +269,38 @@ Gemma 2 모델들은 Gemma 1 모델과 동일한 제어 토큰을 사용하여 �
 다음은 새로운 대화 형식의 구체적인 예시입니다.
 
 **첫 번째 턴:**
-```
-User:<start_of_turn>userKnock knock. <end_of_turn><start_of_turn>modelModel:Who's there? <end_of_turn><eos>
-```
+
+| 컨텍스트 | 포맷 적용 결과 |
+| -------- | -------------- |
+| 사용자:  | `<start_of_turn>user` |
+|          | `Knock knock.<end_of_turn>` |
+|          | `<start_of_turn>model` |
+| 모델:    | `Who's there?<end_of_turn><eos>` |
 
 **두 번째 턴:**
+
+| 컨텍스트 | 포맷 적용 결과 |
+| -------- | -------------- |
+| 사용자:  | `<start_of_turn>user` |
+|          | `Knock knock.<end_of_turn>` |
+|          | `<start_of_turn>model` |
+| 모델:    | `Who's there?<end_of_turn>` |
+| 사용자:  | `<start_of_turn>user` |
+|          | `Gemma.<end_of_turn>` |
+|          | `<start_of_turn>model` |
+| 모델:    | `Gemma who?<end_of_turn><eos>` |
+
+표의 각 행은 한 줄이며, 대화 전체의 시퀀스는 두 번째 턴을 예로 들면 다음과 같이 이어집니다. `user`와 `model` 뒤에는 줄바꿈이 들어가고, 모델은 마지막 `<start_of_turn>model` 다음부터 생성합니다.
+
 ```
-User:<start_of_turn>userKnock knock. <end_of_turn><start_of_turn>modelModel:Who's there? <end_of_turn>User:<start_of_turn>userGemma. <end_of_turn><start_of_turn>modelModel:Gemma who? <end_of_turn><eos>
+<start_of_turn>user
+Knock knock.<end_of_turn>
+<start_of_turn>model
+Who's there?<end_of_turn>
+<start_of_turn>user
+Gemma.<end_of_turn>
+<start_of_turn>model
+Gemma who?<end_of_turn><eos>
 ```
 
 멀티턴 대화를 계속하려면 모델이 출력한 `<eos>` 토큰을 제거하고, 일반적인 사용자 턴의 제어 토큰을 다시 추가한 후 다음 턴의 채팅 템플릿으로 계속 진행하면 됩니다.

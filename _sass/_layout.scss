@@ -310,7 +310,10 @@ blockquote {
 		position: relative;
 		isolation: isolate;
 
-		> .cover-image {
+		// The <picture> adds no box, so the image fills the hero itself.
+		> .cover-picture { display: contents; }
+
+		.cover-image {
 			position: absolute;
 			inset: 0;
 			z-index: -1;

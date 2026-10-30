@@ -20,7 +20,7 @@ layout: default
 			<li lang="{{ post.lang | default: site.lang }}">
 				<h2>
 					<a class="post-link" href="{{ post.url | prepend: site.baseurl }}"
-						>{{ post.title }}</a
+						>{{ post.title | escape }}</a
 					>
 				</h2>
 				<section class="post-excerpt">

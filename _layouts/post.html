@@ -6,14 +6,14 @@ layout: default
     {% if page.cover %}{% include cover.html src=page.cover sizes="(max-width: 767px) 190vw, 100vw" %}{% endif %}
     <div class="scrim {% if page.cover %}has-cover{% endif %}">
       <header class="post-header">
-        <h1 class="title">{{ page.title }}</h1>
-        {% if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>{% endif %}
+        <h1 class="title">{{ page.title | escape }}</h1>
+        {% if page.subtitle %}<p class="subtitle">{{ page.subtitle | escape }}</p>{% endif %}
         {%- comment -%}
           `paper_author`, not `author`: it names who wrote the paper, not this
           post. feed.xml names site.author in each entry's <author>: this
           post's author is always the site's.
         {%- endcomment -%}
-        {% if page.paper_author %}<p class="info">Paper by <strong>{{ page.paper_author }}</strong></p>{% endif %}
+        {% if page.paper_author %}<p class="info">Paper by <strong>{{ page.paper_author | escape }}</strong></p>{% endif %}
       </header>
     </div>
   </div>
@@ -21,7 +21,7 @@ layout: default
   <div class="wrapper">
     {%- comment -%} The cover's CC BY 4.0 credit, which must be visible (_data/covers.yml). {%- endcomment -%}
     {%- assign cover_source = site.data.covers[page.cover] -%}
-    {% if cover_source %}<p class="cover-credit">Cover: <a href="{{ cover_source.url }}">{{ cover_source.title }}</a>, {{ cover_source.credit }} (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)</p>{% endif %}
+    {% if cover_source %}<p class="cover-credit">Cover: <a href="{{ cover_source.url }}">{{ cover_source.title | escape }}</a>, {{ cover_source.credit | escape }} (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)</p>{% endif %}
     <section class="post-meta">
       <div class="post-header-info">
         <div class="post-date">
@@ -103,13 +103,13 @@ layout: default
       {% if page.adjacent_older %}
       <a class="post-nav-link prev" href="{{ page.adjacent_older.url | prepend: site.baseurl }}" rel="prev">
         <span class="post-nav-dir">← Previous</span>
-        <span class="post-nav-title" lang="{{ page.adjacent_older.lang | default: site.lang }}">{{ page.adjacent_older.title }}</span>
+        <span class="post-nav-title" lang="{{ page.adjacent_older.lang | default: site.lang }}">{{ page.adjacent_older.title | escape }}</span>
       </a>
       {% else %}<span></span>{% endif %}
       {% if page.adjacent_newer %}
       <a class="post-nav-link next" href="{{ page.adjacent_newer.url | prepend: site.baseurl }}" rel="next">
         <span class="post-nav-dir">Next →</span>
-        <span class="post-nav-title" lang="{{ page.adjacent_newer.lang | default: site.lang }}">{{ page.adjacent_newer.title }}</span>
+        <span class="post-nav-title" lang="{{ page.adjacent_newer.lang | default: site.lang }}">{{ page.adjacent_newer.title | escape }}</span>
       </a>
       {% else %}<span></span>{% endif %}
     </nav>

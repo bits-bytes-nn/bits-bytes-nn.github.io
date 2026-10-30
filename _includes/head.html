@@ -153,9 +153,11 @@
 	{%- comment -%}
 	  A page kept out of the sitemap (search, 404) is one with nothing to rank, and
 	  Google had indexed the empty search shell. noindex says so; a canonical
-	  beside it would contradict it.
+	  beside it would contradict it. Every other page lets search show its cover
+	  as a large preview (Discover's cards need max-image-preview:large).
 	{%- endcomment %}
-	{% if page.sitemap == false %}<meta name="robots" content="noindex" />{% else %}<link rel="canonical" href="{{ page_full_url }}" />{% endif %}
+	{% if page.sitemap == false %}<meta name="robots" content="noindex" />{% else %}<link rel="canonical" href="{{ page_full_url }}" />
+	<meta name="robots" content="max-image-preview:large" />{% endif %}
 	<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
 	<!-- Structured data (schema.org JSON-LD) for rich search results -->

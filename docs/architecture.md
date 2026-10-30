@@ -52,7 +52,7 @@ _sass/               _layout, _post, _tags, _syntax, _dark, base/;
 _data/               post_conventions.yml (the conventions, shared with
                      scholar-lens), covers.yml (cover credits)
 css/ js/             main.scss, search.css; main.js, search.js, citations.js
-assets/images/       covers (+ -960/-1280 copies), figures, diagrams
+assets/images/       covers (+ -960/-1280 JPEG and WebP copies), figures, diagrams
 feed.xml search.json the Atom feed and the search index, as Liquid pages
 script/              lint-posts.rb, validate-site.sh, check-plugin-output.rb,
                      published-urls.txt, cover-variants.sh
@@ -118,7 +118,8 @@ filters behind `defined?(Jekyll::Hooks)` or `defined?(Liquid::Template)`, so
 ![Categories and date to URL](diagrams/category-url-mapping.png)
 
 - **Permalink:** `/:slugified_categories/:year/:month/:day/:title:output_ext`,
-  where the date is `date:` and `:title` is the file-name slug. `slugify` is
+  where the date is `date:` and `:title` is the file-name slug, slugified (runs of
+  hyphens collapse). `slugify` is
   also what anchors use, so `/categories/#paper-reviews` matches the URL
   segment.
 - **Old URLs.** The permalink once used plain `:categories`, which kept spaces
@@ -154,7 +155,8 @@ filters behind `defined?(Jekyll::Hooks)` or `defined?(Liquid::Template)`, so
 - JSON-LD: `BlogPosting` on posts (`datePublished` is `posted_at`), `WebSite` on
   the home page. Values taken from post content are written with `<` escaped,
   so a `</script>` in text cannot end the block.
-- `hreflang` for translation pairs, with `x-default` on the English twin.
+- `hreflang` for translation pairs; on both posts, `x-default` points at the
+  English twin.
 - The saved theme, applied before first paint by an inline script.
 - Google Fonts, loaded without blocking the first paint
   (`media="print" onload`), with metric-matched local fallbacks
@@ -218,9 +220,9 @@ win).
   the weights the CSS uses (serif only 700). Until they arrive, Latin text is
   set in Arial/Georgia faces scaled to the web fonts' width and line metrics
   (`base/_typography.scss`), so the swap barely moves the page.
-- **Hero covers** are an `<img>` behind the scrim (`_includes/cover.html`) with
-  960, 1280 and 1920px candidates, so phones download a smaller copy. Print
-  hides them.
+- **Hero covers** are a `<picture>` behind the scrim (`_includes/cover.html`):
+  WebP and JPEG at 960, 1280 and 1920px, with `sizes` matching the width each
+  hero draws them at, so phones download a smaller file. Print hides them.
 - **Accessibility**: a visible `:focus-visible` ring on every control, a
   `prefers-reduced-motion` block that removes transitions and smooth scrolling,
   forced-colors rules for MathJax's stretched brackets and the logo, and
@@ -258,7 +260,7 @@ Four layers, each catching what the others cannot:
    checks each hook's mark on the built pages: redirect stubs without
    `noindex`, published times, posted order on the home pages and in the feed,
    previous/next and related links, cover credits, JSON-LD that parses, unique
-   ids, and every recorded URL still built.
+   ids, and every recorded URL, and every post URL in the live sitemap, still built.
 
 `_config.yml` sets `future: true`, so a post dated later in the day still builds
 in a morning merge, and `strict_filters`, so an unknown Liquid filter fails the
@@ -298,6 +300,11 @@ real total.
 - **The index grows with every post.** It loads only when search is used; split
   it or move search server-side if it outgrows that.
 - **Excerpts can show TeX** (`\theta`) when the match falls inside math.
+- **Long posts stay slow in mobile lab tests.** Lighthouse's throttled phone
+  puts LCP at 5–6 s on the longest posts (DeepSeek-V3, the Strands guide) even
+  though the cover itself loads in about 0.1 s: the rest is render delay from
+  laying out 8,000+ DOM nodes and running MathJax. Real-user data (Search
+  Console's Core Web Vitals) has no mobile figures yet; desktop is all good.
 - **Hangul has no metric-matched fallback**, since the fallback font differs
   per OS, so Korean text still shifts slightly when Noto arrives.
 - **Sass is tied to libsass** through the vendored Bourbon/Neat. Replacing their

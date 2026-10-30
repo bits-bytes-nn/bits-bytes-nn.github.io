@@ -1,6 +1,7 @@
 {%- comment -%}
   The hero's cover, as an image the browser sizes: a phone takes the 960 or
-  1280px copy (script/cover-variants.sh) instead of the 1920px original. As a
+  1280px copy (script/cover-variants.sh) instead of the 1920px original, and a
+  browser that reads WebP takes the WebP of that size, about half the bytes. As a
   CSS background it had one size, which made it a phone's slowest paint. It is
   the first thing on the page: eager, and fetched ahead of everything else.
 
@@ -14,4 +15,7 @@
 {%- assign cover_src = include.src | prepend: site.baseurl -%}
 {%- assign cover_ext = include.src | split: '.' | last -%}
 {%- assign cover_base = cover_src | split: '.' | pop | join: '.' -%}
+<picture class="cover-picture">
+<source type="image/webp" srcset="{{ cover_base }}-960.webp 960w, {{ cover_base }}-1280.webp 1280w, {{ cover_base }}.webp 1920w" sizes="{{ include.sizes }}">
 <img class="cover-image" src="{{ cover_src }}" srcset="{{ cover_base }}-960.{{ cover_ext }} 960w, {{ cover_base }}-1280.{{ cover_ext }} 1280w, {{ cover_src }} 1920w" sizes="{{ include.sizes }}" alt="" aria-hidden="true" loading="eager" fetchpriority="high">
+</picture>

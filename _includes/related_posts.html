@@ -18,8 +18,8 @@
     {% for other in page.related %}
     <li>
       <a class="related-posts-link" href="{{ other.url | prepend: site.baseurl }}">
-        <span class="related-posts-title">{{ other.title }}</span>
-        {% if other.subtitle %}<span class="related-posts-sub">{{ other.subtitle }}</span>{% endif %}
+        <span class="related-posts-title">{{ other.title | escape }}</span>
+        {% if other.subtitle %}<span class="related-posts-sub">{{ other.subtitle | escape }}</span>{% endif %}
       </a>
     </li>
     {% endfor %}
