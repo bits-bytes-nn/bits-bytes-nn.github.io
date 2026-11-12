@@ -48,8 +48,9 @@ math:
   defined_macros: [llbracket, rrbracket, textsc]
 
 tags:
-  # Every post carries at least one: it is what _plugins/related_posts.rb joins
-  # posts on. A tag only one paper can have connects nothing.
+  # A post carries one when one names its topic: it is what
+  # _plugins/related_posts.rb joins posts on. A tag only one paper can have
+  # connects nothing.
   controlled:
     - Agentic-AI
     - Alignment
