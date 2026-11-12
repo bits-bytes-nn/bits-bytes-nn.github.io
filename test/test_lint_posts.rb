@@ -97,9 +97,14 @@ class TestLintPosts < Minitest::Test
     assert_finding(/cover for Paper Reviews/, lint(front: FRONT.sub("language-models.jpg", "default.jpg")))
   end
 
-  def test_tags_need_a_controlled_tag_and_current_well_formed_names
+  def test_a_post_needs_tags_but_not_a_controlled_one
+    assert_finding(/no tags/, lint(front: FRONT.sub(/^tags:.*$/, "tags: []")))
+    found = lint(front: FRONT.sub('"Efficient-Attention"', '"Multi-Token-Prediction"'))
+    refute found.any? { |f| f.include?("tag") }, found.inspect
+  end
+
+  def test_tags_need_current_well_formed_names
     found = lint(front: FRONT.sub('"Efficient-Attention"', '"Sparse-Mixture-of-Experts", "Public-Dataset-Only Training", "Community-Detection-For-RAG"'))
-    assert_finding(/no controlled topic tag/, found)
     assert_finding(/retired; use Mixture-of-Experts/, found)
     assert_finding(/joined by hyphens/, found)
     assert_finding(/should have for/, found)
