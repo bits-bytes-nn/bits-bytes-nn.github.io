@@ -185,7 +185,6 @@ module PostLint
     rules = spec["tags"]
     tags = Array(post.data["tags"]).map(&:to_s)
     found = []
-    found << "1: no controlled topic tag (one of #{rules["controlled"].join(", ")})" if (tags & rules["controlled"]).empty?
     tags.each do |tag|
       if (replacement = rules["aliases"][tag])
         found << "1: tag #{tag} is retired; use #{replacement}"

@@ -155,11 +155,12 @@ Tags are free-form and hyphenated, and come in two layers:
 
 - **Specific tags** name the post's own contribution
   (`Fine-Grained-Expert-Segmentation`). Precise, but they connect nothing.
-- **At least one controlled topic tag** from `tags.controlled` in
-  `_data/post_conventions.yml`. "Related reading" needs a shared tag, so a post
-  with only specific tags ships without it.
+- **A controlled topic tag** from `tags.controlled` in
+  `_data/post_conventions.yml`, when one fits. "Related reading" needs a shared
+  tag, so a post with only specific tags ships without it; that is better than
+  a topic tag the post is not about, which suggests unrelated posts.
 
-Add the topic tag; don't swap it for the specific ones. Reuse an existing tag
+Add the topic tag that fits; don't swap it for the specific ones. Reuse an existing tag
 before coining one: three names for one idea leave every post with a tag no
 other post shares. When two tags turn out to be one, keep one and move the
 other to `tags.aliases`; the lint then rejects the retired name. Renaming a tag
