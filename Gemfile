@@ -26,4 +26,4 @@ gem 'nokogiri', '>= 1.12'
 gem 'html-proofer', '~> 5.2'
 
 # test/run_all.rb, run under the bundle like the build.
-gem 'minitest', '~> 5.25', group: :test
+gem 'minitest', '~> 6.1', group: :test

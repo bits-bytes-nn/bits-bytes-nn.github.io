@@ -19,6 +19,7 @@ GEM
       fiber-local (~> 1.1)
       json
     csv (3.3.6)
+    drb (2.2.3)
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
@@ -99,7 +100,9 @@ GEM
     logger (1.7.0)
     mercenary (0.4.0)
     mini_portile2 (2.8.9)
-    minitest (5.27.0)
+    minitest (6.1.0)
+      drb (~> 2.0)
+      prism (>= 1.5, < 3)
     nokogiri (1.19.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -126,6 +129,16 @@ GEM
       afm (>= 0.2.1, < 2)
       hashery (~> 2.0)
       ttfunk
+    prism (2.1.0)
+    prism (2.1.0-aarch64-linux-gnu)
+    prism (2.1.0-aarch64-linux-musl)
+    prism (2.1.0-aarch64-mingw-ucrt)
+    prism (2.1.0-arm-linux-gnu)
+    prism (2.1.0-arm-linux-musl)
+    prism (2.1.0-arm64-darwin)
+    prism (2.1.0-x86_64-darwin)
+    prism (2.1.0-x86_64-linux-gnu)
+    prism (2.1.0-x86_64-linux-musl)
     public_suffix (7.0.5)
     racc (1.8.1)
     rainbow (3.1.1)
@@ -172,7 +185,7 @@ DEPENDENCIES
   jekyll-sitemap
   kramdown-parser-gfm
   logger
-  minitest (~> 5.25)
+  minitest (~> 6.1)
   nokogiri (>= 1.12)
   webrick
 
