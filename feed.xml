@@ -16,7 +16,7 @@ layout: null
   <updated>{{ site.time | date_to_xmlschema }}</updated>
   <id>{{ page.url | absolute_url | xml_escape }}</id>
   <title type="html">{{ site.title | smartify | xml_escape }}</title>
-  <subtitle>{{ site.description | xml_escape }}</subtitle>
+  <subtitle xml:lang="{{ site.description_lang | xml_escape }}">{{ site.description | xml_escape }}</subtitle>
   <author>
     <name>{{ site.author | xml_escape }}</name>
   </author>

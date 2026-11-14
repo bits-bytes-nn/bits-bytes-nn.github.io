@@ -44,8 +44,10 @@ date_format: "%B %-d, %Y"
 # which then leaks into meta content="" attributes and the feed <subtitle>.
 # The home page's description too, and the feed <subtitle> and footer: one text.
 description: >-
-  AI/ML 논문을 설계 결정과 트레이드오프까지 파고들어 읽고, 에이전틱 AI·데이터 아키텍처 현장에서
-  겪은 문제를 정리하는 기술 블로그입니다.
+  In-depth notes on AI/ML papers and technology.
+# The description's language, which differs from `lang`: the footer and the
+# feed mark it so a screen reader does not read it in the page's voice.
+description_lang: en
 baseurl: ''
 url: https://bits-bytes-nn.github.io
 # Post URLs embed :year/:month/:day, and front-matter dates carry no offset, so
