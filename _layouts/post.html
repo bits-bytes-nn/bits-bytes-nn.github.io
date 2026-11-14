@@ -13,7 +13,7 @@ layout: default
           post. feed.xml names site.author in each entry's <author>: this
           post's author is always the site's.
         {%- endcomment -%}
-        {% if page.paper_author %}<p class="info">Paper by <strong>{{ page.paper_author | escape }}</strong></p>{% endif %}
+        {% if page.paper_author %}<p class="info" lang="{{ site.ui_lang }}">Paper by <strong>{{ page.paper_author | escape }}</strong></p>{% endif %}
       </header>
     </div>
   </div>
@@ -21,8 +21,8 @@ layout: default
   <div class="wrapper">
     {%- comment -%} The cover's CC BY 4.0 credit, which must be visible (_data/covers.yml). {%- endcomment -%}
     {%- assign cover_source = site.data.covers[page.cover] -%}
-    {% if cover_source %}<p class="cover-credit">Cover: <a href="{{ cover_source.url }}">{{ cover_source.title | escape }}</a>, {{ cover_source.credit | escape }} (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)</p>{% endif %}
-    <section class="post-meta">
+    {% if cover_source %}<p class="cover-credit" lang="{{ site.ui_lang }}">Cover: <a href="{{ cover_source.url }}">{{ cover_source.title | escape }}</a>, {{ cover_source.credit | escape }} (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)</p>{% endif %}
+    <section class="post-meta" lang="{{ site.ui_lang }}">
       <div class="post-header-info">
         <div class="post-date">
           <span class="meta-label">Published</span>
@@ -73,7 +73,7 @@ layout: default
     {%- assign toc = content | post_toc -%}
     {% if toc.size >= 3 %}
     <details id="post-toc" class="post-toc" open>
-      <summary>
+      <summary lang="{{ site.ui_lang }}">
         <span class="post-toc-title">Contents</span>
         <span class="post-toc-count">{{ toc.size }}</span>
         <span class="post-toc-chevron" aria-hidden="true"></span>
@@ -99,27 +99,23 @@ layout: default
       Korean post would be that same article in English.
     {%- endcomment -%}
     {% if page.adjacent_older or page.adjacent_newer %}
-    <nav class="post-nav" aria-label="Adjacent posts">
+    <nav class="post-nav" aria-label="Adjacent posts" lang="{{ site.ui_lang }}">
       {% if page.adjacent_older %}
       <a class="post-nav-link prev" href="{{ page.adjacent_older.url | prepend: site.baseurl }}" rel="prev">
-        <span class="post-nav-dir">← Previous</span>
+        <span class="post-nav-dir"><span aria-hidden="true">←</span> Previous</span>
         <span class="post-nav-title" lang="{{ page.adjacent_older.lang | default: site.lang }}">{{ page.adjacent_older.title | escape }}</span>
       </a>
       {% else %}<span></span>{% endif %}
       {% if page.adjacent_newer %}
       <a class="post-nav-link next" href="{{ page.adjacent_newer.url | prepend: site.baseurl }}" rel="next">
-        <span class="post-nav-dir">Next →</span>
+        <span class="post-nav-dir">Next <span aria-hidden="true">→</span></span>
         <span class="post-nav-title" lang="{{ page.adjacent_newer.lang | default: site.lang }}">{{ page.adjacent_newer.title | escape }}</span>
       </a>
       {% else %}<span></span>{% endif %}
     </nav>
     {% endif %}
 
-    <section class="rss">
-      <p class="rss-subscribe text"><strong>Subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></strong></p>
-    </section>
-
-    <section class="share">
+    <section class="share" lang="{{ site.ui_lang }}">
       <span>Share: </span>
       {% for social in site.social %}
         {% if social.share and social.share_url %}

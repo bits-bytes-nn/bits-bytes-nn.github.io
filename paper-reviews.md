@@ -44,4 +44,3 @@ nav_order: 3
   </ul>
   {% unless forloop.last %}<hr>{% endunless %}
 {% endfor %}
-<br>

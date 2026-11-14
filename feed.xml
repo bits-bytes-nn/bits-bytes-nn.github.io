@@ -2,11 +2,9 @@
 layout: null
 ---
 {%- comment -%}
-  The Atom feed: jekyll-feed 0.18's template, cut to what this site uses, in
-  place of the gem. The gem sorted and dated entries by `date:`, which on a paper
-  post is the paper's, so a review written this year went out as published in
-  the paper's year, below last year's posts. Entries now go by `posted_at`
-  (_plugins/posted_date.rb).
+  The Atom feed, from jekyll-feed 0.18's template. Entries are ordered and dated
+  by `posted_at` (_plugins/posted_date.rb), not `date:`, which on a paper post
+  is the paper's.
 {%- endcomment -%}
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ site.lang | xml_escape }}">
@@ -15,16 +13,15 @@ layout: null
   <link href="{{ '/' | absolute_url }}" rel="alternate" type="text/html" hreflang="{{ site.lang | xml_escape }}" />
   <updated>{{ site.time | date_to_xmlschema }}</updated>
   <id>{{ page.url | absolute_url | xml_escape }}</id>
-  <title type="html">{{ site.title | smartify | xml_escape }}</title>
-  <subtitle>{{ site.description | xml_escape }}</subtitle>
+  <title type="html" xml:lang="{{ site.ui_lang | xml_escape }}">{{ site.title | smartify | xml_escape }}</title>
+  <subtitle xml:lang="{{ site.ui_lang | xml_escape }}">{{ site.description | xml_escape }}</subtitle>
   <author>
     <name>{{ site.author | xml_escape }}</name>
   </author>
   {%- assign cdata_end_token = "]]>" %}
   {%- assign cdata_end_token_escaped = "]]]]><![CDATA[>" %}
   {%- comment -%} site.posts is newest first by posted_at, ties by `date:`. {%- endcomment %}
-  {%- assign posts = site.posts | where_exp: "post", "post.draft != true" %}
-  {%- for post in posts limit: site.feed.posts_limit %}
+  {%- for post in site.posts limit: site.feed.posts_limit %}
   {%- assign post_title = post.title | smartify | strip_html | normalize_whitespace | xml_escape %}
   <entry{% if post.lang %} xml:lang="{{ post.lang | xml_escape }}"{% endif %}>
     <title type="html">{{ post_title }}</title>

@@ -22,4 +22,3 @@ nav_order: 6
 <p class="desc"><em>{{ page.description }}</em></p>
 
 {% include category-posts.html category="Insights" empty="The first piece is on its way — check back soon." %}
-<br>

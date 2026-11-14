@@ -6,7 +6,7 @@ layout: default
 	<div class="site-header-container {% if site.cover %}has-cover{% endif %}">
 		{% if site.cover %}{% include cover.html src=site.cover sizes="(max-width: 767px) 260vw, max(100vw, 1330px)" %}{% endif %}
 		<div class="scrim {% if site.cover %}has-cover{% endif %}">
-			<header class="site-header">
+			<header class="site-header" lang="{{ site.ui_lang }}">
 				<h1 class="title">{{ site.title }}</h1>
 				{% if site.subtitle %}
 				<p class="subtitle">{{ site.subtitle }}</p>
@@ -31,7 +31,7 @@ layout: default
 					{%- endcomment -%}
 					<p>{{ post.description | shorten_card | escape }}</p>
 				</section>
-				<section class="post-meta">
+				<section class="post-meta" lang="{{ site.ui_lang }}">
 					<div class="post-date">{{ post.posted_at | date: site.date_format }}</div>
 					<div class="post-categories">
 						{% if post.categories.size > 0 %}in {% for cat in post.categories %}
@@ -50,7 +50,7 @@ layout: default
 		  decorative and carry no text. The forward link is `older-posts`; it used
 		  to reuse `newer-posts`, which is what the CSS keys off.
 		{%- endcomment -%}
-		<nav class="pagination" aria-label="Post list pages">
+		<nav class="pagination" aria-label="Post list pages" lang="{{ site.ui_lang }}">
 			<p>
 				{% if paginator.previous_page %}
 				<a

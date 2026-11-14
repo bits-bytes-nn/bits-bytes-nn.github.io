@@ -11,8 +11,8 @@ updates:
         update-types:
           - minor
           - patch
-  # The gems only run in CI (build, html-proofer), but html-proofer pulls in
-  # nokogiri, which gets security releases.
+  # The gems only run at build time, but nokogiri parses post bodies there and
+  # gets security releases.
   - package-ecosystem: bundler
     directory: /
     schedule:

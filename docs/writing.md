@@ -236,7 +236,10 @@ renders wrong with every other gate green:
 - A hand-written `<a class="glightbox">` whose `href` is not its image's `src`:
   the lightbox opens the page in an iframe the site refuses.
 - An ar5iv link: ar5iv answers a lost figure with a placeholder and HTTP 200.
-- A `javascript:` link.
+
+Markup that would run code in a reader's browser (`<script>`, `<style>`, an
+`onclick=`, a `javascript:` or `data:` link) fails the build rather than the
+lint: `_plugins/safe_post_html.rb` checks the HTML kramdown produced.
 
 Two prose rules are style, matching the ones scholar-lens holds its posts to: no
 translationese without a natural reading ("보여지는", "에 있어서는",

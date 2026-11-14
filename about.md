@@ -6,8 +6,8 @@ permalink: /about/
 # — a Korean TTS voice reading English orthography is unintelligible.
 lang: en
 description: >-
-  Jonas Kim — Senior Data Scientist at AWS Professional Services Korea. Fifteen
-  years at the seam between research papers and production ML systems.
+  Jonas Kim — Senior Data Scientist at AWS Professional Services Korea, with
+  over 15 years between research papers and production ML systems.
 main_nav: true
 nav_order: 1
 ---
@@ -30,19 +30,8 @@ If something here sparks a thought, I'd love to hear it — reach out through an
 
 ## Privacy
 
-This blog has no accounts, comments or ads, and keeps no data of its own. What
-your browser shares while you read:
-
-- **Google Analytics** counts page views: the page address, the referring page,
-  your device and browser type and an approximate location. It sets first-party
-  cookies (`_ga`, `_ga_*`) that last up to two years. Google signals and ad
-  personalisation are turned off. To opt out, block those cookies or use
-  [Google's opt-out add-on](https://tools.google.com/dlpage/gaoptout).
-- **Fonts and libraries** load from Google Fonts, jsDelivr and unpkg, which see
-  your IP address as part of serving them.
-- **Paper reviews** ask Semantic Scholar for the paper's citation count, and
-  some posts show figures hosted by their original sites (arXiv and others).
-- **Your browser** keeps your theme choice and cached citation counts in local
-  storage; nothing leaves your device for those.
-
-Questions or requests: [{{ site.email }}](mailto:{{ site.email }}).
+This site uses Google Analytics to count page views. It sets first-party
+cookies (`_ga`, `_ga_*`, up to two years) and sends Google the page address,
+the referring page, your browser type and an approximate location. Google
+signals and ad personalisation are off. To opt out, block those cookies or use
+[Google's opt-out add-on](https://tools.google.com/dlpage/gaoptout).

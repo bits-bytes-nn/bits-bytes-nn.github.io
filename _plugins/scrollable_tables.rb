@@ -3,12 +3,9 @@
 # Wraps every rendered <table> in <div class="table-container"> so a wide table
 # scrolls horizontally instead of squeezing its columns to nothing.
 #
-# The stylesheet has defined `.table-container { overflow-x: auto }` all along
-# (_sass/base/_tables.scss) but nothing ever emitted the wrapper — kramdown
-# produces a bare <table>. Meanwhile `table { table-layout: fixed; width: 100% }`
-# divides the available width evenly no matter how many columns there are: at a
-# 375px viewport a 15-column table gives each column ~23px, about 1.6 Hangul
-# characters per line.
+# kramdown emits a bare <table>; `.table-container { overflow-x: auto }`
+# (_sass/base/_tables.scss) is what lets one wider than the screen scroll rather
+# than divide 375px among its columns.
 #
 # Keyboard access is deliberately NOT set here. A scroll container needs
 # tabindex="0" to be scrollable by keyboard in Safari and Firefox, but only when

@@ -1,34 +1,13 @@
 {%- comment -%}
-  Renders a ko/en language switcher for posts that have a translation.
-  Pairs are matched by a shared `translation_id` front-matter key; each post
-  also sets `lang: ko|en`. Outputs nothing for posts without a counterpart.
+  A link to the post's translation (page.translation, _plugins/translations.rb),
+  between the meta panel and the table of contents. It is an action, unlike the
+  date or category in the meta panel, and labels itself in the language it leads
+  to; `lang` makes a screen reader say it in that language.
 {%- endcomment -%}
-{% if page.translation_id %}
-  {% assign counterpart = nil %}
-  {% for post in site.posts %}
-    {% if post.translation_id == page.translation_id and post.url != page.url %}
-      {% assign counterpart = post %}
-      {% break %}
-    {% endif %}
-  {% endfor %}
-  {% if counterpart %}
-    {% if page.lang == 'ko' %}{% assign other_label = 'English' %}{% else %}{% assign other_label = '한국어' %}{% endif %}
-    {%- comment -%}
-      A standalone button between the meta panel and the table of contents, not a
-      meta item inside .post-header-info. "Read this in English" is an action the
-      reader takes, unlike the date or category next to it, and it carries its own
-      label in the link text — so it needs neither a Language: caption nor a
-      column in that row.
-    {%- endcomment -%}
-    <div class="language-switcher">
-      {%- comment -%}
-        `lang` marks the words that are in the other language, for screen readers:
-        on a Korean page only "English" (the rest is Korean), on an English page
-        the whole Korean label.
-      {%- endcomment -%}
-      <a href="{{ counterpart.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ counterpart.lang }}"{% if page.lang != 'ko' %} lang="ko"{% endif %}>
-        {% if page.lang == 'ko' %}<span lang="{{ counterpart.lang }}">{{ other_label }}</span>{% else %}{{ other_label }}{% endif %}로 읽기 →
-      </a>
-    </div>
-  {% endif %}
-{% endif %}
+{%- assign twin = page.translation -%}
+{%- if twin -%}
+  {%- if twin.lang == 'en' -%}{%- assign label = 'Read in English' -%}{%- else -%}{%- assign label = '한국어로 읽기' -%}{%- endif -%}
+  <div class="language-switcher">
+    <a href="{{ twin.url | prepend: site.baseurl }}" rel="alternate" hreflang="{{ twin.lang }}" lang="{{ twin.lang }}">{{ label }} <span aria-hidden="true">→</span></a>
+  </div>
+{%- endif -%}

@@ -36,6 +36,11 @@ class TestTranslations < Minitest::Test
     assert_equal [], Translations.hidden(posts, "ko")
   end
 
+  def test_counterparts_link_each_post_of_a_pair_to_the_other
+    posts = [post("en", "b"), post("ko", "a"), post("ko", "solo"), post("en", " a "), post("ko", "b"), post("ko", "")]
+    assert_equal({ 0 => 4, 4 => 0, 1 => 3, 3 => 1 }, Translations.counterparts(posts))
+  end
+
   # The filter reads Liquid drops, which answer to string keys.
   def test_listed_drops_hidden_posts
     filter = Object.new.extend(Translations::Filter)

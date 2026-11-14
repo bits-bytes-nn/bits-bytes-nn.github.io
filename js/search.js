@@ -147,19 +147,35 @@
            (bounds.end < text.length ? '…' : '');
   }
 
+  // The query in the address bar (?q=), so a search can be shared and survives
+  // going back to it.
+  // Debounced: Safari throws after 100 replaceState calls in 30 seconds.
+  var syncTimer;
+  function syncUrl() {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(function () {
+      var url = new URL(window.location.href);
+      var query = searchInput.value.trim();
+      if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+      try { history.replaceState(null, '', url); } catch (e) {}
+    }, 400);
+  }
+
   function updateStatus() {
     var query = searchInput.value.trim();
     if (!query) {
+      // The library runs a query of spaces too, and every post matches it.
+      resultsContainer.innerHTML = '';
       statusEl.textContent = '';
       return;
     }
     var n = resultsContainer.querySelectorAll('.search-result').length;
     if (n === 0) {
-      statusEl.textContent = 'No posts match "' + query + '".';
+      statusEl.textContent = 'No post contains every word of "' + query + '". Try fewer words.';
     } else if (n >= LIMIT) {
       // The library stops scanning at `limit`, so the real total is unknown —
       // saying "10 posts found" would be a guess dressed as a count.
-      statusEl.textContent = 'Showing the first ' + LIMIT + ' matches.';
+      statusEl.textContent = 'Showing the first ' + LIMIT + ' posts. Add a word to narrow them.';
     } else {
       statusEl.textContent = n + (n === 1 ? ' post' : ' posts') + ' found.';
     }
@@ -185,6 +201,7 @@
         if (searchInput.value.trim()) {
           search.search(searchInput.value);
           updateStatus();
+          syncUrl();
         }
       })
       .catch(function () {
@@ -208,7 +225,9 @@
   ['focus', 'pointerdown', 'input'].forEach(function (type) {
     searchInput.addEventListener(type, start, { once: true });
   });
-  // Typed into before this script ran (it is deferred): start now.
+  var linked = new URLSearchParams(window.location.search).get('q');
+  if (linked && !searchInput.value) searchInput.value = linked;
+  // Typed into, or linked with a query, before this script ran: start now.
   if (document.activeElement === searchInput || searchInput.value) start();
 
   function init(index) {
@@ -218,33 +237,40 @@
       json: index,
       searchResultTemplate:
         '<div class="search-result">' +
-          '<h2><a href="{url}">{title}</a></h2>' +
+          '<h2 lang="{lang}"><a href="{url}">{title}</a></h2>' +
           '<p class="result-meta"><span class="post-date">{date}</span>' +
           '<span class="post-category">{category}</span></p>' +
-          '<p class="result-snippet">{content}</p>' +
+          '<p class="result-snippet" lang="{lang}">{content}</p>' +
           '<p class="result-tags">{tags}</p>' +
         '</div>',
       // Returning undefined leaves a field to the library's default, which is what
-      // {url} and {date} want — they are attributes and plain text, not prose.
+      // {url} and {lang} want: attribute values, never marked.
       templateMiddleware: function (prop, value) {
         var words = queryWords();
         if (prop === 'content') return excerpt(String(value == null ? '' : value), words);
-        if (prop === 'title' || prop === 'tags' || prop === 'category') {
+        if (prop === 'title' || prop === 'tags' || prop === 'category' || prop === 'date') {
           return mark(String(value == null ? '' : value), words);
         }
         return undefined;
       },
       noResultsText: '',
-      // The library matches every field, and every url ends in .html: a search for
-      // "html" listed the first ten posts with nothing marked.
-      exclude: ['^/.*\\.html$'],
+      // The library matches every field, but a url (every one ends in .html) and
+      // a language code are not what a reader searches for: "html" or "ko" would
+      // list the first ten posts with nothing marked.
+      exclude: ['^/.*\\.html$', '^(' + searchInput.getAttribute('data-languages') + ')$'],
       limit: LIMIT,
       fuzzy: false,
       success: function () {
         // The library registered its own input handler first (it is given the
         // index, not a URL) and renders synchronously; deferring a turn reads
         // the count from the DOM the visitor is actually looking at.
-        searchInput.addEventListener('input', function () {
+        // Mid-composition (a Korean syllable still being typed) the status would
+        // announce a half-typed word; it updates when the syllable is done.
+        searchInput.addEventListener('input', function (e) {
+          if (!e.isComposing) setTimeout(updateStatus, 0);
+          syncUrl();
+        });
+        searchInput.addEventListener('compositionend', function () {
           setTimeout(updateStatus, 0);
         });
       }

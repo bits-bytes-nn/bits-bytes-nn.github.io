@@ -24,7 +24,7 @@
     link.className = 'meta-value';
     link.title = 'Semantic Scholar';
     // `title` reaches neither touch screen readers nor the keyboard.
-    link.setAttribute('aria-label', count + ' citations on Semantic Scholar');
+    link.setAttribute('aria-label', count + (entry.count === 1 ? ' citation' : ' citations') + ' on Semantic Scholar');
     link.href = 'https://www.semanticscholar.org/paper/' + encodeURIComponent(entry.paperId);
     link.textContent = count;
     el.appendChild(link);

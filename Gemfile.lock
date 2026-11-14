@@ -99,6 +99,7 @@ GEM
     logger (1.7.0)
     mercenary (0.4.0)
     mini_portile2 (2.8.9)
+    minitest (5.27.0)
     nokogiri (1.19.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -171,6 +172,8 @@ DEPENDENCIES
   jekyll-sitemap
   kramdown-parser-gfm
   logger
+  minitest (~> 5.25)
+  nokogiri (>= 1.12)
   webrick
 
 RUBY VERSION

@@ -1,24 +1,40 @@
 # frozen_string_literal: true
 #
-# Keeps a translated post out of the post listings.
+# Pairs translated posts (a shared `translation_id`) and keeps one of each pair
+# out of the post listings.
 #
-# A translation pair is one article, but the home page, the category pages and
-# /tags/ each listed it twice: the Korean post and its English twin, side by
-# side. The post in the site's language stays; its counterpart gets `hidden`,
-# which jekyll-paginate already skips and the `listed` filter below drops for
-# every other listing. The counterpart is still built and in the sitemap, the
-# feed and search, and the language switcher on the listed post links to it.
+#   page.translation — the other post of the pair, for the language switcher
+#                      and the hreflang links in head.html
+#   page.hidden      — on the post not in the site's language, when its pair
+#                      is: jekyll-paginate skips it and the `listed` filter
+#                      below drops it, so a pair is listed once. It is still
+#                      built and in the sitemap, the feed and search.
 module Translations
+  # A post's translation_id; blank is none.
+  def self.id(post)
+    post[:translation_id].to_s.strip.then { |s| s.empty? ? nil : s }
+  end
+
+  # `posts` are hashes of { translation_id: }. Returns { index => index of the
+  # other post with its id }. script/lint-posts.rb holds a pair to one post per
+  # language, so there is one other.
+  def self.counterparts(posts)
+    groups = posts.each_index.group_by { |i| id(posts[i]) }
+    groups.delete(nil)
+    groups.each_value.with_object({}) do |group, out|
+      group.each { |i| (other = group.find { |j| j != i }) && out[i] = other }
+    end
+  end
+
   # `posts` are hashes of { lang:, translation_id: }. Returns the indexes of
   # the posts to hide: those not in `site_lang` whose translation_id is shared
   # by a post that is. A post with no counterpart in the site's language stays
   # listed, whatever its language. A blank id is no id.
   def self.hidden(posts, site_lang)
-    id = ->(p) { p[:translation_id].to_s.strip.then { |s| s.empty? ? nil : s } }
-    listed_ids = posts.select { |p| p[:lang] == site_lang }.filter_map(&id)
+    listed_ids = posts.select { |p| p[:lang] == site_lang }.filter_map { |p| id(p) }
     posts.each_index.select do |i|
       p = posts[i]
-      p[:lang] != site_lang && listed_ids.include?(id.call(p))
+      p[:lang] != site_lang && listed_ids.include?(id(p))
     end
   end
 
@@ -39,6 +55,7 @@ if defined?(Jekyll::Hooks)
     site_lang = site.config["lang"]
     posts = docs.map { |d| { lang: d.data["lang"] || site_lang, translation_id: d.data["translation_id"] } }
     Translations.hidden(posts, site_lang).each { |i| docs[i].data["hidden"] = true }
+    Translations.counterparts(posts).each { |i, j| docs[i].data["translation"] = docs[j] }
   end
 end
 
