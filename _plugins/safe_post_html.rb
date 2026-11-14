@@ -14,16 +14,7 @@
 # are text by then and are not flagged. Posts are generated and then reviewed
 # as pull requests, so a failing build blocks the merge (and the deploy)
 # instead of silently rewriting the post.
-#
-# This repo builds via GitHub Actions (not the github-pages gem sandbox), so
-# custom _plugins are allowed.
-begin
-  require "nokogiri"
-rescue LoadError
-  # Plain `ruby test/run_all.rb` in CI: the gem is in the bundle's path.
-  require "bundler/setup"
-  require "nokogiri"
-end
+require "nokogiri"
 
 module SafePostHtml
   ACTIVE_ELEMENTS = %w[

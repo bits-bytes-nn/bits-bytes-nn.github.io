@@ -15,4 +15,3 @@ nav_order: 5
 <p class="desc"><em>{{ page.description }}</em></p>
 
 {% include category-posts.html category="Tech Guides" empty="Hands-on guides are on the way — check back soon." %}
-<br>

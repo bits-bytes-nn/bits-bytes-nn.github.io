@@ -2,7 +2,7 @@
 
 # Bits, Bytes and Neural Networks
 
-**In-depth AI/ML paper reviews, summaries, and tech guides — published as a blog.**
+**In-depth notes on AI/ML papers and technology.**
 
 [bits-bytes-nn.github.io](https://bits-bytes-nn.github.io) · a Jekyll static site on GitHub Pages
 
@@ -33,14 +33,8 @@ merge deploys.
 2. **Install the gems:** `bundle install`
 3. **Serve with live reload** at `http://localhost:4000`:
    `bundle exec jekyll serve`. Restart it after changing `_config.yml`.
-4. **Check a change the way CI does:**
-
-   ```bash
-   ruby test/run_all.rb && ruby script/lint-posts.rb
-   bundle exec jekyll build --strict-front-matter --destination /tmp/site-verify
-   bundle exec htmlproofer /tmp/site-verify --disable-external --allow-hash-href --no-ignore-empty-alt
-   script/validate-site.sh /tmp/site-verify
-   ```
+4. **Check a change the way CI does:** the commands are in
+   [docs/operations.md](docs/operations.md#checks-before-pushing).
 
 ## Documentation
 

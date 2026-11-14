@@ -3,39 +3,41 @@ lang: en
 layout: page
 title: "Categories"
 permalink: /categories/
+footer_nav: true
+nav_order: 8
 description: >-
-  Every post on this blog grouped by category: paper reviews, summaries and
-  surveys, tech guides, and insights.
+  Every post on this blog by type (paper reviews, summaries and surveys, tech
+  guides, insights) and by topic.
 ---
 
 {%- comment -%}
-  Category names are already written in display case in front matter
-  ("Agentic-AI", "Retrieval-Augmented-Generation"), so replacing the separators
-  is the whole job — which is what index.html and _layouts/post.html do. Not
-  `capitalize`: it lowercases everything after the first letter, so "Agentic-AI"
-  would render as "Agentic Ai".
-
-  `listed` drops a translation whose original is listed (_plugins/translations.rb).
-  The divider goes before each group after the first, so a category left empty by
-  the filter leaves no stray line behind.
+  Every post twice: under its type (categories[0]) and its topic
+  (categories[1]), each in the order _data/post_conventions.yml lists them.
+  The ids are the slugs the post meta panel links to. Names are in display
+  case already ("Agentic-AI"), so replacing the separators is the whole job;
+  `capitalize` would make "Agentic Ai". `listed` drops a translation whose
+  original is listed (_plugins/translations.rb); a heading with no posts left
+  is skipped.
 {%- endcomment -%}
-{% assign shown = false %}
-{% for category in site.categories %}
-  {% capture cat %}{{ category | first }}{% endcapture %}
-  {% assign cat_posts = site.categories[cat] | listed %}
-  {% if cat_posts.size == 0 %}{% continue %}{% endif %}
-  {% if shown %}<hr>{% endif %}{% assign shown = true %}
-  {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}
-  <h2 id="{{ cat | slugify }}">{{ cat_display }}</h2>
-  <ul class="posts-list">
-  {% for post in cat_posts %}
-    <li>
-      <strong>
-        <a href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}">{{ post.title | escape }}</a>
-      </strong>
-      <span class="post-date">- {{ post.posted_at | date: site.date_format }}</span>
-    </li>
+{% assign spec = site.data.post_conventions %}
+{% assign groups = "By type,By topic" | split: "," %}
+{% for group in groups %}
+  {% if forloop.first %}{% assign names = spec.types %}{% else %}{% assign names = spec.topics %}{% endif %}
+  <h2>{{ group }}</h2>
+  {% for entry in names %}
+    {% assign cat = entry | first %}
+    {% assign cat_posts = site.categories[cat] | listed %}
+    {% if cat_posts.size == 0 %}{% continue %}{% endif %}
+    <h3 id="{{ cat | slugify }}">{{ cat | replace: "-", " " }}</h3>
+    <ul class="posts-list">
+    {% for post in cat_posts %}
+      <li>
+        <strong>
+          <a href="{{ post.url | prepend: site.baseurl }}" lang="{{ post.lang | default: site.lang }}">{{ post.title | escape }}</a>
+        </strong>
+        <span class="post-date">- {{ post.posted_at | date: site.date_format }}</span>
+      </li>
+    {% endfor %}
+    </ul>
   {% endfor %}
-  </ul>
 {% endfor %}
-<br>

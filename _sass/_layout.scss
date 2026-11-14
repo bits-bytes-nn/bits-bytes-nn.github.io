@@ -18,6 +18,7 @@ html, body {
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
 	outline: 2px solid $action-color;
 	outline-offset: 2px;
@@ -370,18 +371,14 @@ blockquote {
 			// 0.50 and visibly flatten the artwork.
 			background-color: rgba(0,0,0,0.45);
 			// Scaled with the title above, so the hero no longer fills a phone screen.
-			padding: 3em 1em !important;
+			padding: 3em 1em;
 
 			@include media($mobile) {
-				padding: 6em 1em !important;
+				padding: 6em 1em;
 			}
 
 			@include media($tablet) {
-				padding: 9em 1em !important;
-			}
-
-			&:hover {
-				background-color: rgba(0,0,0,0.55);
+				padding: 9em 1em;
 			}
 		}
 	}
@@ -737,11 +734,6 @@ blockquote {
 		a.newer-posts, a.older-posts {
 			display: inline-block;
 			text-decoration: none;
-			transition: $transition-color;
-
-			&:hover {
-				color: $blue;
-			}
 		}
 
 		// A white arrow on a square of the text colour: the link blue, or the
@@ -813,6 +805,7 @@ blockquote {
 
 		.posts-list {
 			@extend %default-ul;
+			margin-bottom: $base-spacing;
 
 			li {
 				padding: modular-scale(-4);
@@ -822,10 +815,6 @@ blockquote {
 				&:hover {
 					transform: translateX(3px);
 				}
-			}
-
-			.desc {
-				font-size: 0.9em;
 			}
 
 			.post-date {

@@ -16,7 +16,8 @@
 # Usage: bundle exec ruby script/check-plugin-output.rb <site_dir> [--record]
 # Prints one line per problem; exits 1 when there is any. --record adds every
 # post's URL and redirect stub to script/published-urls.txt instead, and prints
-# what it added. PUBLISHED_SITEMAP=<url> also checks every URL in that sitemap.
+# what it added. CHECK_LIVE_SITEMAP=1 also checks every post URL in the live
+# sitemap (the site's `url` and base path, /sitemap.xml).
 
 require "jekyll"
 require "json"
@@ -37,7 +38,7 @@ abort "no posts read from #{root}/_posts" if posts.empty?
 problems = []
 lang = ->(post) { post.data["lang"] || site.config["lang"] }
 per_lang = posts.group_by(&lang).transform_values(&:size)
-metas = posts.map { |p| RelatedPosts.meta(p) }
+metas = posts.map { |p| RelatedPosts.meta(p, site.config["lang"]) }
 # Where Jekyll writes a URL: a directory one to index.html, a bare one to .html.
 built = lambda do |url|
   file = url.end_with?("/") ? "#{url}index.html" : File.extname(url).empty? ? "#{url}.html" : url
@@ -56,25 +57,27 @@ if ARGV.include?("--record")
   puts((urls - listed).sort.map { |u| "recorded #{u}" })
   exit
 end
-# The live sitemap too, when CI names it (PUBLISHED_SITEMAP): a post merged
-# without --record is protected from its first deploy on. Unreachable, it is
-# skipped with a warning, so a network blip cannot block a deploy; the list
-# above still applies.
-if (sitemap = ENV["PUBLISHED_SITEMAP"])
+# The live sitemap too, in CI (CHECK_LIVE_SITEMAP): a post merged without
+# --record is protected from its first deploy on. A network failure skips it
+# with a warning (a GitHub annotation in CI), so a blip cannot block a deploy;
+# the list above still applies. A sitemap that answers but lists no post fails.
+if ENV["CHECK_LIVE_SITEMAP"] == "1"
   require "net/http"
+  require "openssl"
+  sitemap = "#{site.config["url"]}#{site.baseurl}/sitemap.xml"
   begin
     uri = URI(sitemap)
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 15, read_timeout: 15) { |http| http.get(uri.request_uri) }
-    raise "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+    raise IOError, "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
     # Posts only (.html): a listing page such as /page/7/ goes when posts do, and
     # no redirect_from could bring it back.
     live = response.body.scan(%r{<loc>https?://[^/<]+([^<]*\.html)</loc>}).flatten.map { |path| path.delete_prefix(site.baseurl) }
-    raise "no post URLs in it" if live.empty?
-
+    problems << "#{sitemap}: no post URLs in it" if live.empty?
     listed |= live
-  rescue StandardError => e
-    warn "warning: #{sitemap} not checked (#{e.message})"
+  rescue IOError, SystemCallError, SocketError, Timeout::Error, Net::ProtocolError, Net::HTTPBadResponse,
+         Net::HTTPHeaderSyntaxError, Zlib::Error, OpenSSL::SSL::SSLError => e
+    warn "::warning::#{sitemap} not checked (#{e.message})"
   end
 end
 listed.each do |url|
@@ -142,7 +145,7 @@ posts.each do |post|
   if per_lang[lang.call(post)] > 1 && !html.include?(%(class="post-nav"))
     problems << "#{name}: no previous/next links"
   end
-  if RelatedPosts.rank(RelatedPosts.meta(post), metas).any? && !html.include?(%(class="related-posts"))
+  if RelatedPosts.rank(RelatedPosts.meta(post, site.config["lang"]), metas).any? && !html.include?(%(class="related-posts"))
     problems << "#{name}: no Related reading"
   end
 

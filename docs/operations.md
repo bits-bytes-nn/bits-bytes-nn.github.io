@@ -18,7 +18,7 @@ The gates CI runs, in its order. Build to a throwaway directory, not `_site/`
 (see [Troubleshooting](#troubleshooting)):
 
 ```bash
-ruby test/run_all.rb                                        # plugin logic and the lint, unit-tested
+bundle exec ruby test/run_all.rb                            # plugin logic and the lint, unit-tested
 ruby script/lint-posts.rb                                   # post sources follow the conventions
 bundle exec jekyll build --strict-front-matter \
   --destination /tmp/site-verify                            # builds clean
@@ -29,9 +29,8 @@ shellcheck script/*.sh assets/images/*.sh && actionlint .github/workflows/*.yml 
 ```
 
 - `test/` covers the pure logic in `_plugins/` (one file per plugin) and
-  `script/lint-posts.rb`. Plain `ruby`, not `bundle exec`: the plugins guard
-  their Jekyll registrations behind `defined?`, and minitest ships with Ruby.
-  **A change in `_plugins/` changes every page**, so add a test case first.
+  `script/lint-posts.rb`; the plugins guard their Jekyll registrations behind
+  `defined?`, so the tests load them without a site. **A change in `_plugins/` changes every page**, so add a test case first.
 - CI's htmlproofer also passes `--swap-urls` for the Pages base path, which a
   local build does not have.
 - Each check in `validate-site.sh` and `script/check-plugin-output.rb` (which it
@@ -76,7 +75,7 @@ site unchanged and `main` red.
 Every URL a post has been published under is in `script/published-urls.txt`,
 and `validate-site.sh` fails when one is no longer built (a renamed post, a
 changed date or category, a lost redirect stub). CI also checks every post URL in
-the live `sitemap.xml` (`PUBLISHED_SITEMAP` in `jekyll.yml`), so a post is
+the live `sitemap.xml` (`CHECK_LIVE_SITEMAP` in `jekyll.yml`), so a post is
 protected from its first deploy even if nobody records it; when the live
 sitemap cannot be fetched, that part is skipped with a warning.
 
@@ -118,7 +117,7 @@ the newest posts).
 - *URL is unknown to Google* with *No referring sitemaps detected*: Google has
   found the URL neither in a sitemap nor through a link. Use **Request
   indexing**. The quota is about ten a day; start with the posts people search
-  for. Requested URLs have been indexed within days.
+  for.
 - *Excluded by 'noindex' tag* on a URL that should rank: a page or redirect stub
   carries `noindex`. Only pages kept out of the sitemap (search, 404) should, and
   `check-plugin-output.rb` fails a post or stub that does.

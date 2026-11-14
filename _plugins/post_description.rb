@@ -3,19 +3,11 @@
 # Derives a one-paragraph description for posts that don't declare one, and
 # stores it in `page.description`.
 #
-# Three separate renderers need a post description: the meta/OG/Twitter/JSON-LD
-# block in _includes/head.html, the Atom <summary> in feed.xml, and
-# the excerpt card on the home page. Jekyll's `page.excerpt` is the first block
-# up to the excerpt separator — and on this blog that block is almost never prose:
-#
-#   * paper posts open with "### TL;DR" immediately followed by "#### <first
-#     question>", so all of them produced the *same* description; and
-#   * essay posts open with an H1 repeating the title, so theirs echoed the title.
-#
-# Deriving it once here (rather than in a Liquid filter) gives all three one
-# value: each reads the front-matter key. The hook runs on :site, :pre_render,
-# after the generators and before anything is rendered, so every consumer
-# observes the same value.
+# The head's meta/OG/JSON-LD block, the feed's <summary> and the home page's
+# cards all read `page.description`. Jekyll's `page.excerpt`, the first block, is
+# rarely prose here (paper posts open with "### TL;DR" and a heading), so the
+# first prose paragraph is used instead. Set once on :site, :pre_render, before
+# anything renders, so every reader of it sees the same value.
 module PostDescription
   # The two budgets, declared once. Templates call the filters by name rather than
   # passing a number, so a limit cannot drift between Ruby and Liquid.
@@ -56,11 +48,11 @@ module PostDescription
   COMMENTS = %r{<!--.*?-->|\{::comment\}.*?\{:/comment\}|\{%-?\s*(?:end)?raw\s*-?%\}}m
 
   class << self
-    def derive(markdown, limit = LIMIT)
+    def derive(markdown)
       para = first_prose_paragraph(markdown.to_s.gsub(COMMENTS, ""))
       return "" if para.nil?
 
-      truncate(strip_inline(para), limit)
+      truncate(strip_inline(para), LIMIT)
     end
 
     # Trims to a word boundary and drops trailing punctuation before the ellipsis.

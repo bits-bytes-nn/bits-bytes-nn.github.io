@@ -1,0 +1,59 @@
+// The search page (search.md, js/search.js).
+#search-container {
+  margin-bottom: 2em;
+
+  // The input takes the site's form style (base/_forms.scss).
+
+  .search-status {
+    margin: 0 0 1em;
+    color: $medium-gray;
+    font-size: 0.9em;
+  }
+
+  .search-result {
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid $base-border-color;
+
+    &:last-child { border-bottom: none; }
+
+    h2 {
+      font-size: 1.44em;
+      margin: 0 0 0.5em;
+
+      a {
+        color: $base-font-color;
+        text-decoration: none;
+
+        &:hover { color: $action-color; }
+      }
+    }
+
+    p { margin: 0.5em 0; }
+  }
+
+  .result-meta {
+    display: flex;
+    gap: 0.75em;
+    align-items: baseline;
+    color: $medium-gray;
+    font-size: 0.9em;
+  }
+
+  .result-snippet { line-height: 1.6; }
+
+  .result-tags {
+    margin: 0.4em 0 0;
+    color: $medium-gray;
+    font-size: 0.85em;
+
+    &:empty { display: none; }
+  }
+
+  mark {
+    background-color: #fff59d;
+    padding: 0 2px;
+    font-weight: bold;
+    color: $base-font-color;
+  }
+}

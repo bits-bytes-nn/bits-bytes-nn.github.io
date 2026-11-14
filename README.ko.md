@@ -2,7 +2,7 @@
 
 # Bits, Bytes and Neural Networks
 
-**AI/ML 논문 리뷰·요약과 기술 가이드를 블로그로 발행합니다.**
+**AI/ML 논문과 기술을 깊이 읽고 정리하는 블로그입니다.**
 
 [bits-bytes-nn.github.io](https://bits-bytes-nn.github.io) · GitHub Pages에서 서빙하는 Jekyll 정적 사이트
 
@@ -31,14 +31,8 @@ Summaries, Paper Surveys, Tech Guides, Insights 다섯 개입니다. 논문 글�
 2. **의존성 설치:** `bundle install`
 3. **개발 서버**(저장하면 다시 빌드, `http://localhost:4000`):
    `bundle exec jekyll serve`. `_config.yml`을 바꾸면 다시 시작합니다.
-4. **CI와 같은 검사:**
-
-   ```bash
-   ruby test/run_all.rb && ruby script/lint-posts.rb
-   bundle exec jekyll build --strict-front-matter --destination /tmp/site-verify
-   bundle exec htmlproofer /tmp/site-verify --disable-external --allow-hash-href --no-ignore-empty-alt
-   script/validate-site.sh /tmp/site-verify
-   ```
+4. **CI와 같은 검사:** 명령은
+   [docs/operations.md](docs/operations.md#checks-before-pushing)에 있습니다.
 
 ## 문서
 

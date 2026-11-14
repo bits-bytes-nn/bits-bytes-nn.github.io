@@ -1,4 +1,4 @@
-<header class="navigation" role="banner">
+<header class="navigation" role="banner" lang="{{ site.ui_lang }}">
 	<div class="navigation-wrapper">
 		<a href="{{ site.baseurl }}/" class="logo">
 			{% if site.logo %}
@@ -16,15 +16,15 @@
 			{% endif %}
 		</a>
 		<button type="button" id="js-mobile-menu" class="navigation-menu-button"
-			aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="js-navigation-menu">
+			aria-label="Menu" aria-expanded="false" aria-controls="js-navigation-menu">
 			{% include icon.html name="bars" %}
 		</button>
 		<nav role="navigation" aria-label="Main">
-			<ul id="js-navigation-menu" class="navigation-menu show">
+			<ul id="js-navigation-menu" class="navigation-menu">
 				{% include nav_links.html %}
 				<li class="nav-link theme-toggle-item">
 					<button type="button" id="theme-toggle" class="theme-toggle"
-						aria-label="Toggle dark mode" title="Toggle dark mode">
+						aria-label="Dark mode" title="Dark mode">
 						<span class="theme-icon-light">{% include icon.html name="moon" %}</span><span class="theme-icon-dark">{% include icon.html name="sun" %}</span>
 					</button>
 				</li>

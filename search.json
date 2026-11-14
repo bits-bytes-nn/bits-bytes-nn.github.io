@@ -12,7 +12,7 @@ layout: null
   There is no `snippet` field: js/search.js cuts the shown excerpt around the
   match in `content`.
 
-  Every field but `url` is searched (js/search.js excludes it): simple-jekyll-search
+  Every field but `url` and `lang` is searched (js/search.js excludes them): simple-jekyll-search
   walks each key and matches a post when all query words appear in one of them.
 {%- endcomment -%}
 [
@@ -21,6 +21,7 @@ layout: null
       "title": {{ post.title | jsonify }},
       "url": "{{ site.baseurl }}{{ post.url }}",
       "date": "{{ post.posted_at | date: site.date_format }}",
+      "lang": {{ post.lang | default: site.lang | jsonify }},
       "category": {{ post.categories | join: ', ' | replace: '-', ' ' | jsonify }},
       "tags": {{ post.tags | join: ', ' | replace: '-', ' ' | jsonify }},
       "content": {{ post.content | plain_text | jsonify }}

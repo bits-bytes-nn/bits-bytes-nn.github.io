@@ -14,29 +14,12 @@
     margin-bottom: 1em;
   }
 
-  .post-header-container .scrim {
-    padding: 2em 1em 1em 1em;
-  }
-
   .post-content {
     padding: 1em 0;
-
-    img {
-      display: block;
-      margin: 0 auto;
-      max-width: 100%;
-      height: auto;
-    }
   }
 
   .post-header {
     margin-bottom: 30px;
-  }
-
-  .post-title {
-    font-size: modular-scale(5); // was hardcoded 42px — keep on the type scale
-    letter-spacing: -0.02em;
-    line-height: 1.15;
   }
 
   // Small uppercase label shared by meta rows and the TOC heading
@@ -50,7 +33,7 @@
     color: $medium-gray;
   }
 
-  // Collapsible table of contents (<details>; populated by JS; hidden if < 3)
+  // Collapsible table of contents (<details>, from _plugins/post_toc.rb; shown at 3+ entries)
   .post-toc {
     margin: 2em 0;
     background: rgba($action-color, 0.04);
@@ -276,36 +259,18 @@
     }
   }
 
-  // Post utilities (share, rss, etc)
-  .rss {
-    margin: 1em 0 0 0;
-    @include span-columns(12);
-
-    @include media ($tablet) {
-      margin: 1em 0;
-      @include span-columns(6);
-    }
-  }
-
   .share {
     font-weight: bold;
-    margin: 0 0 1em 0;
+    margin: 1em 0;
     @include span-columns(12);
 
     @include media ($tablet) {
-      @include span-columns(6);
-      margin: 1em 0;
       text-align: right;
     }
 
     a {
       padding: 0 0.25em;
       text-decoration: none;
-      transition: $transition-color;
-
-      &:hover {
-        color: $blue;
-      }
     }
   }
 
@@ -354,7 +319,7 @@
     .code-copy { opacity: 1; }
   }
 
-  // Previous / next post navigation
+  // Related reading (_includes/related_posts.html)
   .related-posts {
     margin: 2.5em 0 0;
 
@@ -397,13 +362,19 @@
     }
   }
 
+  // Previous / next post navigation
   .post-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
     margin: 2.5em 0;
 
-    @include media($mobile) { grid-template-columns: 1fr; }
+    // One column on a phone; the empty <span> holding a missing side's place
+    // would then be a blank row.
+    @media (max-width: $mobile - 1px) {
+      grid-template-columns: 1fr;
+      > span:empty { display: none; }
+    }
   }
 
   .post-nav-link {

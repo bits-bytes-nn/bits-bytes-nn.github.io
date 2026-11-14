@@ -149,6 +149,7 @@
 
   // Theme toggle button
   .theme-toggle { color: inherit; }
+  .navigation .theme-toggle:hover { color: $link; }
 
   // Tables: body text already flips with `body { color }` above, but the
   // hairline borders are hardcoded light in base/_tables.scss and vanish on
@@ -156,24 +157,20 @@
   th { border-bottom-color: lighten($border, 8%); }
   td { border-bottom-color: $border; }
 
-  // Search UI. search.css hardcodes light colors and an old-brand-blue focus
-  // ring (#2980b9); override the surfaces it owns plus the focus state.
+  // Search (_search.scss). $medium-gray clears 4.5:1 on white but not on $bg.
   #search-input {
     background: $surface;
     border-color: $border;
     color: $fg;
     &:focus { border-color: $link; box-shadow: 0 0 0 3px rgba($link, 0.25); }
   }
-  .search-result { border-bottom-color: $border; }
-  .search-result h2 a { color: $fg; &:hover { color: $link; } }
-  // .result-tags was missing here, so it kept search.css's #767676 — a value
-  // chosen to clear 4.5:1 on white, which lands at 4.2:1 on #0d1117 and fails AA
-  // for text this size.
-  .search-status, .post-category, .result-tags, .search-result .post-date { color: $fg-muted; }
-  .result-snippet, .search-result p { color: $fg; }
-  // #fff on #b8860b is 3.25:1, and bold 0.9em is not large text. Dark text on the
-  // same fill is 7.9:1.
-  mark { background-color: #b8860b; color: $bg; }
+  #search-container {
+    .search-result { border-bottom-color: $border; }
+    .search-result h2 a { color: $fg; &:hover { color: $link; } }
+    .search-status, .result-meta, .result-tags { color: $fg-muted; }
+    // #fff on #b8860b is 3.25:1; dark text on the same fill is 7.9:1.
+    mark { background-color: #b8860b; color: $bg; }
+  }
 
   .post-list > li, .posts-list li { border-color: $border; }
 

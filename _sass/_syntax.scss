@@ -10,8 +10,6 @@
 // Replaces the previous client-side highlight.js pass — rouge tokenizes
 // server-side at build time, so no JS is needed to colorize code.
 
-.highlight table td { padding: 5px; }
-.highlight table pre { margin: 0; }
 .highlight .gh {
   color: #999999;
 }

@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+
+require_relative "translations"
+
 #
 # Decides which other posts a post links to, and exposes them to the layout:
 #
@@ -19,8 +22,8 @@
 # better than a wrong suggestion.
 #
 # That strictness depends on tags that can meet. Per-paper contribution tags
-# rarely do, so a post should also carry a controlled topic tag that fits it
-# (the list is `tags.controlled` in _data/post_conventions.yml) — a looser rule here is not the fix for a post with no suggestions.
+# rarely do, so a post carries a controlled topic tag when one fits it (the list
+# is `tags.controlled` in _data/post_conventions.yml).
 #
 # Jekyll's built-in site.related_posts is either "the 10 most recent posts" or
 # LSI, which needs the classifier gem and a slow indexing pass. This is cheaper
@@ -74,7 +77,7 @@ module RelatedPosts
   def self.eligible?(target, candidate)
     return false if translation_of?(target, candidate)
 
-    lang(candidate) == lang(target)
+    candidate[:lang] == target[:lang]
   end
 
   def self.shared_tags(a, b)
@@ -93,14 +96,8 @@ module RelatedPosts
   end
 
   def self.translation_of?(a, b)
-    tid = a[:translation_id].to_s
-    !tid.empty? && tid == b[:translation_id].to_s
-  end
-
-  # Posts without an explicit `lang` are Korean, the site's `lang` in _config.yml.
-  def self.lang(post)
-    l = post[:lang].to_s
-    l.empty? ? "ko" : l
+    id = Translations.id(a)
+    !id.nil? && id == Translations.id(b)
   end
 
   def self.normalise(tags)
@@ -111,13 +108,14 @@ module RelatedPosts
     post[:date].respond_to?(:to_time) ? post[:date].to_time.to_i : 0
   end
 
-  # The hash `rank` and `adjacent` take, from a Jekyll post.
-  def self.meta(doc)
+  # The hash `rank` and `adjacent` take, from a Jekyll post. A post without
+  # `lang` is in the site's.
+  def self.meta(doc, site_lang)
     {
       id: doc.url,
       tags: doc.data["tags"],
       categories: doc.data["categories"],
-      lang: doc.data["lang"],
+      lang: doc.data["lang"] || site_lang,
       translation_id: doc.data["translation_id"],
       date: doc.data["posted_at"] # posted_date.rb; the day it went up here
     }
@@ -131,11 +129,12 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register :site, :pre_render do |site|
     docs = site.posts.docs
-    meta = docs.map { |d| RelatedPosts.meta(d) }
+    site_lang = site.config["lang"]
+    meta = docs.map { |d| RelatedPosts.meta(d, site_lang) }
     by_url = docs.to_h { |d| [d.url, d] }
     # The listings' order (posted_date.rb's Document#<=>: posted day, then
     # `date:`, then path), so a day with several posts reads the same both ways.
-    ordered = docs.sort.map { |d| RelatedPosts.meta(d) }
+    ordered = docs.sort.map { |d| RelatedPosts.meta(d, site_lang) }
 
     meta.each_with_index do |target, i|
       ids = RelatedPosts.rank(target, meta)

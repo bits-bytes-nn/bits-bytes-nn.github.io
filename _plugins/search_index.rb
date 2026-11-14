@@ -2,13 +2,9 @@
 #
 # `plain_text` — turns a rendered post into the text search.json carries.
 #
-# Replaces `strip_html | strip_newlines`, which got two things wrong:
-#
-#   1. It left HTML entities encoded. kramdown escapes a literal `>` in prose to
-#      `&gt;`, so the index held `"음료 &gt; 탄산음료"` and the search page printed
-#      that verbatim to the reader.
-#   2. It removed tags without leaving anything behind, so `<p>끝</p><p>시작</p>`
-#      indexed as `끝시작` — one token that matches neither word.
+# Unlike `strip_html | strip_newlines`, it decodes HTML entities (kramdown writes
+# a literal `>` as `&gt;`, which the results would print) and leaves a space at
+# block boundaries, so `<p>끝</p><p>시작</p>` is two words, not `끝시작`.
 
 require "cgi"
 

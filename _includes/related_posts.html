@@ -8,12 +8,8 @@
 {%- endcomment -%}
 {% if page.related and page.related.size > 0 %}
 <nav class="related-posts" aria-labelledby="related-posts-heading">
-  {%- comment -%}
-    English, like every other UI string on this site ("Published", "Read time",
-    "Contents", "Site Map"). The chrome is one language by design; only content is
-    bilingual, so this heading does not branch on page.lang.
-  {%- endcomment -%}
-  <h2 id="related-posts-heading" class="related-posts-heading">Related reading</h2>
+  {%- comment -%} In site.ui_lang, like every label; only content is bilingual. {%- endcomment -%}
+  <h2 id="related-posts-heading" class="related-posts-heading" lang="{{ site.ui_lang }}">Related reading</h2>
   <ul>
     {% for other in page.related %}
     <li>

@@ -19,5 +19,11 @@ gem 'bigdecimal'
 gem 'logger'
 gem 'webrick'
 
+# _plugins/safe_post_html.rb parses each post body with its HTML5 parser.
+gem 'nokogiri', '>= 1.12'
+
 # CI quality gate: validates internal links, images, and HTML structure of _site/
 gem 'html-proofer', '~> 5.2'
+
+# test/run_all.rb, run under the bundle like the build.
+gem 'minitest', '~> 5.25', group: :test

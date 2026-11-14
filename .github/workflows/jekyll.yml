@@ -36,17 +36,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # No apt step. The packages it installed are already in the ubuntu-24.04
-      # image — a past run's log showed libyaml-dev/zlib1g-dev/libffi-dev
-      # "already the newest version" and only 2 incidental upgrades — and the
-      # -dev headers were only ever needed to compile Ruby itself, which
-      # ruby/setup-ruby avoids by fetching a prebuilt build. The native gems
-      # (sassc, eventmachine) need g++/make, which the image ships as well.
-      #
-      # What it did cost was `apt-get update` on every deploy, a network-bound
-      # step slower and less reliable than the rest of the pipeline put
-      # together. If this assumption is ever wrong the build job fails and
-      # `deploy` (needs: build) publishes nothing.
+      # No apt step: setup-ruby fetches a prebuilt Ruby, and the native gems
+      # (sassc, eventmachine, nokogiri) need only the g++/make the image ships.
+      # Should that stop holding, the build fails and nothing deploys.
       - name: Setup Ruby
         uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
         # The version comes from .ruby-version (3.3+: html-proofer's
@@ -54,11 +46,9 @@ jobs:
         with:
           bundler-cache: true
       - name: Unit-test the Jekyll plugins
-        # Plain `ruby`, not `bundle exec`: the plugins guard their Jekyll/Liquid
-        # registrations behind `defined?`, so their logic loads standalone, and
-        # minitest ships with Ruby. Runs before the build — these plugins decide
-        # every page's description and read time.
-        run: ruby test/run_all.rb
+        # Before the build: these plugins decide every page's description, order
+        # and read time.
+        run: bundle exec ruby test/run_all.rb
       - name: Lint the post sources
         # Front matter against _data/post_conventions.yml, plus table, math and
         # heading rules the built HTML no longer shows.
@@ -97,7 +87,7 @@ jobs:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           # check-plugin-output.rb also holds the build to the live sitemap, so a
           # post merged without --record cannot silently lose its URL.
-          PUBLISHED_SITEMAP: https://bits-bytes-nn.github.io/sitemap.xml
+          CHECK_LIVE_SITEMAP: "1"
       - name: Upload artifact
         # Nothing to publish from a PR run; the gates above are the whole point.
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

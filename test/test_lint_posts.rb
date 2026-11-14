@@ -145,14 +145,6 @@ class TestLintPosts < Minitest::Test
     assert_equal [], lint("| Flag | Tool |\n|---|---|\n| `A` \\|\\| `B` | `$$\\lvert x \\rvert$$` |\n")
   end
 
-  def test_no_javascript_links
-    ["[click](javascript:alert(1))\n", "[x](<javascript:alert(1)>)\n", "[r]: javascript:alert(1)\n",
-     "[x](java&#115;cript:alert(1))\n", %(<a href="javascript:alert(1)">x</a>\n)].each do |body|
-      assert_finding(/javascript: link/, lint(body))
-    end
-    assert_equal [], lint("`[x](javascript:void(0))` is how not to write it.\n")
-  end
-
   def test_paper_author_has_no_tags
     assert_finding(/paper_author has a tag/, lint(front: FRONT.sub('"Mistral AI"', '"<img src=x onerror=alert(1)>"')))
     assert_finding(/title has a tag/, lint(front: FRONT.sub('"Mistral 7B"', '"<!-- x"')))

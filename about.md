@@ -6,8 +6,8 @@ permalink: /about/
 # — a Korean TTS voice reading English orthography is unintelligible.
 lang: en
 description: >-
-  Jonas Kim — Senior Data Scientist at AWS Professional Services Korea. Fifteen
-  years at the seam between research papers and production ML systems.
+  Jonas Kim — Senior Data Scientist at AWS Professional Services Korea, with
+  over 15 years between research papers and production ML systems.
 main_nav: true
 nav_order: 1
 ---

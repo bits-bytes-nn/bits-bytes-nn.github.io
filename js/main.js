@@ -17,10 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
       // aria-label is static, so without this a screen-reader user cannot tell
       // whether dark mode is currently on.
       themeToggle.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
-      // Repaints the mobile browser's own chrome. The inline bootstrap in
-      // head.html does this on load; without it here the address bar stayed
-      // white until the next navigation. Keep in step with $bg in _dark.scss.
-      if (themeColor) themeColor.setAttribute('content', isDark() ? '#0d1117' : '#ffffff');
+      // Repaints the mobile browser's own chrome (the address bar) in the page
+      // background the theme has just applied.
+      if (themeColor) themeColor.setAttribute('content', getComputedStyle(document.body).backgroundColor);
     }
     syncTheme();
     themeToggle.addEventListener('click', function () {
@@ -44,11 +43,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // the "Copied"/"Failed" result — the only feedback this control exists to give —
   // was never announced. The visible text is the name, and one shared live region
   // reports the outcome. It is shared because a long post has ~50 of these.
+  // The buttons' words are the site's labels (site.ui_lang, which the header
+  // carries), not the post's language.
+  var uiLang = (document.querySelector('.navigation') || {}).lang || '';
   var copyStatus = null;
   function announceCopy(msg) {
     if (!copyStatus) {
       copyStatus = document.createElement('span');
       copyStatus.className = 'sr-only';
+      copyStatus.lang = uiLang;
       copyStatus.setAttribute('aria-live', 'polite');
       document.body.appendChild(copyStatus);
     }
@@ -68,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'code-copy';
+    btn.lang = uiLang;
     btn.textContent = 'Copy';
     block.style.position = 'relative';
     block.appendChild(btn);
@@ -96,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Mobile menu toggle
   var menuToggle = document.getElementById('js-mobile-menu');
   var menu = document.getElementById('js-navigation-menu');
-  if (menu) menu.classList.remove('show');
   if (menuToggle && menu) {
     menuToggle.addEventListener('click', function (e) {
       e.preventDefault();
@@ -146,21 +149,22 @@ document.addEventListener('DOMContentLoaded', function () {
       if (wide.matches) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
       else document.documentElement.style.removeProperty('--nav-height');
     };
-    if (window.ResizeObserver) new ResizeObserver(syncNavHeight).observe(nav);
-    else window.addEventListener('resize', syncNavHeight);
-    if (wide.addEventListener) wide.addEventListener('change', syncNavHeight);
-    else wide.addListener(syncNavHeight); // Safari before 14
+    new ResizeObserver(syncNavHeight).observe(nav);
+    wide.addEventListener('change', syncNavHeight);
     syncNavHeight();
     window.addEventListener('scroll', function () {
       nav.classList.toggle('scrolled', window.pageYOffset > 50);
     }, { passive: true });
   }
 
+  // GLightbox loads only on posts with a body image (_includes/footer.html).
+  var lightboxScript = document.getElementById('glightbox-js');
+  var lightboxCss = document.getElementById('glightbox-css');
+
   // Wrap plain Markdown images in a .glightbox anchor so they're zoomable too
   // (hand-written <a class="glightbox"> images are already covered).
-  document.querySelectorAll('.post-content img').forEach(function (img) {
+  if (lightboxScript) document.querySelectorAll('.post-content img').forEach(function (img) {
     if (img.closest('a')) return;                 // already linked (e.g. glightbox)
-    if (img.classList.contains('profile')) return; // about-page portrait: not zoomable
     var src = img.getAttribute('src');
     if (!src) return;
     var a = document.createElement('a');
@@ -184,8 +188,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // GLightbox's script and stylesheet load async (_includes/footer.html), so
   // either may arrive after this. Set up once both have: opened before its CSS
   // applied, the viewer drew at the page bottom and would not close.
-  var lightboxScript = document.getElementById('glightbox-js');
-  var lightboxCss = document.getElementById('glightbox-css');
   var lightboxReady = function () {
     if (window.GLightbox && lightboxCss && lightboxCss.media === 'all' && !lightboxReady.done) {
       lightboxReady.done = true;

@@ -13,9 +13,7 @@
 set -uo pipefail
 
 SITE="${1:-_site}"
-# Resolved from the script's own location, not the caller's cwd — the timezone
-# check below reads _config.yml, and keying it on cwd meant it silently vanished
-# whenever the script was run from anywhere but the repo root.
+# From the script's own location, so the config checks work from any cwd.
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CONFIG="$ROOT/_config.yml"
 failures=0
@@ -23,12 +21,16 @@ failures=0
 fail() { printf '  FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
 pass() { printf '  ok    %s\n' "$1"; }
 
-# XML well-formedness through Ruby's bundled REXML rather than xmllint, so this
-# script needs no toolchain beyond the Ruby the build already requires — CI used
-# to apt-install libxml2-utils purely for this. rexml is in the bundle
-# (Gemfile.lock, via html-proofer), so this works under `bundle exec` too.
+# XML well-formedness through REXML (in the bundle), so the script needs only
+# the build's Ruby. A parse error prints its first lines, with the position.
 xml_wellformed() {
-  ruby -rrexml/document -e 'REXML::Document.new(File.read(ARGV[0]))' "$1" 2>/dev/null
+  ruby -rrexml/document -e '
+    begin
+      REXML::Document.new(File.read(ARGV[0]))
+    rescue REXML::ParseException => e
+      warn e.message.lines.first(3).join
+      exit 1
+    end' "$1"
 }
 
 if [ ! -d "$SITE" ]; then
@@ -44,7 +46,7 @@ fi
 
 # Read the canonical URL from config rather than repeating it here, so the gate
 # cannot end up checking a domain the site no longer uses.
-BASE_URL=$(sed -nE 's/^url:[[:space:]]*"?([^"[:space:]]+)"?[[:space:]]*$/\1/p' "$CONFIG" | head -1)
+BASE_URL=$(ruby -ryaml -e 'print YAML.safe_load_file(ARGV[0])["url"].to_s.strip' "$CONFIG")
 if [ -z "$BASE_URL" ]; then
   echo "could not read 'url:' from $CONFIG" >&2
   exit 1

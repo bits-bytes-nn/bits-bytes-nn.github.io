@@ -16,4 +16,3 @@ nav_order: 4
 <p class="desc"><em>{{ page.description }}</em></p>
 
 {% include category-posts.html category="Paper Surveys" empty="Surveys are in the works — this space will fill up soon." %}
-<br>

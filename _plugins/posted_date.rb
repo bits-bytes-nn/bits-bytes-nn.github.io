@@ -3,12 +3,9 @@
 # Gives every post `posted_at`, the day it went up here, and orders the posts by
 # it. Sets `last_modified_at` to that day when it is later than `date:`.
 #
-# A paper post's `date:` is the paper's publication date: it builds the URL, so
-# it stays. The file name carries the day the post was published here. Read
-# from `date:`, a review written this year was listed below last year's posts,
-# shown as "Published" in the paper's year, and dated that way in the JSON-LD,
-# and the sitemap's <lastmod> and the feed's <updated> said it had not changed
-# since the paper came out.
+# A paper post's `date:` is the paper's publication date, and it builds the URL;
+# the file name carries the day the post went up here. Listings, "Published",
+# the JSON-LD, <lastmod> and the feed go by that day, not the paper's.
 #
 # The layouts show and date a post by `posted_at`; the post page also shows
 # `date:` as the paper's date. jekyll-sitemap and feed.xml read

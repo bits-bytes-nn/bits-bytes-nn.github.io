@@ -4,8 +4,7 @@ layout: page
 title: Paper Summaries
 permalink: /paper-summaries/
 description: >-
-  Concise digests of AI/ML papers, posts, and talks — distilled to their core
-  contributions and insights.
+  Concise digests of AI/ML papers, distilled to their core contributions.
 # Stays in the nav even with no posts yet: a missing tab reads as a section that
 # was removed, not one that is still filling up. The empty-state line below is
 # the honest signal, and the tab is what says this blog does summaries.
@@ -18,4 +17,3 @@ nav_order: 2
 <p class="desc"><em>{{ page.description }}</em></p>
 
 {% include category-posts.html category="Paper Summaries" empty="Summaries are in the works — this space will fill up soon." %}
-<br>

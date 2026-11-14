@@ -146,10 +146,10 @@
 
 	<!-- Site styles -->
 	<link rel="stylesheet" href="{{ '/css/main.css' | prepend: site.baseurl }}">
-	{% if page.stylesheet %}<link rel="stylesheet" href="{{ page.stylesheet | prepend: site.baseurl }}">{% endif %}
-	<!-- Without JS the phone menu stays open (main.js closes it): let it scroll
-	     away with the page rather than cover two thirds of the screen. -->
-	<noscript><style>.navigation { position: absolute; }</style></noscript>
+	<!-- Without JS the phone menu has no toggle: show it open, without the
+	     button, and let it scroll away with the page rather than cover two
+	     thirds of the screen. -->
+	<noscript><style>.navigation { position: absolute; } .navigation ul.navigation-menu { display: block; } .navigation .navigation-menu-button { display: none; }</style></noscript>
 	{%- comment -%}
 	  A page kept out of the sitemap (search, 404) is one with nothing to rank, and
 	  Google had indexed the empty search shell. noindex says so; a canonical
@@ -203,18 +203,14 @@
 	</script>
 	{% endif %}
 
-	<!-- hreflang alternates for translated posts (paired by translation_id).
-	     x-default, for readers in neither language, is the English one: they
-	     are likelier to read English than Korean, and English queries brought
-	     most of the search clicks (Search Console). -->
-	{% if page.translation_id %}
-	<link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />
-	{% if page.lang == 'en' %}<link rel="alternate" hreflang="x-default" href="{{ page.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
-	{% for post in site.posts %}
-	  {% if post.translation_id == page.translation_id and post.url != page.url %}
+	<!-- hreflang alternates for a translated post (page.translation,
+	     _plugins/translations.rb). x-default, for readers in neither language,
+	     is the English one: they are likelier to read English than Korean. -->
+	{% if page.translation %}
+	{% assign pair = "" | split: "" | push: page | push: page.translation %}
+	{% for post in pair %}
 	<link rel="alternate" hreflang="{{ post.lang }}" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />
 	{% if post.lang == 'en' %}<link rel="alternate" hreflang="x-default" href="{{ post.url | prepend: site.baseurl | prepend: site.url }}" />{% endif %}
-	  {% endif %}
 	{% endfor %}
 	{% endif %}
 

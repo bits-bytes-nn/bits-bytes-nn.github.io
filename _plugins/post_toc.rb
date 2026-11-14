@@ -3,10 +3,8 @@
 # Liquid filter: {{ content | post_toc }} → the post's table of contents, one
 # { "id", "text", "num" } per <h2 id> in the rendered body.
 #
-# Built here, not in the browser: js/main.js used to fill the list on
-# DOMContentLoaded, which came after the first paint once the fonts stopped
-# blocking it, so the TOC opened and pushed the article down. It also left
-# readers without JavaScript no TOC at all.
+# Built at build time, so the list is in the first paint (filled by a script it
+# would push the article down) and there without JavaScript.
 #
 # `text` stays HTML (tags stripped, entities kept), so a heading that names a
 # tag ("&lt;think&gt; 토큰") renders as written. `num` is the item's number, or
