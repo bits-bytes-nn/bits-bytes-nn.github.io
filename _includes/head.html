@@ -303,7 +303,7 @@
 
 	<!-- Google Analytics, on the deployed build only: a local serve would count as traffic.
 	     Google signals and ad personalisation are off: this site shows no ads and
-	     needs page counts, not cross-site profiles (see About, "Privacy"). -->
+	     needs page counts, not cross-site profiles. About, "Privacy", is the notice. -->
 	{% if site.ga_tracking_id and jekyll.environment == 'production' %}
 	<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga_tracking_id }}"></script>
 	<script>
