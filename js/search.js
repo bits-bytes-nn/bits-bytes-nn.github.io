@@ -154,16 +154,22 @@
   // The query in the address bar (?q=), so a search can be shared and survives
   // going back to it.
   // Debounced: Safari throws after 100 replaceState calls in 30 seconds.
-  var syncTimer;
+  var syncTimer = null;
+  function writeUrl() {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+    var url = new URL(window.location.href);
+    var query = searchInput.value.trim();
+    if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+    try { history.replaceState(null, '', url); } catch (e) {}
+  }
   function syncUrl() {
     clearTimeout(syncTimer);
-    syncTimer = setTimeout(function () {
-      var url = new URL(window.location.href);
-      var query = searchInput.value.trim();
-      if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
-      try { history.replaceState(null, '', url); } catch (e) {}
-    }, 400);
+    syncTimer = setTimeout(writeUrl, 400);
   }
+  // Leaving before the wait is over (a result clicked straight after typing)
+  // still records the query, so Back returns to it.
+  window.addEventListener('pagehide', function () { if (syncTimer !== null) writeUrl(); });
 
   // Up to BODY_CAP occurrences of `word` in `text` (both lowercase).
   function occurrences(text, word) {
@@ -251,9 +257,7 @@
       html += '<button type="button" class="search-more">Show ' + Math.min(LIMIT, rest) + ' more</button>';
     }
     resultsContainer.innerHTML = html;
-    // The status is announced (aria-live): mid-composition it would read out a
-    // half-typed syllable, so it waits for the syllable to be done.
-    if (!composing) announce(words);
+    announce(words);
   }
 
   function announce(words) {
@@ -279,7 +283,7 @@
     if (!words.length) {
       results = [];
       resultsContainer.innerHTML = '';
-      if (!composing) statusEl.textContent = '';
+      statusEl.textContent = '';
       return;
     }
     results = rank(words);
@@ -327,17 +331,21 @@
 
   // The results follow every keystroke, a syllable still being composed
   // included: a Korean IME (or a phone keyboard composing a whole word) keeps
-  // the last one open until Space, Enter or blur. Only the spoken status waits.
-  var composing = false;
+  // the last one open until Space, Enter or blur.
   var runTimer;
   function scheduleRun() {
     if (!ready) return;
     clearTimeout(runTimer);
     runTimer = setTimeout(run, 80);
   }
-  searchInput.addEventListener('compositionstart', function () { composing = true; });
+  // The status is shown throughout but spoken (aria-live) only once the
+  // syllable is done: mid-composition it would read out a half-typed one.
+  searchInput.addEventListener('compositionstart', function () {
+    statusEl.setAttribute('aria-live', 'off');
+  });
   searchInput.addEventListener('compositionend', function () {
-    composing = false;
+    statusEl.setAttribute('aria-live', 'polite');
+    statusEl.textContent = ''; // so the same words are announced again
     scheduleRun();
   });
   searchInput.addEventListener('input', function () {

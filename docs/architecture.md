@@ -215,8 +215,9 @@ site.
   body, with a little for how often the body has them), then newest first. A
   translation pair counts once (`translation`): the post in the site's language
   when both match, at the better score. The results follow every keystroke,
-  a Korean syllable still being composed included; the spoken status waits for
-  it. The status gives the real total;
+  a Korean syllable still being composed included; the status is spoken
+  (`aria-live`) only once the syllable is done. A query is kept in `?q=` even
+  when a result is clicked straight after typing. The status gives the real total;
   10 results show, and "Show 10 more" adds the next ones and moves focus to the
   first of them.
 - Each result's title and excerpt carry its post's `lang`; the excerpt is cut

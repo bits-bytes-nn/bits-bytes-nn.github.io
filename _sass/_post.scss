@@ -99,6 +99,7 @@
     // (_plugins/post_toc.rb).
     ul ul {
       padding: 0 0 0 1.2em;
+      li { font-size: inherit; } // not 0.92em of 0.92em
       a { font-weight: 400; }
     }
 
