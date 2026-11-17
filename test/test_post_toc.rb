@@ -26,6 +26,11 @@ class TestPostToc < Minitest::Test
     assert(entries.all? { |e| e["num"].nil? })
   end
 
+  def test_an_h3_before_any_h2_is_listed_as_a_section
+    entries = toc(%(<h3 id="p">Preface</h3><h2 id="a">A</h2><h3 id="a1">A1</h3>))
+    assert_equal [2, 2, 3], entries.map { |e| e["level"] }
+  end
+
   def test_two_h2s_and_no_h3s_stay_too_short_to_show
     assert_equal 2, toc(%(<h2 id="a">A</h2><h2 id="b">B</h2>)).size
   end

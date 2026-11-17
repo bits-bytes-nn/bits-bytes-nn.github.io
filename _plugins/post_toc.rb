@@ -22,6 +22,9 @@ module PostTocFilter
     heads = html.to_s.scan(HEADING).map { |level, id, inner| [level.to_i, id, inner.gsub(/<[^>]+>/, "").strip] }
     top = heads.select { |level, _, _| level == 2 }
     heads = top if top.size >= MIN
+    # An h3 before the first h2 has no section to sit under: list it as one.
+    first_h2 = heads.index { |level, _, _| level == 2 } || heads.size
+    heads = heads.each_with_index.map { |(level, id, text), i| [i < first_h2 ? 2 : level, id, text] }
     # Numbers count h2s only: with h3s among them, "1 … 14" would number sections
     # and their parts alike, so the list goes unnumbered and the h3s indented.
     unnumbered = heads.count { |_, _, text| text.match?(SELF_NUMBERED) } > heads.size / 2.0 ||

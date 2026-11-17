@@ -86,10 +86,23 @@ layout: default
         <span class="post-toc-count">{{ toc.size }}</span>
         <span class="post-toc-chevron" aria-hidden="true"></span>
       </summary>
+      {%- comment -%}
+        h3s (level 3, _plugins/post_toc.rb) nest under the h2 before them, so
+        a screen reader hears the sections and their parts.
+      {%- endcomment %}
       <ul>
-        {%- for entry in toc %}
-        <li{% if entry.level == 3 %} class="toc-sub"{% endif %}><a href="#{{ entry.id }}">{% if entry.num %}<span class="toc-num">{{ entry.num }}</span>{% endif %}{{ entry.text }}</a></li>
-        {%- endfor %}
+        {%- assign sub_open = false -%}
+        {%- for entry in toc -%}
+        {%- if entry.level == 3 -%}
+          {%- unless sub_open %}<ul>{% assign sub_open = true %}{% endunless %}
+          <li><a href="#{{ entry.id }}">{{ entry.text }}</a></li>
+        {%- else -%}
+          {%- if sub_open %}</ul>{% assign sub_open = false %}{% endif -%}
+          {%- unless forloop.first %}</li>{% endunless %}
+        <li><a href="#{{ entry.id }}">{% if entry.num %}<span class="toc-num">{{ entry.num }}</span>{% endif %}{{ entry.text }}</a>
+        {%- endif -%}
+        {%- endfor -%}
+        {%- if sub_open %}</ul>{% endif %}</li>
       </ul>
     </details>
     {% endif %}

@@ -95,9 +95,10 @@
       font-size: 0.92em;
     }
 
-    // An h3, listed when the post has too few h2s (_plugins/post_toc.rb).
-    .toc-sub {
-      margin-left: 1.2em;
+    // h3s, listed under their h2 when the post has too few h2s
+    // (_plugins/post_toc.rb).
+    ul ul {
+      padding: 0 0 0 1.2em;
       a { font-weight: 400; }
     }
 

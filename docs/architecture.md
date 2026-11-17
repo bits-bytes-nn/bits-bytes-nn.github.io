@@ -209,10 +209,14 @@ site.
   with the page, and runs any query typed while it downloads. It shows "Loading
   the search index…", and "Search could not load" on failure. It keeps the query
   in the address bar (`?q=`), so a search can be linked, and runs it on load.
-- A post matches when every query word is in its title, tags, category or body.
+- A post matches when every query word is in its title, tags, category or body
+  (not its date).
   Matches rank by where the words are (`WEIGHTS`: title, then tags, category,
   body, with a little for how often the body has them), then newest first. A
-  translation pair counts once (`translation`). The status gives the real total;
+  translation pair counts once (`translation`): the post in the site's language
+  when both match, at the better score. The results follow every keystroke,
+  a Korean syllable still being composed included; the spoken status waits for
+  it. The status gives the real total;
   10 results show, and "Show 10 more" adds the next ones and moves focus to the
   first of them.
 - Each result's title and excerpt carry its post's `lang`; the excerpt is cut

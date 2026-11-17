@@ -185,7 +185,7 @@
 	  "publisher": { "@type": "Person", "name": {{ site.author | jsonify }} },
 	  {%- comment -%} The paper a paper post is about, by its DOI. {%- endcomment -%}
 	  {%- if page.paper_doi %}
-	  "about": { "@type": "ScholarlyArticle", "sameAs": {{ page.paper_doi | prepend: 'https://doi.org/' | jsonify }} },
+	  "about": { "@type": "ScholarlyArticle", "name": {{ page.title | jsonify | replace: '<', '\u003c' }}, "identifier": {{ page.paper_doi | jsonify }}, "sameAs": {{ page.paper_doi | prepend: 'https://doi.org/' | jsonify }} },
 	  {%- endif %}
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify | replace: '<', '\u003c' }}
 	}

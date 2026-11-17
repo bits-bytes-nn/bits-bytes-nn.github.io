@@ -203,20 +203,29 @@
     });
   }
 
-  // Matching posts, best first; of a translation pair, the better-scoring one
-  // (the original on a tie, since it is the newer by a second).
+  // The site's language (site.lang): of a translation pair that both match, the
+  // post in it is shown, at the better score of the two; the twin only when it
+  // alone matches (an English query the Korean original lacks).
+  var SITE_LANG = searchInput.getAttribute('data-site-lang');
+
+  // Matching posts, best first, newest first on a tie; a pair counts once.
   function rank(words) {
-    var seen = {};
-    return docs
+    var matched = docs
       .map(function (doc) { return { doc: doc, score: score(doc, words) }; })
-      .filter(function (r) { return r.score > 0; })
-      .sort(function (a, b) { return b.score - a.score || a.doc.order - b.doc.order; })
-      .filter(function (r) {
-        var pair = r.doc.post.translation;
-        if (!pair) return true;
-        if (seen[pair]) return false;
-        return (seen[pair] = true);
-      });
+      .filter(function (r) { return r.score > 0; });
+    var pairs = {};
+    matched.forEach(function (r) {
+      var pair = r.doc.post.translation;
+      if (!pair) return;
+      var kept = pairs[pair];
+      if (!kept) { pairs[pair] = r; return; }
+      var mine = r.doc.post.lang === SITE_LANG;
+      var best = Math.max(kept.score, r.score);
+      if (mine) { r.score = best; pairs[pair] = r; } else { kept.score = best; }
+    });
+    return matched
+      .filter(function (r) { var pair = r.doc.post.translation; return !pair || pairs[pair] === r; })
+      .sort(function (a, b) { return b.score - a.score || a.doc.order - b.doc.order; });
   }
 
   function text(v) { return String(v == null ? '' : v); }
@@ -242,9 +251,18 @@
       html += '<button type="button" class="search-more">Show ' + Math.min(LIMIT, rest) + ' more</button>';
     }
     resultsContainer.innerHTML = html;
+    // The status is announced (aria-live): mid-composition it would read out a
+    // half-typed syllable, so it waits for the syllable to be done.
+    if (!composing) announce(words);
+  }
 
+  function announce(words) {
     var query = searchInput.value.trim();
     var n = results.length;
+    if (!words.length) {
+      statusEl.textContent = '';
+      return;
+    }
     if (n === 0) {
       statusEl.textContent = words.length > 1
         ? 'No post contains every word of "' + query + '". Try fewer words.'
@@ -261,7 +279,7 @@
     if (!words.length) {
       results = [];
       resultsContainer.innerHTML = '';
-      statusEl.textContent = '';
+      if (!composing) statusEl.textContent = '';
       return;
     }
     results = rank(words);
@@ -307,19 +325,25 @@
     searchInput.addEventListener(type, start, { once: true });
   });
 
-  // Mid-composition (a Korean syllable still being typed) the results and the
-  // status would follow a half-typed word; they update when it is done.
+  // The results follow every keystroke, a syllable still being composed
+  // included: a Korean IME (or a phone keyboard composing a whole word) keeps
+  // the last one open until Space, Enter or blur. Only the spoken status waits.
+  var composing = false;
   var runTimer;
   function scheduleRun() {
     if (!ready) return;
     clearTimeout(runTimer);
     runTimer = setTimeout(run, 80);
   }
-  searchInput.addEventListener('input', function (e) {
-    if (!e.isComposing) scheduleRun();
+  searchInput.addEventListener('compositionstart', function () { composing = true; });
+  searchInput.addEventListener('compositionend', function () {
+    composing = false;
+    scheduleRun();
+  });
+  searchInput.addEventListener('input', function () {
+    scheduleRun();
     syncUrl();
   });
-  searchInput.addEventListener('compositionend', scheduleRun);
 
   var linked = new URLSearchParams(window.location.search).get('q');
   if (linked && !searchInput.value) searchInput.value = linked;

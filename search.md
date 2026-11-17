@@ -14,7 +14,7 @@ sitemap: false
 ---
 
 <div id="search-container">
-  <input type="search" id="search-input" data-index="{{ '/search.json' | prepend: site.baseurl }}" placeholder="Search titles, text and tags…"
+  <input type="search" id="search-input" data-index="{{ '/search.json' | prepend: site.baseurl }}" data-site-lang="{{ site.lang }}" placeholder="Search titles, text and tags…"
          autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search posts" lang="en">
   <p id="search-status" class="search-status" role="status" aria-live="polite" lang="en"></p>
   <noscript><p class="search-status">Search runs in the browser and needs JavaScript.</p></noscript>
