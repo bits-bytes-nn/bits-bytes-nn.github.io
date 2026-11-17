@@ -17,11 +17,6 @@
 (function () {
   'use strict';
 
-  var searchInput = document.getElementById('search-input');
-  var resultsContainer = document.getElementById('results-container');
-  var statusEl = document.getElementById('search-status');
-  if (!searchInput || !resultsContainer || !statusEl) return;
-
   var LIMIT = 10;         // results shown at first, and added by "Show more"
   var WINDOW_CHARS = 220; // length of the excerpt shown
   var LEAD_CHARS = 60;    // run-up kept before the first match, for context
@@ -31,11 +26,6 @@
   // that names it once, but never a title hit.
   var WEIGHTS = { title: 8, tags: 4, category: 2, body: 1 };
   var BODY_CAP = 20;
-
-  function queryWords() {
-    // Every word must appear; the highlight marks the same words.
-    return searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  }
 
   var ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
   function escapeHtml(text) {
@@ -151,26 +141,6 @@
            (bounds.end < text.length ? '…' : '');
   }
 
-  // The query in the address bar (?q=), so a search can be shared and survives
-  // going back to it.
-  // Debounced: Safari throws after 100 replaceState calls in 30 seconds.
-  var syncTimer = null;
-  function writeUrl() {
-    clearTimeout(syncTimer);
-    syncTimer = null;
-    var url = new URL(window.location.href);
-    var query = searchInput.value.trim();
-    if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
-    try { history.replaceState(null, '', url); } catch (e) {}
-  }
-  function syncUrl() {
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(writeUrl, 400);
-  }
-  // Leaving before the wait is over (a result clicked straight after typing)
-  // still records the query, so Back returns to it.
-  window.addEventListener('pagehide', function () { if (syncTimer !== null) writeUrl(); });
-
   // Up to BODY_CAP occurrences of `word` in `text` (both lowercase).
   function occurrences(text, word) {
     var n = 0;
@@ -199,23 +169,20 @@
     return total;
   }
 
-  var docs = [];
   // The index lowercased once, in its order (newest first), for matching.
   function prepare(index) {
-    docs = index.map(function (post, order) {
+    return index.map(function (post, order) {
       var lower = function (v) { return String(v == null ? '' : v).toLowerCase(); };
       return { post: post, order: order, title: lower(post.title), tags: lower(post.tags),
                category: lower(post.category), content: lower(post.content) };
     });
   }
 
-  // The site's language (site.lang): of a translation pair that both match, the
-  // post in it is shown, at the better score of the two; the twin only when it
-  // alone matches (an English query the Korean original lacks).
-  var SITE_LANG = searchInput.getAttribute('data-site-lang');
-
-  // Matching posts, best first, newest first on a tie; a pair counts once.
-  function rank(words) {
+  // Matching posts, best first, newest first on a tie. A translation pair
+  // counts once: of a pair that both match, the post in `siteLang` is shown, at
+  // the better score of the two; the twin only when it alone matches (an
+  // English query the Korean original lacks).
+  function rank(docs, words, siteLang) {
     var matched = docs
       .map(function (doc) { return { doc: doc, score: score(doc, words) }; })
       .filter(function (r) { return r.score > 0; });
@@ -225,7 +192,7 @@
       if (!pair) return;
       var kept = pairs[pair];
       if (!kept) { pairs[pair] = r; return; }
-      var mine = r.doc.post.lang === SITE_LANG;
+      var mine = r.doc.post.lang === siteLang;
       var best = Math.max(kept.score, r.score);
       if (mine) { r.score = best; pairs[pair] = r; } else { kept.score = best; }
     });
@@ -246,6 +213,46 @@
         '<p class="result-tags">' + mark(text(post.tags), words) + '</p>' +
       '</div>';
   }
+
+  // test/js/search.test.js loads the functions above in node.
+  if (typeof module === 'object' && module.exports) {
+    module.exports = { prepare: prepare, rank: rank, score: score, excerpt: excerpt, mark: mark,
+                       resultHtml: resultHtml, WEIGHTS: WEIGHTS };
+    return;
+  }
+
+  var searchInput = document.getElementById('search-input');
+  var resultsContainer = document.getElementById('results-container');
+  var statusEl = document.getElementById('search-status');
+  if (!searchInput || !resultsContainer || !statusEl) return;
+
+  function queryWords() {
+    // Every word must appear; the highlight marks the same words.
+    return searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  }
+
+  // The query in the address bar (?q=), so a search can be shared and survives
+  // going back to it.
+  // Debounced: Safari throws after 100 replaceState calls in 30 seconds.
+  var syncTimer = null;
+  function writeUrl() {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+    var url = new URL(window.location.href);
+    var query = searchInput.value.trim();
+    if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+    try { history.replaceState(null, '', url); } catch (e) {}
+  }
+  function syncUrl() {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(writeUrl, 400);
+  }
+  // Leaving before the wait is over (a result clicked straight after typing)
+  // still records the query, so Back returns to it.
+  window.addEventListener('pagehide', function () { if (syncTimer !== null) writeUrl(); });
+
+  var SITE_LANG = searchInput.getAttribute('data-site-lang'); // site.lang
+  var docs = [];
 
   var results = [];
   var shown = LIMIT;
@@ -286,7 +293,7 @@
       statusEl.textContent = '';
       return;
     }
-    results = rank(words);
+    results = rank(docs, words, SITE_LANG);
     draw(words);
   }
 
@@ -316,7 +323,7 @@
         return response.json();
       })
       .then(function (index) {
-        prepare(index);
+        docs = prepare(index);
         ready = true;
         statusEl.textContent = '';
         if (searchInput.value.trim()) run();

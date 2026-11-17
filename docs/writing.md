@@ -55,7 +55,7 @@ subtitle: "<one-line pitch>"       # paper posts: required, not the title; else 
 date: YYYY-MM-DD HH:MM:SS          # paper posts: the paper's date; else the posting date
 paper_author: "<Org>"              # the paper's org, not people; paper posts only
 paper_doi: "10.48550/arXiv.<id>"   # optional, paper posts only: the citation count in the meta panel (docs/architecture.md)
-seo_title: "<shorter title>"       # optional: for <title> when the title is too long
+seo_title: "<shorter title>"       # required when the title is over seo_title_max_length (70); for <title>
 description: >-                    # optional, plain text; see below
   <search snippet, ~150 chars>
 categories: ["<Type>", "<Topic>"]
@@ -76,7 +76,10 @@ translation_id: <shared-slug>      # on both posts of a ko/en pair
   "Paper by …".
 - **`<title>`.** A paper post's `<title>` is its title (or `seo_title`) plus
   "논문 리뷰" / "논문 요약", the words a Korean reader searches with. English
-  twins and social cards keep the plain title.
+  twins and social cards keep the plain title. A title over
+  `seo_title_max_length` (70 characters, in the conventions) needs a shorter
+  `seo_title`, which the lint holds to the same limit: search results cut a
+  longer one.
 - **`cover`** is not free: see [covers](#categories-urls-and-covers).
 
 ## Dates
@@ -205,9 +208,12 @@ Write `$$…$$` for inline and display math alike, and set `use_math: true`.
   license and a link when the license asks for one (CC BY does), as an italic
   line right under the image:
   `*Figure: Yao et al., [Tree of Thoughts](https://arxiv.org/abs/2305.10601) (2023), Figure 1. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*`
-  For your own drawing after someone else's, say so (`*Redrawn after Yao et al., 2022.*`). When
-  hotlinking an arXiv figure, prefer a pinned version (`arxiv.org/html/<id>v1/…`):
-  a revision can renumber the figures.
+  For your own drawing after someone else's, say so (`*Redrawn after Yao et al., 2022.*`).
+- A paper's figure from arXiv is stored, not hotlinked: save it as
+  `/assets/images/<slug>-<n>.<ext>`, the name scholar-lens gives it (the lint
+  rejects an arXiv image URL). An arXiv link rots when a revision renumbers the
+  figures, and a remote image gets no width/height, so the page jumps as it
+  loads. Any other site's image is its owner's and stays a link to it.
 - Diagrams are drawn in Excalidraw (`.excalidraw` beside the PNG; the sources
   are excluded from the site). `assets/images/render-diagrams.sh` renders them.
   Write ASCII arrows (`->`) in diagram text: Excalifont has no `→`, and one such

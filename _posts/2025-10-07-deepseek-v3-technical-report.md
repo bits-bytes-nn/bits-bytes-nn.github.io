@@ -41,7 +41,7 @@ DeepSeek-V3는 오픈소스 대규모 언어 모델 분야에서 획기적인 �
 
 DeepSeek-V3는 총 671B개의 파라미터를 가지며 각 토큰당 37B개의 파라미터가 활성화되는 강력한 Mixture-of-Experts (MoE) 언어 모델입니다. 효율적인 추론과 비용 효과적인 훈련을 달성하기 위해 DeepSeek-V3는 DeepSeek-V2에서 철저히 검증된 Multi-head Latent Attention (MLA)와 DeepSeekMoE 아키텍처를 채택했습니다.
 
-![벤치마크 성능 비교](https://arxiv.org/html/2412.19437/x1.png)
+![벤치마크 성능 비교](/assets/images/deepseek-v3-technical-report-1.png)
 
 위 그림에서 보듯이 DeepSeek-V3는 다양한 벤치마크 과제에서 뛰어난 성능을 보여줍니다. MMLU-Pro, GPQA-Diamond, MATH 500, AIME 2024, Codeforces, SWE-bench Verified 등의 평가에서 경쟁 모델들을 크게 앞서는 결과를 달성했습니다. 이는 DeepSeek-V3의 우수한 성능을 입증하는 핵심적인 연구 기여를 보여줍니다.
 
@@ -118,7 +118,7 @@ DeepSeek-V3는 총 671B개의 파라미터를 가지며 각 토큰당 37B개의 
 
 DeepSeek-V3는 효율적인 추론을 위한 Multi-head Latent Attention (MLA)와 경제적인 훈련을 위한 DeepSeekMoE를 특징으로 하는 기본 아키텍처를 먼저 소개합니다. 이후 전체 성능을 향상시키는 것으로 관찰된 Multi-Token Prediction (MTP) 훈련 목표를 제시합니다. 명시적으로 언급되지 않은 다른 세부 사항들에 대해서는 DeepSeek-V3가 DeepSeek-V2의 설정을 따릅니다.
 
-![DeepSeek-V3 기본 아키텍처](https://arxiv.org/html/2412.19437/x2.png)
+![DeepSeek-V3 기본 아키텍처](/assets/images/deepseek-v3-technical-report-2.png)
 
 위 그림은 DeepSeek-V3의 기본 아키텍처를 보여줍니다. DeepSeek-V2를 따라 효율적인 추론과 경제적인 훈련을 위해 MLA와 DeepSeekMoE를 채택했습니다. 아키텍처는 Feed-Forward Network, RMSNorm, Attention, RMSNorm 구성 요소들로 이루어져 있으며, multi-head latent attention (MLA) 메커니즘과 Routed Expert 및 Shared Expert 구성 요소를 가진 DeepSeekMoE 아키텍처를 핵심으로 합니다.
 
@@ -256,7 +256,7 @@ DeepSeek-V2에서 사용된 디바이스 제한 라우팅과 마찬가지로, De
 
 Gloeckle et al. (2024)에서 영감을 받아, 연구진은 각 위치에서 여러 미래 토큰으로 예측 범위를 확장하는 Multi-Token Prediction (MTP) 목표를 조사하고 DeepSeek-V3에 설정했습니다. 한편으로는 MTP 목표가 훈련 신호를 밀집화하고 데이터 효율성을 향상시킬 수 있습니다. 다른 한편으로는 MTP가 모델이 미래 토큰의 더 나은 예측을 위해 표현을 미리 계획할 수 있게 할 수 있습니다.
 
-![Multi-Token Prediction 구현](https://arxiv.org/html/2412.19437/x3.png)
+![Multi-Token Prediction 구현](/assets/images/deepseek-v3-technical-report-3.png)
 
 위 그림은 MTP 구현을 보여줍니다. 각 깊이에서 각 토큰의 예측에 대한 완전한 인과 체인을 유지합니다. 독립적인 출력 헤드를 사용하여 $$D$$개의 추가 토큰을 병렬로 예측하는 Gloeckle et al. (2024)와 달리, 연구진은 순차적으로 추가 토큰을 예측하고 각 예측 깊이에서 완전한 인과 체인을 유지합니다.
 
@@ -321,7 +321,7 @@ DeepSeek-V3의 훈련은 연구진이 처음부터 개발한 효율적이고 경
 
 #### DualPipe와 계산-통신 오버랩
 
-![DualPipe 오버랩 전략](https://arxiv.org/html/2412.19437/x4.png)
+![DualPipe 오버랩 전략](/assets/images/deepseek-v3-technical-report-4.png)
 
 위 그림은 트랜스포머 모델에서 개별 순방향 및 역방향 청크 쌍에 대한 오버랩 전략을 보여주는 아키텍처 다이어그램입니다. 이 다이어그램은 순방향 및 역방향 패스에 관련된 다양한 구성 요소와 통신 패턴을 보여주며, 계산(MLP), 통신(DISPATCH, COMBINE, PP), 그리고 시간 의존성을 포함합니다. 이 그림의 중요성은 순방향과 역방향 계산을 동시에 수행할 수 있도록 하여 트랜스포머 모델의 효율성을 향상시키는 오버랩 전략의 상세한 시각화를 제공한다는 점입니다.
 
@@ -333,7 +333,7 @@ DualPipe의 핵심 아이디어는 개별 순방향 및 역방향 청크 쌍 내
 
 효율적인 오버랩 전략이 주어지면, 전체 DualPipe 스케줄링이 다음 그림에 나타나 있습니다.
 
-![DualPipe 스케줄링](https://arxiv.org/html/2412.19437/x5.png)
+![DualPipe 스케줄링](/assets/images/deepseek-v3-technical-report-5.png)
 
 이 그림은 DualPipe 시스템에서 마이크로 배치의 스케줄링을 보여주는 스케줄링 다이어그램입니다. 이 다이어그램은 시간에 따른 8개의 병렬 처리(PP) 랭크와 20개의 마이크로 배치를 순방향과 역방향 모두에서 스케줄링하는 것을 보여줍니다. 이 그림의 핵심 연구 의의는 공유된 검은색 테두리로 표시된 셀들이 상호 오버랩된 계산과 통신을 나타내는 것처럼, 효율성을 향상시키기 위해 계산과 통신이 오버랩되는 DualPipe 스케줄링 접근법을 보여준다는 것입니다.
 
@@ -379,7 +379,7 @@ DualPipe에 충분한 계산 성능을 보장하기 위해, 연구진은 통신 
 
 ### FP8 훈련
 
-![FP8 혼합 정밀도 프레임워크](https://arxiv.org/html/2412.19437/x6.png)
+![FP8 혼합 정밀도 프레임워크](/assets/images/deepseek-v3-technical-report-6.png)
 
 위 그림은 FP8 데이터 형식을 사용한 전체 혼합 정밀도 프레임워크를 보여주는 아키텍처 다이어그램입니다. 명확성을 위해 Linear 연산자만 설명되어 있습니다. 이 다이어그램은 Input, Fprop, Σ(합계), Wgrad, Output, Weight, Input Gradient, Master Weight, Optimizer States 및 이들의 연결을 포함한 혼합 정밀도 프레임워크의 주요 구성 요소와 데이터 흐름을 보여줍니다. 이 그림의 연구적 의의는 딥러닝 모델의 효율성과 성능을 향상시키기 위해 모델의 다른 부분에 대해 서로 다른 수치 표현(예: FP8, FP16, FP32)을 사용하는 기법인 혼합 정밀도 프레임워크의 고수준 개요를 제공한다는 것입니다.
 
@@ -402,7 +402,7 @@ DualPipe에 충분한 계산 성능을 보장하기 위해, 연구진은 통신 
 
 #### 양자화와 곱셈을 통한 정밀도 향상
 
-![세밀한 양자화와 누적 정밀도 향상](https://arxiv.org/html/2412.19437/x7.png)
+![세밀한 양자화와 누적 정밀도 향상](/assets/images/deepseek-v3-technical-report-7.png)
 
 위 그림은 제안된 방법의 두 가지 핵심 구성 요소를 보여주는 아키텍처 다이어그램입니다. (a) 세밀한 양자화와 (b) 누적 정밀도 증가입니다. 이 다이어그램은 입력 스케일링 팩터, 텐서 코어, CUDA 코어, 그리고 양자화 및 누적 과정에 관련된 기타 구성 요소들을 보여줍니다. NC(요소 수)와 스케일링 팩터를 사용하여 양자화를 관리하고 GEMM 정밀도를 향상시키는 것을 강조합니다. 이 그림의 연구적 의의는 저자들이 제안한 세밀한 양자화 기법과 NC=128 요소 간격으로 CUDA 코어로 승격하여 고정밀도 누적을 위한 FP8 GEMM 정밀도를 향상시키는 전략을 시각적으로 설명한다는 것입니다.
 
@@ -579,7 +579,7 @@ YaRN 구성은 DeepSeek-V2에서 사용된 것과 일치하며, 분리된 공유
 
 이 2단계 확장 훈련을 통해 DeepSeek-V3는 강력한 성능을 유지하면서 최대 128K 길이의 입력을 처리할 수 있습니다.
 
-![Needle In A Haystack 테스트 결과](https://arxiv.org/html/2412.19437/x8.png)
+![Needle In A Haystack 테스트 결과](/assets/images/deepseek-v3-technical-report-8.png)
 
 위 그림은 DeepSeek-V3 모델의 "Needle In A Haystack" (NIAH) 테스트 평가 결과를 보여주는 선 그래프입니다. 이 그래프는 128K 토큰까지의 서로 다른 컨텍스트 윈도우 길이(x축)에 걸쳐 DeepSeek-V3 모델이 달성한 문서 깊이 백분율(y축)을 나타냅니다. 이 그림의 연구적 의의는 대규모 문서 컬렉션 내에서 관련 콘텐츠를 찾는 정보 검색 시스템의 효과를 평가하는 중요한 벤치마크인 NIAH 테스트에서 DeepSeek-V3 모델의 강력한 성능을 보여준다는 것입니다.
 
@@ -725,7 +725,7 @@ DeepSeek-V3의 베이스 모델은 영어와 중국어가 대부분을 차지하
 
 이를 검증하기 위해 Pile 테스트 세트의 서로 다른 도메인에서 16B 보조 손실 기반 베이스라인과 16B 보조 손실 없는 모델의 전문가 로드를 기록하고 분석합니다.
 
-![전문가 로드 분석](https://arxiv.org/html/2412.19437/x9.png)
+![전문가 로드 분석](/assets/images/deepseek-v3-technical-report-9.png)
 
 위 그림은 Pile 테스트 세트의 세 도메인(Wikipedia (en), Github, DM Mathematics)과 두 개의 서로 다른 레이어(레이어 9와 레이어 18)에 걸쳐 두 개의 서로 다른 모델(보조 손실 기반 및 보조 손실 없는)에 대한 상대적 전문가 로드의 히트맵 시각화를 보여줍니다. 그림에서 제시된 핵심 정보는 실제 전문가 로드와 이론적으로 균형 잡힌 전문가 로드 간의 비율을 나타내는 상대적 전문가 로드입니다. 히트맵은 서로 다른 도메인과 레이어에 걸쳐 두 모델 간의 전문가 전문화 패턴의 차이를 보여줍니다. 이 그림의 연구적 의의는 보조 손실 없는 모델이 보조 손실 기반 모델에 비해 더 큰 전문가 전문화 패턴을 보인다는 것을 입증하는 것으로, 이는 이러한 유형의 모델의 행동과 성능을 이해하는 데 관련된 발견입니다.
 
@@ -984,7 +984,7 @@ DeepSeek-V3의 FP8 혼합 정밀도 훈련 프레임워크의 효과를 검증�
 
 #### FP8 대 BF16 훈련 비교
 
-![FP8와 BF16 훈련 손실 곡선 비교](https://arxiv.org/html/2412.19437/x10.png)
+![FP8와 BF16 훈련 손실 곡선 비교](/assets/images/deepseek-v3-technical-report-10.png)
 
 위 그림은 DeepSeek-V2 데이터셋의 두 가지 버전(16B 토큰과 230B 토큰)에서 BF16과 FP8 훈련 간의 손실 곡선을 비교한 결과를 보여줍니다. 손실 값들은 계수 0.9를 가진 지수 이동 평균(EMA)으로 평활화되었습니다. 이 그래프는 대규모 언어 모델 훈련에서 효율적인 모델 배포를 위한 중요한 고려사항인 BF16과 FP8 정밀도 형식 간의 성능 비교를 보여주는 연구적 의의를 가집니다.
 
@@ -1012,7 +1012,7 @@ DeepSeek-V3의 FP8 혼합 정밀도 훈련 프레임워크의 효과를 검증�
 
 연구진은 Pile 테스트 세트에서 16B 보조 손실 기반 베이스라인과 보조 손실 없는 모델의 전문가 로드를 기록하고 분석했습니다. 이 분석은 서로 다른 로드 밸런싱 전략이 전문가들의 전문화 패턴에 미치는 영향을 이해하는 데 중요한 통찰을 제공합니다.
 
-![전문가 로드 히트맵 시각화](https://arxiv.org/html/2412.19437/x11.png)
+![전문가 로드 히트맵 시각화](/assets/images/deepseek-v3-technical-report-11.png)
 
 위 그림들은 Pile 테스트 세트의 세 도메인(Wikipedia (en), Github, DM Mathematics)에 걸쳐 보조 손실 기반 모델과 보조 손실 없는 모델의 상대적 전문가 로드를 보여주는 포괄적인 히트맵 시각화입니다. 각 히트맵은 신경망 아키텍처의 서로 다른 레이어를 나타내며, 보조 손실 없는 모델이 보조 손실 기반 모델에 비해 모든 레이어에서 더 큰 전문가 전문화 패턴을 보인다는 것을 보여줍니다.
 

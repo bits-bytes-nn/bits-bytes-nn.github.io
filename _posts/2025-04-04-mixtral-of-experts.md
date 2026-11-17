@@ -80,7 +80,7 @@ Mixtral은 트랜스포머 아키텍처를 기반으로 하며, [Vaswani와 연�
 
 ### 희소 전문가 혼합(Sparse Mixture of Experts)
 
-![전문가 혼합 층. 각 입력 벡터는 라우터에 의해 8개의 전문가 중 2개에 할당됩니다. 층의 출력은 선택된 두 전문가의 출력의 가중합입니다. Mixtral에서 전문가는 바닐라 트랜스포머 아키텍처의 표준 피드포워드 블록입니다.](https://arxiv.org/html/2401.04088v1/images/smoe.png)
+![전문가 혼합 층. 각 입력 벡터는 라우터에 의해 8개의 전문가 중 2개에 할당됩니다. 층의 출력은 선택된 두 전문가의 출력의 가중합입니다. Mixtral에서 전문가는 바닐라 트랜스포머 아키텍처의 표준 피드포워드 블록입니다.](/assets/images/mixtral-of-experts-1.png)
 
 전문가 혼합 층(Mixture of Experts, MoE)에 대해 간략히 살펴보겠습니다. 더 자세한 내용은 [Fedus와 연구진](https://arxiv.org/pdf/2209.01667)의 논문을 참조하시기 바랍니다.
 
@@ -124,7 +124,7 @@ $$ y = \sum_{i=0}^{n-1} \text{Softmax}(\text{Top2}(x \cdot W_g))_i \cdot \text{S
 
 Mixtral 모델을 Llama와 비교하기 위해 다양한 벤치마크에서 자체 평가 파이프라인을 통해 모든 벤치마크를 재실행했습니다. 성능은 다음과 같은 카테고리로 분류된 다양한 작업에서 측정되었습니다.
 
-![그림 2: 다양한 벤치마크에서 Mixtral과 여러 Llama 모델의 성능 비교. 모든 모델은 정확한 비교를 위해 동일한 평가 파이프라인으로 재평가되었습니다. Mixtral은 모든 벤치마크에서 Llama 2 70B와 비슷하거나 더 나은 성능을 보여주며, 특히 수학과 코드 생성 분야에서 월등히 우수합니다.](https://arxiv.org/html/2401.04088v1/images/231209_bench_combined.png)
+![그림 2: 다양한 벤치마크에서 Mixtral과 여러 Llama 모델의 성능 비교. 모든 모델은 정확한 비교를 위해 동일한 평가 파이프라인으로 재평가되었습니다. Mixtral은 모든 벤치마크에서 Llama 2 70B와 비슷하거나 더 나은 성능을 보여주며, 특히 수학과 코드 생성 분야에서 월등히 우수합니다.](/assets/images/mixtral-of-experts-2.png)
 
 아래 표는 Mixtral과 Llama 모델 간의 상세한 성능 비교를 보여줍니다. Mixtral 8x7B는 추론 과정에서 5배 적은 활성 매개변수를 사용하면서도 거의 모든 인기 벤치마크에서 Llama 2 70B의 성능을 능가하거나 일치시킵니다.
 
@@ -148,7 +148,7 @@ Mixtral 모델을 Llama와 비교하기 위해 다양한 벤치마크에서 자�
 
 아래 그림은 다양한 카테고리에서 Mixtral과 Llama 모델들의 성능을 비교합니다. Mixtral은 대부분의 지표에서 Llama 2 70B를 능가합니다. 특히 코드와 수학 벤치마크에서 우수한 성능을 보여줍니다.
 
-![그림 3: Mistral(7B/8x7B)과 Llama 2(7B/13B/70B)의 MMLU, 상식 추론, 세계 지식, 독해 이해, 수학, 코드 벤치마크 결과 비교. Mixtral은 독해 이해 벤치마크를 제외한 모든 벤치마크에서 5배 적은 활성 매개변수를 사용하면서도 Llama 2 70B를 크게 능가합니다. 특히 코드와 수학 분야에서 Llama 2 70B보다 월등히 우수합니다.](https://arxiv.org/html/2401.04088v1/images/231209_scaling.png)
+![그림 3: Mistral(7B/8x7B)과 Llama 2(7B/13B/70B)의 MMLU, 상식 추론, 세계 지식, 독해 이해, 수학, 코드 벤치마크 결과 비교. Mixtral은 독해 이해 벤치마크를 제외한 모든 벤치마크에서 5배 적은 활성 매개변수를 사용하면서도 Llama 2 70B를 크게 능가합니다. 특히 코드와 수학 분야에서 Llama 2 70B보다 월등히 우수합니다.](/assets/images/mixtral-of-experts-3.png)
 
 ### 크기와 효율성
 
@@ -210,7 +210,7 @@ Mixtral 모델의 장거리 컨텍스트 처리 능력을 평가하기 위해, [
 
 또한 아래 그림(오른쪽)은 [Azerbayev와 연구진](https://arxiv.org/pdf/2310.10631)이 개발한 proof-pile 데이터셋의 일부에 대한 Mixtral의 퍼플렉시티(perplexity)가 컨텍스트 크기가 증가함에 따라 단조롭게 감소함을 보여줍니다. 퍼플렉시티는 언어 모델의 성능을 평가하는 지표로, 값이 낮을수록 모델이 텍스트를 더 정확하게 예측한다는 것을 의미합니다. 이 결과는 Mixtral이 더 많은 컨텍스트를 활용할수록 더 정확한 예측을 할 수 있음을 보여주는 중요한 지표입니다.
 
-![그림 4: Mixtral의 장거리 성능. (왼쪽) Mixtral은 패스키의 위치와 입력 시퀀스의 길이에 관계없이 패스키 작업에서 100% 검색 정확도를 보여줍니다.](https://arxiv.org/html/2401.04088v1/images/passkey.png) ![(오른쪽) proof-pile 데이터셋에 대한 Mixtral의 퍼플렉시티는 컨텍스트 길이가 증가함에 따라 단조롭게 감소합니다.](https://arxiv.org/html/2401.04088v1/images/perplexity.png)
+![그림 4: Mixtral의 장거리 성능. (왼쪽) Mixtral은 패스키의 위치와 입력 시퀀스의 길이에 관계없이 패스키 작업에서 100% 검색 정확도를 보여줍니다.](/assets/images/mixtral-of-experts-4.png) ![(오른쪽) proof-pile 데이터셋에 대한 Mixtral의 퍼플렉시티는 컨텍스트 길이가 증가함에 따라 단조롭게 감소합니다.](/assets/images/mixtral-of-experts-5.png)
 
 ### 편향성 벤치마크
 
@@ -252,7 +252,7 @@ DPO는 [Rafailov와 연구진](https://arxiv.org/pdf/2305.18290)이 제안한 �
 
 이러한 훈련 과정을 통해 개발된 Mixtral-Instruct는 MT-Bench에서 8.30점을 기록했습니다. MT-Bench는 [Zheng과 연구진](https://arxiv.org/pdf/2306.05685)이 개발한 벤치마크로, 대화형 AI 모델의 성능을 평가하기 위한 다양한 카테고리의 다중 턴 질문으로 구성되어 있습니다. 이 점수는 2023년 12월 기준으로 공개 가중치 모델 중 가장 높은 성적입니다.
 
-![LMSys 리더보드. (2023년 12월 22일 스크린샷) Mixtral 8x7B Instruct v0.1은 Arena Elo 평점 1121을 달성하여 Claude-2.1(1117), 모든 버전의 GPT-3.5-Turbo(최고 1117), Gemini Pro(1111), Llama-2-70b-chat(1077)를 능가했습니다. Mixtral은 현재 공개 가중치 모델 중 큰 차이로 가장 우수한 성능을 보여줍니다.](https://arxiv.org/html/2401.04088v1/images/lmsys_231222.png)
+![LMSys 리더보드. (2023년 12월 22일 스크린샷) Mixtral 8x7B Instruct v0.1은 Arena Elo 평점 1121을 달성하여 Claude-2.1(1117), 모든 버전의 GPT-3.5-Turbo(최고 1117), Gemini Pro(1111), Llama-2-70b-chat(1077)를 능가했습니다. Mixtral은 현재 공개 가중치 모델 중 큰 차이로 가장 우수한 성능을 보여줍니다.](/assets/images/mixtral-of-experts-6.png)
 
 위 그림은 LMSys 리더보드의 스크린샷으로, 2023년 12월 22일 기준 Mixtral 8x7B Instruct v0.1의 성능을 보여줍니다. 이 모델은 Arena Elo 평점 1121을 기록하여 Claude-2.1(1117), 모든 버전의 GPT-3.5-Turbo(최고 점수 1117), Gemini Pro(1111), 그리고 Llama-2-70b-chat(1077)을 모두 능가했습니다. 이는 Mixtral이 현재 공개된 가중치 모델 중에서 상당한 차이로 가장 우수한 성능을 보여준다는 것을 의미합니다.
 
@@ -276,7 +276,7 @@ MT-Bench에서의 높은 점수와 LMSys 평가에서의 우수한 성능은 Mix
 
 또한 아래 그림에서 연속된 토큰들이 종종 동일한 전문가에 할당되는 것을 관찰할 수 있습니다. 실제로 The Pile 데이터셋에서 일정 수준의 위치적 지역성(positional locality)이 관찰됩니다. 
 
-![그림 8: 각 토큰이 첫 번째 전문가 선택으로 색상 처리된 텍스트 샘플. 전문가 선택은 특히 초기 및 최종 층에서 도메인보다는 구문과 더 일치하는 것으로 나타납니다.](https://arxiv.org/html/2401.04088v1/images/routing-sample.png)
+![그림 8: 각 토큰이 첫 번째 전문가 선택으로 색상 처리된 텍스트 샘플. 전문가 선택은 특히 초기 및 최종 층에서 도메인보다는 구문과 더 일치하는 것으로 나타납니다.](/assets/images/mixtral-of-experts-7.png)
 
 | 데이터셋 | 첫 번째 선택 층 0 | 첫 번째 선택 층 15 | 첫 번째 선택 층 31 | 첫 번째 또는 두 번째 선택 층 0 | 첫 번째 또는 두 번째 선택 층 15 | 첫 번째 또는 두 번째 선택 층 31 |
 | --- | --- | --- | --- | --- | --- | --- |

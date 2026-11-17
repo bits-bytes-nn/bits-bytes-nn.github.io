@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"
+seo_title: "Direct Preference Optimization (DPO)"
 subtitle: "직접 선호 최적화: 언어 모델은 사실 보상 모델이다"
 date: 2023-05-29 17:57:46
 paper_author: "Stanford University"
@@ -55,7 +56,7 @@ DPO는 모든 실험 설정에서 기존 방법들과 비교하여 우수한 성
 
 기존의 방법들은 일반적으로 강화학습을 사용하여 언어 모델이 인간의 선호도와 일치하도록 조정하는데, 이 논문에서는 기존 방법들이 사용하는 강화학습 기반 목적 함수를 단순한 이진 교차 엔트로피 목적 함수로 정확하게 최적화할 수 있음을 보여줍니다. 이를 통해 선호도 학습 파이프라인을 크게 단순화할 수 있습니다.
 
-![RLHF와 DPO 비교](https://arxiv.org/html/2305.18290/figures/diagrams/teaser.png)
+![RLHF와 DPO 비교](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-1.png)
 
 위 그림은 인간 피드백을 활용한 언어 모델 파인튜닝의 두 가지 접근법을 비교합니다. 기존의 인간 피드백 기반 강화학습(RLHF) 방법은 먼저 프롬프트와 응답 쌍에 대한 인간 선호도 데이터셋에 보상 모델을 학습시킨 후, 강화학습을 사용하여 학습된 보상을 최대화하는 정책을 찾습니다. 반면 Direct Preference Optimization(DPO)은 단순한 분류 목적 함수로 선호도를 가장 잘 만족하는 정책을 직접 최적화하며, 암묵적 보상 모델을 학습시켜 해당하는 최적 정책을 닫힌 형태로 추출할 수 있습니다.
 
@@ -328,9 +329,9 @@ DPO 외에도 인간 선호도를 준수하도록 언어 모델을 훈련시키�
 
 ### DPO의 RLHF 목적 함수 최적화 능력
 
-![보상-KL 프론티어와 요약 승률](https://arxiv.org/html/2305.18290/x1.png)
+![보상-KL 프론티어와 요약 승률](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-2.png)
 
-![대화 승률](https://arxiv.org/html/2305.18290/x2.png)
+![대화 승률](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-3.png)
 
 위 그림들은 DPO와 다른 방법들의 성능을 비교합니다. 왼쪽 그림은 다양한 알고리즘의 기대 보상 대 참조 정책과의 KL 발산 프론티어를 보여줍니다. DPO는 모든 KL 값에 대해 가장 높은 기대 보상을 제공하여 최적화의 품질을 입증합니다. 오른쪽 그림은 GPT-4를 평가자로 사용한 TL;DR 요약 작업에서 인간이 작성한 요약에 대한 승률을 샘플링 온도별로 보여줍니다. DPO는 PPO의 최상의 성능을 초과하면서도 샘플링 온도 변화에 더 강건합니다.
 
@@ -356,9 +357,9 @@ TL;DR 요약 데이터셋의 테스트 분할에서 완성을 샘플링하고 �
 
 이 작업에 대한 표준 SFT 모델이 없으므로 사전학습된 Pythia-2.8B로 시작하여 Preferred-FT를 사용하여 선택된 완성에 대해 참조 모델을 훈련시켜 완성이 모델의 분포 내에 있도록 한 다음 DPO를 사용하여 훈련합니다. 또한 128개의 Preferred-FT 완성 중 최선(Best of 128)과 Pythia-2.8B 기본 모델의 2샷 프롬프트 버전과 비교하여, DPO가 각 방법의 최상 성능 온도에서 비슷하거나 더 나은 성능을 보임을 발견합니다.
 
-![대화 작업 승률](https://arxiv.org/html/2305.18290/x3.png)
+![대화 작업 승률](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-4.png)
 
-![훈련 과정의 승률 변화](https://arxiv.org/html/2305.18290/x4.png)
+![훈련 과정의 승률 변화](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-5.png)
 
 위 그림들은 Anthropic-HH 단일 턴 대화에 대한 GPT-4가 계산한 승률을 보여줍니다. 왼쪽 그림에서 DPO는 Anthropic-HH 테스트 세트의 선택된 요약을 개선하는 유일한 방법입니다. 오른쪽 그림은 훈련 과정에서 다양한 샘플링 온도에 대한 승률을 보여주며, DPO의 개선이 다양한 샘플링 온도에 대해 훈련 과정 전반에 걸쳐 상당히 안정적임을 보여줍니다.
 
@@ -680,9 +681,9 @@ Unlikelihood 베이스라인은 감정 실험에 포함했지만, 요약이나 �
 
 Best of $$N$$ 베이스라인은 실험에서 강력하지만 계산적으로 비용이 많이 드는 베이스라인입니다. Anthropic-HH 대화와 TL;DR 요약에 대해 다양한 $$N$$ 값의 Best of $$N$$ 베이스라인을 평가한 결과를 제시합니다.
 
-![Best of N 성능 곡선](https://arxiv.org/html/2305.18290/x5.png)
+![Best of N 성능 곡선](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-6.png)
 
-![TL;DR Best of N](https://arxiv.org/html/2305.18290/x6.png)
+![TL;DR Best of N](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-7.png)
 
 위 그림들은 $$N = \{1, 4, 16, 64, 128\}$$에 대한 Best of $$N$$ 베이스라인의 성능을 보여줍니다. 성능은 대략 64-128개의 샘플 이후에 정체됩니다. 첫 번째 그림은 Anthropic-HH 대화에서 선택된 샘플링 온도에 대한 승률을 보여주며, 두 번째 그림은 TL;DR 요약에서의 결과를 나타냅니다.
 
@@ -738,7 +739,7 @@ GPT-4 판단: Response B [GT]가 질문에 대한 직접적이고 정확한 답�
 
 ### 인간 연구 세부사항
 
-![인간 연구 설문 레이아웃](https://arxiv.org/html/2305.18290/figures/results/survey.png)
+![인간 연구 설문 레이아웃](/assets/images/direct-preference-optimization--your-language-model-is-secretly-a-reward-model-8.png)
 
 위 그림은 SurveyMonkey에서의 설문 레이아웃을 보여줍니다. 각 응답자는 유사하게 형식화된 25개의 판단을 완료했습니다.
 

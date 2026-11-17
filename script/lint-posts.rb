@@ -40,7 +40,22 @@ module PostLint
 
   # Returns findings as "line: message" strings; empty when the post passes.
   def self.check(post, spec)
-    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + liquid(post) + lightbox(post)
+    front_matter(post, spec) + tags(post, spec) + translation(post, spec) + body(post) + liquid(post) + lightbox(post) + figures(post)
+  end
+
+  # A paper's figure hotlinked from arXiv: links rot when versions change, and
+  # a remote image gets no width/height (_plugins/image_dimensions.rb), so the
+  # page jumps as it loads. scholar-lens stores them (its ImageLocalizer); any
+  # other remote image is its owner's and stays a link.
+  ARXIV_FIGURE = %r{(?:!\[[^\]]*\]\(\s*|<img\b[^>]*?\ssrc=["'])https?://(?:[a-z0-9-]+\.)*arxiv\.org/}i
+
+  def self.figures(post)
+    lines = post.body.split("\n", -1)
+    fences(lines).zip(lines).each_with_index.filter_map do |(fenced, line), i|
+      next if fenced || !line.match?(ARXIV_FIGURE)
+
+      "#{post.body_line + i}: an arXiv figure is linked, not stored; save it as /assets/images/#{slug(post)}-<n>.<ext>"
+    end
   end
 
   # A hand-written zoomable figure opens its href in the lightbox. A page there
@@ -119,6 +134,14 @@ module PostLint
     # It ships as plain text (meta, feed, home card); markup would show literally.
     if data["description"].to_s.match?(/\$\$|\*\S[^*]*\*|`|\]\(|<[a-zA-Z\/]|\{[{%]/)
       found << "1: description is plain text; no $$, *emphasis*, backticks, links or tags"
+    end
+    # The <title> is cut in a results list past this; scholar-lens checks the same.
+    limit = spec["seo_title_max_length"]
+    if limit && data["title"].to_s.length > limit && !data["seo_title"]
+      found << "1: title is over #{limit} characters; add a shorter seo_title for <title>"
+    end
+    if limit && data["seo_title"].to_s.length > limit
+      found << "1: seo_title is over #{limit} characters"
     end
     # Text the reader sees: a tag in it (<think>, <!-- …) is read as HTML.
     %w[title subtitle paper_author].each do |key|
@@ -342,7 +365,7 @@ module PostLint
       in_references = line.match?(REFERENCES) if line.start_with?("#")
       # ar5iv answers a figure it lost with a "NO IMAGE AVAILABLE" PNG and HTTP
       # 200, so no link check notices: 59 figures went blank that way.
-      found << "#{n}: ar5iv link; use arxiv.org/html or a copy in assets/images" if bare.include?("ar5iv.")
+      found << "#{n}: ar5iv link; link arxiv.org, and store a figure in assets/images" if bare.include?("ar5iv.")
       # A whole tag, outside code and math: `i<j` and `$$a<b$$` are text.
       text = bare.gsub(/\$\$.*?\$\$/, "")
       tags = text.scan(%r{(?<!\\)<(/?)([a-zA-Z][\w-]*)(\s[^<>]*)?/?>})

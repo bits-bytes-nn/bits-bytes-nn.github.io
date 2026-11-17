@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model"
+seo_title: "DeepSeek-V2: A Strong, Economical, Efficient MoE Model"
 subtitle: "DeepSeek-V2: 강력하고 경제적이며 효율적인 Mixture-of-Experts 언어 모델"
 date: 2024-05-07 15:56:43
 paper_author: "DeepSeek AI"
@@ -43,11 +44,11 @@ DeepSeek-V2는 경제적인 훈련과 효율적인 추론을 특징으로 하는
 
 DeepSeek-V2의 핵심 혁신은 두 가지 새로운 아키텍처에 있습니다. 첫째, Multi-head Latent Attention(MLA)은 Key-Value(KV) 캐시를 잠재 벡터로 크게 압축하여 효율적인 추론을 보장합니다. 둘째, DeepSeekMoE는 희소 계산을 통해 경제적인 비용으로 강력한 모델을 훈련할 수 있게 합니다.
 
-![성능 비교 그래프](https://arxiv.org/html/2405.04434/x1.png)
+![성능 비교 그래프](/assets/images/deepseek-v2--a-strong--economical--and-efficient-mixture-of-experts-language-model-1.png)
 
 위 그래프는 다양한 오픈소스 언어 모델들의 활성화된 파라미터 수와 MMLU(Massive Multitask Language Understanding) 정확도 간의 관계를 보여줍니다. DeepSeek-V2는 단 21B개의 활성화된 파라미터로도 최고 수준의 성능을 달성하고 있음을 확인할 수 있습니다.
 
-![효율성 비교](https://arxiv.org/html/2405.04434/x2.png)
+![효율성 비교](/assets/images/deepseek-v2--a-strong--economical--and-efficient-mixture-of-experts-language-model-2.png)
 
 성능 개선 지표를 보면, DeepSeek-V2는 이전 모델인 DeepSeek 67B와 비교하여 훈련 비용을 42.5% 절감하고, KV 캐시를 93.3% 감소시키며, 최대 생성 처리량을 5.76배 향상시켰습니다.
 
@@ -73,7 +74,7 @@ MLA는 이러한 문제를 해결하기 위해 저랭크 키-값 공동 압축�
 
 Feed-Forward Networks의 경우, DeepSeekMoE 아키텍처를 따릅니다. 이는 전문가 특화의 더 높은 잠재력을 위해 세밀한 전문가 분할과 공유 전문가 격리를 채택합니다. DeepSeekMoE 아키텍처는 GShard와 같은 기존 MoE 아키텍처와 비교하여 큰 장점을 보여주며, 경제적인 비용으로 강력한 모델을 훈련할 수 있게 합니다.
 
-![DeepSeek-V2 아키텍처](https://arxiv.org/html/2405.04434/x3.png)
+![DeepSeek-V2 아키텍처](/assets/images/deepseek-v2--a-strong--economical--and-efficient-mixture-of-experts-language-model-3.png)
 
 위 그림은 DeepSeek-V2의 전체 아키텍처를 보여줍니다. MLA는 생성을 위한 KV 캐시를 크게 줄여 효율적인 추론을 보장하고, DeepSeekMoE는 희소 아키텍처를 통해 경제적인 비용으로 강력한 모델 훈련을 가능하게 합니다.
 
@@ -106,7 +107,7 @@ DeepSeek-V2는 두 가지 핵심 기술을 결합하여 강력한 성능, 경제
 
 DeepSeek-V2는 기본적으로 트랜스포머 아키텍처를 따르고 있으며, 각 트랜스포머 블록은 어텐션 모듈과 Feed-Forward Network(FFN)으로 구성됩니다. 하지만 어텐션 모듈과 FFN 모두에서 혁신적인 아키텍처를 설계하고 채택했습니다. 어텐션의 경우 MLA(Multi-head Latent Attention)를 설계했으며, 이는 저랭크 키-값 공동 압축을 활용하여 추론 시 키-값 캐시의 병목 현상을 제거하고 효율적인 추론을 지원합니다. FFN의 경우 DeepSeekMoE 아키텍처를 채택했으며, 이는 경제적인 비용으로 강력한 모델을 훈련할 수 있게 하는 고성능 MoE 아키텍처입니다.
 
-![MHA, GQA, MQA, MLA 어텐션 비교](https://arxiv.org/html/2405.04434/x4.png)
+![MHA, GQA, MQA, MLA 어텐션 비교](/assets/images/deepseek-v2--a-strong--economical--and-efficient-mixture-of-experts-language-model-4.png)
 
 위 그림은 Multi-Head Attention(MHA), Grouped-Query Attention(GQA), Multi-Query Attention(MQA), 그리고 Multi-head Latent Attention(MLA)의 서로 다른 어텐션 메커니즘을 보여주는 아키텍처 다이어그램입니다. 이 다이어그램은 입력 쿼리, 키, 값과 같은 핵심 구성 요소와 관계를 보여주며, MLA의 경우 키와 값을 잠재 벡터로 압축하는 과정을 나타냅니다. 이 그림의 연구적 의의는 MLA가 키와 값을 잠재 벡터로 공동 압축함으로써 추론 중 키-값(KV) 캐시를 크게 줄일 수 있다는 핵심 기여를 보여주는 것입니다.
 
@@ -378,7 +379,7 @@ YaRN 설정에서는 스케일 $$s$$를 40, $$\alpha$$를 1, $$\beta$$를 32로 
 
 추가로 시퀀스 길이 32K, 배치 크기 576 시퀀스로 1000 스텝 동안 모델을 훈련했습니다. 훈련이 32K의 시퀀스 길이에서만 수행되었음에도 불구하고, 모델은 128K의 컨텍스트 길이에서 평가될 때도 강건한 성능을 보여줍니다.
 
-![Needle In A Haystack 테스트 결과](https://arxiv.org/html/2405.04434/x5.png)
+![Needle In A Haystack 테스트 결과](/assets/images/deepseek-v2--a-strong--economical--and-efficient-mixture-of-experts-language-model-5.png)
 
 위 그림은 "Needle In A Haystack"(NIAH) 테스트에서 DeepSeek-V2 모델의 성능을 보여주는 선 그래프입니다. 이 그래프는 1K에서 128K 토큰까지의 다양한 컨텍스트 윈도우 길이에 대해 DeepSeek-V2 모델이 달성한 문서 깊이 백분율을 나타냅니다. 이 그림의 연구적 의의는 DeepSeek-V2 모델이 128K 토큰까지의 큰 컨텍스트 윈도우 크기에서도 높은 정확도를 유지한다는 것을 보여주어, "Needle In A Haystack" 작업에서 장거리 의존성을 처리하는 효과를 입증한다는 것입니다.
 

@@ -38,6 +38,10 @@ topics:
 # (_plugins/posted_date.rb).
 forbidden_keys: [author, last_modified_at]
 
+# A title longer than this needs a shorter `seo_title` for <title> (search
+# results cut it); `seo_title` is held to it too.
+seo_title_max_length: 70
+
 # `lang` values. A translation is one post in each, sharing a translation_id;
 # the language switcher (_includes/language_switcher.html) knows these two.
 languages: [ko, en]
