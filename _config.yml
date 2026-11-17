@@ -156,11 +156,7 @@ social:
 
 
 protocols:
-  # Default social card image, used only when a page sets no `cover`. The old
-  # value was my_logo.png declared as 612x605 — the file is actually 192x192,
-  # below the 200x200 floor Facebook/LinkedIn need to render a card at all.
-  # my_header_image.jpg is the site cover and its declared size is real.
+  # Default social card image, used only when a page sets no `cover` (the site
+  # cover; at least 200x200, or Facebook/LinkedIn render no card). head.html
+  # reads its size from the file.
   fb_image: /assets/my_header_image.jpg
-  fb_image_width: 1920
-  fb_image_height: 600
-  fb_image_type: image/jpeg

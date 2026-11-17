@@ -79,7 +79,7 @@ layout: default
 
     {%- comment -%} From the post's h2s (_plugins/post_toc.rb), when there are 3 or more. {%- endcomment -%}
     {%- assign toc = content | post_toc -%}
-    {% if toc.size >= 3 %}
+    {% if toc.size >= 3 %}{%- comment -%} PostTocFilter::MIN {%- endcomment -%}
     <details id="post-toc" class="post-toc" open>
       <summary lang="{{ site.ui_lang }}">
         <span class="post-toc-title">Contents</span>
@@ -88,7 +88,7 @@ layout: default
       </summary>
       <ul>
         {%- for entry in toc %}
-        <li><a href="#{{ entry.id }}">{% if entry.num %}<span class="toc-num">{{ entry.num }}</span>{% endif %}{{ entry.text }}</a></li>
+        <li{% if entry.level == 3 %} class="toc-sub"{% endif %}><a href="#{{ entry.id }}">{% if entry.num %}<span class="toc-num">{{ entry.num }}</span>{% endif %}{{ entry.text }}</a></li>
         {%- endfor %}
       </ul>
     </details>

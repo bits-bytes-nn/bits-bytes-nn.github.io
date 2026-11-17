@@ -6,6 +6,8 @@
 # themselves rather than to whichever files happen to be in assets/.
 
 require "minitest/autorun"
+require "tmpdir"
+require "fileutils"
 require_relative "../_plugins/image_dimensions"
 
 class TestImageDimensions < Minitest::Test
@@ -84,5 +86,18 @@ class TestImageDimensions < Minitest::Test
     html = '<img src="/assets/missing.png">'
     assert_equal html, ImageDimensions.apply(html) { nil }
     assert_equal html, ImageDimensions.apply(html) { "not an image" }
+  end
+
+  # The filter head.html declares the social image's size with.
+  def test_image_size_reads_a_repo_file_and_nil_for_none
+    Dir.mktmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "assets"))
+      File.binwrite(File.join(dir, "assets/c.jpg"), jpeg(1920, 1005))
+      filter = Object.new.extend(ImageSizeFilter)
+      site = Struct.new(:source).new(dir)
+      filter.instance_variable_set(:@context, Struct.new(:registers).new({ site: site }))
+      assert_equal [1920, 1005], filter.image_size("/assets/c.jpg")
+      assert_nil filter.image_size("/assets/missing.jpg")
+    end
   end
 end

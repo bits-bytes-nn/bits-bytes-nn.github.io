@@ -1,18 +1,18 @@
-/* Client-side search over /search.json (simple-jekyll-search).
+/* Client-side search over /search.json.
  *
- * The index is every post's full body — that is what makes Korean recall work,
- * since simple-jekyll-search does plain substring matching and cannot find a
- * character it never indexed. A search term is rarely in a post's opening lines,
- * so a fixed excerpt from the top would show no visible match and make correct
- * results look wrong.
+ * The index is every post's full body: matching is plain substring matching,
+ * without stemming, so a word never indexed can never be found, and indexing
+ * whole posts is what makes Korean recall work. A search term is rarely in a
+ * post's opening lines, so a fixed excerpt from the top would show no visible
+ * match and make correct results look wrong; the excerpt is cut around the
+ * match instead.
  *
- * So the excerpt is cut around the match instead. That happens in
- * `templateMiddleware`, a simple-jekyll-search hook called once per {placeholder}
- * per result: it receives the full field value and returns what to render, so the
- * whole body reaches this file and only the window reaches the DOM.
+ * A post matches when every query word is in it (title, tags, category or
+ * body). Matches are ranked by where the words are (WEIGHTS: a title hit beats
+ * a passing mention), then newest first, and a translation pair counts once.
  *
- * Everything returned from the middleware is inserted as HTML by the library, so
- * text is escaped here and the only tags introduced are the <mark>s.
+ * Results are built as HTML here, so all text is escaped and the only tags
+ * introduced are the <mark>s.
  */
 (function () {
   'use strict';
@@ -22,14 +22,18 @@
   var statusEl = document.getElementById('search-status');
   if (!searchInput || !resultsContainer || !statusEl) return;
 
-  var LIMIT = 10;         // must match the `limit` passed to SimpleJekyllSearch
+  var LIMIT = 10;         // results shown at first, and added by "Show more"
   var WINDOW_CHARS = 220; // length of the excerpt shown
   var LEAD_CHARS = 60;    // run-up kept before the first match, for context
   var SNAP_CHARS = 12;    // how far to reach for a space rather than cut a word
+  // Score per query word, by where it is found. A body hit adds up to one more
+  // for frequency (BODY_CAP occurrences), so a post about the word outranks one
+  // that names it once, but never a title hit.
+  var WEIGHTS = { title: 8, tags: 4, category: 2, body: 1 };
+  var BODY_CAP = 20;
 
   function queryWords() {
-    // The library lowercases and splits on spaces, and requires every word to
-    // appear; matching that here keeps the highlight honest.
+    // Every word must appear; the highlight marks the same words.
     return searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
   }
 
@@ -161,119 +165,164 @@
     }, 400);
   }
 
-  function updateStatus() {
+  // Up to BODY_CAP occurrences of `word` in `text` (both lowercase).
+  function occurrences(text, word) {
+    var n = 0;
+    var at = text.indexOf(word);
+    while (at !== -1 && n < BODY_CAP) {
+      n++;
+      at = text.indexOf(word, at + word.length);
+    }
+    return n;
+  }
+
+  // 0 when a word is missing from the post, else the sum of WEIGHTS for where
+  // each word was found.
+  function score(doc, words) {
+    var total = 0;
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      var body = occurrences(doc.content, w);
+      var s = (doc.title.indexOf(w) !== -1 ? WEIGHTS.title : 0) +
+              (doc.tags.indexOf(w) !== -1 ? WEIGHTS.tags : 0) +
+              (doc.category.indexOf(w) !== -1 ? WEIGHTS.category : 0) +
+              (body ? WEIGHTS.body * (1 + body / BODY_CAP) : 0);
+      if (!s) return 0;
+      total += s;
+    }
+    return total;
+  }
+
+  var docs = [];
+  // The index lowercased once, in its order (newest first), for matching.
+  function prepare(index) {
+    docs = index.map(function (post, order) {
+      var lower = function (v) { return String(v == null ? '' : v).toLowerCase(); };
+      return { post: post, order: order, title: lower(post.title), tags: lower(post.tags),
+               category: lower(post.category), content: lower(post.content) };
+    });
+  }
+
+  // Matching posts, best first; of a translation pair, the better-scoring one
+  // (the original on a tie, since it is the newer by a second).
+  function rank(words) {
+    var seen = {};
+    return docs
+      .map(function (doc) { return { doc: doc, score: score(doc, words) }; })
+      .filter(function (r) { return r.score > 0; })
+      .sort(function (a, b) { return b.score - a.score || a.doc.order - b.doc.order; })
+      .filter(function (r) {
+        var pair = r.doc.post.translation;
+        if (!pair) return true;
+        if (seen[pair]) return false;
+        return (seen[pair] = true);
+      });
+  }
+
+  function text(v) { return String(v == null ? '' : v); }
+
+  function resultHtml(post, words) {
+    var lang = escapeHtml(text(post.lang));
+    return '<div class="search-result">' +
+        '<h2 lang="' + lang + '"><a href="' + escapeHtml(text(post.url)) + '">' + mark(text(post.title), words) + '</a></h2>' +
+        '<p class="result-meta"><span class="post-date">' + escapeHtml(text(post.date)) + '</span>' +
+        '<span class="post-category">' + mark(text(post.category), words) + '</span></p>' +
+        '<p class="result-snippet" lang="' + lang + '">' + excerpt(text(post.content), words) + '</p>' +
+        '<p class="result-tags">' + mark(text(post.tags), words) + '</p>' +
+      '</div>';
+  }
+
+  var results = [];
+  var shown = LIMIT;
+
+  function draw(words) {
+    var html = results.slice(0, shown).map(function (r) { return resultHtml(r.doc.post, words); }).join('');
+    var rest = results.length - shown;
+    if (rest > 0) {
+      html += '<button type="button" class="search-more">Show ' + Math.min(LIMIT, rest) + ' more</button>';
+    }
+    resultsContainer.innerHTML = html;
+
     var query = searchInput.value.trim();
-    if (!query) {
-      // The library runs a query of spaces too, and every post matches it.
+    var n = results.length;
+    if (n === 0) {
+      statusEl.textContent = words.length > 1
+        ? 'No post contains every word of "' + query + '". Try fewer words.'
+        : 'No post contains "' + query + '".';
+    } else {
+      statusEl.textContent = n + (n === 1 ? ' post' : ' posts') + ' found' +
+        (n > shown ? ', showing the best ' + shown + '.' : '.');
+    }
+  }
+
+  function run() {
+    var words = queryWords();
+    shown = LIMIT;
+    if (!words.length) {
+      results = [];
       resultsContainer.innerHTML = '';
       statusEl.textContent = '';
       return;
     }
-    var n = resultsContainer.querySelectorAll('.search-result').length;
-    if (n === 0) {
-      statusEl.textContent = 'No post contains every word of "' + query + '". Try fewer words.';
-    } else if (n >= LIMIT) {
-      // The library stops scanning at `limit`, so the real total is unknown —
-      // saying "10 posts found" would be a guess dressed as a count.
-      statusEl.textContent = 'Showing the first ' + LIMIT + ' posts. Add a word to narrow them.';
-    } else {
-      statusEl.textContent = n + (n === 1 ? ' post' : ' posts') + ' found.';
-    }
+    results = rank(words);
+    draw(words);
   }
 
+  resultsContainer.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('.search-more')) return;
+    var first = shown;
+    shown += LIMIT;
+    draw(queryWords());
+    // Keyboard and screen-reader users continue at the first new result, not
+    // back at the top.
+    var next = resultsContainer.querySelectorAll('.search-result a')[first];
+    if (next) next.focus();
+  });
+
   // The index is every post's full text, about 1 MB over the wire, so it is
-  // fetched when the visitor first reaches for the box, not with the page.
-  // Fetched here rather than by the library so that a query typed while it
-  // downloads is run once it lands, and a failed download says so.
+  // fetched when the visitor first reaches for the box, not with the page, and
+  // a query typed while it downloads runs once it lands.
+  var ready = false;
   var started = false;
   function start() {
     if (started) return;
     started = true;
     statusEl.textContent = 'Loading the search index…';
-    var index = fetch(searchInput.getAttribute('data-index')).then(function (response) {
-      if (!response.ok) throw new Error(response.status);
-      return response.json();
-    });
-    Promise.all([index, library()])
-      .then(function (loaded) {
-        var search = init(loaded[0]);
+    fetch(searchInput.getAttribute('data-index'))
+      .then(function (response) {
+        if (!response.ok) throw new Error(response.status);
+        return response.json();
+      })
+      .then(function (index) {
+        prepare(index);
+        ready = true;
         statusEl.textContent = '';
-        if (searchInput.value.trim()) {
-          search.search(searchInput.value);
-          updateStatus();
-          syncUrl();
-        }
+        if (searchInput.value.trim()) run();
       })
       .catch(function () {
         statusEl.textContent = 'Search could not load. Reload the page to try again.';
       });
   }
-  // simple-jekyll-search loads async (search.md): resolves once it has, and
-  // gives up after LIBRARY_WAIT, so a CDN that hangs ends in a message rather
-  // than "Loading" for ever. The library is 4 KB; the index has no such limit.
-  var LIBRARY_WAIT = 15000;
-  function library() {
-    return new Promise(function (resolve, reject) {
-      if (window.SimpleJekyllSearch) return resolve();
-      var script = document.getElementById('search-lib');
-      if (!script || 'failed' in script.dataset) return reject(new Error('no search library'));
-      script.addEventListener('load', resolve);
-      script.addEventListener('error', reject);
-      setTimeout(reject, LIBRARY_WAIT);
-    });
-  }
   ['focus', 'pointerdown', 'input'].forEach(function (type) {
     searchInput.addEventListener(type, start, { once: true });
   });
+
+  // Mid-composition (a Korean syllable still being typed) the results and the
+  // status would follow a half-typed word; they update when it is done.
+  var runTimer;
+  function scheduleRun() {
+    if (!ready) return;
+    clearTimeout(runTimer);
+    runTimer = setTimeout(run, 80);
+  }
+  searchInput.addEventListener('input', function (e) {
+    if (!e.isComposing) scheduleRun();
+    syncUrl();
+  });
+  searchInput.addEventListener('compositionend', scheduleRun);
+
   var linked = new URLSearchParams(window.location.search).get('q');
   if (linked && !searchInput.value) searchInput.value = linked;
   // Typed into, or linked with a query, before this script ran: start now.
   if (document.activeElement === searchInput || searchInput.value) start();
-
-  function init(index) {
-    return SimpleJekyllSearch({
-      searchInput: searchInput,
-      resultsContainer: resultsContainer,
-      json: index,
-      searchResultTemplate:
-        '<div class="search-result">' +
-          '<h2 lang="{lang}"><a href="{url}">{title}</a></h2>' +
-          '<p class="result-meta"><span class="post-date">{date}</span>' +
-          '<span class="post-category">{category}</span></p>' +
-          '<p class="result-snippet" lang="{lang}">{content}</p>' +
-          '<p class="result-tags">{tags}</p>' +
-        '</div>',
-      // Returning undefined leaves a field to the library's default, which is what
-      // {url} and {lang} want: attribute values, never marked.
-      templateMiddleware: function (prop, value) {
-        var words = queryWords();
-        if (prop === 'content') return excerpt(String(value == null ? '' : value), words);
-        if (prop === 'title' || prop === 'tags' || prop === 'category' || prop === 'date') {
-          return mark(String(value == null ? '' : value), words);
-        }
-        return undefined;
-      },
-      noResultsText: '',
-      // The library matches every field, but a url (every one ends in .html) and
-      // a language code are not what a reader searches for: "html" or "ko" would
-      // list the first ten posts with nothing marked.
-      exclude: ['^/.*\\.html$', '^(' + searchInput.getAttribute('data-languages') + ')$'],
-      limit: LIMIT,
-      fuzzy: false,
-      success: function () {
-        // The library registered its own input handler first (it is given the
-        // index, not a URL) and renders synchronously; deferring a turn reads
-        // the count from the DOM the visitor is actually looking at.
-        // Mid-composition (a Korean syllable still being typed) the status would
-        // announce a half-typed word; it updates when the syllable is done.
-        searchInput.addEventListener('input', function (e) {
-          if (!e.isComposing) setTimeout(updateStatus, 0);
-          syncUrl();
-        });
-        searchInput.addEventListener('compositionend', function () {
-          setTimeout(updateStatus, 0);
-        });
-      }
-    });
-  }
 })();
