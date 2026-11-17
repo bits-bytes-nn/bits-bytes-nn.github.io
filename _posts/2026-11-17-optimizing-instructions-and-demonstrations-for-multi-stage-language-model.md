@@ -7,10 +7,13 @@ date: 2024-06-17 16:12:03
 paper_author: "Stanford University"
 paper_doi: "10.48550/arXiv.2406.11695"
 description: "MIPRO는 다단계 LM 프로그램에서 모듈별 지시문과 시연 예시를 중간 레이블 없이 함께 최적화하는 DSPy 옵티마이저이며, Llama-3-8B를 쓴 일곱 과제 중 다섯에서 기준 옵티마이저를 앞섰습니다. 제안 전략, 크레딧 할당 방식, 실험 결과를 정리합니다."
-categories: ["Paper Reviews", "Finetuning"]
+categories: ["Paper Reviews", "Language-Models"]
 tags: ["MIPRO-Optimizer", "Multi-Stage-LM-Programs", "Prompt-Optimization", "Bayesian-Surrogate-Model", "Instruction-Proposal", "Agentic-AI"]
-cover: /assets/images/finetuning.jpg
+cover: /assets/images/language-models.jpg
 use_math: true
+# First published under the Finetuning topic.
+redirect_from:
+  - /paper-reviews/finetuning/2024/06/17/optimizing-instructions-and-demonstrations-for-multi-stage-language-model.html
 ---
 ## TL;DR
 
