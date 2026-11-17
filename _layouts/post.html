@@ -48,12 +48,20 @@ layout: default
         </div>
         {% endif %}
         {%- comment -%}
-          Hidden until js/citations.js fills it from Semantic Scholar. Last, so
-          the fields before it stay put when it appears.
+          The count the build fetched (`citation`, _plugins/citations.rb);
+          js/citations.js refreshes it once it is a day old, and fills the
+          field, hidden till then, when the build has none. The link's text and
+          label are the ones the script writes. Last, so the fields before it
+          stay put when it appears.
         {%- endcomment -%}
-        {% if page.paper_doi %}
-        <div class="post-citations" data-paper-doi="{{ page.paper_doi | escape }}" hidden>
+        {% if page.citation_id %}
+        {%- assign cited = page.citation -%}
+        <div class="post-citations" data-citation-id="{{ page.citation_id | escape }}"
+          {%- if cited %} data-count="{{ cited.count }}" data-paper-id="{{ cited.paper_id | escape }}" data-fetched-at="{{ site.data.citations.fetched_at | escape }}"{% else %} hidden{% endif %}>
           <span class="meta-label">Citations</span>
+          {%- if cited %}
+          <a class="meta-value" title="Semantic Scholar" aria-label="{{ cited.shown }} {% if cited.count == 1 %}citation{% else %}citations{% endif %} on Semantic Scholar" href="https://www.semanticscholar.org/paper/{{ cited.paper_id | escape }}">{{ cited.shown }}</a>
+          {%- endif %}
         </div>
         {% endif %}
       </div>

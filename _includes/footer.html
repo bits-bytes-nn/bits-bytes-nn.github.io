@@ -69,7 +69,7 @@
 {% endif %}
 
 <script src="{{ '/js/main.js' | prepend: site.baseurl }}" defer></script>
-{% if page.paper_doi %}<script src="{{ '/js/citations.js' | prepend: site.baseurl }}" defer></script>{% endif %}
+{% if page.citation_id %}<script src="{{ '/js/citations.js' | prepend: site.baseurl }}" defer></script>{% endif %}
 
 <!-- Do not write Liquid tag delimiters in these HTML comments. Liquid tokenizes
      tags inside comments too, so a tag named in prose is opened for real and the

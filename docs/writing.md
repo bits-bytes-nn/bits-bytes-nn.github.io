@@ -54,7 +54,7 @@ title: "<Post Title>"
 subtitle: "<one-line pitch>"       # paper posts: required, not the title; else optional
 date: YYYY-MM-DD HH:MM:SS          # paper posts: the paper's date; else the posting date
 paper_author: "<Org>"              # the paper's org, not people; paper posts only
-paper_doi: "10.48550/arXiv.<id>"   # optional, paper posts only: the citation count in the meta panel
+paper_doi: "10.48550/arXiv.<id>"   # optional, paper posts only: the citation count in the meta panel (docs/architecture.md)
 seo_title: "<shorter title>"       # optional: for <title> when the title is too long
 description: >-                    # optional, plain text; see below
   <search snippet, ~150 chars>

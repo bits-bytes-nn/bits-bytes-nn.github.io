@@ -153,8 +153,8 @@ module PostLint
       if subtitle.empty? || subtitle == data["title"].to_s.strip
         found << "1: #{type} posts need a subtitle that is not the title"
       end
-      # js/citations.js puts it in the request path as is, so a URL, a `doi:`
-      # prefix, or a `?` or `#` in it finds nothing there.
+      # _plugins/citations.rb makes it the Semantic Scholar id as is, so a URL,
+      # a `doi:` prefix, or a `?` or `#` in it finds nothing there.
       # arXiv registers one DOI per paper, without the version (…v2).
       doi = data["paper_doi"].to_s
       if data.key?("paper_doi") && !doi.match?(%r{\A10\.\d{4,9}/[^\s?#]+\z})

@@ -9,6 +9,10 @@ on:
   # reached main and merely failed to deploy, leaving main red.
   pull_request:
     branches: [ "main" ]
+  # Daily, so the citation counts printed into the paper posts are at most a
+  # day old (script/fetch-citations.rb); the browser refreshes older ones.
+  schedule:
+    - cron: "41 20 * * *"  # 20:41 UTC, 05:41 KST
   workflow_dispatch:
 
 # Read-only by default. Only `deploy` gets the Pages and OIDC grants, so a PR
@@ -56,6 +60,19 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Fetch citation counts
+        # One batch request to Semantic Scholar, written to _data/citations.json
+        # for the build to print. When it fails, the counts the live site
+        # published last are kept; with neither, it warns and the site builds
+        # without counts, which the browser then asks for. Run on PRs too, so
+        # the gates below check the pages as they will be published. It fails
+        # only on a refused SEMANTIC_SCHOLAR_API_KEY; its own timeouts and
+        # retries end it in about six minutes at worst.
+        run: bundle exec ruby script/fetch-citations.rb
+        timeout-minutes: 8
+        env:
+          SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "$BASE_PATH" --strict-front-matter
         env:
