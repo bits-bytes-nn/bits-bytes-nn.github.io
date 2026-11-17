@@ -1,0 +1,9 @@
+---
+layout: null
+---
+{%- comment -%}
+  The citation counts this build printed (_data/citations.json), published so
+  the next build can keep them when Semantic Scholar does not answer
+  (script/fetch-citations.rb). `null` from a build without them.
+{%- endcomment -%}
+{{ site.data.citations | jsonify }}

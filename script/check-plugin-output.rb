@@ -20,6 +20,7 @@
 # sitemap (the site's `url` and base path, /sitemap.xml).
 
 require "jekyll"
+require "cgi"
 require "json"
 
 site_dir = File.expand_path(ARGV.fetch(0))
@@ -115,6 +116,20 @@ posts.each do |post|
   html = File.read(path, encoding: "UTF-8")
   # head.html marks a page noindex when it is out of the sitemap; a post never is.
   problems << "#{name}: the page says noindex" if html[%r{<head>.*?</head>}m].to_s.include?('name="robots" content="noindex"')
+
+  # citations.rb: the field js/citations.js fills, shown with the count the
+  # build fetched, or hidden without one.
+  if (id = post.data["citation_id"])
+    field = html[%r{<div class="post-citations" data-citation-id="#{Regexp.escape(CGI.escapeHTML(id))}"[^>]*>.*?</div>}m]
+    cited = post.data["citation"]
+    if !field
+      problems << "#{name}: no citation field for #{id}"
+    elsif cited ? !field.include?(%(data-count="#{cited["count"]}")) || !field.include?(">#{cited["shown"]}</a>") || field[/\A[^>]*\bhidden>/] : !field[/\A[^>]*\bhidden>/]
+      problems << (cited ? "#{name}: the citation field does not show #{cited["shown"]}" : "#{name}: the citation field has no count but is not hidden")
+    end
+  elsif post.data["paper_doi"]
+    problems << "#{name}: a paper_doi but no citation_id"
+  end
 
   # legacy_urls.rb: a stub at the pre-slug URL of a post published before the change.
   legacy = Jekyll::URL.new(template: LegacyUrls::TEMPLATE, placeholders: post.url_placeholders).to_s

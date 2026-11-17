@@ -41,7 +41,7 @@ shellcheck script/*.sh assets/images/*.sh && actionlint .github/workflows/*.yml 
 
 | Workflow | Runs on | Does |
 |---|---|---|
-| `jekyll.yml` | PRs to `main`, pushes to `main`, manual | tests → lint → production build → htmlproofer → validate-site; on `main` only, deploys to GitHub Pages |
+| `jekyll.yml` | PRs to `main`, pushes to `main`, daily 20:41 UTC, manual | tests → lint → citation counts → production build → htmlproofer → validate-site; on `main` only, deploys to GitHub Pages (the daily run refreshes the citation counts) |
 | `workflow-lint.yml` | PRs and pushes to `main`, manual | actionlint and shellcheck |
 | `external-links.yml` | Mondays, manual | htmlproofer with external links on; fails (and notifies) on a dead link, blocks nothing |
 | Dependabot | weekly | PRs for GitHub Actions and gems |
@@ -57,6 +57,29 @@ shellcheck script/*.sh assets/images/*.sh && actionlint .github/workflows/*.yml 
 - `external-links.yml` ignores 403/429/999 (bot walls and rate limits) and two
   hosts that fail any scripted request while working in a browser; its comment
   says which.
+
+## Citation counts
+
+`script/fetch-citations.rb` runs in every `jekyll.yml` run, before the build
+(how it works: docs/architecture.md, "Citation counts").
+
+- **A run's warnings** ("Citation counts" annotations) say when Semantic
+  Scholar did not answer and which counts were kept, or which papers have no
+  count. They block nothing.
+- **An API key**, for a higher rate limit: request one from Semantic Scholar
+  and save it as the repository secret `SEMANTIC_SCHOLAR_API_KEY`. A key the
+  API refuses fails every run, PRs from this repository included, until the
+  secret is renewed or deleted.
+- **A paper with no count, or the wrong one**: find its record on
+  semanticscholar.org and add `paper_doi: <paperId>` to
+  `_data/citation_ids.yml`. Check the paperId answers first
+  (`https://api.semanticscholar.org/graph/v1/paper/<paperId>?fields=citationCount`):
+  some records on the website are not in the API.
+- **Counts in a local build**: run `bundle exec ruby script/fetch-citations.rb`
+  before `jekyll build`; `_data/citations.json` is not in Git, and a run that
+  gets no answer leaves an older one in place.
+- **The daily run stopped**: GitHub turns schedules off after 60 days without
+  repository activity; turn it back on under Actions.
 
 ## When a deploy fails
 

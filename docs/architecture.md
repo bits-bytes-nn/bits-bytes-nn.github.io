@@ -50,12 +50,14 @@ _plugins/            build-time Ruby, one concern per file (see Plugins)
 _sass/               _layout, _post, _tags, _search, _syntax, _dark, base/;
                      bourbon/ and neat/ are vendored, not edited
 _data/               post_conventions.yml (the conventions, shared with
-                     scholar-lens), covers.yml (cover credits)
+                     scholar-lens), covers.yml (cover credits),
+                     citation_ids.yml (Semantic Scholar records); citations.json
+                     is fetched before the build, not in Git
 css/ js/             main.scss; main.js, search.js, citations.js
 assets/images/       covers (+ -960/-1280 JPEG and WebP copies), figures, diagrams
 feed.xml search.json the Atom feed and the search index, as Liquid pages
 script/              lint-posts.rb, validate-site.sh, check-plugin-output.rb,
-                     published-urls.txt, cover-variants.sh
+                     published-urls.txt, cover-variants.sh, fetch-citations.rb
 test/                minitest for _plugins/ and the lint
 docs/                these documents and their diagrams
 .github/             workflows (deploy, workflow lint, external links), Dependabot
@@ -76,7 +78,8 @@ excluded from the site.
    URL to `redirect_from`; `posted_date.rb` sets `posted_at` and
    `last_modified_at` and re-sorts the posts; `translations.rb` marks the English
    twin of a pair `hidden` and links each post of a pair to the other
-   (`page.translation`).
+   (`page.translation`); `citations.rb` sets each paper post's Semantic
+   Scholar id and fetched count.
 3. **Generators**: pagination, the sitemap and the redirect stubs
    (`_layouts/redirect.html`).
 4. **`:pre_render` hooks**: `post_description.rb` fills in each post's
@@ -101,6 +104,7 @@ and safe to delete.
 |---|---|---|
 | `posted_date.rb` | `:post_read`, and a `Document#<=>` override | `posted_at` = the file-name day when later than `date:`, else `date:`. Posts compare by it, so `site.posts`, `site.tags`, `site.categories`, pagination and everything iterating them are in posting order. Sets `last_modified_at` to a later file-name day |
 | `legacy_urls.rb` | `:post_read` | adds the pre-2026-10-11 URL (`/paper%20reviews/…`) of each older post to `redirect_from` |
+| `citations.rb` | `:post_read` | sets `citation_id` (the Semantic Scholar id) on each post with a `paper_doi`, and `citation` from `_data/citations.json`; fails the build on a bad `_data/citation_ids.yml` entry (see [Citation counts](#search)) |
 | `translations.rb` | `:post_read`, `listed` filter | sets `page.translation` (the other post of a pair, for the language switcher and `hreflang`) and hides the twin from every listing; `listed` drops hidden posts |
 | `post_description.rb` | `:pre_render`, filter | derives `description` from the first prose paragraph |
 | `related_posts.rb` | `:pre_render` | ranks related posts by shared tags (weights at the top of the file) and sets the previous/next post in posting order, same language, never the twin |
@@ -210,13 +214,27 @@ site.
 - `_config.yml` cannot configure the search: it is browser JavaScript. Change
   `search.json` or `js/search.js`.
 
-**Citation counts** on posts with a `paper_doi` come from Semantic Scholar in
-the browser (`js/citations.js`), looked up as `arXiv:<id>` for an arXiv DOI and
-`DOI:<doi>` otherwise, and cached a day in `localStorage`. A failed request
-shows the last count it got, or hides the field. A zero hides it too: Semantic
-Scholar returns 0 for a paper's duplicate records. OpenAlex was not used because
-it counts the preprint and the published version separately, well under the
-real total.
+**Citation counts** on posts with a `paper_doi` come from Semantic Scholar.
+Before each build, `script/fetch-citations.rb` asks for every paper in one
+batch request and writes `_data/citations.json` (not in Git); the build prints
+each count on its post (`_plugins/citations.rb`), and CI runs once a day so the
+counts stay about a day old. The count is in the HTML, so it shows without
+JavaScript. `js/citations.js` shows that count and asks
+Semantic Scholar itself only when the newest count it has, the build's or its
+`localStorage` one, is a day old (the build's gets six more hours, for a
+late daily run). The keyless API answers 429 often, to a batch too, so the
+script retries with backoff. A failed fetch
+keeps the counts the live site published last (`/citations.json`) when it can
+read them; with none, it warns and builds without them.
+A failed browser request keeps the count shown, or hides the field. A zero hides it too: Semantic Scholar returns 0 for a paper's
+duplicate records.
+
+A paper is looked up as `arXiv:<id>` for an arXiv DOI and `DOI:<doi>` otherwise,
+unless `_data/citation_ids.yml` names its record (paperId): for a paper missing
+under its arXiv ID, or one that leads to a duplicate. It is keyed by
+`paper_doi`, so a regenerated post keeps it. `SEMANTIC_SCHOLAR_API_KEY`, a
+repository secret, is sent when set. OpenAlex was not used because it counts
+the preprint and the published version separately, well under the real total.
 
 ## Styles
 
@@ -316,6 +334,11 @@ build.
   matching has no morphology. A real fix is a different search engine.
 - **The index grows with every post.** It loads only when search is used; split
   it or move search server-side if it outgrows that.
+- **Citation counts age when the daily run stops.** GitHub turns off a
+  scheduled workflow after 60 days with no repository activity; the counts in
+  the pages then age, and readers' browsers ask Semantic Scholar once a day.
+  Re-enable it under Actions. A paper Semantic Scholar's API does not have
+  (Gemini 1.0, `arXiv:2312.11805`, today) shows no count.
 - **Excerpts can show TeX** (`\theta`) when the match falls inside math.
 - **Long posts stay slow in mobile lab tests.** Lighthouse's throttled phone
   puts LCP at 5–6 s on the longest posts (DeepSeek-V3, the Strands guide) even
