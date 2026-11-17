@@ -65,9 +65,10 @@ jobs:
         # for the build to print. When it fails, the counts the live site
         # published last are kept; with neither, it warns and the site builds
         # without counts, which the browser then asks for. Run on PRs too, so
-        # the gates below check the pages as they will be published. It fails
-        # only on a refused SEMANTIC_SCHOLAR_API_KEY; its own timeouts and
-        # retries end it in about six minutes at worst.
+        # the gates below check the pages as they will be published. The API
+        # never fails the job: a refused SEMANTIC_SCHOLAR_API_KEY is an error
+        # (annotation and run summary) and a keyless retry, and its timeouts
+        # end it in about five minutes.
         run: bundle exec ruby script/fetch-citations.rb
         timeout-minutes: 8
         env:

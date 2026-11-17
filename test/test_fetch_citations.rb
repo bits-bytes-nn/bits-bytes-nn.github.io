@@ -76,14 +76,24 @@ class TestFetchCitations < Minitest::Test
   def test_it_stops_before_the_deadline
     answering(*Array.new(5) { response(429) }, took: 60)
     assert_nil CitationFetch.fetch(%w[arXiv:1])
-    assert_operator @now, :<=, CitationFetch::DEADLINE + 60
+    assert_operator @now, :<=, CitationFetch::DEADLINE
     assert_operator @asked.size, :<, 5
   end
 
-  def test_another_4xx_is_not_retried
-    answering(response(400))
+  def test_a_shared_deadline_cuts_a_second_fetch_short
+    answering(*Array.new(10) { response(429) }, took: 60)
+    stop = @now + CitationFetch::DEADLINE
+    CitationFetch.fetch(%w[arXiv:1], stop: stop)
+    first = @asked.size
+    CitationFetch.fetch(%w[arXiv:1], stop: stop)
+    assert_equal first, @asked.size # no try that could run past the shared deadline
+  end
+
+  def test_another_4xx_is_not_retried_and_says_why
+    answering(response(400, "{\"error\":\"Unrecognized field\"}\n"))
     assert_nil CitationFetch.fetch(%w[arXiv:1])
     assert_equal 1, @asked.size
+    assert_includes $stderr.string, "400 {\"error\":\"Unrecognized field\"}"
   end
 
   def test_a_refused_key_raises_but_a_403_without_one_does_not
