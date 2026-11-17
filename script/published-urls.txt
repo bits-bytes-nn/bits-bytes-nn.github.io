@@ -52,12 +52,14 @@
 /paper-reviews/language-models/2024/01/25/deepseek-coder-when-the-large-language-model-meets-programming-the-rise-of-code-intelligence.html
 /paper-reviews/language-models/2024/02/05/deepseekmath-pushing-the-limits-of-mathematical-reasoning-in-open-language-models.html
 /paper-reviews/language-models/2024/05/07/deepseek-v2-a-strong-economical-and-efficient-mixture-of-experts-language-model.html
+/paper-reviews/language-models/2024/06/17/optimizing-instructions-and-demonstrations-for-multi-stage-language-model.html
 /paper-reviews/language-models/2024/07/31/gemma-2-improving-open-language-models-at-a-practical-size.html
 /paper-reviews/language-models/2024/07/31/the-llama-3-herd-of-models.html
 /paper-reviews/language-models/2024/11/22/tulu-3-pushing-frontiers-in-open-language-model-post-training.html
 /paper-reviews/language-models/2024/12/27/deepseek-v3-technical-report.html
 /paper-reviews/language-models/2025/01/22/deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning.html
 /paper-reviews/language-models/2025/05/14/qwen3-technical-report.html
+/paper-reviews/language-models/2025/07/25/gepa-reflective-prompt-evolution-can-outperform-reinforcement-learning.html
 /paper-reviews/language-models/2025/07/28/kimi-k2-open-agentic-intelligence.html
 /paper-reviews/language-models/2025/12/02/deepseek-v3.2-pushing-the-frontier-of-open-large-language-models.html
 /paper-reviews/multimodal-learning/2023/12/19/gemini-a-family-of-highly-capable-multimodal-models.html

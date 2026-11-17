@@ -7,10 +7,13 @@ date: 2025-07-25 17:42:32
 paper_author: "UC Berkeley"
 paper_doi: "10.48550/arXiv.2507.19457"
 description: "GEPA는 실행 트레이스를 자연어로 성찰해 지시문을 고치고 파레토 프런티어로 후보를 고르는 프롬프트 옵티마이저입니다. Qwen3 8B 여섯 과제에서 최대 35배 적은 롤아웃으로 GRPO를 평균 6% 앞서며, 구조와 실험 결과를 정리합니다."
-categories: ["Paper Reviews", "Finetuning"]
+categories: ["Paper Reviews", "Language-Models"]
 tags: ["Reflective-Prompt-Evolution", "Pareto-Based-Candidate-Selection", "Natural-Language-Reflection", "Prompt-Optimization", "Sample-Efficient-Optimization", "Reasoning-Models"]
-cover: /assets/images/finetuning.jpg
+cover: /assets/images/language-models.jpg
 use_math: true
+# First published under the Finetuning topic.
+redirect_from:
+  - /paper-reviews/finetuning/2025/07/25/gepa-reflective-prompt-evolution-can-outperform-reinforcement-learning.html
 ---
 ## TL;DR
 
