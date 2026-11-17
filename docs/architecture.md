@@ -23,8 +23,8 @@ a plugin or a stylesheet, or debugs a build. Writing posts is in
 
 A static site: Markdown posts plus Liquid templates, built by Jekyll into plain
 HTML once per deploy and served as files by GitHub Pages. There is no server and
-no database. Everything dynamic (theme toggle, search, citation counts, image
-zoom) runs in the reader's browser.
+no database. Everything dynamic (theme toggle, search, image zoom, refreshing
+the citation counts the build printed) runs in the reader's browser.
 
 ## Stack
 
@@ -36,7 +36,7 @@ zoom) runs in the reader's browser.
 | Math | MathJax 3, loaded only on posts with `use_math: true` | about 1 MB the other pages never fetch |
 | Styles | Sass (`_sass/`) with vendored Bourbon and Neat | pinned to `jekyll-sass-converter` 2.x (libsass); 3.x rejects Bourbon/Neat's `/` division |
 | JavaScript | plain JS: `js/main.js` everywhere, `js/search.js` on `/search/`, `js/citations.js` on posts with a `paper_doi` | no framework; icons are inline SVG (`_includes/icon.html`), so no icon font |
-| Third-party scripts | GLightbox and MathJax (jsDelivr), simple-jekyll-search (unpkg), Google Fonts, Google Analytics | the three libraries are version-pinned with SRI hashes; Fonts and Analytics change per request and cannot be |
+| Third-party scripts | GLightbox and MathJax (jsDelivr), Google Fonts, Google Analytics | the two libraries are version-pinned with SRI hashes; Fonts and Analytics change per request and cannot be |
 | Hosting | GitHub Pages via GitHub Actions | see [operations.md](operations.md#ci-and-deploy) |
 
 ## Repository layout
@@ -58,6 +58,7 @@ assets/images/       covers (+ -960/-1280 JPEG and WebP copies), figures, diagra
 feed.xml search.json the Atom feed and the search index, as Liquid pages
 script/              lint-posts.rb, validate-site.sh, check-plugin-output.rb,
                      published-urls.txt, cover-variants.sh, fetch-citations.rb
+citations.json       the counts the build printed, published for the next build
 test/                minitest for _plugins/ and the lint
 docs/                these documents and their diagrams
 .github/             workflows (deploy, workflow lint, external links), Dependabot
@@ -74,12 +75,14 @@ excluded from the site.
 
 1. **Read.** Jekyll reads `_config.yml`, `_data/`, the pages and `_posts/`.
    Front matter decides each post's URL and its template variables.
-2. **`:post_read` hooks**, in file-name order: `legacy_urls.rb` adds each old
-   URL to `redirect_from`; `posted_date.rb` sets `posted_at` and
-   `last_modified_at` and re-sorts the posts; `translations.rb` marks the English
-   twin of a pair `hidden` and links each post of a pair to the other
-   (`page.translation`); `citations.rb` sets each paper post's Semantic
-   Scholar id and fetched count.
+2. **`:post_read` hooks**, in the order the files load (by name, except that
+   `related_posts.rb` requires `translations.rb`): `citations.rb` sets each
+   paper post's Semantic Scholar id and fetched count; `legacy_urls.rb` adds
+   each old URL to `redirect_from`; `posted_date.rb` sets `posted_at` and
+   `last_modified_at` and re-sorts the posts; `translations.rb` marks the
+   English twin of a pair `hidden` and links each post of a pair to the other
+   (`page.translation`). None reads what another sets; a hook that must would
+   need the order made explicit.
 3. **Generators**: pagination, the sitemap and the redirect stubs
    (`_layouts/redirect.html`).
 4. **`:pre_render` hooks**: `post_description.rb` fills in each post's
@@ -191,26 +194,36 @@ since the repo has none, a `robots.txt` naming it.
 There is no server, so search runs in the browser over an index built with the
 site.
 
-- **`search.json`** lists every post as `{title, url, date, lang, category,
-  tags, content}`, where `content` is the whole post as plain text. simple-jekyll-search
-  matches substrings without stemming, so a word missing from the index can never
-  be found; indexing whole posts is what makes Korean recall work. The cost is
-  size, linear in the number of posts (several MB, about a third of that
-  gzipped; `curl -so /dev/null -w '%{size_download}' <site>/search.json`).
+- **`search.json`** lists every post as `{title, url, date, lang, translation,
+  category, tags, content}`, where `content` is the whole post as plain text.
+  Matching is substring matching without stemming, so a word missing from the
+  index can never be found; indexing whole posts is what makes Korean recall
+  work. The cost is size, linear in the number of posts (several MB, about a
+  third of that gzipped; `curl -so /dev/null -w '%{size_download}' <site>/search.json`).
 - **`plain_text`** (`_plugins/search_index.rb`) strips tags *before* decoding
   entities (the other order turns an escaped `&lt;script&gt;` into a tag), puts a
   space at block boundaries so `<p>끝</p><p>시작</p>` stays two words, and strips
   math delimiters but keeps the TeX.
-- **`js/search.js`** fetches the index the first time the visitor focuses or
-  types in the box, not with the page, and runs any query typed while it
-  downloads. It shows "Loading the search index…", and "Search could not load"
-  on failure. It keeps the query in the address bar (`?q=`), so a search can be
-  linked, and runs it on load. It excludes the `url` and `lang` fields from
-  matching, marks each result's title and excerpt with its post's `lang`, cuts each excerpt around the match (choosing the window
-  that holds the most distinct query words, snapping to a space within 12
-  characters), escapes everything it returns, and adds only `<mark>`s.
-- Results stop at 10. The library stops scanning there, so the count says
-  "Showing the first 10" rather than guessing a total.
+- **`js/search.js`** does the matching and ranking itself (no library). It
+  fetches the index the first time the visitor focuses or types in the box, not
+  with the page, and runs any query typed while it downloads. It shows "Loading
+  the search index…", and "Search could not load" on failure. It keeps the query
+  in the address bar (`?q=`), so a search can be linked, and runs it on load.
+- A post matches when every query word is in its title, tags, category or body
+  (not its date).
+  Matches rank by where the words are (`WEIGHTS`: title, then tags, category,
+  body, with a little for how often the body has them), then newest first. A
+  translation pair counts once (`translation`): the post in the site's language
+  when both match, at the better score. The results follow every keystroke,
+  a Korean syllable still being composed included; the status is spoken
+  (`aria-live`) only once the syllable is done. A query is kept in `?q=` even
+  when a result is clicked straight after typing. The status gives the real total;
+  10 results show, and "Show 10 more" adds the next ones and moves focus to the
+  first of them.
+- Each result's title and excerpt carry its post's `lang`; the excerpt is cut
+  around the match (choosing the window that holds the most distinct query
+  words, snapping to a space within 12 characters). Everything is escaped, and
+  the only tags added are `<mark>`s.
 - `_config.yml` cannot configure the search: it is browser JavaScript. Change
   `search.json` or `js/search.js`.
 
@@ -277,8 +290,8 @@ kramdown's only math delimiter is `$$`. It passes the contents through untouched
 as `\(…\)` (inline) or `\[…\]` (display), and MathJax, configured in `head.html`,
 renders them in the browser. Single `$` is not math to kramdown, so Markdown
 emphasis runs over it first (the rules are in
-[writing.md](writing.md#math)). MathJax is configured to ignore `$` as a
-delimiter too, so two prices on a line (`$1.2B … $250M`) do not become a
+[writing.md](writing.md#math)). MathJax reads only `\(…\)` and `\[…\]`, not
+`$` or `$$`, so two prices on a line (`$1.2B … $250M`) do not become a
 formula, and `processEscapes` lets `\$` print a dollar inside math.
 
 `head.html` defines the extra macros (`\llbracket`, `\rrbracket`, `\textsc`);
@@ -326,10 +339,9 @@ build.
 
 ## Known limits
 
-- **No relevance ranking in search.** The library scans `site.posts` in order and
-  stops at the limit, so results are newest first, and a title match can rank
-  below a passing mention. Fixing it means owning matching and ranking, at which
-  point the library should go.
+- **Search ranking is by field, not relevance.** A title hit outranks a body
+  hit, but there is no term weighting (a word every post has counts like a rare
+  one) and no phrase matching.
 - **Korean compound words** split by spaces match only as written: substring
   matching has no morphology. A real fix is a different search engine.
 - **The index grows with every post.** It loads only when search is used; split

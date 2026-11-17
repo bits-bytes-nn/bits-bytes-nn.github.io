@@ -10,15 +10,13 @@
 {%- assign page_description = page.description | default: site.description | shorten_meta -%}
 
 {%- comment -%}
-  A page `cover` is a wide banner of unknown size, so its dimensions are not
-  declared — crawlers measure it themselves. Only the configured default image
-  ships width/height, because those values are verified against the file.
+  The page's cover, else the site's default image. Its size is read from the
+  file (image_size, _plugins/image_dimensions.rb), so a link preview can lay
+  out before the image arrives.
 {%- endcomment -%}
-{%- if page.cover -%}
-	{%- assign social_image = page.cover | prepend: site.baseurl | prepend: site.url -%}
-{%- else -%}
-	{%- assign social_image = site.protocols.fb_image | prepend: site.baseurl | prepend: site.url -%}
-{%- endif -%}
+{%- assign social_src = page.cover | default: site.protocols.fb_image -%}
+{%- assign social_image = social_src | prepend: site.baseurl | prepend: site.url -%}
+{%- assign social_size = social_src | image_size -%}
 
 {%- assign page_lang = page.lang | default: site.lang -%}
 {%- if page_lang == 'en' -%}
@@ -122,10 +120,10 @@
 	<meta property="og:locale" content="{{ og_locale }}" />
 	<meta property="og:image" content="{{ social_image }}" />
 	<meta property="og:image:alt" content="{{ page_title | escape }}" />
-	{% unless page.cover %}<meta property="og:image:type" content="{{ site.protocols.fb_image_type }}" />
-	<meta property="og:image:width" content="{{ site.protocols.fb_image_width }}" />
-	<meta property="og:image:height" content="{{ site.protocols.fb_image_height }}" />
-	{% endunless %}
+	<meta property="og:image:type" content="image/{% if social_src contains '.png' %}png{% else %}jpeg{% endif %}" />
+	{% if social_size %}<meta property="og:image:width" content="{{ social_size[0] }}" />
+	<meta property="og:image:height" content="{{ social_size[1] }}" />
+	{% endif %}
 	{% if page.layout == 'post' %}
 	<meta property="article:published_time" content="{{ page.posted_at | date_to_xmlschema }}" />
 	{% if page.last_modified_at %}<meta property="article:modified_time" content="{{ page.last_modified_at | date_to_xmlschema }}" />
@@ -185,6 +183,10 @@
 	  "image": "{{ social_image }}",
 	  "author": { "@type": "Person", "name": {{ site.author | jsonify }}, "url": "{{ '/about/' | prepend: site.baseurl | prepend: site.url }}" },
 	  "publisher": { "@type": "Person", "name": {{ site.author | jsonify }} },
+	  {%- comment -%} The paper a paper post is about, by its DOI. {%- endcomment -%}
+	  {%- if page.paper_doi %}
+	  "about": { "@type": "ScholarlyArticle", "name": {{ page.title | jsonify | replace: '<', '\u003c' }}, "identifier": {{ page.paper_doi | jsonify }}, "sameAs": {{ page.paper_doi | prepend: 'https://doi.org/' | jsonify }} },
+	  {%- endif %}
 	  "keywords": {{ page.tags | join: ', ' | replace: '-', ' ' | jsonify | replace: '<', '\u003c' }}
 	}
 	</script>
@@ -219,12 +221,12 @@
 	<script>
 	MathJax = {
 	  tex: {
-	    // NOTE: single '$' is intentionally NOT an inline delimiter. kramdown emits
-	    // all math as \(...\) / \[...\], so '$' is unneeded here — and enabling it
-	    // makes MathJax mis-render prose currency on a line (e.g. "$1.2B ... $29B")
-	    // as a formula. processEscapes lets a literal "\$" render as a dollar sign.
+	    // kramdown emits all math as \(...\) / \[...\], so no '$' delimiter is
+	    // needed: '$' would mis-render prose currency on a line ("$1.2B ... $29B"),
+	    // and '$$' would turn one in a title or a related-post link into math.
+	    // processEscapes lets a literal "\$" render as a dollar sign.
 	    inlineMath: [['\\(', '\\)']],
-	    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+	    displayMath: [['\\[', '\\]']],
 	    processEscapes: true,
 	    macros: {
 	      llbracket: '[\\![',
@@ -268,11 +270,13 @@
 	            el.scrollWidth > el.clientWidth;
 	          if (scrolls && el.getAttribute('tabindex') !== '0') {
 	            el.setAttribute('tabindex', '0');
-	            el.setAttribute('role', 'region');
+	            // A group, not a region: a long post has dozens of these, and as
+	            // landmarks they drowned the page's real ones (tables stay regions).
+	            el.setAttribute('role', 'group');
 	            el.setAttribute('aria-label', display
 	              ? (english ? 'Equation ' + n + ', scrollable' : '수식 ' + n + ', 가로 스크롤')
 	              : (english ? 'Inline equation ' + n + ', scrollable' : '인라인 수식 ' + n + ', 가로 스크롤'));
-	          } else if (!scrolls && el.getAttribute('role') === 'region') {
+	          } else if (!scrolls && el.getAttribute('role') === 'group') {
 	            el.removeAttribute('tabindex');
 	            el.removeAttribute('role');
 	            el.removeAttribute('aria-label');
@@ -292,7 +296,7 @@
 	};
 	</script>
 	<!-- Pinned to an exact version with an integrity hash, like the other
-	     versioned CDN files (GLightbox, simple-jekyll-search). A floating alias
+	     versioned CDN file (GLightbox). A floating alias
 	     such as `mathjax@3` cannot carry an SRI hash, so the bytes it serves could
 	     change without a commit. The fonts MathJax fetches later are not covered. -->
 	<script id="MathJax-script" async

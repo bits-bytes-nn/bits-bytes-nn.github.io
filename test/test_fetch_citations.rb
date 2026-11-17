@@ -129,9 +129,10 @@ class TestFetchCitations < Minitest::Test
   LIVE = "https://example.org/citations.json"
 
   # run() in a scratch dir; returns [what it returned, the file, the notes].
-  def run_with(*answers, key: "")
+  def run_with(*answers, key: "", existing: nil)
     Dir.mktmpdir do |dir|
       out = File.join(dir, "citations.json")
+      File.write(out, existing) if existing
       notes = []
       answering(*answers)
       data = CitationFetch.run(%w[arXiv:1 arXiv:2], out: out, published_url: LIVE, key: key,
@@ -176,9 +177,10 @@ class TestFetchCitations < Minitest::Test
   end
 
   def test_with_nothing_to_write_the_file_is_left_alone
-    data, file, notes = run_with(*Array.new(5) { response(429) }, response(404))
+    before = JSON.generate("fetched_at" => "2026-11-01T00:00:00Z", "papers" => {})
+    data, file, notes = run_with(*Array.new(5) { response(429) }, response(404), existing: before)
     assert_nil data
-    assert_nil file
+    assert_equal JSON.parse(before), file
     assert_match(/not updated/, notes.last[1])
   end
 end

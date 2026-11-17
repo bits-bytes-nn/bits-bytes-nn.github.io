@@ -15,13 +15,12 @@ nav_order: 3
 
 {%- comment -%} Only "Paper Reviews" posts, grouped by their secondary topic — prevents other top-level categories (e.g. Insights) from leaking in via shared subcategories {%- endcomment -%}
 {% assign review_posts = site.categories['Paper Reviews'] | listed %}
+{%- comment -%} In the spec's topic order, as /categories/ lists them; a topic with no review is skipped. {%- endcomment -%}
+{% assign used = "" | split: "" %}
+{% for post in review_posts %}{% assign used = used | push: post.categories[1] %}{% endfor %}
+
 {% assign topics = "" | split: "" %}
-{% for post in review_posts %}
-  {% for c in post.categories %}
-    {% unless c == 'Paper Reviews' %}{% assign topics = topics | push: c %}{% endunless %}
-  {% endfor %}
-{% endfor %}
-{% assign topics = topics | uniq | sort %}
+{% for topic in site.data.post_conventions.topics %}{% if used contains topic[0] %}{% assign topics = topics | push: topic[0] %}{% endif %}{% endfor %}
 
 {% for cat in topics %}
   {% assign cat_display = cat | replace: "-", " " | replace: "_", " " %}

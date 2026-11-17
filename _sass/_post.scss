@@ -95,6 +95,14 @@
       font-size: 0.92em;
     }
 
+    // h3s, listed under their h2 when the post has too few h2s
+    // (_plugins/post_toc.rb).
+    ul ul {
+      padding: 0 0 0 1.2em;
+      li { font-size: inherit; } // not 0.92em of 0.92em
+      a { font-weight: 400; }
+    }
+
     a {
       display: inline-flex;
       align-items: center;
@@ -274,8 +282,14 @@
     }
   }
 
+  // A 44px touch target around the 20px icon.
   .social-link {
-    margin: 0 0.5em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
     color: $medium-gray;
     transition: $transition-color;
 
@@ -414,6 +428,12 @@
 // the close icon to 18×5px.
 .glightbox-container .gslide-image img {
   background-color: #fff;
+}
+
+// Above a phone the controls sit in the corners; a figure the full height of
+// the window ran under the close button.
+body:not(.glightbox-mobile) .glightbox-container .gslide-image img {
+  max-height: calc(100vh - 6rem);
 }
 
 // On a black band, so the ring holds 3:1 over a white figure too.

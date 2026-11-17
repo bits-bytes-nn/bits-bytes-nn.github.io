@@ -40,7 +40,6 @@ _site
 .claude/
 .idea/
 .run/
-_posts_bak/
 
 # Editor and toolchain leftovers
 node_modules/
