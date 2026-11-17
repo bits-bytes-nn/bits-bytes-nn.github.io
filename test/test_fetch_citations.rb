@@ -6,6 +6,8 @@
 
 require "minitest/autorun"
 require "stringio"
+require "tmpdir"
+require_relative "../_plugins/citations"
 require_relative "../script/fetch-citations"
 
 class TestFetchCitations < Minitest::Test
@@ -16,10 +18,12 @@ class TestFetchCitations < Minitest::Test
     CitationFetch.pause = ->(s) { @now += s }
     CitationFetch.http = ->(*) { raise "no network in tests" }
     @stderr, $stderr = $stderr, StringIO.new # the retry log
+    @stdout, $stdout = $stdout, StringIO.new
   end
 
   def teardown
     $stderr = @stderr
+    $stdout = @stdout
     CitationFetch.http = CitationFetch.pause = CitationFetch.clock = nil
   end
 
@@ -118,5 +122,63 @@ class TestFetchCitations < Minitest::Test
     assert_nil CitationFetch.published("https://example.org/citations.json")
     answering(SocketError.new("x"))
     assert_nil CitationFetch.published("https://example.org/citations.json")
+  end
+
+  S2 = "f1c0aad419cd942d5a135b47fcce58d101dbb3bd"
+  NOW = Time.utc(2026, 11, 17, 12)
+  LIVE = "https://example.org/citations.json"
+
+  # run() in a scratch dir; returns [what it returned, the file, the notes].
+  def run_with(*answers, key: "")
+    Dir.mktmpdir do |dir|
+      out = File.join(dir, "citations.json")
+      notes = []
+      answering(*answers)
+      data = CitationFetch.run(%w[arXiv:1 arXiv:2], out: out, published_url: LIVE, key: key,
+                               note: ->(m, l) { notes << [l, m] }, now: NOW)
+      [data, File.file?(out) ? JSON.parse(File.read(out)) : nil, notes]
+    end
+  end
+
+  def published(at)
+    response(200, JSON.generate("fetched_at" => at, "papers" => { "arXiv:1" => { "count" => 3, "paper_id" => S2 } }))
+  end
+
+  def test_run_writes_the_fetched_counts_and_names_the_missing
+    data, file, notes = run_with(response(200, JSON.generate([{ "paperId" => S2, "citationCount" => 9 }, nil])))
+    assert_equal({ "fetched_at" => "2026-11-17T12:00:00Z", "papers" => { "arXiv:1" => { "count" => 9, "paper_id" => S2 } } }, file)
+    assert_equal file, data
+    assert_equal [["warning", "no count for arXiv:2 (not found, or 0: see _data/citation_ids.yml)"]], notes
+  end
+
+  def test_a_refused_key_is_an_error_and_is_asked_again_without_it
+    _, file, notes = run_with(response(403), response(200, JSON.generate([nil, nil])), key: "k")
+    assert_equal %w[k] + [nil], @asked.map { |r| r["x-api-key"] }
+    assert_equal "error", notes.first[0]
+    assert_equal({}, file["papers"])
+  end
+
+  def test_without_an_answer_the_published_counts_are_kept
+    _, file, notes = run_with(*Array.new(5) { response(429) }, published("2026-11-16T20:41:00Z"))
+    assert_equal "2026-11-16T20:41:00Z", file["fetched_at"]
+    assert_equal [["warning", "no usable answer from Semantic Scholar; kept the published counts of 2026-11-16T20:41:00Z"]], notes
+  end
+
+  def test_published_counts_a_week_old_are_an_error
+    _, _, notes = run_with(*Array.new(5) { response(429) }, published("2026-11-09T00:00:00Z"))
+    assert_equal "error", notes.last[0]
+  end
+
+  def test_an_unusable_answer_falls_back_too
+    _, file, notes = run_with(response(200, "[]"), published("2026-11-16T20:41:00Z"))
+    assert_equal 3, file.dig("papers", "arXiv:1", "count")
+    assert_match(/unusable answer/, notes.first[1])
+  end
+
+  def test_with_nothing_to_write_the_file_is_left_alone
+    data, file, notes = run_with(*Array.new(5) { response(429) }, response(404))
+    assert_nil data
+    assert_nil file
+    assert_match(/not updated/, notes.last[1])
   end
 end

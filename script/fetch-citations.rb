@@ -30,7 +30,8 @@ module CitationFetch
 
   class KeyRefused < StandardError; end
 
-  # The seams test/test_fetch_citations.rb replaces.
+  # The seams test/test_fetch_citations.rb replaces. `Citations` comes from
+  # _plugins/citations.rb, which Jekyll loads (and the tests require).
   class << self
     attr_writer :http, :pause, :clock
 
@@ -83,14 +84,51 @@ module CitationFetch
   rescue StandardError
     nil
   end
-end
 
-# A warning or error: an annotation in CI, and an error also in the run's
-# summary, where a scheduled run's shows without opening the log.
-def note(message, level = "warning")
-  warn(ENV["GITHUB_ACTIONS"] ? "::#{level} title=Citation counts::#{message}" : "fetch-citations: #{message}")
-  summary = ENV["GITHUB_STEP_SUMMARY"]
-  File.write(summary, "**Citation counts:** #{message}\n", mode: "a") if level == "error" && summary && !summary.empty?
+  # Fetches the counts for `ids` and writes them to `out`, or, failing that,
+  # the counts `published_url` holds. Calls `note.(message, level)` for each
+  # warning or error. Returns what it wrote, or nil.
+  def self.run(ids, out:, published_url:, key: "", note: method(:note), now: Time.now)
+    stop = clock.call + DEADLINE # one deadline for both tries below
+    begin
+      answer = fetch(ids, key: key, stop: stop)
+    rescue KeyRefused => e
+      note.("Semantic Scholar refused SEMANTIC_SCHOLAR_API_KEY (#{e.message}); renew the secret. Asking without it", "error")
+      answer = fetch(ids, stop: stop)
+    end
+    papers = nil
+    if answer
+      begin
+        papers = Citations.entries(ids, JSON.parse(answer))
+      rescue JSON::ParserError, ArgumentError => e
+        note.("unusable answer from Semantic Scholar (#{e.message.lines.first.strip})", "warning")
+      end
+    end
+
+    if papers
+      data = { "fetched_at" => now.utc.iso8601, "papers" => papers.sort.to_h }
+      puts "fetch-citations: #{papers.size} of #{ids.size} papers counted"
+      missing = ids - papers.keys
+      note.("no count for #{missing.join(", ")} (not found, or 0: see _data/citation_ids.yml)", "warning") unless missing.empty?
+    elsif (data = published(published_url))
+      age = now - (Time.iso8601(data["fetched_at"]) rescue Time.at(0))
+      note.("no usable answer from Semantic Scholar; kept the published counts of #{data["fetched_at"]}",
+            age > STALE ? "error" : "warning")
+    else
+      note.("no usable answer from Semantic Scholar and no published counts; #{File.basename(out)} is not updated", "warning")
+      return nil
+    end
+    File.write(out, JSON.pretty_generate(data) + "\n")
+    data
+  end
+
+  # A warning or error: an annotation in CI, and an error also in the run's
+  # summary, where a scheduled run's shows without opening the log.
+  def self.note(message, level = "warning")
+    warn(ENV["GITHUB_ACTIONS"] ? "::#{level} title=Citation counts::#{message}" : "fetch-citations: #{message}")
+    summary = ENV["GITHUB_STEP_SUMMARY"]
+    File.write(summary, "**Citation counts:** #{message}\n", mode: "a") if level == "error" && summary && !summary.empty?
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
@@ -107,33 +145,6 @@ if $PROGRAM_NAME == __FILE__
   ids = site.posts.docs.filter_map { |post| post.data["citation_id"] }.uniq
   abort "fetch-citations: no post has a citation_id; is _plugins/citations.rb loaded?" if ids.empty?
 
-  papers = nil
-  stop = CitationFetch.clock.call + CitationFetch::DEADLINE # one deadline for both tries below
-  begin
-    answer = CitationFetch.fetch(ids, key: ENV["SEMANTIC_SCHOLAR_API_KEY"].to_s, stop: stop)
-  rescue CitationFetch::KeyRefused => e
-    note("Semantic Scholar refused SEMANTIC_SCHOLAR_API_KEY (#{e.message}); renew the secret. Asking without it", "error")
-    answer = CitationFetch.fetch(ids, stop: stop)
-  end
-  if answer
-    begin
-      papers = Citations.entries(ids, JSON.parse(answer))
-    rescue JSON::ParserError, ArgumentError => e
-      note("unusable answer from Semantic Scholar (#{e.message.lines.first.strip})")
-    end
-  end
-
-  if papers
-    File.write(out, JSON.pretty_generate("fetched_at" => Time.now.utc.iso8601, "papers" => papers.sort.to_h) + "\n")
-    puts "fetch-citations: #{papers.size} of #{ids.size} papers counted"
-    missing = ids - papers.keys
-    note("no count for #{missing.join(", ")} (not found, or 0: see _data/citation_ids.yml)") unless missing.empty?
-  elsif (last = CitationFetch.published("#{site.config["url"]}#{ENV.fetch("BASE_PATH", site.baseurl)}/citations.json"))
-    File.write(out, JSON.pretty_generate(last) + "\n")
-    age = Time.now - (Time.iso8601(last["fetched_at"]) rescue Time.at(0))
-    note("no usable answer from Semantic Scholar; kept the published counts of #{last["fetched_at"]}",
-         age > CitationFetch::STALE ? "error" : "warning")
-  else
-    note("no usable answer from Semantic Scholar and no published counts; _data/citations.json is not updated")
-  end
+  url = "#{site.config["url"]}#{ENV.fetch("BASE_PATH", site.baseurl)}/citations.json"
+  CitationFetch.run(ids, out: out, published_url: url, key: ENV["SEMANTIC_SCHOLAR_API_KEY"].to_s)
 end

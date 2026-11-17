@@ -90,4 +90,20 @@ class TestCitations < Minitest::Test
       assert_nil post.data["citation"]
     end
   end
+
+  # The build prints the field and js/citations.js rewrites it, each with its
+  # own copy of the wording: they must say the same.
+  def test_the_layout_and_the_script_word_the_count_alike
+    root = File.expand_path("..", __dir__)
+    layout = File.read(File.join(root, "_layouts/post.html"))
+    script = File.read(File.join(root, "js/citations.js"))
+    assert_includes layout, %({% if cited.count == 1 %}citation{% else %}citations{% endif %} on Semantic Scholar")
+    assert_includes script, %(+ (entry.count === 1 ? ' citation' : ' citations') + ' on Semantic Scholar')
+    assert_includes layout, 'title="Semantic Scholar"'
+    assert_includes script, "link.title = 'Semantic Scholar'"
+    assert_includes layout, 'href="https://www.semanticscholar.org/paper/{{ cited.paper_id | escape }}"'
+    assert_includes script, "'https://www.semanticscholar.org/paper/' + encodeURIComponent(entry.paperId)"
+    # delimited() and toLocaleString('en-US') group by thousands with commas.
+    assert_includes script, "entry.count.toLocaleString('en-US')"
+  end
 end
