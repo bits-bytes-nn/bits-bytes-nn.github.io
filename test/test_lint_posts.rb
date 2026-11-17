@@ -152,7 +152,7 @@ class TestLintPosts < Minitest::Test
 
   def test_no_ar5iv_links
     assert_finding(/ar5iv link/, lint("![그림](https://ar5iv.labs.arxiv.org//html/2310.06825/assets/x1.png)\n"))
-    assert_equal [], lint("![그림](https://arxiv.org/html/2401.04088v1/x1.png)\n")
+    assert_equal [], lint("[논문](https://arxiv.org/html/2401.04088v1)\n")
   end
 
   def test_a_body_h1_outside_code
@@ -381,5 +381,22 @@ class TestLintPosts < Minitest::Test
     survey = FRONT.sub('"Paper Reviews"', '"Paper Surveys"').sub("paper_author: \"Mistral AI\"\n", "")
     assert_equal [], lint(front: survey)
   end
-end
 
+  def test_an_arxiv_figure_must_be_stored
+    assert_finding(%r{3: an arXiv figure is linked, not stored; save it as /assets/images/mistral-7b-<n>},
+                   lint("Text.\n\n![Fig](https://arxiv.org/html/2310.06825v1/x1.png)\n"))
+    assert_finding(/arXiv figure/, lint(%(<img src="https://www.arxiv.org/x.png" alt="a">\n)))
+    assert_equal [], lint("![Fig](/assets/images/mistral-7b-1.png)\n")
+    assert_equal [], lint("![Diagram](https://d2908q01vomqb2.cloudfront.net/x.png)\n") # its owner's
+    assert_equal [], lint("See [the paper](https://arxiv.org/abs/2310.06825).\n")      # a link, not an image
+    assert_equal [], lint("```markdown\n![Fig](https://arxiv.org/html/x.png)\n```\n")  # an example
+  end
+
+  def test_a_long_title_needs_a_short_seo_title
+    long = "A" * (SPEC["seo_title_max_length"] + 1)
+    assert_finding(/title is over \d+ characters; add a shorter seo_title/,
+                   lint(front: FRONT.sub('title: "Mistral 7B"', %(title: "#{long}"))))
+    assert_equal [], lint(front: FRONT.sub('title: "Mistral 7B"', %(title: "#{long}"\nseo_title: "Short")))
+    assert_finding(/seo_title is over/, lint(front: "#{FRONT}seo_title: \"#{long}\"\n"))
+  end
+end

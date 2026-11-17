@@ -302,7 +302,9 @@ checks.
 
 Five layers, each catching what the others cannot:
 
-1. **Unit tests** (`test/`): plugin functions and the lint, without a site.
+1. **Unit tests** (`test/`): plugin functions and the lint, without a site;
+   `test/js/` tests the search script's matching and ranking in node
+   (`node --test 'test/js/*.test.js'`, no packages).
 2. **Source lint** (`script/lint-posts.rb`): front matter against
    `_data/post_conventions.yml`, plus Markdown defects the built HTML no longer
    shows (broken tables, unsafe math, text read as Liquid or HTML, bad fences).

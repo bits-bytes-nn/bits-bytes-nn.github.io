@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "데이터에 맥락을 새겨 넣는 법 — AI Ready Data, Semantic Layer, Knowledge Graph, Ontology"
+seo_title: "데이터에 맥락을 새겨 넣는 법 — 시맨틱 레이어와 지식 그래프"
 description: >-
   'AI-ready 데이터'는 깨끗한 데이터가 아니라 맥락을 기계가 실행할 수 있는 형태로 새겨 넣은
   데이터입니다. 같은 스키마에서 text-to-SQL 정확도가 16.7%에서 54.2%로 오른 이유를 짚습니다.
@@ -271,8 +272,8 @@ LLM으로 그래프를 자동 구축하는 파이프라인은 다섯 단계로 �
 
 같은 뼈대를 학계 쪽 어휘로 그린 지도가 Peng et al. 서베이의 그림입니다. 인덱싱·검색·생성 사이에 축이 하나 더 놓여 있다는 게 요점입니다 — 검색 결과를 노드·트리플·경로·부분그래프 중 무엇으로 뽑을 것인가. §4.4에서 볼 LightRAG·PathRAG의 차이가 정확히 이 축에서 갈립니다.
 
-<a href="https://arxiv.org/html/2408.08921v2/x2.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: GraphRAG 파이프라인의 학계 지도 — G-Indexing에서 G-Retrieval, 그리고 그래프 표현 형식을 거쳐 G-Generation으로 (출처: Peng et al., Graph Retrieval-Augmented Generation: A Survey, 2024, Figure 2)">
-  <img src="https://arxiv.org/html/2408.08921v2/x2.png" alt="GraphRAG 파이프라인 도식. 왼쪽 아래 Graph Database와 G-Indexing에서 시작해 위쪽 G-Retrieval(질의 확장·분해, 검색기, 병합·가지치기)로 올라가고, 가운데 Retrieval Results 열에 노드·트리플·경로·부분그래프·혼합이 나열되며, Graph Format 열은 인접 테이블·자연어·코드 형태·구문 트리·노드 시퀀스·그래프 임베딩 중 하나로 변환한 뒤 오른쪽 G-Generation의 생성 전·중·후 보강 단계로 이어져 최종 응답을 만든다." />
+<a href="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-1.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: GraphRAG 파이프라인의 학계 지도 — G-Indexing에서 G-Retrieval, 그리고 그래프 표현 형식을 거쳐 G-Generation으로 (출처: Peng et al., Graph Retrieval-Augmented Generation: A Survey, 2024, Figure 2)">
+  <img src="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-1.png" alt="GraphRAG 파이프라인 도식. 왼쪽 아래 Graph Database와 G-Indexing에서 시작해 위쪽 G-Retrieval(질의 확장·분해, 검색기, 병합·가지치기)로 올라가고, 가운데 Retrieval Results 열에 노드·트리플·경로·부분그래프·혼합이 나열되며, Graph Format 열은 인접 테이블·자연어·코드 형태·구문 트리·노드 시퀀스·그래프 임베딩 중 하나로 변환한 뒤 오른쪽 G-Generation의 생성 전·중·후 보강 단계로 이어져 최종 응답을 만든다." />
 </a>
 
 
@@ -317,8 +318,8 @@ AWS 블로그에 실린 구성도가 이 관리형의 경계를 그대로 보여
 
 첫째 처방은 $33,000을 추정한 KET-RAG 연구진이 내놨고, 그 구조가 논문의 인덱싱 그림에 담겨 있습니다. 코퍼스 전체를 LLM으로 훑는 대신 핵심 조각들만 기존 GraphRAG로 뽑아 **KG Skeleton**(골격 그래프)을 만듭니다. 나머지는 LLM 없이 단어를 토큰화해 텍스트-키워드 이분 그래프로 구성합니다. 질의 시점에는 두 층에서 각각 얼마씩 회수할지를 비율 $$\theta$$로 나눠 씁니다. 비싼 층은 얇게, 값싼 층은 두껍게 긁는 셈입니다.
 
-<a href="https://arxiv.org/html/2502.09304v2/x1.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 비싼 층은 얇게, 값싼 층은 두껍게 — LLM으로 뽑은 KG 골격과 LLM 없이 깐 텍스트-키워드 이분 그래프를 겹쳐 인덱싱 비용을 낮춘다 (출처: Huang, Zhang, Xiao, KET-RAG, 2025, Figure 1)">
-  <img src="https://arxiv.org/html/2502.09304v2/x1.png" alt="KET-RAG 구조도. 아래 인덱싱 단계에서 입력 텍스트가 ① KNN 그래프로 묶인 뒤 ② 기존 GraphRAG로 일부만 KG Skeleton이 되고, ③ 단어·문장 토큰화로 Juliet·Romeo·Hamlet 같은 키워드와 텍스트 조각을 잇는 Text-Keyword 이분 그래프가 만들어진다. 위 검색·생성 단계에서는 질의와 길이 한도, 회수 비율 세타를 입력받아 ④ 두 층에서 각각 회수한 뒤 ⑤ 맥락을 합쳐 LLM에 넣고 최종 답을 만든다." />
+<a href="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-2.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 비싼 층은 얇게, 값싼 층은 두껍게 — LLM으로 뽑은 KG 골격과 LLM 없이 깐 텍스트-키워드 이분 그래프를 겹쳐 인덱싱 비용을 낮춘다 (출처: Huang, Zhang, Xiao, KET-RAG, 2025, Figure 1)">
+  <img src="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-2.png" alt="KET-RAG 구조도. 아래 인덱싱 단계에서 입력 텍스트가 ① KNN 그래프로 묶인 뒤 ② 기존 GraphRAG로 일부만 KG Skeleton이 되고, ③ 단어·문장 토큰화로 Juliet·Romeo·Hamlet 같은 키워드와 텍스트 조각을 잇는 Text-Keyword 이분 그래프가 만들어진다. 위 검색·생성 단계에서는 질의와 길이 한도, 회수 비율 세타를 입력받아 ④ 두 층에서 각각 회수한 뒤 ⑤ 맥락을 합쳐 LLM에 넣고 최종 답을 만든다." />
 </a>
 
 값싼 층을 어디까지 두껍게 해도 되는지는 결국 실측 문제지만, 방향은 분명합니다. LLM을 인덱싱 전 구간에 균일하게 뿌린 것이 낭비였습니다. 둘째 처방은 같은 관찰을 끝까지 밀어붙입니다. 인덱싱에서 LLM을 적게 쓰는 데 그치지 않고 아예 뺍니다. 2024년 11월 Microsoft의 [**LazyGraphRAG**](https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/)입니다. 발상의 전환은 이렇습니다 — 인덱싱 시점에 LLM을 쓰지 말고, NLP 명사구 추출로 값싸게 구조만 잡은 뒤 **LLM 사용을 쿼리 시점으로 미룬다.** Microsoft가 공개한 결과는 다음과 같습니다.
@@ -345,8 +346,8 @@ LazyGraphRAG의 발상을 조금 더 풀어 보면 왜 이게 통하는지 보�
 
 원조 GraphRAG와 방금 본 두 후속(LightRAG·PathRAG)이 같은 그래프에서 무엇을 집어 오는지를 PathRAG 논문의 그림 하나가 압축해 보여 줍니다. 빨간색이 프롬프트에 실제로 들어가는 부분입니다.
 
-<a href="https://arxiv.org/html/2502.14902v1/x1.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 같은 그래프, 다른 회수 범위 — (a) GraphRAG는 커뮤니티 전체를, (b) LightRAG는 질의 노드의 이웃 전부를, (c) PathRAG는 질의 노드를 잇는 관계 경로만 프롬프트에 넣는다 (출처: Chen et al., PathRAG, 2025, Figure 1)">
-  <img src="https://arxiv.org/html/2502.14902v1/x1.png" alt="세 방식의 회수 범위를 비교한 그래프 도식. (a) GraphRAG는 커뮤니티 타원 전체가 빨갛게 칠해져 커뮤니티 단위로 정보를 가져오고, (b) LightRAG는 plants·aphids·device 같은 질의 관련 노드에 붙은 이웃 노드가 거의 다 빨갛게 선택되며, (c) PathRAG는 같은 질의 노드들을 잇는 굵은 빨간 경로만 남고 sun·water·oak 같은 주변 노드는 파란색으로 제외된다." />
+<a href="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-3.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 같은 그래프, 다른 회수 범위 — (a) GraphRAG는 커뮤니티 전체를, (b) LightRAG는 질의 노드의 이웃 전부를, (c) PathRAG는 질의 노드를 잇는 관계 경로만 프롬프트에 넣는다 (출처: Chen et al., PathRAG, 2025, Figure 1)">
+  <img src="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-3.png" alt="세 방식의 회수 범위를 비교한 그래프 도식. (a) GraphRAG는 커뮤니티 타원 전체가 빨갛게 칠해져 커뮤니티 단위로 정보를 가져오고, (b) LightRAG는 plants·aphids·device 같은 질의 관련 노드에 붙은 이웃 노드가 거의 다 빨갛게 선택되며, (c) PathRAG는 같은 질의 노드들을 잇는 굵은 빨간 경로만 남고 sun·water·oak 같은 주변 노드는 파란색으로 제외된다." />
 </a>
 
 (a)는 커뮤니티 전체를, (b)는 이웃 전체를, (c)는 경로만 사용합니다. 왼쪽에서 오른쪽으로 갈수록 프롬프트에 들어가는 토큰이 줄어듭니다. 두 연구 모두 토큰을 적게 넣은 쪽이 답을 더 잘 맞혔다고 보고합니다. 그래프를 놓고 나면 다음 싸움은 "무엇을 넣을까"가 아니라 **"무엇을 빼도 되는가"**가 됩니다. 다만 비용이 내렸다는 게 품질까지 따라온다는 뜻은 아니고, 선불에서 종량으로 바뀐 청구서가 늘 유리하다는 뜻도 아닙니다 — 두 셈 모두 §7.5에서 독립 평가 수치로 다시 따집니다.
@@ -624,8 +625,8 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 논문은 이 흩어짐을 후처리로 메웁니다. 문장을 통째로 삼킨 덩어리(compound) 노드를 쪼개고, 흩어진 조각들을 상위 개념으로 묶는 두 단계입니다. 한 문장이 그 과정을 거치며 어떻게 달라지는지가 논문의 첫 그림에 그대로 담겨 있습니다. 생후 12개월 TV 시청이 4.5세 인지능력과 음의 상관을 보인다는 문장을 놓고, 초기 추출은 문장 전체를 뭉친 덩어리 노드(association between … and …) 하나를 만들어 버립니다. 쪼개기(splitting)가 그걸 개별 엔티티로 분해하고, 추상화(abstraction)가 유아 미디어 노출 같은 상위 개념으로 묶어 흩어진 섬들을 잇습니다. 색으로 표시된 엔티티 중복 제거·대명사 해소·출처 추적이 각 단계에서 하는 일입니다.
 
-<a href="https://arxiv.org/html/2510.11297v1/x1.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 덩어리 노드에서 쪼개기, 그리고 상위 개념 추상화까지 — 한 문장이 세 단계를 거치며 트리플이 달라진다 (출처: Chen et al., Are Large Language Models Effective Knowledge Graph Constructors?, 2025, Figure 1)">
-  <img src="https://arxiv.org/html/2510.11297v1/x1.png" alt="한 문장이 세 단계를 거치는 트리플 변화 도식. 맨 아래 예시 문장에서 초기 추출(Initial Extraction)은 문장 전체를 뭉친 'association between …' 덩어리 노드를 만들고, 쪼개기(Splitting)는 그것을 개별 엔티티를 가리키는 reference 트리플들로 분해하며, 추상화(Abstraction)는 'infant media exposure'·'child cognitive development' 같은 상위 개념으로 묶는 is_an_instance_of 트리플을 만든다. 오른쪽 범례는 초록이 엔티티 중복 제거, 보라가 대명사 해소, 주황이 출처 추적임을 표시한다." />
+<a href="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-4.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 덩어리 노드에서 쪼개기, 그리고 상위 개념 추상화까지 — 한 문장이 세 단계를 거치며 트리플이 달라진다 (출처: Chen et al., Are Large Language Models Effective Knowledge Graph Constructors?, 2025, Figure 1)">
+  <img src="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-4.png" alt="한 문장이 세 단계를 거치는 트리플 변화 도식. 맨 아래 예시 문장에서 초기 추출(Initial Extraction)은 문장 전체를 뭉친 'association between …' 덩어리 노드를 만들고, 쪼개기(Splitting)는 그것을 개별 엔티티를 가리키는 reference 트리플들로 분해하며, 추상화(Abstraction)는 'infant media exposure'·'child cognitive development' 같은 상위 개념으로 묶는 is_an_instance_of 트리플을 만든다. 오른쪽 범례는 초록이 엔티티 중복 제거, 보라가 대명사 해소, 주황이 출처 추적임을 표시한다." />
 </a>
 
 세 단계를 다 거친 뒤의 숫자는 이렇습니다. 후처리는 모든 모델의 $$F_{GC}$$를 끌어올립니다. 그런데 모델 사이의 격차는 거의 그대로 남습니다. 초기 추출의 0.249~0.794가 후처리 후 0.441~0.927로 옮겨 갈 뿐입니다.
@@ -665,8 +666,8 @@ $$\mathrm{score}(d) = \sum_{r} \frac{w_r}{60 + \mathrm{rank}_r(d)}$$
 
 이 승패는 검색 후처리를 얹어도 대체로 뒤집히지 않습니다. 같은 평가가 후처리 두 가지까지 교차해 봤습니다. **재순위화(reranking)**는 회수한 조각을 다시 점수 매겨 순서를 바꿉니다. **IRCoT**는 한 번에 답하지 않고, 지금까지 모은 근거로 다음에 무엇을 더 찾아야 하는지를 되물으며 검색과 추론을 번갈아 돌립니다. 둘 다 얹어 봤지만 질의 유형별 우위 관계는 그대로였습니다.
 
-<a href="https://arxiv.org/html/2502.11371v3/x1.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 추론 전략(Rerank · Vanilla · IRCoT)별 QA 성능 — 단일 홉(NQ)에서는 벡터 RAG가, 멀티홉(MultiHop-RAG)에서는 그래프 기반 HippoRAG2가 전략과 무관하게 앞선다 (출처: Han et al., RAG vs. GraphRAG: A Systematic Evaluation and Key Insights, 2025, Figure 1)">
-  <img src="https://arxiv.org/html/2502.11371v3/x1.png" alt="추론 전략별 QA 성능을 비교한 두 개의 꺾은선 그래프. 왼쪽 NQ(단일 홉)에서는 Rerank·Vanilla·IRCoT 세 전략 모두에서 벡터 RAG가 가장 높은 F1을 유지하고, 오른쪽 MultiHop-RAG(멀티홉)에서는 그래프 기반 HippoRAG2가 세 전략 모두에서 가장 높다. 전략을 바꿔도 방법 사이의 순서는 유지되지만, MultiHop-RAG의 Community-GraphRAG(Local)만 IRCoT에서 Vanilla보다 낮게 떨어진다." />
+<a href="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-5.png" class="glightbox" data-gallery="ai-ready-data" data-glightbox="title: 추론 전략(Rerank · Vanilla · IRCoT)별 QA 성능 — 단일 홉(NQ)에서는 벡터 RAG가, 멀티홉(MultiHop-RAG)에서는 그래프 기반 HippoRAG2가 전략과 무관하게 앞선다 (출처: Han et al., RAG vs. GraphRAG: A Systematic Evaluation and Key Insights, 2025, Figure 1)">
+  <img src="/assets/images/ai-ready-data-semantic-layer-knowledge-graph-5.png" alt="추론 전략별 QA 성능을 비교한 두 개의 꺾은선 그래프. 왼쪽 NQ(단일 홉)에서는 Rerank·Vanilla·IRCoT 세 전략 모두에서 벡터 RAG가 가장 높은 F1을 유지하고, 오른쪽 MultiHop-RAG(멀티홉)에서는 그래프 기반 HippoRAG2가 세 전략 모두에서 가장 높다. 전략을 바꿔도 방법 사이의 순서는 유지되지만, MultiHop-RAG의 Community-GraphRAG(Local)만 IRCoT에서 Vanilla보다 낮게 떨어진다." />
 </a>
 
 이 그림이 보여 주는 건 하나입니다. 두 패널의 순서가 서로 뒤집혀 있습니다. 단일 홉(NQ)에서는 벡터 RAG가 세 전략 내내 맨 위에 있고, 멀티홉(MultiHop-RAG)에서는 그래프를 쓰는 HippoRAG2가 세 전략 내내 맨 위에 있습니다. 후처리는 방법 사이의 순서를 바꾸지 못하고 각자의 점수를 함께 밀어 올리는 데 그칩니다. 방법 선택을 대신해 주지는 못한다는 뜻입니다.
