@@ -56,7 +56,7 @@ jobs:
       - name: Unit-test the search script
         # js/search.js's matching and ranking, in node's own test runner: no
         # packages to install. The runner image ships Node.
-        run: node --test test/js/
+        run: node --test 'test/js/*.test.js'
       - name: Lint the post sources
         # Front matter against _data/post_conventions.yml, plus table, math and
         # heading rules the built HTML no longer shows.

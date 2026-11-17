@@ -1,5 +1,5 @@
 // Unit tests for js/search.js's matching, ranking and markup, in node:
-//   node --test test/js/
+//   node --test 'test/js/*.test.js'
 // The cases are the ones a review found broken: a title match ranked below
 // passing mentions, a translation pair taking two slots, markup in a result.
 'use strict';
