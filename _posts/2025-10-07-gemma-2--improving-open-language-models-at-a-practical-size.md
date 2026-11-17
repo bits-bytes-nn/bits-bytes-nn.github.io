@@ -433,7 +433,7 @@ Gemma 2B 모델들은 더 큰 모델들에 비해 형식 견고성이 약간 떨
 
 ### 축자적 암송 결과
 
-![암송률 비교](https://arxiv.org/html/2408.00118/x1.png)
+![암송률 비교](/assets/images/gemma-2--improving-open-language-models-at-a-practical-size-1.png)
 
 위 그림의 결과를 보면, 먼저 암송 평가를 포함한 문헌의 최신 모델들과 비교했습니다. Gemma 2는 유사한 크기의 이전 모델들에 비해 현저히 적게 암송하며, 암송률이 0.1% 미만으로 나타났습니다(로그 y축에 주목). 이는 [Nasr et al.의 연구](https://arxiv.org/pdf/2311.17035)에서 제안된 확장 가능한 추출 방법론으로 측정했을 때도 상당한 개선을 보여줍니다.
 

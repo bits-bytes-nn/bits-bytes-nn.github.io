@@ -1,0 +1,9 @@
+# The Semantic Scholar record (paperId) of a paper_doi whose usual id
+# (arXiv:<id>, DOI:<doi>) finds no record there, or a duplicate with no
+# citations. Keyed by paper_doi, so a regenerated post keeps it.
+# _plugins/citations.rb fails the build on a key no post gives or a value that
+# is not a paperId. The paperId is the hex string at the end of a paper's
+# semanticscholar.org URL.
+
+# DeepSeek-V3: arXiv:2412.19437 leads to a duplicate record with 0 citations.
+10.48550/arXiv.2412.19437: 5b6fdb2aea424d02c141da81d62b04d739d62b96

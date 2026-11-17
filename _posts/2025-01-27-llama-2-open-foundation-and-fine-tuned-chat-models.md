@@ -62,7 +62,7 @@ BLOOM, LLaMA-1, Falcon과 같은 공개된 사전학습 모델들은 GPT-3나 Ch
 인간 평가를 보완하기 위해 GPT-4 모델을 사용하여 상용 라이선스 파운데이션 모델들과 Llama 2-Chat 모델의 유용성과 안전성을 비교 평가했습니다. 평가의 공정성을 위해 모델 응답의 제시 순서를 무작위로 바꾸었으며, 동점을 제거하기 위해 승률을 $$\text{win}/(\text{win}+\text{loss})$$ 공식으로 계산했습니다.
 ### 안전성 평가 결과
 
-![안전성 평가 결과](https://arxiv.org/html/2307.09288v1/img/safety_overall_human_temp.png)
+![안전성 평가 결과](/assets/images/llama-2-open-foundation-and-fine-tuned-chat-models-1.png)
 
 약 2,000개의 적대적 프롬프트에 대한 안전성 평가에서 Llama 2-Chat 모델은 다른 오픈소스 및 비공개 모델들과 비교하여 우수한 성능을 보여주었습니다. 특히 70b-chat 변형 모델이 가장 낮은 안전성 위반율을 기록했습니다. 하지만 이러한 안전성 평가 결과는 프롬프트 세트의 한계, 평가 가이드라인의 주관성, 그리고 개별 평가자의 주관성으로 인한 편향이 있을 수 있습니다. 또한 이러한 안전성 평가는 Llama 2-Chat 모델에 최적화된 콘텐츠 기준을 사용했을 가능성이 있다는 점을 고려해야 합니다.
 
@@ -304,7 +304,7 @@ Llama 2의 안전성 평가와 완화 방법은 크게 네 가지 주요 영역�
 
 HolisticBias 데이터셋의 인구통계학적 정체성 용어를 사용하여 다양한 집단의 대표성을 분석했습니다. 종교, 성별과 성, 국적, 인종과 민족, 성적 지향이라는 5개 축으로 구분하여 각 축의 상위 5개 용어 빈도를 측정했습니다. 성별과 성의 경우, 'She' 대명사는 적게 등장하지만 'female'이라는 용어는 더 많은 문서에서 발견되었습니다. 성적 지향의 상위 5개 용어는 모두 LGBTQ+ 정체성과 관련되어 있었으며, 국적, 인종과 민족, 종교에서는 서구적 편향이 관찰되었습니다.
 
-![데이터 유해성](https://arxiv.org/html/2307.09288v1/img/data_toxicity.png)
+![데이터 유해성](/assets/images/llama-2-open-foundation-and-fine-tuned-chat-models-2.png)
 
 #### 데이터 유해성 평가
 
@@ -412,11 +412,11 @@ Llama 2-Chat의 안전성을 평가하기 위해 연구진은 안전성 카테�
 
 1점이나 2점은 위반으로 간주되며, 각 샘플은 세 명의 주석자가 평가하여 다수결로 위반 여부를 결정했습니다. 평가자 간 신뢰도(IRR)는 Gwet의 AC1/2 통계를 사용하여 측정했으며, 주석 배치에 따라 0.70에서 0.95 사이의 점수를 보였습니다. Llama 2-Chat 주석에 대한 평균 IRR은 Gwet의 AC2 측정에서 0.92를 기록했습니다.
 
-![전반적인 안전성 측정](https://arxiv.org/html/2307.09288v1/img/safety_human_eval/overall_violation.png)
+![전반적인 안전성 측정](/assets/images/llama-2-open-foundation-and-fine-tuned-chat-models-3.png)
 
 Llama 2-Chat은 모든 모델 크기에서 낮은 위반율을 보여주었습니다. 다만 이러한 결과는 프롬프트 세트의 한계, 검토 가이드라인의 주관성, 콘텐츠 기준, 그리고 개별 평가자의 주관성을 고려하여 신중하게 해석해야 합니다.
 
-![위험 카테고리별 위반율](https://arxiv.org/html/2307.09288v1/img/safety_human_eval/category.png)
+![위험 카테고리별 위반율](/assets/images/llama-2-open-foundation-and-fine-tuned-chat-models-4.png)
 
 위험 카테고리별 안전성 위반율을 분석한 결과, Llama 2-Chat은 비전문가 조언 카테고리에서 상대적으로 더 많은 위반을 보였습니다. 이는 때때로 적절한 면책 조항(예: "저는 전문가가 아닙니다")을 포함하지 않는 등의 이유 때문입니다. 다른 두 카테고리에서는 모델 크기와 관계없이 일관되게 낮은 위반율을 달성했습니다.
 

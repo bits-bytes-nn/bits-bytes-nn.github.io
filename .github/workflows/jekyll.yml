@@ -9,6 +9,10 @@ on:
   # reached main and merely failed to deploy, leaving main red.
   pull_request:
     branches: [ "main" ]
+  # Daily, so the citation counts printed into the paper posts are at most a
+  # day old (script/fetch-citations.rb); the browser refreshes older ones.
+  schedule:
+    - cron: "41 20 * * *"  # 20:41 UTC, 05:41 KST
   workflow_dispatch:
 
 # Read-only by default. Only `deploy` gets the Pages and OIDC grants, so a PR
@@ -49,6 +53,10 @@ jobs:
         # Before the build: these plugins decide every page's description, order
         # and read time.
         run: bundle exec ruby test/run_all.rb
+      - name: Unit-test the search script
+        # js/search.js's matching and ranking, in node's own test runner: no
+        # packages to install. The runner image ships Node.
+        run: node --test 'test/js/*.test.js'
       - name: Lint the post sources
         # Front matter against _data/post_conventions.yml, plus table, math and
         # heading rules the built HTML no longer shows.
@@ -56,6 +64,20 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Fetch citation counts
+        # One batch request to Semantic Scholar, written to _data/citations.json
+        # for the build to print. When it fails, the counts the live site
+        # published last are kept; with neither, it warns and the site builds
+        # without counts, which the browser then asks for. Run on PRs too, so
+        # the gates below check the pages as they will be published. The API
+        # never fails the job: a refused SEMANTIC_SCHOLAR_API_KEY is an error
+        # (annotation and run summary) and a keyless retry, and its timeouts
+        # end it in about five minutes.
+        run: bundle exec ruby script/fetch-citations.rb
+        timeout-minutes: 8
+        env:
+          SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "$BASE_PATH" --strict-front-matter
         env:

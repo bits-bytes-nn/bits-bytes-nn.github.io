@@ -207,6 +207,7 @@
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
+  summary:focus-visible,
   [tabindex]:focus-visible { outline-color: $link; }
 
   // $medium-gray (#767676) is 4.17:1 here and 3.81:1 on $surface. The dark rules

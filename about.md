@@ -30,8 +30,6 @@ If something here sparks a thought, I'd love to hear it — reach out through an
 
 ## Privacy
 
-This site uses Google Analytics to count page views. It sets first-party
-cookies (`_ga`, `_ga_*`, up to two years) and sends Google the page address,
-the referring page, your browser type and an approximate location. Google
-signals and ad personalisation are off. To opt out, block those cookies or use
-[Google's opt-out add-on](https://tools.google.com/dlpage/gaoptout).
+This site uses Google Analytics, which sets cookies to count page views; block
+them or use [Google's opt-out add-on](https://tools.google.com/dlpage/gaoptout)
+to opt out.

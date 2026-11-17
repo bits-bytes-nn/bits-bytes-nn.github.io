@@ -6,9 +6,6 @@
 # Runs as a post-render hook (after kramdown produces HTML), so it covers both
 # Markdown ![](...) images and hand-written <img> tags. Tags that already set a
 # loading attribute are left untouched.
-#
-# This repo builds via GitHub Actions (not the github-pages gem sandbox), so
-# custom _plugins are allowed.
 module LazyImages
   # Negative lookahead on `loading=` so an explicit loading="eager" (used for an
   # above-the-fold image) survives.

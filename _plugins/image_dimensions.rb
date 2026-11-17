@@ -72,6 +72,19 @@ module ImageDimensions
   private_class_method :jpeg, :svg
 end
 
+# Liquid filter: {{ "/assets/images/x.jpg" | image_size }} → [width, height]
+# of that repo file, or nil. _includes/head.html declares the social image's
+# size with it, so a link preview can lay out before the image arrives.
+module ImageSizeFilter
+  def image_size(src)
+    site = @context.registers[:site]
+    path = ImageDimensions.source_file(src.to_s, site.source, "")
+    File.file?(path) ? ImageDimensions.read(File.binread(path)) : nil
+  end
+end
+
+Liquid::Template.register_filter(ImageSizeFilter) if defined?(Liquid::Template)
+
 # Guarded so test/ can require this file without Jekyll loaded.
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register [:posts, :pages], :post_render do |doc|

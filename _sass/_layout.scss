@@ -478,9 +478,18 @@ blockquote {
 	.theme-toggle {
 		margin: 0;
 		padding: 0;
-		// The icon alone is 15x20px; this is the 24px minimum target size.
+		// The icon alone is 15x20px; this is the 24px minimum target size, and a
+		// 44px touch target in the phone menu, beside items of about that height.
 		min-width: 24px;
 		min-height: 24px;
+		@media (max-width: $tablet - 1px) {
+			// The menu's items are right-aligned: the icon keeps that edge.
+			display: inline-flex;
+			align-items: center;
+			justify-content: flex-end;
+			min-width: 44px;
+			min-height: 44px;
+		}
 		font-size: 1.15em;
 		line-height: 1;
 		color: $medium-gray;

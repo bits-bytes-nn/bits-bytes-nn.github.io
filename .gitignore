@@ -40,8 +40,10 @@ _site
 .claude/
 .idea/
 .run/
-_posts_bak/
 
 # Editor and toolchain leftovers
 node_modules/
 .vscode/
+
+# Citation counts, fetched before each build (script/fetch-citations.rb)
+_data/citations.json

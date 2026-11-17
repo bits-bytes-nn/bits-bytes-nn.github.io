@@ -23,8 +23,8 @@ a plugin or a stylesheet, or debugs a build. Writing posts is in
 
 A static site: Markdown posts plus Liquid templates, built by Jekyll into plain
 HTML once per deploy and served as files by GitHub Pages. There is no server and
-no database. Everything dynamic (theme toggle, search, citation counts, image
-zoom) runs in the reader's browser.
+no database. Everything dynamic (theme toggle, search, image zoom, refreshing
+the citation counts the build printed) runs in the reader's browser.
 
 ## Stack
 
@@ -36,7 +36,7 @@ zoom) runs in the reader's browser.
 | Math | MathJax 3, loaded only on posts with `use_math: true` | about 1 MB the other pages never fetch |
 | Styles | Sass (`_sass/`) with vendored Bourbon and Neat | pinned to `jekyll-sass-converter` 2.x (libsass); 3.x rejects Bourbon/Neat's `/` division |
 | JavaScript | plain JS: `js/main.js` everywhere, `js/search.js` on `/search/`, `js/citations.js` on posts with a `paper_doi` | no framework; icons are inline SVG (`_includes/icon.html`), so no icon font |
-| Third-party scripts | GLightbox and MathJax (jsDelivr), simple-jekyll-search (unpkg), Google Fonts, Google Analytics | the three libraries are version-pinned with SRI hashes; Fonts and Analytics change per request and cannot be |
+| Third-party scripts | GLightbox and MathJax (jsDelivr), Google Fonts, Google Analytics | the two libraries are version-pinned with SRI hashes; Fonts and Analytics change per request and cannot be |
 | Hosting | GitHub Pages via GitHub Actions | see [operations.md](operations.md#ci-and-deploy) |
 
 ## Repository layout
@@ -50,12 +50,15 @@ _plugins/            build-time Ruby, one concern per file (see Plugins)
 _sass/               _layout, _post, _tags, _search, _syntax, _dark, base/;
                      bourbon/ and neat/ are vendored, not edited
 _data/               post_conventions.yml (the conventions, shared with
-                     scholar-lens), covers.yml (cover credits)
+                     scholar-lens), covers.yml (cover credits),
+                     citation_ids.yml (Semantic Scholar records); citations.json
+                     is fetched before the build, not in Git
 css/ js/             main.scss; main.js, search.js, citations.js
 assets/images/       covers (+ -960/-1280 JPEG and WebP copies), figures, diagrams
 feed.xml search.json the Atom feed and the search index, as Liquid pages
 script/              lint-posts.rb, validate-site.sh, check-plugin-output.rb,
-                     published-urls.txt, cover-variants.sh
+                     published-urls.txt, cover-variants.sh, fetch-citations.rb
+citations.json       the counts the build printed, published for the next build
 test/                minitest for _plugins/ and the lint
 docs/                these documents and their diagrams
 .github/             workflows (deploy, workflow lint, external links), Dependabot
@@ -72,11 +75,14 @@ excluded from the site.
 
 1. **Read.** Jekyll reads `_config.yml`, `_data/`, the pages and `_posts/`.
    Front matter decides each post's URL and its template variables.
-2. **`:post_read` hooks**, in file-name order: `legacy_urls.rb` adds each old
-   URL to `redirect_from`; `posted_date.rb` sets `posted_at` and
-   `last_modified_at` and re-sorts the posts; `translations.rb` marks the English
-   twin of a pair `hidden` and links each post of a pair to the other
-   (`page.translation`).
+2. **`:post_read` hooks**, in the order the files load (by name, except that
+   `related_posts.rb` requires `translations.rb`): `citations.rb` sets each
+   paper post's Semantic Scholar id and fetched count; `legacy_urls.rb` adds
+   each old URL to `redirect_from`; `posted_date.rb` sets `posted_at` and
+   `last_modified_at` and re-sorts the posts; `translations.rb` marks the
+   English twin of a pair `hidden` and links each post of a pair to the other
+   (`page.translation`). None reads what another sets; a hook that must would
+   need the order made explicit.
 3. **Generators**: pagination, the sitemap and the redirect stubs
    (`_layouts/redirect.html`).
 4. **`:pre_render` hooks**: `post_description.rb` fills in each post's
@@ -101,6 +107,7 @@ and safe to delete.
 |---|---|---|
 | `posted_date.rb` | `:post_read`, and a `Document#<=>` override | `posted_at` = the file-name day when later than `date:`, else `date:`. Posts compare by it, so `site.posts`, `site.tags`, `site.categories`, pagination and everything iterating them are in posting order. Sets `last_modified_at` to a later file-name day |
 | `legacy_urls.rb` | `:post_read` | adds the pre-2026-10-11 URL (`/paper%20reviews/…`) of each older post to `redirect_from` |
+| `citations.rb` | `:post_read` | sets `citation_id` (the Semantic Scholar id) on each post with a `paper_doi`, and `citation` from `_data/citations.json`; fails the build on a bad `_data/citation_ids.yml` entry (see [Citation counts](#search)) |
 | `translations.rb` | `:post_read`, `listed` filter | sets `page.translation` (the other post of a pair, for the language switcher and `hreflang`) and hides the twin from every listing; `listed` drops hidden posts |
 | `post_description.rb` | `:pre_render`, filter | derives `description` from the first prose paragraph |
 | `related_posts.rb` | `:pre_render` | ranks related posts by shared tags (weights at the top of the file) and sets the previous/next post in posting order, same language, never the twin |
@@ -187,36 +194,60 @@ since the repo has none, a `robots.txt` naming it.
 There is no server, so search runs in the browser over an index built with the
 site.
 
-- **`search.json`** lists every post as `{title, url, date, lang, category,
-  tags, content}`, where `content` is the whole post as plain text. simple-jekyll-search
-  matches substrings without stemming, so a word missing from the index can never
-  be found; indexing whole posts is what makes Korean recall work. The cost is
-  size, linear in the number of posts (several MB, about a third of that
-  gzipped; `curl -so /dev/null -w '%{size_download}' <site>/search.json`).
+- **`search.json`** lists every post as `{title, url, date, lang, translation,
+  category, tags, content}`, where `content` is the whole post as plain text.
+  Matching is substring matching without stemming, so a word missing from the
+  index can never be found; indexing whole posts is what makes Korean recall
+  work. The cost is size, linear in the number of posts (several MB, about a
+  third of that gzipped; `curl -so /dev/null -w '%{size_download}' <site>/search.json`).
 - **`plain_text`** (`_plugins/search_index.rb`) strips tags *before* decoding
   entities (the other order turns an escaped `&lt;script&gt;` into a tag), puts a
   space at block boundaries so `<p>끝</p><p>시작</p>` stays two words, and strips
   math delimiters but keeps the TeX.
-- **`js/search.js`** fetches the index the first time the visitor focuses or
-  types in the box, not with the page, and runs any query typed while it
-  downloads. It shows "Loading the search index…", and "Search could not load"
-  on failure. It keeps the query in the address bar (`?q=`), so a search can be
-  linked, and runs it on load. It excludes the `url` and `lang` fields from
-  matching, marks each result's title and excerpt with its post's `lang`, cuts each excerpt around the match (choosing the window
-  that holds the most distinct query words, snapping to a space within 12
-  characters), escapes everything it returns, and adds only `<mark>`s.
-- Results stop at 10. The library stops scanning there, so the count says
-  "Showing the first 10" rather than guessing a total.
+- **`js/search.js`** does the matching and ranking itself (no library). It
+  fetches the index the first time the visitor focuses or types in the box, not
+  with the page, and runs any query typed while it downloads. It shows "Loading
+  the search index…", and "Search could not load" on failure. It keeps the query
+  in the address bar (`?q=`), so a search can be linked, and runs it on load.
+- A post matches when every query word is in its title, tags, category or body
+  (not its date).
+  Matches rank by where the words are (`WEIGHTS`: title, then tags, category,
+  body, with a little for how often the body has them), then newest first. A
+  translation pair counts once (`translation`): the post in the site's language
+  when both match, at the better score. The results follow every keystroke,
+  a Korean syllable still being composed included; the status is spoken
+  (`aria-live`) only once the syllable is done. A query is kept in `?q=` even
+  when a result is clicked straight after typing. The status gives the real total;
+  10 results show, and "Show 10 more" adds the next ones and moves focus to the
+  first of them.
+- Each result's title and excerpt carry its post's `lang`; the excerpt is cut
+  around the match (choosing the window that holds the most distinct query
+  words, snapping to a space within 12 characters). Everything is escaped, and
+  the only tags added are `<mark>`s.
 - `_config.yml` cannot configure the search: it is browser JavaScript. Change
   `search.json` or `js/search.js`.
 
-**Citation counts** on posts with a `paper_doi` come from Semantic Scholar in
-the browser (`js/citations.js`), looked up as `arXiv:<id>` for an arXiv DOI and
-`DOI:<doi>` otherwise, and cached a day in `localStorage`. A failed request
-shows the last count it got, or hides the field. A zero hides it too: Semantic
-Scholar returns 0 for a paper's duplicate records. OpenAlex was not used because
-it counts the preprint and the published version separately, well under the
-real total.
+**Citation counts** on posts with a `paper_doi` come from Semantic Scholar.
+Before each build, `script/fetch-citations.rb` asks for every paper in one
+batch request and writes `_data/citations.json` (not in Git); the build prints
+each count on its post (`_plugins/citations.rb`), and CI runs once a day so the
+counts stay about a day old. The count is in the HTML, so it shows without
+JavaScript. `js/citations.js` shows that count and asks
+Semantic Scholar itself only when the newest count it has, the build's or its
+`localStorage` one, is a day old (the build's gets six more hours, for a
+late daily run). The keyless API answers 429 often, to a batch too, so the
+script retries with backoff. A failed fetch
+keeps the counts the live site published last (`/citations.json`) when it can
+read them; with none, it warns and builds without them.
+A failed browser request keeps the count shown, or hides the field. A zero hides it too: Semantic Scholar returns 0 for a paper's
+duplicate records.
+
+A paper is looked up as `arXiv:<id>` for an arXiv DOI and `DOI:<doi>` otherwise,
+unless `_data/citation_ids.yml` names its record (paperId): for a paper missing
+under its arXiv ID, or one that leads to a duplicate. It is keyed by
+`paper_doi`, so a regenerated post keeps it. `SEMANTIC_SCHOLAR_API_KEY`, a
+repository secret, is sent when set. OpenAlex was not used because it counts
+the preprint and the published version separately, well under the real total.
 
 ## Styles
 
@@ -259,8 +290,8 @@ kramdown's only math delimiter is `$$`. It passes the contents through untouched
 as `\(…\)` (inline) or `\[…\]` (display), and MathJax, configured in `head.html`,
 renders them in the browser. Single `$` is not math to kramdown, so Markdown
 emphasis runs over it first (the rules are in
-[writing.md](writing.md#math)). MathJax is configured to ignore `$` as a
-delimiter too, so two prices on a line (`$1.2B … $250M`) do not become a
+[writing.md](writing.md#math)). MathJax reads only `\(…\)` and `\[…\]`, not
+`$` or `$$`, so two prices on a line (`$1.2B … $250M`) do not become a
 formula, and `processEscapes` lets `\$` print a dollar inside math.
 
 `head.html` defines the extra macros (`\llbracket`, `\rrbracket`, `\textsc`);
@@ -271,7 +302,9 @@ checks.
 
 Five layers, each catching what the others cannot:
 
-1. **Unit tests** (`test/`): plugin functions and the lint, without a site.
+1. **Unit tests** (`test/`): plugin functions and the lint, without a site;
+   `test/js/` tests the search script's matching and ranking in node
+   (`node --test 'test/js/*.test.js'`, no packages).
 2. **Source lint** (`script/lint-posts.rb`): front matter against
    `_data/post_conventions.yml`, plus Markdown defects the built HTML no longer
    shows (broken tables, unsafe math, text read as Liquid or HTML, bad fences).
@@ -308,14 +341,18 @@ build.
 
 ## Known limits
 
-- **No relevance ranking in search.** The library scans `site.posts` in order and
-  stops at the limit, so results are newest first, and a title match can rank
-  below a passing mention. Fixing it means owning matching and ranking, at which
-  point the library should go.
+- **Search ranking is by field, not relevance.** A title hit outranks a body
+  hit, but there is no term weighting (a word every post has counts like a rare
+  one) and no phrase matching.
 - **Korean compound words** split by spaces match only as written: substring
   matching has no morphology. A real fix is a different search engine.
 - **The index grows with every post.** It loads only when search is used; split
   it or move search server-side if it outgrows that.
+- **Citation counts age when the daily run stops.** GitHub turns off a
+  scheduled workflow after 60 days with no repository activity; the counts in
+  the pages then age, and readers' browsers ask Semantic Scholar once a day.
+  Re-enable it under Actions. A paper Semantic Scholar's API does not have
+  (Gemini 1.0, `arXiv:2312.11805`, today) shows no count.
 - **Excerpts can show TeX** (`\theta`) when the match falls inside math.
 - **Long posts stay slow in mobile lab tests.** Lighthouse's throttled phone
   puts LCP at 5–6 s on the longest posts (DeepSeek-V3, the Strands guide) even
